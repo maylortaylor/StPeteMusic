@@ -1,0 +1,487 @@
+{
+  "name": "StPeteMusic Post Manager",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-chat",
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.manualChatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -368,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "https://docs.google.com/spreadsheets/d/1kzzR8zPxxNmNmp7hXFwzWMoVZh7ZLC9GZBnob1UNYo8/edit?usp=sharing"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "IG_PastPosts"
+        },
+        "options": {}
+      },
+      "id": "read-past-posts",
+      "name": "Read Past Posts",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -144,
+        0
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8E2u1vvFWEDkldjj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "aggregate-posts",
+      "name": "Aggregate Posts",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        80,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Chat Trigger').item.json.chatInput }}\n\n---\nCONTEXT - Past Instagram Posts for Style Reference:\n{{ JSON.stringify($('Aggregate Posts').item.json.data, null, 2) }}",
+        "options": {
+          "systemMessage": "You are the Social Media Content Manager for @StPeteMusic, a community organization showcasing bands in the greater St. Petersburg, FL and Tampa Bay area.\n\n## BRAND IDENTITY\n- **Primary Brand:** @StPeteMusic — Music promoter brand for booking, marketing, and managing live shows\n- **Partner Venue:** Suite E Studios — Community space in the Historic Warehouse Arts District, St. Pete FL\n- **Tone:** Enthusiastic, authentic, community-oriented, welcoming. Slightly informal but professional. Passionate about arts, culture, and music.\n\n## KEY LINKS\n- Instagram: https://www.instagram.com/StPeteMusic\n- Facebook: https://www.facebook.com/StPeteFLMusic\n- YouTube: https://youtube.com/@StPeteMusic\n- EventBrite (#FinalFriday): https://final-friday.eventbrite.com/\n- Suite E Studios: https://linktr.ee/suite_e_studios\n\n## ANCHOR EVENTS\n\n### Final Friday (Monthly)\n- Last Friday of each month\n- Doors: 7pm | Band 1: 8-9pm | Band 2: 9-10:20pm | Band 3: 10:45pm-midnight\n- Hashtags: #FinalFriday #StPeteMusic\n- Always tag performing bands by Instagram handle\n\n### Instant Noodles (Monthly)\n- Last Wednesday of each month\n- Doors: 6pm | Community jam: 7-10pm\n- Community jam session (not open mic) — building the band from the ground up\n- Hashtags: #InstantNoodles #FinalWednesday #StPeteMusic\n\n### Second Saturday Art Walk\n- Warehouse Arts District community activation\n- Focus on artists and in-studio activities\n\n## CONTENT GUIDELINES\n\n### Keywords to Use\nCommunity, arts, culture, music, local, St. Pete, St Pete Music, Warehouse Arts District, vibrant, unique, connect, experience, discover, live music, collaboration, creativity\n\n### Event Promotion Format (REQUIRED for all event posts)\nALWAYS include:\n1. Who / What / When / Why It Matters\n2. Clear CTAs (call to action)\n3. Date, time, cost, what to expect\n4. Cross-branding tags: @suite.e.studios @stpetemusic #StPeteMusic\n5. Tag all performing artists/bands\n\n### EMOJI USAGE FOR EVENT POSTS\nUse emojis at the START of lines and next to key info:\n- 🎸 or 🎤 for band/artist names\n- 📅 for dates\n- ⏰ or 🕖 for times\n- 📍 for location\n- 🎟️ for tickets/cost\n- 🚪 for doors open time\n- 🔥 for featured/headliner acts\n- ✨ for special announcements\n- 🎶 for music-related content\n- 🍜 for Instant Noodles events\n\n## YOUR CAPABILITIES\n\n1. **Analyze Past Posts:** You have access to the IG_PastPosts data. Study the tone, format, hashtag usage, and style of these past posts to maintain consistency.\n\n2. **Create New Posts:** Generate Instagram captions that match the established style. For events, always use the emoji format and include all required information.\n\n3. **Manage PostSchedule:** You can add new posts to the schedule, edit existing ones, and help organize the content calendar.\n\n4. **Style Consistency:** Every post should feel like it could have been written by the same person who wrote the past posts. Match the energy, vocabulary, and formatting.\n\n## TOOLS AVAILABLE\n- Use the Google Sheets tools to read the PostSchedule and add/update posts\n- When adding a new post, include columns for: PostDate, PostTime, Platform, Caption, Hashtags, Status, Notes\n\nWhen the user asks you to create posts, analyze the past posts first to match the style, then create content that feels authentic to the @StPeteMusic brand."
+        }
+      },
+      "id": "ai-agent",
+      "name": "Post Manager Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        304,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Read the current post schedule from the PostSchedule tab. Use this to see what posts are already scheduled and their status.",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "https://docs.google.com/spreadsheets/d/1kzzR8zPxxNmNmp7hXFwzWMoVZh7ZLC9GZBnob1UNYo8/edit?usp=sharing"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "PostSchedule"
+        },
+        "options": {}
+      },
+      "id": "sheets-tool-read",
+      "name": "Read Schedule Tool",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        496,
+        224
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8E2u1vvFWEDkldjj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Add a new post to the PostSchedule sheet. You MUST call this tool to add posts. Required fields: PostDate (YYYY-MM-DD), DayOfWeek, PostTime (HH:MM), Platform, Caption (the full post text), Hashtags, Status (Draft/Scheduled/Posted). Optional: EventType, MediaType, TagsMentions, Notes.",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "https://docs.google.com/spreadsheets/d/1kzzR8zPxxNmNmp7hXFwzWMoVZh7ZLC9GZBnob1UNYo8/edit?usp=sharing"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "PostSchedule"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post Date": "={{ $fromAI('PostDate', 'The date for the post in YYYY-MM-DD format') }}",
+            "Day of Week": "={{ $fromAI('DayOfWeek', 'The day of the week, e.g. Monday, Tuesday') }}",
+            "Post Time": "={{ $fromAI('PostTime', 'The time for the post in HH:MM format') }}",
+            "Event Type": "={{ $fromAI('EventType', 'Type of event: Final Friday, Instant Noodles, Art Walk, General, etc') }}",
+            "Platform": "={{ $fromAI('Platform', 'The platform: Instagram, Facebook, etc') }}",
+            "Caption / Post Text": "={{ $fromAI('Caption', 'The full post text/caption') }}",
+            "Media Type": "={{ $fromAI('MediaType', 'Type of media: Image, Video, Carousel, Reel, etc') }}",
+            "Tags / Mentions": "={{ $fromAI('TagsMentions', 'Instagram handles to tag, e.g. @stpetemusic @suite.e.studios') }}",
+            "Hashtags": "={{ $fromAI('Hashtags', 'Hashtags for the post, e.g. #StPeteMusic #FinalFriday') }}",
+            "Status": "={{ $fromAI('Status', 'Post status: Draft, Scheduled, or Posted') }}",
+            "Notes": "={{ $fromAI('Notes', 'Any additional context or notes') }}"
+          },
+          "schema": [
+            {
+              "id": "Post Date",
+              "displayName": "Post Date",
+              "type": "string"
+            },
+            {
+              "id": "Day of Week",
+              "displayName": "Day of Week",
+              "type": "string"
+            },
+            {
+              "id": "Post Time",
+              "displayName": "Post Time",
+              "type": "string"
+            },
+            {
+              "id": "Event Type",
+              "displayName": "Event Type",
+              "type": "string"
+            },
+            {
+              "id": "Platform",
+              "displayName": "Platform",
+              "type": "string"
+            },
+            {
+              "id": "Caption / Post Text",
+              "displayName": "Caption / Post Text",
+              "type": "string"
+            },
+            {
+              "id": "Media Type",
+              "displayName": "Media Type",
+              "type": "string"
+            },
+            {
+              "id": "Tags / Mentions",
+              "displayName": "Tags / Mentions",
+              "type": "string"
+            },
+            {
+              "id": "Hashtags",
+              "displayName": "Hashtags",
+              "type": "string"
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "type": "string"
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "sheets-tool-append",
+      "name": "Add Post Tool",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        640,
+        224
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8E2u1vvFWEDkldjj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Update an existing post in the PostSchedule sheet. REQUIRED: row_number (use Read Schedule Tool first to get it). Provide row_number plus any fields to change: PostDate, DayOfWeek, PostTime, Platform, Caption, Hashtags, Status, EventType, MediaType, TagsMentions, Notes.",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "https://docs.google.com/spreadsheets/d/1kzzR8zPxxNmNmp7hXFwzWMoVZh7ZLC9GZBnob1UNYo8/edit?usp=sharing"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "PostSchedule"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $fromAI('row_number', 'The row number of the post to update - REQUIRED') }}",
+            "Post Date": "={{ $fromAI('PostDate', 'The date for the post in YYYY-MM-DD format') }}",
+            "Day of Week": "={{ $fromAI('DayOfWeek', 'The day of the week, e.g. Monday, Tuesday') }}",
+            "Post Time": "={{ $fromAI('PostTime', 'The time for the post in HH:MM format') }}",
+            "Event Type": "={{ $fromAI('EventType', 'Type of event: Final Friday, Instant Noodles, Art Walk, General, etc') }}",
+            "Platform": "={{ $fromAI('Platform', 'The platform: Instagram, Facebook, etc') }}",
+            "Caption / Post Text": "={{ $fromAI('Caption', 'The full post text/caption') }}",
+            "Media Type": "={{ $fromAI('MediaType', 'Type of media: Image, Video, Carousel, Reel, etc') }}",
+            "Tags / Mentions": "={{ $fromAI('TagsMentions', 'Instagram handles to tag, e.g. @stpetemusic @suite.e.studios') }}",
+            "Hashtags": "={{ $fromAI('Hashtags', 'Hashtags for the post, e.g. #StPeteMusic #FinalFriday') }}",
+            "Status": "={{ $fromAI('Status', 'Post status: Draft, Scheduled, or Posted') }}",
+            "Notes": "={{ $fromAI('Notes', 'Any additional context or notes') }}"
+          },
+          "schema": [
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "type": "number",
+              "defaultMatch": true
+            },
+            {
+              "id": "Post Date",
+              "displayName": "Post Date",
+              "type": "string"
+            },
+            {
+              "id": "Day of Week",
+              "displayName": "Day of Week",
+              "type": "string"
+            },
+            {
+              "id": "Post Time",
+              "displayName": "Post Time",
+              "type": "string"
+            },
+            {
+              "id": "Event Type",
+              "displayName": "Event Type",
+              "type": "string"
+            },
+            {
+              "id": "Platform",
+              "displayName": "Platform",
+              "type": "string"
+            },
+            {
+              "id": "Caption / Post Text",
+              "displayName": "Caption / Post Text",
+              "type": "string"
+            },
+            {
+              "id": "Media Type",
+              "displayName": "Media Type",
+              "type": "string"
+            },
+            {
+              "id": "Tags / Mentions",
+              "displayName": "Tags / Mentions",
+              "type": "string"
+            },
+            {
+              "id": "Hashtags",
+              "displayName": "Hashtags",
+              "type": "string"
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "type": "string"
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "type": "string"
+            }
+          ],
+          "matchingColumns": [
+            "row_number"
+          ]
+        },
+        "options": {}
+      },
+      "id": "sheets-tool-update",
+      "name": "Update Post Tool",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        768,
+        224
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8E2u1vvFWEDkldjj",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "think-tool",
+      "name": "Think",
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1,
+      "position": [
+        928,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $workflow.id }}",
+        "contextWindowLength": 1000
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        272
+      ],
+      "id": "5ae72ae3-5dc9-404b-9ad8-8b55ab6356aa",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        0,
+        240
+      ],
+      "id": "4d7ec594-7400-4a2e-86cf-22035ca52519",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "RvrzPfcivG8oboah",
+          "name": "Ollama account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Past Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Past Posts": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Posts": {
+      "main": [
+        [
+          {
+            "node": "Post Manager Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Schedule Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Post Manager Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Post Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Post Manager Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Post Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Post Manager Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "Post Manager Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Post Manager Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Post Manager Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "1ce83ed2-1eae-4abb-ab76-c1477186e0cb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "da7750eb66821341a4098e6079afb93a6beab41e93efcc04b21179a2a3342cfc"
+  },
+  "id": "3uN3vWr1YOuzVfpr",
+  "tags": []
+}
