@@ -27,4 +27,4 @@ node_modules/
 *.key
 
 # Large data files that can be regenerated
-data/stpetemusic-instagram-data/
+data/archive/
