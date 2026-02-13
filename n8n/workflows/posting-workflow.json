@@ -1,0 +1,75 @@
+{
+  "name": "Postng Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "post-schedule",
+        "responseMode": "lastNode"
+      },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "calendarId": "primary",
+        "summary": "={{$json['Platform'] + ' – ' + $json['Title']}}",
+        "description": "Description: {{$json['Description']}}\nHashtags: {{$json['Hashtags']}}\nUsernames: {{$json['@Usernames']}}\nGoogle Sheet Link: https://docs.google.com/spreadsheets/d/1123975168/edit#gid=1123975168",
+        "start": "={{$json['Post Date'] + 'T' + $json['Post Time']}}",
+        "end": "={{$json['Post Date'] + 'T' + $json['Post Time']}}",
+        "colorId": "={{$json['Platform']==='Facebook'?'9':$json['Platform']==='Instagram'?'11':'10'}}"
+      },
+      "name": "Create Google Calendar Event",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://graph.facebook.com/v16.0/{{$json['Instagram_Page_ID']}}/media",
+        "bodyParametersUi": {
+          "parameter": [
+            {"name": "image_url", "value": "={{$json['FFMPEG_OUTPUT_NAME']}}"},
+            {"name": "caption", "value": "={{$json['Description'] + ' ' + $json['Hashtags']}}"}
+          ]
+        },
+        "options": {}
+      },
+      "name": "Instagram API Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [750, 300]
+    },
+    {
+      "parameters": {
+        "sheetId": "1123975168",
+        "range": "Sheet1",
+        "valueInputMode": "USER_ENTERED",
+        "columns": ["Calendar Link","Post Link","Status"],
+        "values": [
+          [
+            "={{$json['htmlLink']}}",
+            "={{$json['id']}}",
+            "Scheduled"
+          ]
+        ],
+        "rowIndex": "={{$json['RowID']}}"
+      },
+      "name": "Update Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [1000, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": { "main": [[{"node": "Create Google Calendar Event","type":"main","index":0}]] },
+    "Create Google Calendar Event": { "main": [[{"node": "Instagram API Post","type":"main","index":0}]] },
+    "Instagram API Post": { "main": [[{"node": "Update Google Sheet","type":"main","index":0}]] }
+  },
+  "active": true,
+  "settings": {},
+  "id": "calendar_fb_ig_posting"
+}

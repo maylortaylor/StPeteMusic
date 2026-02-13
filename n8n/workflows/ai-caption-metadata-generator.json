@@ -1,0 +1,69 @@
+{
+  "name": "AI Caption & Metadata Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ai-generate",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// AI Agent Enhancement Logic\nconst description = $json['Description'] || '';\nconst platform = $json['Platform'] || 'Instagram';\nconst manualPost = $json['Status'] === 'Draft';\nconst enhancedDescription = description + ' #GeneratedByAI';\nconst hashtags = '#music #live #event';\nconst usernames = '@stpetemusic';\nconst status = manualPost ? 'AI Enhanced' : 'AI Generated';\nreturn [{json:{Description: enhancedDescription, Hashtags: hashtags, Usernames: usernames, Status: status, RowID: $json['RowID']}}];"
+      },
+      "name": "AI Caption Generator",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "sheetId": "1123975168",
+        "range": "Sheet1",
+        "valueInputMode": "USER_ENTERED",
+        "columns": [
+          "Description",
+          "Hashtags",
+          "@Usernames",
+          "Status"
+        ],
+        "values": [
+          [
+            "={{$json['Description']}}",
+            "={{$json['Hashtags']}}",
+            "={{$json['Usernames']}}",
+            "={{$json['Status']}}"
+          ]
+        ],
+        "rowIndex": "={{$json['RowID']}}"
+      },
+      "name": "Update Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [750, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Optional: Apply background formatting\nreturn [{ json: { RowID: $json['RowID'], BackgroundColor: $json['Status']==='AI Generated'?'#A9A9A9':'#D3D3D3' } }];"
+      },
+      "name": "Apply Row Formatting",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [950, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": { "main": [[{"node": "AI Caption Generator","type": "main","index": 0}]] },
+    "AI Caption Generator": { "main": [[{"node": "Update Google Sheet","type": "main","index": 0}]] },
+    "Update Google Sheet": { "main": [[{"node": "Apply Row Formatting","type": "main","index": 0}]] }
+  },
+  "active": true,
+  "settings": {},
+  "id": "ai_caption_001"
+}

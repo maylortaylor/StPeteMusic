@@ -3,13 +3,13 @@
   "nodes": [
     {
       "parameters": {},
-      "id": "trigger-chat",
+      "id": "8a7730be-e427-4385-af14-2851d6c8188a",
       "name": "Chat Trigger",
       "type": "@n8n/n8n-nodes-langchain.manualChatTrigger",
       "typeVersion": 1.1,
       "position": [
-        -368,
-        0
+        144,
+        384
       ]
     },
     {
@@ -26,13 +26,13 @@
         },
         "options": {}
       },
-      "id": "read-past-posts",
+      "id": "85289f64-fc34-4b9d-a41a-c1fa7c17e52f",
       "name": "Read Past Posts",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        -144,
-        0
+        368,
+        384
       ],
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -46,13 +46,13 @@
         "aggregate": "aggregateAllItemData",
         "options": {}
       },
-      "id": "aggregate-posts",
+      "id": "ef6c5d8b-c20e-420a-a0b4-b7d77ac36d51",
       "name": "Aggregate Posts",
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        80,
-        0
+        592,
+        384
       ]
     },
     {
@@ -63,13 +63,13 @@
           "systemMessage": "You are the Social Media Content Manager for @StPeteMusic, a community organization showcasing bands in the greater St. Petersburg, FL and Tampa Bay area.\n\n## BRAND IDENTITY\n- **Primary Brand:** @StPeteMusic — Music promoter brand for booking, marketing, and managing live shows\n- **Partner Venue:** Suite E Studios — Community space in the Historic Warehouse Arts District, St. Pete FL\n- **Tone:** Enthusiastic, authentic, community-oriented, welcoming. Slightly informal but professional. Passionate about arts, culture, and music.\n\n## KEY LINKS\n- Instagram: https://www.instagram.com/StPeteMusic\n- Facebook: https://www.facebook.com/StPeteFLMusic\n- YouTube: https://youtube.com/@StPeteMusic\n- EventBrite (#FinalFriday): https://final-friday.eventbrite.com/\n- Suite E Studios: https://linktr.ee/suite_e_studios\n\n## ANCHOR EVENTS\n\n### Final Friday (Monthly)\n- Last Friday of each month\n- Doors: 7pm | Band 1: 8-9pm | Band 2: 9-10:20pm | Band 3: 10:45pm-midnight\n- Hashtags: #FinalFriday #StPeteMusic\n- Always tag performing bands by Instagram handle\n\n### Instant Noodles (Monthly)\n- Last Wednesday of each month\n- Doors: 6pm | Community jam: 7-10pm\n- Community jam session (not open mic) — building the band from the ground up\n- Hashtags: #InstantNoodles #FinalWednesday #StPeteMusic\n\n### Second Saturday Art Walk\n- Warehouse Arts District community activation\n- Focus on artists and in-studio activities\n\n## CONTENT GUIDELINES\n\n### Keywords to Use\nCommunity, arts, culture, music, local, St. Pete, St Pete Music, Warehouse Arts District, vibrant, unique, connect, experience, discover, live music, collaboration, creativity\n\n### Event Promotion Format (REQUIRED for all event posts)\nALWAYS include:\n1. Who / What / When / Why It Matters\n2. Clear CTAs (call to action)\n3. Date, time, cost, what to expect\n4. Cross-branding tags: @suite.e.studios @stpetemusic #StPeteMusic\n5. Tag all performing artists/bands\n\n### EMOJI USAGE FOR EVENT POSTS\nUse emojis at the START of lines and next to key info:\n- 🎸 or 🎤 for band/artist names\n- 📅 for dates\n- ⏰ or 🕖 for times\n- 📍 for location\n- 🎟️ for tickets/cost\n- 🚪 for doors open time\n- 🔥 for featured/headliner acts\n- ✨ for special announcements\n- 🎶 for music-related content\n- 🍜 for Instant Noodles events\n\n## YOUR CAPABILITIES\n\n1. **Analyze Past Posts:** You have access to the IG_PastPosts data. Study the tone, format, hashtag usage, and style of these past posts to maintain consistency.\n\n2. **Create New Posts:** Generate Instagram captions that match the established style. For events, always use the emoji format and include all required information.\n\n3. **Manage PostSchedule:** You can add new posts to the schedule, edit existing ones, and help organize the content calendar.\n\n4. **Style Consistency:** Every post should feel like it could have been written by the same person who wrote the past posts. Match the energy, vocabulary, and formatting.\n\n## TOOLS AVAILABLE\n- Use the Google Sheets tools to read the PostSchedule and add/update posts\n- When adding a new post, include columns for: PostDate, PostTime, Platform, Caption, Hashtags, Status, Notes\n\nWhen the user asks you to create posts, analyze the past posts first to match the style, then create content that feels authentic to the @StPeteMusic brand."
         }
       },
-      "id": "ai-agent",
+      "id": "c9353c53-74b4-4e5f-97ab-c6db1d5bb20a",
       "name": "Post Manager Agent",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        304,
-        0
+        816,
+        384
       ]
     },
     {
@@ -88,13 +88,13 @@
         },
         "options": {}
       },
-      "id": "sheets-tool-read",
+      "id": "16318ce8-eed8-449a-b631-0e22ca84dedd",
       "name": "Read Schedule Tool",
       "type": "n8n-nodes-base.googleSheetsTool",
       "typeVersion": 4.7,
       "position": [
-        496,
-        224
+        1008,
+        608
       ],
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -133,73 +133,270 @@
             "Status": "={{ $fromAI('Status', 'Post status: Draft, Scheduled, or Posted') }}",
             "Notes": "={{ $fromAI('Notes', 'Any additional context or notes') }}"
           },
+          "matchingColumns": [],
           "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
             {
               "id": "Post Date",
               "displayName": "Post Date",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
             },
             {
               "id": "Day of Week",
               "displayName": "Day of Week",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
             },
             {
               "id": "Post Time",
               "displayName": "Post Time",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Week #",
+              "displayName": "Week #",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
               "id": "Event Type",
               "displayName": "Event Type",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
             },
             {
               "id": "Platform",
               "displayName": "Platform",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
             },
             {
               "id": "Caption / Post Text",
               "displayName": "Caption / Post Text",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
             },
             {
               "id": "Media Type",
               "displayName": "Media Type",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Media Link",
+              "displayName": "Media Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
               "id": "Tags / Mentions",
               "displayName": "Tags / Mentions",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
             },
             {
               "id": "Hashtags",
               "displayName": "Hashtags",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
             },
             {
               "id": "Status",
               "displayName": "Status",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Buffer Link",
+              "displayName": "Buffer Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
               "id": "Notes",
               "displayName": "Notes",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Column 16",
+              "displayName": "Column 16",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 17",
+              "displayName": "Column 17",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 18",
+              "displayName": "Column 18",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 19",
+              "displayName": "Column 19",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 20",
+              "displayName": "Column 20",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 21",
+              "displayName": "Column 21",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 22",
+              "displayName": "Column 22",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 23",
+              "displayName": "Column 23",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 24",
+              "displayName": "Column 24",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 25",
+              "displayName": "Column 25",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 26",
+              "displayName": "Column 26",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
             }
-          ]
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
         },
         "options": {}
       },
-      "id": "sheets-tool-append",
+      "id": "1e5c53ba-6f2b-4eaf-8a4d-326e644ba071",
       "name": "Add Post Tool",
       "type": "n8n-nodes-base.googleSheetsTool",
       "typeVersion": 4.7,
       "position": [
-        640,
-        224
+        1152,
+        608
       ],
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -239,82 +436,282 @@
             "Status": "={{ $fromAI('Status', 'Post status: Draft, Scheduled, or Posted') }}",
             "Notes": "={{ $fromAI('Notes', 'Any additional context or notes') }}"
           },
+          "matchingColumns": [
+            "row_number"
+          ],
           "schema": [
             {
-              "id": "row_number",
-              "displayName": "row_number",
-              "type": "number",
-              "defaultMatch": true
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
               "id": "Post Date",
               "displayName": "Post Date",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
             },
             {
               "id": "Day of Week",
               "displayName": "Day of Week",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
             },
             {
               "id": "Post Time",
               "displayName": "Post Time",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Week #",
+              "displayName": "Week #",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
               "id": "Event Type",
               "displayName": "Event Type",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
             },
             {
               "id": "Platform",
               "displayName": "Platform",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
             },
             {
               "id": "Caption / Post Text",
               "displayName": "Caption / Post Text",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
             },
             {
               "id": "Media Type",
               "displayName": "Media Type",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Media Link",
+              "displayName": "Media Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
               "id": "Tags / Mentions",
               "displayName": "Tags / Mentions",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
             },
             {
               "id": "Hashtags",
               "displayName": "Hashtags",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
             },
             {
               "id": "Status",
               "displayName": "Status",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Buffer Link",
+              "displayName": "Buffer Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
             },
             {
               "id": "Notes",
               "displayName": "Notes",
-              "type": "string"
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Column 16",
+              "displayName": "Column 16",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 17",
+              "displayName": "Column 17",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 18",
+              "displayName": "Column 18",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 19",
+              "displayName": "Column 19",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 20",
+              "displayName": "Column 20",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 21",
+              "displayName": "Column 21",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 22",
+              "displayName": "Column 22",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 23",
+              "displayName": "Column 23",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 24",
+              "displayName": "Column 24",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 25",
+              "displayName": "Column 25",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Column 26",
+              "displayName": "Column 26",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true
             }
           ],
-          "matchingColumns": [
-            "row_number"
-          ]
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
         },
         "options": {}
       },
-      "id": "sheets-tool-update",
+      "id": "126ed473-0fa2-4d07-a105-282ae54cf7de",
       "name": "Update Post Tool",
       "type": "n8n-nodes-base.googleSheetsTool",
       "typeVersion": 4.7,
       "position": [
-        768,
-        224
+        1280,
+        608
       ],
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -325,13 +722,13 @@
     },
     {
       "parameters": {},
-      "id": "think-tool",
+      "id": "5876c4da-38d7-4541-b7e1-283c514966a4",
       "name": "Think",
       "type": "@n8n/n8n-nodes-langchain.toolThink",
       "typeVersion": 1,
       "position": [
-        928,
-        224
+        1440,
+        608
       ]
     },
     {
@@ -343,28 +740,29 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        256,
-        272
+        800,
+        624
       ],
-      "id": "5ae72ae3-5dc9-404b-9ad8-8b55ab6356aa",
+      "id": "0ca9a774-bc3e-4d27-bc19-19e9f09d48b7",
       "name": "Simple Memory"
     },
     {
       "parameters": {
+        "modelName": "models/gemini-2.0-flash",
         "options": {}
       },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        0,
-        240
+        592,
+        624
       ],
-      "id": "4d7ec594-7400-4a2e-86cf-22035ca52519",
-      "name": "Ollama Chat Model",
+      "id": "69ef92df-82e9-46c9-be14-f286aa1fd2b3",
+      "name": "Google Gemini Chat Model",
       "credentials": {
-        "ollamaApi": {
-          "id": "RvrzPfcivG8oboah",
-          "name": "Ollama account"
+        "googlePalmApi": {
+          "id": "GuuPppCRFzmY792V",
+          "name": "Google Gemini(PaLM) Api account"
         }
       }
     }
@@ -459,7 +857,7 @@
         ]
       ]
     },
-    "Ollama Chat Model": {
+    "Google Gemini Chat Model": {
       "ai_languageModel": [
         [
           {
@@ -477,7 +875,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "1ce83ed2-1eae-4abb-ab76-c1477186e0cb",
+  "versionId": "20023429-0d77-4baf-a015-bbb8396e57d6",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "da7750eb66821341a4098e6079afb93a6beab41e93efcc04b21179a2a3342cfc"

@@ -1,0 +1,43 @@
+{
+  "name": "Instagram JSON Scraper",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://www.instagram.com/suite.e.stpete/",
+        "method": "GET",
+        "responseFormat": "text",
+        "options": {}
+      },
+      "name": "Instagram Page Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract JSON data from <script> tag\nconst html = $json['body'];\nconst match = html.match(/window\\._sharedData = (.*);<\\/script>/);\nif(match){\n  const data = JSON.parse(match[1]);\n  const posts = data.entry_data.ProfilePage[0].graphql.user.edge_owner_to_timeline_media.edges.map(e => {\n    const node = e.node;\n    const captionEdge = node.edge_media_to_caption.edges[0];\n    const caption = captionEdge ? captionEdge.node.text : '';\n    const hashtags = (caption.match(/#\\w+/g) || []).join(', ');\n    const mentions = (caption.match(/@\\w+/g) || []).join(', ');\n    return {caption, hashtags, mentions, shortcode: node.shortcode, timestamp: node.taken_at_timestamp};\n  });\n  return posts.map(p => ({json: p}));\n} else { return []; }"
+      },
+      "name": "Parse JSON Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "path": "/Users/matttaylor/Downloads/instagram_posts.json",
+        "dataPropertyName": "body"
+      },
+      "name": "Save to Local JSON",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [750, 300]
+    }
+  ],
+  "connections": {
+    "Instagram Page Request": { "main": [[{"node": "Parse JSON Data","type": "main","index": 0}]] },
+    "Parse JSON Data": { "main": [[{"node": "Save to Local JSON","type": "main","index": 0}]] }
+  },
+  "active": true,
+  "settings": {},
+  "id": "instagram_scraper_001"
+}

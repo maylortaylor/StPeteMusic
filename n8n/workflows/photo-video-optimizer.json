@@ -1,0 +1,256 @@
+{
+  "name": "Photo/Video Optimizer",
+  "nodes": [
+    {
+      "parameters": {
+        "sheetId": "1123975168",
+        "range": "Sheet1",
+        "options": {}
+      },
+      "name": "Update Sheet Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        1536,
+        -320
+      ],
+      "id": "045afa70-d62b-4d12-83a4-91060b2fdc75"
+    },
+    {
+      "parameters": {
+        "triggerOn": "folder",
+        "path": "/Users/matttaylor/Downloads/mediaTests/test",
+        "events": [
+          "add"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.localFileTrigger",
+      "typeVersion": 1,
+      "position": [
+        96,
+        -256
+      ],
+      "id": "28f313d8-6b49-45a7-b3de-db0a601aec94",
+      "name": "Local File Trigger"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.mediaType }}",
+                    "rightValue": "video",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b4f3a010-f702-41fe-972a-1387e06e2a54"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Video"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "144fa791-b054-4d5a-a229-ff4a02bc9a56",
+                    "leftValue": "={{ $json.mediaType }}",
+                    "rightValue": "photo",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Photo"
+            }
+          ]
+        },
+        "looseTypeValidation": "={{ $json }}",
+        "options": {
+          "allMatchingOutputs": false
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        512,
+        -256
+      ],
+      "id": "e4bd4119-7ecb-4881-bf32-97176d7390bc",
+      "name": "Switch",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "command": "={{ $json.imagemagickCommand }}"
+      },
+      "name": "FFmpeg Optimize Photo",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        -96
+      ],
+      "id": "21dab929-327e-4e1c-90d3-e334c61dcb94"
+    },
+    {
+      "parameters": {
+        "command": "={{ $json.ffmpegCommand }}"
+      },
+      "name": "FFmpeg Optimize Video",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        -432
+      ],
+      "id": "004d161e-32bb-4a02-a8e9-5fa5e18496df"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "import os\n\n# --- Configuration ---\nTARGET_WIDTH = 1080\nTARGET_HEIGHT = 1350\nJPEG_QUALITY = 85 # Quality level for compression (80-90 is typical for social media)\n\n# Initialize variables used in error reporting outside the try block\nfilePath = None\noutputPath = None\n\n# The input data is available in the 'items' variable (a list of dictionaries)\ntry:\n    # 1. Retrieve input variables from the first item using the standard 'items' variable\n    # CRITICAL FIX: Access the nested JSON data within the n8n item object\n    input_data = items[0].json\n    \n    filePath = input_data.get('filePath')\n    outputPath = input_data.get('outputPath')\n    fileName = input_data.get('fileName')\n    fileType = input_data.get('fileType')\n\n    if not all([filePath, outputPath, fileName, fileType]):\n        raise ValueError(\"Missing required fields (filePath, outputPath, fileName, fileType) in input data.\")\n\n    # 2. Prepare output file paths\n    base_name = os.path.splitext(fileName)[0]\n    outputFileName = f\"{base_name}_optimized.jpg\"\n    outputFilePath = os.path.join(outputPath, outputFileName)\n    \n    # 3. Construct the ImageMagick command list\n    \n    # List of common raw formats that often need special decoding flags\n    RAW_FORMATS = {'cr2', 'nef', 'arw', 'dng', 'raf', 'orf'}\n    \n    imagemagick_command = ['magick']\n\n    # Add specific raw decoding instruction if the file is a known raw format\n    if fileType in RAW_FORMATS:\n        imagemagick_command.extend(['-define', 'dng:decode=all'])\n        \n    # Add the input file path and processing steps\n    imagemagick_command.extend([\n        filePath,\n        # NEW LOGIC: Use -auto-orient to correctly handle rotation based on EXIF data\n        '-auto-orient', \n        # NEW LOGIC: Use standard -resize 'WxH>' to scale the image down \n        # to fit within the WxH bounds without cropping.\n        # The '>' modifier ensures it only scales down, not up.\n        '-resize', f'{TARGET_WIDTH}x{TARGET_HEIGHT}>',\n        # Removed: -gravity 'Center', -crop 'WxH+0+0'\n        \n        '-strip',\n        '-quality', str(JPEG_QUALITY),\n        outputFilePath\n    ])\n    \n    # 5. Join the command list into a single string\n    # CRITICAL FIX: Prepend the 'mkdir -p' command to ensure the output directory exists\n    # The '&&' ensures the 'convert' command only runs if the 'mkdir' succeeds.\n    convert_command_string = ' '.join(imagemagick_command)\n    command_string = f\"mkdir -p {outputPath} && {convert_command_string}\"\n    \n    # 6. Prepare output data for the next n8n node\n    output = {\n        \"fileName\": outputFileName,\n        \"filePath\": outputFilePath,\n        \"fileType\": \"jpg\",\n        \"outputPath\": outputPath,\n        \"mediaType\": \"photo\",\n        # New field containing the command string for the Execute Command node\n        \"imagemagickCommand\": command_string\n    }\n    \n    return [output]\n\nexcept Exception as e:\n    # Handle general Python or input errors\n    error_output = {\n        \"failureDetails\": \"Python Processing Failed\",\n        \"errorMessage\": str(e),\n        \"inputPath\": filePath\n    }\n    print(f\"General Python Error: {e}\")\n    return [error_output]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        -96
+      ],
+      "id": "5ae1cdd0-18cc-4f65-ba8f-00927242db3d",
+      "name": "Generate ImageMagick cmd for Photo"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "import json\nimport os\nfrom pathlib import Path\n\n# --- Configuration ---\n# Define the target root folder name for processed media\nPROCESSED_FOLDER = 'mediaProcessed'\n\n# Get the file path from n8n Local File Trigger input\nitem = _input.first().json\nfile_path = item['filePath']\nfile_name = os.path.basename(file_path)\nfile_ext = Path(file_path).suffix.lower()\n\n# Define image, RAW, and video extensions\nimage_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp']\nraw_extensions = [\n    '.cr2', '.cr3', '.nef', '.arw', '.dng', '.orf', '.rw2', '.pef', '.srw', \n    '.raf', '.raw', '.rwl', '.iiq', '.3fr', '.fff', '.erf', '.mef', '.mos', '.x3f'\n]\nvideo_extensions = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.flv', '.wmv', '.m4v']\n\n# Initialize output\noutput = {\n    'fileName': file_name,\n    'filePath': file_path,\n    'fileType': '',\n    'ffmpegCommand': '',\n    'outputPath': '',\n    'mediaType': ''\n}\n\n# --- Calculate Base Output Directory ---\nparent_dir = Path(file_path).parent.parent\n\n# Determine media type and processing\nif file_ext in image_extensions or file_ext in raw_extensions:\n    # --- Photo / Raw Logic ---\n    media_type_folder = 'photo'\n    \n    if file_ext in image_extensions:\n        output['fileType'] = 'image'\n        output_ext = file_ext if file_ext not in ['.png', '.gif', '.bmp', '.tiff'] else '.jpg'\n    else: # raw_extensions\n        output['fileType'] = 'raw_image'\n        output_ext = '.jpg'\n\n    output['mediaType'] = 'photo'\n    \n    # Set the final output directory path\n    output_dir = parent_dir / PROCESSED_FOLDER / media_type_folder\n    output_filename = f\"{Path(file_name).stem}_optimized{output_ext}\"\n    output_path = str(output_dir / output_filename)\n    output['outputPath'] = str(output_dir) # Only store the directory path\n\n    # FFmpeg command for images/raw\n    ffmpeg_cmd_core = f\"\"\"ffmpeg -i \"{file_path}\" \\\\\n-vf \"scale=1080:1350:force_original_aspect_ratio=increase,crop=1080:1350\" \\\\\n-q:v 2 \\\\\n\"{output_path}\" \"\"\"\n    \n    # CRITICAL FIX: Prepend mkdir -p to ensure the directory exists\n    ffmpeg_cmd = f\"mkdir -p \\\"{output['outputPath']}\\\" && {ffmpeg_cmd_core}\"\n    output['ffmpegCommand'] = ffmpeg_cmd.strip()\n\nelif file_ext in video_extensions:\n    # --- Video Logic ---\n    media_type_folder = 'video'\n    output['fileType'] = 'video'\n    output['mediaType'] = 'video'\n    \n    output_ext = '.mp4' \n    \n    # Set the final output directory path\n    output_dir = parent_dir / PROCESSED_FOLDER / media_type_folder\n    output_filename = f\"{Path(file_name).stem}_optimized{output_ext}\"\n    output_path = str(output_dir / output_filename)\n    output['outputPath'] = str(output_dir) # Only store the directory path\n\n    # FFmpeg command for videos\n    ffmpeg_cmd_core = f\"\"\"ffmpeg -i \"{file_path}\" \\\\\n-vf \"scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30\" \\\\\n-c:v libx264 \\\\\n-preset medium \\\\\n-crf 23 \\\\\n-c:a aac \\\\\n-b:a 128k \\\\\n-ar 44100 \\\\\n-movflags +faststart \\\\\n\"{output_path}\" \"\"\"\n    \n    # CRITICAL FIX: Prepend mkdir -p to ensure the directory exists\n    ffmpeg_cmd = f\"mkdir -p \\\"{output['outputPath']}\\\" && {ffmpeg_cmd_core}\"\n    output['ffmpegCommand'] = ffmpeg_cmd.strip()\n\nelse:\n    # --- Unknown/Unsupported Logic ---\n    output['fileType'] = 'unknown'\n    output['mediaType'] = 'unsupported'\n    output['outputPath'] = str(Path(file_path).parent / PROCESSED_FOLDER / 'unsupported')\n    ffmpeg_cmd_core = f'# Unsupported file type: {file_ext}'\n    \n    # CRITICAL FIX: Prepend mkdir -p to ensure the directory exists\n    ffmpeg_cmd = f\"mkdir -p \\\"{output['outputPath']}\\\" && {ffmpeg_cmd_core}\"\n    output['ffmpegCommand'] = ffmpeg_cmd.strip()\n\n# Return the output for n8n\nreturn output"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        -432
+      ],
+      "id": "a289b456-07e6-43f2-aaef-2c7126fa1b41",
+      "name": "Generate FFmpeg cmd for Video"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "import os\nimport re\n# Removed 'subprocess' and 'piexif' imports as they are no longer needed\nfrom datetime import datetime\n\n# Define common extensions for quick lookup\nphoto_exts = {'jpg', 'jpeg', 'png', 'gif', 'tiff', 'tif', 'raw', 'cr2', 'nef', 'arw', 'dng', 'webp'}\nvideo_exts = {'mp4', 'mov', 'avi', 'mkv', 'webm', 'flv', 'wmv', 'm4v', '3gp'}\n\n# Removed the get_image_date_piexif function as it is no longer used for path generation\n\ntry:\n    # --- Setup ---\n    # Get the 'path' from the first item in the input data (assuming '_input' is available in the n8n context)\n    file_path = _input.item.json.path \n    \n    if not file_path:\n        raise ValueError(\"The input data does not contain a 'path' field.\")\n        \n    # 1. filePath\n    filePath = file_path\n    \n    # 2. fileName\n    fileName = os.path.basename(file_path)\n    \n    # 3. fileType (extension)\n    _, file_ext = os.path.splitext(fileName)\n    fileType = file_ext.lower().lstrip('.') # Lowercase and remove leading dot\n    \n    # 5. mediaType (photo or video)\n    if fileType in photo_exts:\n        mediaType = 'photo'\n    elif fileType in video_exts:\n        mediaType = 'video'\n    else:\n        # Default for unrecognized types\n        mediaType = 'other' \n        \n    # --- 4. outputPath Calculation ---\n    parent_dir = os.path.dirname(os.path.dirname(file_path))\n    \n    # The last folder component is simply the mediaType (e.g., 'photo', 'video', or 'other')\n    path_component = mediaType\n\n    # Construct the final outputPath: {parent_dir}/mediaProcessed/{mediaType}\n    outputPath = os.path.join(parent_dir, 'mediaProcessed', path_component)\n    \n    # Prepare the output data structure for n8n\n    output = {\n        \"fileName\": fileName,\n        \"filePath\": filePath,\n        \"fileType\": fileType,\n        \"outputPath\": outputPath,\n        \"mediaType\": mediaType\n    }\n    \n    # n8n expects a list of dictionaries as output\n    return [output]\n    \nexcept Exception as e:\n    # Handle any errors during processing\n    # print(f\"An error occurred: {e}\") # Debugging line\n    # Returning an empty list or a list with an error object\n    return [{\"error\": str(e)}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        -256
+      ],
+      "id": "f9ee201a-e8e5-4cd8-abe8-e0b925f05e2f",
+      "name": "Parse File Info"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Local File Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse File Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Generate FFmpeg cmd for Video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate ImageMagick cmd for Photo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FFmpeg Optimize Video": {
+      "main": [
+        []
+      ]
+    },
+    "Generate ImageMagick cmd for Photo": {
+      "main": [
+        [
+          {
+            "node": "FFmpeg Optimize Photo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate FFmpeg cmd for Video": {
+      "main": [
+        [
+          {
+            "node": "FFmpeg Optimize Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse File Info": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c9ff1923-fc41-4665-84e9-f40e77eed07b",
+  "meta": {
+    "instanceId": "da7750eb66821341a4098e6079afb93a6beab41e93efcc04b21179a2a3342cfc"
+  },
+  "id": "DXB2YBJseTNHiSZg",
+  "tags": []
+}

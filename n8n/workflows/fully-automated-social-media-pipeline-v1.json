@@ -1,0 +1,175 @@
+{
+  "name": "Fully Automated Social Media Pipeline v1",
+  "nodes": [
+    {
+      "parameters": {
+        "sheetId": "1123975168",
+        "range": "Sheet1",
+        "triggerOn": "valueChange",
+        "filters": {
+          "Ready to Post": true
+        }
+      },
+      "name": "Google Sheet Trigger",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Validate Media Folder Link\nconst mediaFolder = $json['Media Folder Link'];\nconst platform = $json['Platform'];\nconst title = $json['Title'] || 'Post';\nif (!mediaFolder) {\n  return [{\n    json: {\n      Status: 'Waiting for Media',\n      Ready_to_Post: false,\n      Additional_Notes: 'Media folder missing',\n      RowID: $json['RowID'] || null\n    }\n  }];\n}\nreturn [{json: {mediaFolder, platform, title, RowID: $json['RowID'] || null, mediaFile: $json['Media File']}}];"
+      },
+      "name": "Validate Media Folder",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Set dynamic FFmpeg output name\nconst platform = $json['platform'];\nconst title = $json['title'].replace(/\\s+/g, '_');\nconst isVideo = $json['mediaFile'].endsWith('.mp4') || $json['mediaFile'].endsWith('.mov');\nlet width, height, aspect;\nif (isVideo || platform==='TikTok') { width=1080; height=1920; aspect='9-16'; }\nelse { width=1080; height=1350; aspect='4-5'; }\nconst ext = isVideo ? '.mp4' : '.jpg';\nconst outputName = `${width}x${height}_${aspect}_${platform}_${title}${ext}`;\nreturn [{json:{...$json, FFMPEG_OUTPUT_NAME: outputName}}];"
+      },
+      "name": "Generate FFmpeg Output Name",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "command": "ffmpeg -i {{$json[\"mediaFile\"]}} {{$json[\"FFMPEG_OUTPUT_NAME\"]}}",
+        "options": {}
+      },
+      "name": "FFmpeg Optimize Media",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// AI Caption Enhancement\nconst description = $json['Description'] || '';\nconst platform = $json['platform'] || 'Instagram';\nconst manualPost = $json['Status'] === 'Draft';\nconst enhancedDescription = description + ' #GeneratedByAI';\nconst hashtags = '#music #live #event';\nconst usernames = '@stpetemusic';\nconst status = manualPost ? 'AI Enhanced' : 'AI Generated';\nreturn [{json:{Description: enhancedDescription, Hashtags: hashtags, Usernames: usernames, Status: status, RowID: $json['RowID'], platform: platform}}];"
+      },
+      "name": "AI Caption Generator",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "sheetId": "1123975168",
+        "range": "Sheet1",
+        "valueInputMode": "USER_ENTERED",
+        "columns": ["Description","Hashtags","@Usernames","Status"],
+        "values": [
+          ["={{$json['Description']}}","={{$json['Hashtags']}}","={{$json['Usernames']}}","={{$json['Status']}}"]
+        ],
+        "rowIndex": "={{$json['RowID']}}"
+      },
+      "name": "Update Google Sheet (AI)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "calendarId": "primary",
+        "summary": "={{$json['platform'] + ' – ' + $json['Title']}}",
+        "description": "Description: {{$json['Description']}}\nHashtags: {{$json['Hashtags']}}\nUsernames: {{$json['Usernames']}}\nGoogle Sheet Link: https://docs.google.com/spreadsheets/d/1123975168/edit#gid=1123975168",
+        "start": "={{$json['Post Date'] + 'T' + $json['Post Time']}}",
+        "end": "={{$json['Post Date'] + 'T' + $json['Post Time']}}",
+        "colorId": "={{$json['platform']==='Facebook'?'9':$json['platform']==='Instagram'?'11':'10'}}"
+      },
+      "name": "Create Google Calendar Event",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "url": "https://graph.facebook.com/v16.0/{{$json['Instagram_Page_ID']}}/media",
+        "bodyParametersUi": {
+          "parameter": [
+            {"name": "image_url", "value": "={{$json['FFMPEG_OUTPUT_NAME']}}"},
+            {"name": "caption", "value": "={{$json['Description'] + ' ' + $json['Hashtags']}}"}
+          ]
+        },
+        "options": {}
+      },
+      "name": "Instagram API Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1650, 300]
+    },
+    {
+      "parameters": {
+        "sheetId": "1123975168",
+        "range": "Sheet1",
+        "valueInputMode": "USER_ENTERED",
+        "columns": ["Calendar Link","Post Link","Status"],
+        "values": [
+          ["={{$json['htmlLink']}}","={{$json['id']}}","Scheduled"]
+        ],
+        "rowIndex": "={{$json['RowID']}}"
+      },
+      "name": "Update Google Sheet (Post Links)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [1850, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Apply row formatting\nreturn [{ json: { RowID: $json['RowID'], BackgroundColor: $json['Status']==='AI Generated'?'#A9A9A9':'#D3D3D3' } }];"
+      },
+      "name": "Apply Row Formatting",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [2050, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://www.instagram.com/suite.e.stpete/",
+        "method": "GET",
+        "responseFormat": "text",
+        "options": {}
+      },
+      "name": "Instagram Page Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [250, 600]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract JSON data\nconst html = $json['body'];\nconst match = html.match(/window\\._sharedData = (.*);<\\/script>/);\nif(match){\n  const data = JSON.parse(match[1]);\n  const posts = data.entry_data.ProfilePage[0].graphql.user.edge_owner_to_timeline_media.edges.map(e => {\n    const node = e.node;\n    const captionEdge = node.edge_media_to_caption.edges[0];\n    const caption = captionEdge ? captionEdge.node.text : '';\n    const hashtags = (caption.match(/#\\w+/g) || []).join(', ');\n    const mentions = (caption.match(/@\\w+/g) || []).join(', ');\n    return {caption, hashtags, mentions, shortcode: node.shortcode, timestamp: node.taken_at_timestamp};\n  });\n  return posts.map(p => ({json: p}));\n} else { return []; }"
+      },
+      "name": "Parse JSON Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [500, 600]
+    },
+    {
+      "parameters": {
+        "path": "/Users/matttaylor/Downloads/instagram_posts.json",
+        "dataPropertyName": "body"
+      },
+      "name": "Save to Local JSON",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [750, 600]
+    }
+  ],
+  "connections": {
+    "Google Sheet Trigger": { "main":[[{"node":"Validate Media Folder","type":"main","index":0}]] },
+    "Validate Media Folder": { "main":[[{"node":"Generate FFmpeg Output Name","type":"main","index":0}]] },
+    "Generate FFmpeg Output Name": { "main":[[{"node":"FFmpeg Optimize Media","type":"main","index":0}]] },
+    "FFmpeg Optimize Media": { "main":[[{"node":"AI Caption Generator","type":"main","index":0}]] },
+    "AI Caption Generator": { "main":[[{"node":"Update Google Sheet (AI)","type":"main","index":0}]] },
+    "Update Google Sheet (AI)": { "main":[[{"node":"Create Google Calendar Event","type":"main","index":0}]] },
+    "Create Google Calendar Event": { "main":[[{"node":"Instagram API Post","type":"main","index":0}]] },
+    "Instagram API Post": { "main":[[{"node":"Update Google Sheet (Post Links)","type":"main","index":0}]] },
+    "Update Google Sheet (Post Links)": { "main":[[{"node":"Apply Row Formatting","type":"main","index":0}]] },
+    "Instagram Page Request": { "main":[[{"node":"Parse JSON Data","type":"main","index":0}]] },
+    "Parse JSON Data": { "main":[[{"node":"Save to Local JSON","type":"main","index":0}]] }
+  },
+  "active": true,
+  "settings": {},
+  "id": "fully_auto_pipeline_v1"
+}

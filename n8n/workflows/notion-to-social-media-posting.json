@@ -1,0 +1,678 @@
+{
+  "name": "Notion to Social Media Posting",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2176,
+        1280
+      ],
+      "id": "fa80cfbd-b522-43e1-9063-221ce3f83ec8",
+      "name": "Manual Trigger"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "49cebf36f8774bd69c4329d2c0d750c5",
+          "mode": "id"
+        },
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Status|status",
+              "condition": "equals",
+              "selectValue": "Scheduled",
+              "statusValue": "Scheduled"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -1968,
+        1280
+      ],
+      "id": "e89b8c11-1120-45c5-8925-2fd1eca0dd51",
+      "name": "Query Notion Database",
+      "credentials": {
+        "notionApi": {
+          "id": "ZXEH8wTvzaAHv60e",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Extract post data from Notion page properties\n// Using actual property names from the database\n\nreturn {\n  pageId: $json.id,\n  title: $json.name || '',\n  caption: $json.property_caption_text || '',\n  platform: $json.property_platform || '',\n  mediaType: $json.property_media_type || '',\n  mediaUrl: $json.property_media_link || '',\n  hashtags: $json.property_hashtags || '',\n  tags: $json.property_tags_mentions || '',\n  postUrl: $json.url\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1776,
+        1280
+      ],
+      "id": "39754cd1-119a-4152-a841-9708b0062f05",
+      "name": "Extract Post Data"
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.platform }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "IG"
+            },
+            {
+              "value2": "FB",
+              "output": 1
+            },
+            {
+              "value2": "YT",
+              "output": 2
+            },
+            {
+              "operation": "notContains",
+              "value2": "IG, FB, YT",
+              "output": 3
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        -1568,
+        1280
+      ],
+      "id": "904e27cf-4d96-436f-9589-418f08f36544",
+      "name": "Platform Router",
+      "outputs": [
+        "Instagram",
+        "Facebook",
+        "YouTube"
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Prepare Instagram media data\nconst mediaUrl = $json.mediaUrl;\nconst caption = ($json.caption || '') + ' ' + ($json.hashtags || '');\nconst isVideo = $json.mediaType?.toLowerCase() === 'video';\nconst igAccessToken = process.env.IG_ACCESS_TOKEN;\nconst igUserId = process.env.IG_USER_ID;\n\nreturn {\n  pageId: $json.pageId,\n  mediaUrl: mediaUrl,\n  caption: caption.trim(),\n  isVideo: isVideo,\n  mediaType: isVideo ? 'video_url' : 'image_url',\n  igAccessToken: igAccessToken,\n  igUserId: igUserId\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1376,
+        1088
+      ],
+      "id": "81b1c1c8-d9c1-48e3-b414-af835a32e60e",
+      "name": "Prepare Instagram Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=`https://graph.facebook.com/v16.0/${$json.igUserId}/media`",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"{{$json.mediaType}}\": \"{{$json.mediaUrl}}\",\n  \"caption\": \"{{$json.caption}}\",\n  \"access_token\": \"{{$json.igAccessToken}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1168,
+        1024
+      ],
+      "id": "f0c998c6-f727-4798-8b9e-4a0583b78460",
+      "name": "Create Instagram Container"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=`https://graph.facebook.com/v16.0/${$json.igUserId}/media_publish`",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"creation_id\": \"{{$json.id}}\",\n  \"access_token\": \"{{$json.igAccessToken}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -976,
+        1024
+      ],
+      "id": "d745e700-66c3-4afc-9381-5d3f96dff2dc",
+      "name": "Publish Instagram Post"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "49cebf36f8774bd69c4329d2c0d750c5",
+          "mode": "id"
+        },
+        "simple": false,
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status",
+              "selectValue": "Posted"
+            },
+            {
+              "key": "Posted Date|date",
+              "date": "={{new Date().toISOString().split('T')[0]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -768,
+        1024
+      ],
+      "id": "41d91dff-dc16-440d-a02b-9d558ef556a3",
+      "name": "Update Notion (Instagram)",
+      "credentials": {
+        "notionApi": {
+          "id": "ZXEH8wTvzaAHv60e",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Prepare Facebook post data\nconst caption = ($json.caption || '') + ' ' + ($json.hashtags || '');\nconst mediaType = $json.mediaType?.toLowerCase();\nconst isVideo = mediaType === 'video';\n\nreturn {\n  pageId: $json.pageId,\n  mediaUrl: $json.mediaUrl,\n  message: caption.trim(),\n  isVideo: isVideo,\n  endpoint: 'feed',  // Using /feed endpoint (photos/videos deprecated)\n  fbAccessToken: 'EAALKWb1XnDUBQvxJztEdhKck9m53XONWTeB56rSXQVEMMXuuuHiOLrgIDtR2pfKUZCFY2BsUoMBZAU3QGcZBabQih5BUD8BzYyRqTXM6JRF8tQqksQveZBmW4pECUEidvBAM5PcCrDtfxlWpUMQlxe7VZAHgrdq3cjwt7kPisPvAwqYGnZB1Vqe5oZBajZCuAgEKnks9mkct35V1YYz2WBj7auvA73G16FEf20ZC6SIYUckCrhcaEJeabGXkXTBCDDVSZByY9W1kfl0tFeTvlXxPzW1ZC5KnjoFyXwNgmIZD',\n  fbPageId: '2002101827299913'\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1376,
+        1232
+      ],
+      "id": "613f6a99-a4b6-4fd4-9561-5126cd7f5cc4",
+      "name": "Prepare Facebook Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v16.0/{{ $json.fbPageId }}/{{ $json.endpoint }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": \"{{$json.message}}\",\n  \"link\": \"{{$json.mediaUrl}}\",\n  \"access_token\": \"{{$json.fbAccessToken}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1168,
+        1232
+      ],
+      "id": "d692d605-1754-4ef2-85cd-392597ca8f5c",
+      "name": "Post to Facebook"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "49cebf36f8774bd69c4329d2c0d750c5",
+          "mode": "id"
+        },
+        "simple": false,
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status",
+              "selectValue": "Posted"
+            },
+            {
+              "key": "Posted Date|date",
+              "date": "={{new Date().toISOString().split('T')[0]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -976,
+        1200
+      ],
+      "id": "ce38b197-3a29-4fa9-be97-90c19dac0440",
+      "name": "Update Notion (Facebook)",
+      "credentials": {
+        "notionApi": {
+          "id": "ZXEH8wTvzaAHv60e",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Prepare YouTube upload data\nconst title = $json.title || 'Untitled Video';\nconst description = ($json.caption || '') + '\\n\\n' + ($json.hashtags || '');\nconst tags = ($json.hashtags || '').split(' ').filter(tag => tag.startsWith('#')).map(tag => tag.substring(1));\nconst mediaUrl = $json.mediaUrl || '';\n\n// Extract Google Drive file ID from URL if applicable\nlet driveFileId = null;\nif (mediaUrl.includes('drive.google.com')) {\n  const match = mediaUrl.match(/[?&]id=([a-zA-Z0-9-_]+)/) || mediaUrl.match(/\\/d\\/([a-zA-Z0-9-_]+)/);\n  if (match && match[1]) {\n    driveFileId = match[1];\n  }\n}\n\nreturn {\n  pageId: $json.pageId,\n  mediaUrl: mediaUrl,\n  driveFileId: driveFileId,\n  title: title,\n  description: description.trim(),\n  tags: tags.length > 0 ? tags : ['video', 'upload'],\n  privacyStatus: 'public'\n};\n\n// Note: YouTube uses OAuth2 credential from n8n, no token needed here"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1376,
+        1376
+      ],
+      "id": "8ec07224-4740-4f6f-abc1-6606247e6e12",
+      "name": "Prepare YouTube Data"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.googleapis.com/drive/v3/files/{{$json.driveFileId}}?alt=media",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1168,
+        1376
+      ],
+      "id": "97bfdc27-1b07-4284-98eb-aec41c3a8426",
+      "name": "Download Video from Google Drive",
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "IL8Tigtg9I9WHhIx",
+          "name": "Google account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "49cebf36f8774bd69c4329d2c0d750c5",
+          "mode": "id"
+        },
+        "simple": false,
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status|status",
+              "selectValue": "Published",
+              "statusValue": "Posted"
+            },
+            {
+              "key": "Post Date|date",
+              "date": "={{new Date().toISOString().split('T')[0]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -624,
+        1360
+      ],
+      "id": "775fc6a5-ab0d-41a9-a409-0b97f3a1159c",
+      "name": "Update Notion (YouTube)",
+      "credentials": {
+        "notionApi": {
+          "id": "ZXEH8wTvzaAHv60e",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Handle unsupported platforms\nreturn {\n  error: 'Unsupported platform: ' + ($json.platform || 'unknown'),\n  pageId: $json.pageId,\n  message: 'This platform is not yet configured in the workflow'\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1376,
+        1536
+      ],
+      "id": "1e13c23d-94e3-472b-a625-d79854c6bd01",
+      "name": "Unsupported Platform"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2176,
+        1536
+      ],
+      "id": "43f730b2-c46e-4e9e-8c90-e590b2320a6e",
+      "name": "Error Handler"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Extract error details\nconst errorData = {\n  message: $json.errorMessage || 'Unknown error',\n  nodeSource: $json.nodeName || 'Unknown node',\n  timestamp: new Date().toISOString(),\n  executionId: $execution.id\n};\n\nreturn errorData;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1968,
+        1536
+      ],
+      "id": "e0743b6b-dc95-41f7-99cd-7c9b4ca2c8fe",
+      "name": "Format Error Data"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "49cebf36f8774bd69c4329d2c0d750c5",
+          "mode": "id"
+        },
+        "simple": false,
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Status",
+              "selectValue": "Error"
+            },
+            {
+              "key": "Notes|rich_text",
+              "textContent": "Error during posting: {{$json.message}} (Node: {{$json.nodeSource}})"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -1776,
+        1536
+      ],
+      "id": "af080160-b5b4-4f37-b63b-146b3be25a43",
+      "name": "Update Notion with Error",
+      "credentials": {
+        "notionApi": {
+          "id": "ZXEH8wTvzaAHv60e",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Format YouTube publishAt timestamp\n// Parse the date and time from Notion\nconst dateStr = $json.postDate?.start || ''; // \"2026-02-28\"\nconst timeStr = $json.postTime || ''; // \"10:00 AM\"\n\n// Parse time string (handles both 12-hour with AM/PM and 24-hour formats)\nlet hours = 0;\nlet minutes = 0;\n\nif (timeStr) {\n  const timeParts = timeStr.match(/(\\d{1,2}):(\\d{2})\\s*(AM|PM)?/i);\n  \n  if (timeParts) {\n    hours = parseInt(timeParts[1]);\n    minutes = parseInt(timeParts[2]);\n    const meridiem = timeParts[3]?.toUpperCase();\n    \n    // Convert 12-hour to 24-hour if needed\n    if (meridiem === 'PM' && hours !== 12) {\n      hours += 12;\n    } else if (meridiem === 'AM' && hours === 12) {\n      hours = 0;\n    }\n  }\n}\n\n// Format as ISO 8601 with Z (UTC)\nconst publishAt = dateStr ? `${dateStr}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00Z` : null;\n\nreturn {\n  ...($json), // Keep all existing data\n  publishAt: publishAt, // Add formatted timestamp for YouTube\n  publishAtDebug: {\n    originalDate: dateStr,\n    originalTime: timeStr,\n    parsed: { hours, minutes },\n    formatted: publishAt\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -976,
+        1376
+      ],
+      "id": "format-youtube-publishat",
+      "name": "Format YouTube PublishAt"
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $json.title }}",
+        "regionCode": "US",
+        "categoryId": "10",
+        "options": {
+          "description": "={{ $json.description }}",
+          "privacyStatus": "unlisted",
+          "publishAt": "={{ $json.publishAt }}"
+        }
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        -880,
+        1360
+      ],
+      "id": "a2d70cda-39ef-4060-ba04-bdc35ed86dbd",
+      "name": "Upload a video",
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "mTi24S9mwCIxSqWV",
+          "name": "YouTube account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Query Notion Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Notion Database": {
+      "main": [
+        [
+          {
+            "node": "Extract Post Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Post Data": {
+      "main": [
+        [
+          {
+            "node": "Platform Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Platform Router": {
+      "main": [
+        [
+          {
+            "node": "Prepare Instagram Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Facebook Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare YouTube Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unsupported Platform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Instagram Data": {
+      "main": [
+        [
+          {
+            "node": "Create Instagram Container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Instagram Container": {
+      "main": [
+        [
+          {
+            "node": "Publish Instagram Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish Instagram Post": {
+      "main": [
+        [
+          {
+            "node": "Update Notion (Instagram)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Facebook Data": {
+      "main": [
+        [
+          {
+            "node": "Post to Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Facebook": {
+      "main": [
+        [
+          {
+            "node": "Update Notion (Facebook)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare YouTube Data": {
+      "main": [
+        [
+          {
+            "node": "Download Video from Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Video from Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Format YouTube PublishAt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format YouTube PublishAt": {
+      "main": [
+        [
+          {
+            "node": "Upload a video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Handler": {
+      "main": [
+        [
+          {
+            "node": "Format Error Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Error Data": {
+      "main": [
+        [
+          {
+            "node": "Update Notion with Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload a video": {
+      "main": [
+        [
+          {
+            "node": "Update Notion (YouTube)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ba917bdb-74b0-40a9-a216-87ed57eabf0c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9293fc07055c195e236ac85072d0208fe886bdff22e173da7b17b3c0599dbb93"
+  },
+  "id": "2XR1YFk6rTugDoBU",
+  "tags": [
+    {
+      "updatedAt": "2026-02-10T20:20:09.838Z",
+      "createdAt": "2026-02-10T20:20:09.838Z",
+      "id": "D9E8utmVDstMtU5F",
+      "name": "Multi-Platform"
+    },
+    {
+      "updatedAt": "2026-02-10T20:20:09.840Z",
+      "createdAt": "2026-02-10T20:20:09.840Z",
+      "id": "E2gcnw4bdYuXZ0TH",
+      "name": "Notion Integration"
+    },
+    {
+      "updatedAt": "2026-02-10T20:20:09.826Z",
+      "createdAt": "2026-02-10T20:20:09.826Z",
+      "id": "lmJLNTLcj9Hi6oau",
+      "name": "Social Media"
+    }
+  ]
+}
