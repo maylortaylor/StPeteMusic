@@ -44,7 +44,7 @@ Create test post in Notion:
 - **Platform:** "Instagram"
 - **Media Type:** "Image"
 - **Media Link:** (public image URL)
-- **Status:** "Scheduled"
+- **Status:** "Ready"
 
 In n8n, click the **Execute** button and watch it work!
 

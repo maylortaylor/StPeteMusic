@@ -6,10 +6,10 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -2176,
-        1280
+        -1184,
+        176
       ],
-      "id": "fa80cfbd-b522-43e1-9063-221ce3f83ec8",
+      "id": "4c0e6eed-e176-43f4-9750-0e0a63933476",
       "name": "Manual Trigger"
     },
     {
@@ -27,8 +27,8 @@
             {
               "key": "Status|status",
               "condition": "equals",
-              "selectValue": "Scheduled",
-              "statusValue": "Scheduled"
+              "selectValue": "Ready",
+              "statusValue": "Ready"
             }
           ]
         },
@@ -37,10 +37,10 @@
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2.2,
       "position": [
-        -1968,
-        1280
+        -976,
+        176
       ],
-      "id": "e89b8c11-1120-45c5-8925-2fd1eca0dd51",
+      "id": "015ea702-9a6d-49dc-b895-327f780f63f8",
       "name": "Query Notion Database",
       "credentials": {
         "notionApi": {
@@ -52,15 +52,15 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "// Extract post data from Notion page properties\n// Using actual property names from the database\n\nreturn {\n  pageId: $json.id,\n  title: $json.name || '',\n  caption: $json.property_caption_text || '',\n  platform: $json.property_platform || '',\n  mediaType: $json.property_media_type || '',\n  mediaUrl: $json.property_media_link || '',\n  hashtags: $json.property_hashtags || '',\n  tags: $json.property_tags_mentions || '',\n  postUrl: $json.url\n};"
+        "jsCode": "// Extract post data from Notion page properties\n// Using actual property names from the database\n\nreturn {\n  pageId: $json.id,\n  notionId: $json.property_id || '',\n  title: $json.name || '',\n  caption: $json.property_caption_text || '',\n  platform: $json.property_platform || '',\n  mediaType: $json.property_media_type || '',\n  mediaUrl: $json.property_media_link || '',\n  hashtags: $json.property_hashtags || '',\n  tags: $json.property_tags_mentions || '',\n  postDate: $json.property_post_date || '',\n  postTime: $json.property_post_time || '',\n  privacyStatus: $json.property_privacy_status || 'unlisted',\n  youtubePlaylist: $json.property_youtube_playlist || 'Suite E Studios',\n  postUrl: $json.url\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1776,
-        1280
+        -784,
+        176
       ],
-      "id": "39754cd1-119a-4152-a841-9708b0062f05",
+      "id": "e0168489-e4f5-407b-98f3-430bad074ee6",
       "name": "Extract Post Data"
     },
     {
@@ -91,10 +91,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 1,
       "position": [
-        -1568,
-        1280
+        -576,
+        176
       ],
-      "id": "904e27cf-4d96-436f-9589-418f08f36544",
+      "id": "625c49d6-449c-481b-ad8d-132a532576ef",
       "name": "Platform Router",
       "outputs": [
         "Instagram",
@@ -105,15 +105,15 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "// Prepare Instagram media data\nconst mediaUrl = $json.mediaUrl;\nconst caption = ($json.caption || '') + ' ' + ($json.hashtags || '');\nconst isVideo = $json.mediaType?.toLowerCase() === 'video';\nconst igAccessToken = process.env.IG_ACCESS_TOKEN;\nconst igUserId = process.env.IG_USER_ID;\n\nreturn {\n  pageId: $json.pageId,\n  mediaUrl: mediaUrl,\n  caption: caption.trim(),\n  isVideo: isVideo,\n  mediaType: isVideo ? 'video_url' : 'image_url',\n  igAccessToken: igAccessToken,\n  igUserId: igUserId\n};"
+        "jsCode": "// Prepare Instagram media data\nconst mediaUrl = $json.mediaUrl;\nconst caption = ($json.caption || '') + ' ' + ($json.hashtags || '');\nconst isVideo = $json.mediaType?.toLowerCase() === 'video';\nconst igAccessToken = $env.IG_ACCESS_TOKEN;\nconst igUserId = $env.IG_USER_ID;\n\nreturn {\n  pageId: $json.pageId,\n  mediaUrl: mediaUrl,\n  caption: caption.trim(),\n  isVideo: isVideo,\n  mediaType: isVideo ? 'video_url' : 'image_url',\n  igAccessToken: igAccessToken,\n  igUserId: igUserId\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1376,
-        1088
+        -384,
+        -16
       ],
-      "id": "81b1c1c8-d9c1-48e3-b414-af835a32e60e",
+      "id": "d27f939e-dba3-4ddf-9440-e1b03fe40b93",
       "name": "Prepare Instagram Data"
     },
     {
@@ -128,10 +128,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        -1168,
-        1024
+        -176,
+        -80
       ],
-      "id": "f0c998c6-f727-4798-8b9e-4a0583b78460",
+      "id": "63e58d30-94ee-4b7e-9bb2-4e6e08409ac7",
       "name": "Create Instagram Container"
     },
     {
@@ -146,10 +146,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        -976,
-        1024
+        16,
+        -80
       ],
-      "id": "d745e700-66c3-4afc-9381-5d3f96dff2dc",
+      "id": "a19ccbbf-fb94-4397-8128-2c21b7a41e7f",
       "name": "Publish Instagram Post"
     },
     {
@@ -178,10 +178,10 @@
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2.2,
       "position": [
-        -768,
-        1024
+        224,
+        -80
       ],
-      "id": "41d91dff-dc16-440d-a02b-9d558ef556a3",
+      "id": "f51eaddd-47a2-4232-a6a1-6da393802bf8",
       "name": "Update Notion (Instagram)",
       "credentials": {
         "notionApi": {
@@ -193,34 +193,41 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "// Prepare Facebook post data\nconst caption = ($json.caption || '') + ' ' + ($json.hashtags || '');\nconst mediaType = $json.mediaType?.toLowerCase();\nconst isVideo = mediaType === 'video';\n\nreturn {\n  pageId: $json.pageId,\n  mediaUrl: $json.mediaUrl,\n  message: caption.trim(),\n  isVideo: isVideo,\n  endpoint: 'feed',  // Using /feed endpoint (photos/videos deprecated)\n  fbAccessToken: 'EAALKWb1XnDUBQvxJztEdhKck9m53XONWTeB56rSXQVEMMXuuuHiOLrgIDtR2pfKUZCFY2BsUoMBZAU3QGcZBabQih5BUD8BzYyRqTXM6JRF8tQqksQveZBmW4pECUEidvBAM5PcCrDtfxlWpUMQlxe7VZAHgrdq3cjwt7kPisPvAwqYGnZB1Vqe5oZBajZCuAgEKnks9mkct35V1YYz2WBj7auvA73G16FEf20ZC6SIYUckCrhcaEJeabGXkXTBCDDVSZByY9W1kfl0tFeTvlXxPzW1ZC5KnjoFyXwNgmIZD',\n  fbPageId: '2002101827299913'\n};"
+        "jsCode": "// Prepare Facebook post data\nconst caption = ($json.caption || '') + ' ' + ($json.hashtags || '');\n\nreturn {\n  pageId: $env.FB_PAGE_ID,\n  message: caption.trim(),\n  mediaUrl: $json.mediaUrl,\n  mediaType: $json.mediaType?.toLowerCase()\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1376,
-        1232
+        -384,
+        128
       ],
-      "id": "613f6a99-a4b6-4fd4-9561-5126cd7f5cc4",
+      "id": "e1d9f1f9-efdf-4c2e-a8f5-07fcbc36b0dc",
       "name": "Prepare Facebook Data"
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "=https://graph.facebook.com/v16.0/{{ $json.fbPageId }}/{{ $json.endpoint }}",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"message\": \"{{$json.message}}\",\n  \"link\": \"{{$json.mediaUrl}}\",\n  \"access_token\": \"{{$json.fbAccessToken}}\"\n}",
-        "options": {}
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v23.0",
+        "node": "={{ $json.pageId }}",
+        "edge": "feed",
+        "options": {
+          "queryParametersJson": "={\n    \"message\": \"{{ $json.message }}\",\n    \"link\": \"{{ $json.mediaUrl }}\"\n  }"
+        }
       },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.1,
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
       "position": [
-        -1168,
-        1232
+        -160,
+        128
       ],
-      "id": "d692d605-1754-4ef2-85cd-392597ca8f5c",
-      "name": "Post to Facebook"
+      "id": "c753d164-1edb-4447-9db3-78bb0c9a2067",
+      "name": "Post to Facebook",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "LIfGI2uVpSQETLNs",
+          "name": "Facebook Graph account"
+        }
+      }
     },
     {
       "parameters": {
@@ -248,10 +255,10 @@
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2.2,
       "position": [
-        -976,
-        1200
+        112,
+        96
       ],
-      "id": "ce38b197-3a29-4fa9-be97-90c19dac0440",
+      "id": "28025298-94f3-449a-a5af-97d0a564985e",
       "name": "Update Notion (Facebook)",
       "credentials": {
         "notionApi": {
@@ -263,15 +270,15 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "// Prepare YouTube upload data\nconst title = $json.title || 'Untitled Video';\nconst description = ($json.caption || '') + '\\n\\n' + ($json.hashtags || '');\nconst tags = ($json.hashtags || '').split(' ').filter(tag => tag.startsWith('#')).map(tag => tag.substring(1));\nconst mediaUrl = $json.mediaUrl || '';\n\n// Extract Google Drive file ID from URL if applicable\nlet driveFileId = null;\nif (mediaUrl.includes('drive.google.com')) {\n  const match = mediaUrl.match(/[?&]id=([a-zA-Z0-9-_]+)/) || mediaUrl.match(/\\/d\\/([a-zA-Z0-9-_]+)/);\n  if (match && match[1]) {\n    driveFileId = match[1];\n  }\n}\n\nreturn {\n  pageId: $json.pageId,\n  mediaUrl: mediaUrl,\n  driveFileId: driveFileId,\n  title: title,\n  description: description.trim(),\n  tags: tags.length > 0 ? tags : ['video', 'upload'],\n  privacyStatus: 'public'\n};\n\n// Note: YouTube uses OAuth2 credential from n8n, no token needed here"
+        "jsCode": "// Prepare YouTube upload data\nconst title = $json.title || 'Untitled Video';\nconst description = ($json.caption || '') + '\\n\\n' + ($json.hashtags || '');\nconst tags = ($json.hashtags || '').split(' ').filter(tag => tag.startsWith('#')).map(tag => tag.substring(1));\nconst mediaUrl = $json.mediaUrl || '';\n// Use privacyStatus if not 'Scheduled', otherwise default to 'unlisted' for the actual upload\nconst privacyStatus = ($json.privacyStatus === 'Scheduled') ? 'unlisted' : ($json.privacyStatus || 'unlisted');\nconst youtubePlaylist = $json.youtubePlaylist || 'Suite E Studios';\n\n// Extract Google Drive file ID from URL if applicable\nlet driveFileId = null;\nif (mediaUrl.includes('drive.google.com')) {\n  const match = mediaUrl.match(/[?&]id=([a-zA-Z0-9-_]+)/) || mediaUrl.match(/\\/d\\/([a-zA-Z0-9-_]+)/);\n  if (match && match[1]) {\n    driveFileId = match[1];\n  }\n}\n\nreturn {\n  pageId: $json.pageId,\n  mediaUrl: mediaUrl,\n  driveFileId: driveFileId,\n  title: title,\n  description: description.trim(),\n  tags: tags.length > 0 ? tags : ['video', 'upload'],\n  privacyStatus: privacyStatus,\n  youtubePlaylist: youtubePlaylist\n};\n\n// Note: YouTube uses OAuth2 credential from n8n, no token needed here"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1376,
-        1376
+        -384,
+        272
       ],
-      "id": "8ec07224-4740-4f6f-abc1-6606247e6e12",
+      "id": "1fe58c8e-a7f0-410f-b052-93a2205c236a",
       "name": "Prepare YouTube Data"
     },
     {
@@ -284,10 +291,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        -1168,
-        1376
+        -176,
+        272
       ],
-      "id": "97bfdc27-1b07-4284-98eb-aec41c3a8426",
+      "id": "90375e1c-7a24-4f0a-816e-6cd4746d62e4",
       "name": "Download Video from Google Drive",
       "credentials": {
         "googleOAuth2Api": {
@@ -305,17 +312,13 @@
           "value": "49cebf36f8774bd69c4329d2c0d750c5",
           "mode": "id"
         },
-        "simple": false,
+        "pageId": "={{ $json.pageId }}",
+        "simple": true,
         "propertiesUi": {
           "propertyValues": [
             {
-              "key": "Status|status",
-              "selectValue": "Published",
-              "statusValue": "Posted"
-            },
-            {
-              "key": "Post Date|date",
-              "date": "={{new Date().toISOString().split('T')[0]}}"
+              "key": "Status",
+              "selectValue": "Posted"
             }
           ]
         },
@@ -324,10 +327,10 @@
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2.2,
       "position": [
-        -624,
-        1360
+        464,
+        256
       ],
-      "id": "775fc6a5-ab0d-41a9-a409-0b97f3a1159c",
+      "id": "c2756b7b-227f-4bef-b04a-2a757aedfb0e",
       "name": "Update Notion (YouTube)",
       "credentials": {
         "notionApi": {
@@ -344,10 +347,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1376,
-        1536
+        -384,
+        432
       ],
-      "id": "1e13c23d-94e3-472b-a625-d79854c6bd01",
+      "id": "c1a1de1a-267c-42d8-97cf-9b72617ccd11",
       "name": "Unsupported Platform"
     },
     {
@@ -355,10 +358,10 @@
       "type": "n8n-nodes-base.errorTrigger",
       "typeVersion": 1,
       "position": [
-        -2176,
-        1536
+        -1184,
+        432
       ],
-      "id": "43f730b2-c46e-4e9e-8c90-e590b2320a6e",
+      "id": "ef1864c7-7959-405f-86dd-2ad6e3237834",
       "name": "Error Handler"
     },
     {
@@ -369,10 +372,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1968,
-        1536
+        -976,
+        432
       ],
-      "id": "e0743b6b-dc95-41f7-99cd-7c9b4ca2c8fe",
+      "id": "92fb872b-3fab-47b5-8551-220eedff4368",
       "name": "Format Error Data"
     },
     {
@@ -401,10 +404,10 @@
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2.2,
       "position": [
-        -1776,
-        1536
+        -784,
+        432
       ],
-      "id": "af080160-b5b4-4f37-b63b-146b3be25a43",
+      "id": "5356a2f5-d96f-4503-85e0-aa53f4de384a",
       "name": "Update Notion with Error",
       "credentials": {
         "notionApi": {
@@ -416,15 +419,15 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "// Format YouTube publishAt timestamp\n// Parse the date and time from Notion\nconst dateStr = $json.postDate?.start || ''; // \"2026-02-28\"\nconst timeStr = $json.postTime || ''; // \"10:00 AM\"\n\n// Parse time string (handles both 12-hour with AM/PM and 24-hour formats)\nlet hours = 0;\nlet minutes = 0;\n\nif (timeStr) {\n  const timeParts = timeStr.match(/(\\d{1,2}):(\\d{2})\\s*(AM|PM)?/i);\n  \n  if (timeParts) {\n    hours = parseInt(timeParts[1]);\n    minutes = parseInt(timeParts[2]);\n    const meridiem = timeParts[3]?.toUpperCase();\n    \n    // Convert 12-hour to 24-hour if needed\n    if (meridiem === 'PM' && hours !== 12) {\n      hours += 12;\n    } else if (meridiem === 'AM' && hours === 12) {\n      hours = 0;\n    }\n  }\n}\n\n// Format as ISO 8601 with Z (UTC)\nconst publishAt = dateStr ? `${dateStr}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00Z` : null;\n\nreturn {\n  ...($json), // Keep all existing data\n  publishAt: publishAt, // Add formatted timestamp for YouTube\n  publishAtDebug: {\n    originalDate: dateStr,\n    originalTime: timeStr,\n    parsed: { hours, minutes },\n    formatted: publishAt\n  }\n};"
+        "jsCode": "// Format YouTube publishAt timestamp based on privacy status\nconst isScheduled = $json.privacyStatus === 'Scheduled';\nlet publishAt = null;\n\n// Only format timestamp if privacy status is 'Scheduled'\nif (isScheduled) {\n  const dateStr = $json.postDate?.start || $json.postDate || ''; // \"2026-02-28\"\n  const timeStr = $json.postTime || ''; // \"10:00 AM\"\n  \n  // Parse time string (handles both 12-hour with AM/PM and 24-hour formats)\n  let hours = 0;\n  let minutes = 0;\n  \n  if (timeStr) {\n    const timeParts = timeStr.match(/(\\d{1,2}):(\\d{2})\\s*(AM|PM)?/i);\n    \n    if (timeParts) {\n      hours = parseInt(timeParts[1]);\n      minutes = parseInt(timeParts[2]);\n      const meridiem = timeParts[3]?.toUpperCase();\n      \n      // Convert 12-hour to 24-hour if needed\n      if (meridiem === 'PM' && hours !== 12) {\n        hours += 12;\n      } else if (meridiem === 'AM' && hours === 12) {\n        hours = 0;\n      }\n    }\n  }\n  \n  // Format as ISO 8601 with Z (UTC)\n  publishAt = dateStr ? `${dateStr}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00Z` : null;\n}\n\nreturn {\n  ...($json), // Keep all existing data\n  publishAt: publishAt // null if posting immediately, formatted timestamp if Scheduled\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -976,
-        1376
+        80,
+        272
       ],
-      "id": "format-youtube-publishat",
+      "id": "8a4e807a-6797-441d-ad7d-c2773f0e733a",
       "name": "Format YouTube PublishAt"
     },
     {
@@ -436,17 +439,17 @@
         "categoryId": "10",
         "options": {
           "description": "={{ $json.description }}",
-          "privacyStatus": "unlisted",
+          "privacyStatus": "={{ $json.privacyStatus }}",
           "publishAt": "={{ $json.publishAt }}"
         }
       },
       "type": "n8n-nodes-base.youTube",
       "typeVersion": 1,
       "position": [
-        -880,
-        1360
+        256,
+        288
       ],
-      "id": "a2d70cda-39ef-4060-ba04-bdc35ed86dbd",
+      "id": "38ac17e7-eddd-4955-8a1a-8e2ef088a107",
       "name": "Upload a video",
       "credentials": {
         "youTubeOAuth2Api": {
@@ -454,6 +457,25 @@
           "name": "YouTube account"
         }
       }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&key=$env.YOUTUBE_API_KEY",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"snippet\": {\n    \"playlistId\": \"PL5gTeopOibQREpXSSqHwVaZTWv1EdUuki\",\n    \"resourceId\": {\n      \"kind\": \"youtube#video\",\n      \"videoId\": \"{{ $json.id }}\"\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        400,
+        288
+      ],
+      "id": "add-to-suite-e-playlist",
+      "name": "Add to Suite E Studios Playlist",
+      "onError": "continueErrorOutput"
     }
   ],
   "pinData": {},
@@ -582,17 +604,6 @@
       "main": [
         [
           {
-            "node": "Download Video from Google Drive",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Download Video from Google Drive": {
-      "main": [
-        [
-          {
             "node": "Format YouTube PublishAt",
             "type": "main",
             "index": 0
@@ -601,6 +612,17 @@
       ]
     },
     "Format YouTube PublishAt": {
+      "main": [
+        [
+          {
+            "node": "Download Video from Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Video from Google Drive": {
       "main": [
         [
           {
@@ -637,6 +659,17 @@
       "main": [
         [
           {
+            "node": "Add to Suite E Studios Playlist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to Suite E Studios Playlist": {
+      "main": [
+        [
+          {
             "node": "Update Notion (YouTube)",
             "type": "main",
             "index": 0
@@ -649,12 +682,12 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "ba917bdb-74b0-40a9-a216-87ed57eabf0c",
+  "versionId": "0526a534-cdad-4c3e-9d05-1ff4e854d19b",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9293fc07055c195e236ac85072d0208fe886bdff22e173da7b17b3c0599dbb93"
   },
-  "id": "2XR1YFk6rTugDoBU",
+  "id": "vSIZBesUL9n5aiL6",
   "tags": [
     {
       "updatedAt": "2026-02-10T20:20:09.838Z",

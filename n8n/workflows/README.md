@@ -51,8 +51,29 @@ To set up Instagram + Facebook + YouTube posting:
    - YouTube: Add OAuth2 Google credentials (configure in n8n UI)
 
 3. **Set up Notion database** (if not already done)
-   - Create database with fields: Post Title, Caption, Platform, Media Type, Media Link, Status
-   - Add test post with Status: "Scheduled"
+   - **Required fields for all platforms:**
+     - Post Title (Text)
+     - Caption (Text)
+     - Platform (Select: Instagram, Facebook, YouTube)
+     - Media Type (Select: Image, Video)
+     - Media Link (URL)
+     - Status (Select: Draft, Ready, Posted, Error)
+
+   - **YouTube-specific fields:**
+     - Post Date (Date)
+     - Post Time (Text - e.g., "2:00 PM" or "14:00")
+     - Privacy Status (Select: Public, Unlisted, Private, Scheduled)
+       - `Scheduled`: Posts at the date/time specified, uploads as Unlisted
+       - `Public/Unlisted/Private`: Posts immediately with that privacy setting
+     - YouTube Playlist (Select: Suite E Studios, #Final Friday)
+
+   - **Optional fields:**
+     - Day of Week (Formula: `formatDate(prop("Post Date"), "EEEE")`)
+     - Tags/Mentions (Text)
+     - Hashtags (Text)
+     - Notes (Text)
+
+   - Add test post with Status: "Ready"
 
 4. **Test the workflow**
    - Run workflow manually in n8n
@@ -87,7 +108,7 @@ See `../README.md` for detailed setup instructions and troubleshooting.
 ### Notion_to_Social_Media_Posting.json
 
 **What it does:**
-- Queries Notion database for posts marked "Scheduled"
+- Queries Notion database for posts marked "Ready"
 - Routes posts to Instagram, Facebook, or YouTube based on platform selection
 - Handles media uploading and caption publishing
 - Updates Notion status on success/failure
@@ -95,7 +116,12 @@ See `../README.md` for detailed setup instructions and troubleshooting.
 **Platform Support:**
 - **Instagram:** Business accounts, image + video support, captions up to 2,200 chars
 - **Facebook:** Any page type, image + video support, full captions
-- **YouTube:** Public/unlisted videos, 6 videos/day quota, OAuth2 auth
+- **YouTube:**
+  - Privacy modes: Public, Unlisted, Private
+  - Scheduled posting or immediate upload
+  - Auto-adds videos to Suite E Studios playlist
+  - 6 videos/day quota, OAuth2 auth
+  - Videos from Google Drive
 
 **Trigger:**
 - Manual (from n8n UI) or scheduled (future)
@@ -262,7 +288,7 @@ For best results, set up workflows in this order:
 ## 🔄 Workflow Execution Flow
 
 ```
-Notion Database (Status: "Scheduled")
+Notion Database (Status: "Ready")
     ↓
 [Notion_to_Social_Media_Posting.json]
     ├─ [Photo_Video_Optimizer.json] (optional)
@@ -278,8 +304,41 @@ Notion Database (Status: "Scheduled")
     └─→ "Error" (failure)
 ```
 
+## 🛣️ Roadmap
+
+### Phase 1 (Current) ✅
+- [x] Instagram posting from Notion
+- [x] Facebook posting from Notion
+- [x] YouTube video upload with scheduling
+- [x] Post Now (immediate posting) option
+- [x] YouTube privacy status (Public, Unlisted, Private)
+- [x] Auto-add to Suite E Studios playlist
+
+### Phase 2 (Planned) 🔄
+- [ ] **Batch Processing:** Point to a Google Drive folder and process all videos
+- [ ] **Playlist Selection:** Choose between multiple playlists from Notion
+- [ ] **Post History Workflow:** Archival and analytics tracking
+- [ ] **Notion Data Entry Workflow:** Auto-fill form for easier post creation
+- [ ] **Video Analytics:** Track views, engagement per video
+- [ ] **Scheduled Trigger:** Replace manual trigger with time-based scheduling
+- [ ] **Retry Logic:** Auto-retry failed uploads
+
+### Phase 3 (Future) 💡
+- [ ] TikTok integration
+- [ ] Twitter/X integration
+- [ ] LinkedIn posting
+- [ ] Automated caption generation
+- [ ] Image carousel support
+- [ ] Community tab content
+
+### Known Limitations
+- Instagram: Requires Business account (not Creator account)
+- YouTube: 6 videos per day quota
+- Facebook: Some account types may have restrictions
+- Videos must be on Google Drive (publicly accessible link required)
+
 ---
 
 **Last Updated:** February 12, 2026
-**Status:** Phase 1 - Multi-Platform Posting Setup
+**Status:** Phase 1 - Multi-Platform Posting Setup (YouTube Enhanced)
 **Maintained By:** Matt Taylor
