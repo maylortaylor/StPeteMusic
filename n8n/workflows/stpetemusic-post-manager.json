@@ -106,7 +106,7 @@
     {
       "parameters": {
         "descriptionType": "manual",
-        "toolDescription": "Add a new post to the PostSchedule sheet. You MUST call this tool to add posts. Required fields: PostDate (YYYY-MM-DD), DayOfWeek, PostTime (HH:MM), Platform, Caption (the full post text), Hashtags, Status (Draft/Scheduled/Posted). Optional: EventType, MediaType, TagsMentions, Notes.",
+        "toolDescription": "Add a new post to the PostSchedule sheet. You MUST call this tool to add posts. Required fields: PostDate (YYYY-MM-DD), DayOfWeek, PostTime (HH:MM), Platform, Caption (the full post text), Hashtags, Status (Draft/Ready/Posted). Optional: EventType, MediaType, TagsMentions, Notes.",
         "operation": "append",
         "documentId": {
           "__rl": true,
@@ -130,7 +130,7 @@
             "Media Type": "={{ $fromAI('MediaType', 'Type of media: Image, Video, Carousel, Reel, etc') }}",
             "Tags / Mentions": "={{ $fromAI('TagsMentions', 'Instagram handles to tag, e.g. @stpetemusic @suite.e.studios') }}",
             "Hashtags": "={{ $fromAI('Hashtags', 'Hashtags for the post, e.g. #StPeteMusic #FinalFriday') }}",
-            "Status": "={{ $fromAI('Status', 'Post status: Draft, Scheduled, or Posted') }}",
+            "Status": "={{ $fromAI('Status', 'Post status: Draft, Ready, or Posted') }}",
             "Notes": "={{ $fromAI('Notes', 'Any additional context or notes') }}"
           },
           "matchingColumns": [],
@@ -433,7 +433,7 @@
             "Media Type": "={{ $fromAI('MediaType', 'Type of media: Image, Video, Carousel, Reel, etc') }}",
             "Tags / Mentions": "={{ $fromAI('TagsMentions', 'Instagram handles to tag, e.g. @stpetemusic @suite.e.studios') }}",
             "Hashtags": "={{ $fromAI('Hashtags', 'Hashtags for the post, e.g. #StPeteMusic #FinalFriday') }}",
-            "Status": "={{ $fromAI('Status', 'Post status: Draft, Scheduled, or Posted') }}",
+            "Status": "={{ $fromAI('Status', 'Post status: Draft, Ready, or Posted') }}",
             "Notes": "={{ $fromAI('Notes', 'Any additional context or notes') }}"
           },
           "matchingColumns": [
