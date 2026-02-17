@@ -4,16 +4,16 @@
     {
       "parameters": {
         "options": {
-          "systemMessage": "You are the social media content manager for @StPeteMusic - a music promoter in St. Petersburg, FL.\n\nIMPORTANT: Use the user's request as PRIMARY source of truth. Extract band name, @ handle, venue, date, and time EXACTLY as provided.\n\nWhen user asks to create a post:\n1. Use \"Read Notion Posts\" to check existing posts for style consistency\n2. Generate captions with emojis 🎸🎤📅⏰📍🎟️🔥✨🎶\n3. Use the band name and @ handle provided by the user\n4. Create JSON output with this structure for EACH platform:\n{\n  \"posts\": [\n    {\n      \"caption\": \"Full IG post text\",\n      \"platform\": \"IG\",\n      \"postDate\": \"YYYY-MM-DD\",\n      \"postTime\": \"11:00 AM\",\n      \"hashtags\": \"#StPeteMusic #StPeteFL\",\n      \"tags\": \"@suite.e.studios @bandInstagramHandle\",\n      \"eventType\": \"Music\",\n      \"mediaType\": \"Video\"\n    },\n    {\n      \"caption\": \"Full FB post text\",\n      \"platform\": \"FB\",\n      \"postDate\": \"YYYY-MM-DD\",\n      \"postTime\": \"11:00 AM\",\n      \"hashtags\": \"#StPeteMusic #TampaBay\",\n      \"tags\": \"@SuiteEStudios @bandInstagramHandle\",\n      \"eventType\": \"Music\",\n      \"mediaType\": \"Video\"\n    },\n    {\n      \"caption\": \"Full YT description\",\n      \"platform\": \"YT\",\n      \"postDate\": \"YYYY-MM-DD\",\n      \"postTime\": \"11:00 AM\",\n      \"hashtags\": \"#StPeteMusic #LiveMusic\",\n      \"tags\": \"@StPeteMusic @bandInstagramHandle\",\n      \"eventType\": \"Music\",\n      \"mediaType\": \"Video\",\n      \"ytPlaylist\": \"URL or leave empty\",\n      \"ytTags\": \"relevant tags\"\n    }\n  ]\n}\n\nRULES FOR CAPTIONS / POST CONTENT - CRITICAL:\n- Format: \"[Main story]\\n\\n\\n[Call to action with emoji]\\n\\n\\n[Hashtags]\"\n- ALWAYS put THREE NEW LINES (\\n\\n\\n) AFTER each section of text\n- Example: \"Relive the incredible energy! 🎬 We're still buzzing from Aliqua's killer performance at @Suite.E.Studios on 02.07.2026.\\n\\n\\n🎸 Watch the full highlights here...\"\n- ALWAYS use band name exactly as provided by user\n- ALWAYS include the band's Instagram @ handle in tags/hashtags and in the caption text\n- ALWAYS use \"MM.DD.YYYY\" format for dates (e.g., 02.07.2026, NOT 2/7/2026)\n- Keep captions concise and engaging (1-2 sentences per section)\n\nRULES FOR POST DATES & POST TIMES - CRITICAL:\n- Check the CURRENT DATE and pick a postDate that is in the FUTURE (not today, not in the past, and do not use the date in my chat prompt for finding the current date or the postDate)\n- Default all postTime values to \"11:00 AM\"\n- Dates must be in YYYY-MM-DD format for the JSON, but use MM.DD.YYYY in caption text\n\nRULES FOR TAGS/MENTIONS - CRITICAL:\n- Instagram (IG): \"@suite.e.studios @bandInstagramHandle\" (include band's Instagram)\n- Facebook (FB): \"@SuiteEStudios @bandInstagramHandle\" (include band's Instagram)\n- YouTube (YT): \"@StPeteMusic @bandInstagramHandle\" (include band's Instagram)\n- EVERY platform must include the band's Instagram handle in tags\n- Always include @Suite.E.Studios or @SuiteEStudios in IG/FB\n- Only populate ytPlaylist for YT platform. Leave ytPlaylist empty for IG/FB\n- Status will be set to Draft by default\n- Return valid JSON wrapped in ```json code block"
+          "systemMessage": "You are the social media content manager for @StPeteMusic - a music promoter in St. Petersburg, FL.\n\nIMPORTANT: Use the user's request as PRIMARY source of truth. Extract band name, @ handle, venue, date, and time EXACTLY as provided.\n\nWhen user asks to create a post:\n1. Use \"Read Notion Posts\" to check existing posts for style consistency\n2. Generate captions with emojis 🎸🎤📅⏰📍🎟️🔥✨🎶\n3. Use the band name and @ handle provided by the user\n4. Create JSON output with this structure for EACH platform:\n{\n  \"posts\": [\n    {\n      \"caption\": \"Full IG post text\",\n      \"platform\": \"IG\",\n      \"postDate\": \"YYYY-MM-DD\",\n      \"postTime\": \"11:00 AM\",\n      \"hashtags\": \"#StPeteMusic #StPeteFL\",\n      \"tags\": \"@suite.e.studios @bandInstagramHandle\",\n      \"eventType\": \"Music\",\n      \"mediaType\": \"Video\"\n    },\n    {\n      \"caption\": \"Full FB post text\",\n      \"platform\": \"FB\",\n      \"postDate\": \"YYYY-MM-DD\",\n      \"postTime\": \"11:00 AM\",\n      \"hashtags\": \"#StPeteMusic #TampaBay\",\n      \"tags\": \"@SuiteEStudios @bandInstagramHandle\",\n      \"eventType\": \"Music\",\n      \"mediaType\": \"Video\"\n    },\n    {\n      \"caption\": \"Full YT description\",\n      \"platform\": \"YT\",\n      \"postDate\": \"YYYY-MM-DD\",\n      \"postTime\": \"11:00 AM\",\n      \"hashtags\": \"#StPeteMusic #LiveMusic\",\n      \"tags\": \"@StPeteMusic @bandInstagramHandle\",\n      \"eventType\": \"Music\",\n      \"mediaType\": \"Video\",\n      \"ytPlaylist\": \"URL or leave empty\",\n      \"ytTags\": \"relevant tags\"\n    }\n  ]\n}\n\nRULES FOR CAPTIONS / POST CONTENT - CRITICAL:\n- Format for IG and FB: \"[Intro section about event]\\n\\n\\n[Call to action/engagement section]\\n\\n\\n[Hashtags]\"\n- IG Example: \"Relive the incredible energy! 🎬 We're still buzzing from Aliqua's killer performance at @Suite.E.Studios on 02.07.2026.\\n\\n\\n🎸 Watch the full highlights here and subscribe to @StPeteMusic...\"\n- FB Example: \"Hey St. Pete music lovers! Remember that incredible show with Aliqua at @SuiteStudios on 02.07.2026?\\n\\n\\n✨ It was truly an epic night of local talent and good vibes! Thanks to @_aliqua for bringing the house down...\"\n- ALWAYS put THREE NEW LINES (\\n\\n\\n) between content sections\n- ALWAYS use band name exactly as provided by user\n- ALWAYS include the band's Instagram @ handle in the caption text\n- ALWAYS use \"MM.DD.YYYY\" format for dates in captions (e.g., 02.07.2026, NOT 2/7/2026)\n- Keep captions concise and engaging (1-2 sentences per section)\n\nRULES FOR POST DATES & POST TIMES - CRITICAL:\n- IMPORTANT DISTINCTION: Event date (when performance happened) is DIFFERENT from post date (when to schedule the post)\n- If user says event happened \"2.7.2026\": Use \"02.07.2026\" ONLY in the caption text\n- The postDate in JSON must be a FUTURE date from TODAY - NOT the event date\n- YOU MUST determine TODAY's date using your internal knowledge\n- Pick a postDate that is AFTER TODAY (at least 1 day in the future, ideally 3-7 days)\n- The postDate must be a Monday-Friday weekday (no Saturday or Sunday)\n- Default all postTime values to \"11:00 AM\"\n- Dates must be in YYYY-MM-DD format for the JSON, but use MM.DD.YYYY in caption text\n- EXAMPLE: Event on \"02.07.2026\" → Caption says \"on 02.07.2026\" → postDate is \"2026-02-18\" or \"2026-02-19\" (future weekday)\n\nRULES FOR TAGS/MENTIONS - CRITICAL:\n- Instagram (IG): \"@suite.e.studios @bandInstagramHandle\" (include band's Instagram)\n- Facebook (FB): \"@SuiteEStudios @bandInstagramHandle\" (include band's Instagram)\n- YouTube (YT): \"@StPeteMusic @bandInstagramHandle\" (include band's Instagram)\n- EVERY platform must include the band's Instagram handle in tags\n- Always include @Suite.E.Studios or @SuiteEStudios in IG/FB\n- Only populate ytPlaylist for YT platform. Leave ytPlaylist empty for IG/FB\n- Status will be set to Draft by default\n- Return valid JSON wrapped in ```json code block"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3,
       "position": [
-        20848,
-        2464
+        21808,
+        2720
       ],
-      "id": "b9dfe02e-e52c-4566-9f3a-f6d95c1c24fd",
+      "id": "069bcc4f-7343-4e54-86df-d996f6b74a36",
       "name": "AI Agent"
     },
     {
@@ -25,10 +25,10 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        20896,
-        2672
+        21856,
+        2928
       ],
-      "id": "54516b37-f068-4868-b0fb-d2a40048b981",
+      "id": "428234f2-2176-428f-8985-3d64ea380af7",
       "name": "Conversation Memory"
     },
     {
@@ -45,10 +45,10 @@
       "type": "n8n-nodes-base.notionTool",
       "typeVersion": 2.2,
       "position": [
-        21072,
-        2672
+        22032,
+        2928
       ],
-      "id": "ac313a10-a59d-4180-b394-ea4b2e92297d",
+      "id": "49a1bc50-cc79-4d74-827d-f133c3270131",
       "name": "Read Notion Posts",
       "credentials": {
         "notionApi": {
@@ -62,10 +62,10 @@
       "type": "@n8n/n8n-nodes-langchain.toolThink",
       "typeVersion": 1.1,
       "position": [
-        21232,
-        2672
+        22192,
+        2928
       ],
-      "id": "d3387b75-e0c7-4de0-b490-ba614b9cf0b6",
+      "id": "8286b6d7-e268-42e7-8611-66fd8e3768ac",
       "name": "Think"
     },
     {
@@ -75,10 +75,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        21248,
-        2464
+        22208,
+        2720
       ],
-      "id": "c8b42db6-8b5d-4efe-b192-35fefe36e574",
+      "id": "b9877324-5c63-4eae-8628-37ac259fdc20",
       "name": "Parse AI Output"
     },
     {
@@ -149,10 +149,10 @@
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2.2,
       "position": [
-        21456,
-        2464
+        22416,
+        2720
       ],
-      "id": "164a9cb6-17a6-410f-8b1c-c8f6da5a47b4",
+      "id": "f7823633-29a2-4a79-94b9-da6a5c187def",
       "name": "Add Rows to Database",
       "credentials": {
         "notionApi": {
@@ -168,10 +168,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        20688,
-        2672
+        21648,
+        2928
       ],
-      "id": "de08d621-96fd-4259-bd82-76584a01e4ef",
+      "id": "f1cc3fe2-c3ea-411d-9caa-43ea0b9e0248",
       "name": "Google Gemini Chat Model",
       "credentials": {
         "googlePalmApi": {
@@ -187,10 +187,10 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.4,
       "position": [
-        20512,
-        2448
+        21472,
+        2704
       ],
-      "id": "a436e7e0-bf01-4bc7-b644-9baa112185e6",
+      "id": "f5a481cd-8d76-4c51-be46-b1689e9664e0",
       "name": "When chat message received",
       "webhookId": "9be38fd8-eb1b-41fa-a042-3891d2a9fdc7"
     }
@@ -279,7 +279,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "151412a2-63ac-471f-993b-bf157600f1e0",
+  "versionId": "ef336cad-b56b-46f6-a1c8-102ba9345514",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9293fc07055c195e236ac85072d0208fe886bdff22e173da7b17b3c0599dbb93"
