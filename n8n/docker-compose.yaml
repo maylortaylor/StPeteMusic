@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   n8n:
     image: n8nio/n8n:latest
@@ -9,6 +7,7 @@ services:
       - "5678:5678"
     env_file: ../.env
     environment:
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
       - NODE_FUNCTION_ALLOW_BUILTIN=fs
       - N8N_BASIC_AUTH_ACTIVE=false
       - N8N_HOST=localhost

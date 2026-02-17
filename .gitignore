@@ -28,3 +28,4 @@ node_modules/
 
 # Large data files that can be regenerated
 data/archive/
+data/secrets/
