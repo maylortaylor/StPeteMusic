@@ -8,8 +8,9 @@ All n8n workflow files and supporting scripts for @StPeteMusic automation.
 
 | Workflow | Purpose | Status | Use For |
 |----------|---------|--------|---------|
-| **stpetemusic-post-manager.json** | Main post management interface | ✅ Active | Primary StPeteMusic content management |
+| **notion-post-creator.json** | Chat-based post creation & Notion database management | ✅ NEW | Create social media posts via natural language chat, auto-populate Notion database |
 | **notion-to-social-media-posting.json** | Multi-platform posting engine | 🔧 Phase 1 | Post to Instagram, Facebook, YouTube from Notion |
+| **stpetemusic-post-manager.json** | Main post management interface | ✅ Active | Primary StPeteMusic content management (Google Sheets based) |
 | **photo-video-optimizer.json** | Media optimization & conversion | ✅ Available | Resize/convert media for platform requirements |
 | **ai-caption-metadata-generator.json** | AI-powered captions & metadata | ✅ Available | Generate captions using Claude/Gemini APIs |
 
@@ -38,12 +39,36 @@ All n8n workflow files and supporting scripts for @StPeteMusic automation.
 4. Configure any missing credentials in n8n UI
 5. Test with sample data before deploying
 
-### Phase 1: Multi-Platform Posting Setup
+### Phase 1: Chat-Based Post Creation (NEW - Start Here!)
 
-To set up Instagram + Facebook + YouTube posting:
+To create posts using natural language chat:
 
 1. **Import workflow**
-   - Import `Notion_to_Social_Media_Posting.json`
+   - Import `notion-post-creator.json`
+
+2. **Configure API credentials in n8n**
+   - Google Sheets OAuth2: Should be auto-configured (reads `IG_PastPosts` sheet for style reference)
+   - Notion API: Should be auto-configured (reads/writes `Social Media Posts` database)
+   - Google Gemini API: Should be auto-configured (for AI caption generation)
+
+3. **Test the workflow**
+   - Open n8n UI → Click on "notion-post-creator" workflow
+   - Click "Chat" button to open chat interface
+   - Type: "Create an Instagram post for Final Friday on February 28"
+   - Watch the AI generate a caption and create a Notion entry
+   - Open Notion database and verify the new post appears (Status="Draft")
+
+4. **Finalize the post**
+   - Add your media (image/video) URL to the Notion "Media Link" field
+   - Change Status from "Draft" to "Ready"
+   - Follow Phase 2 below to publish
+
+### Phase 2: Multi-Platform Posting Setup
+
+To publish posts from Notion to Instagram + Facebook + YouTube:
+
+1. **Import workflow**
+   - Import `notion-to-social-media-posting.json`
 
 2. **Configure API credentials in n8n**
    - Instagram: Add credentials using `IG_USER_ID` and `IG_ACCESS_TOKEN` from `.env`
@@ -89,6 +114,69 @@ See `../README.md` for detailed setup instructions and troubleshooting.
 | **findMediaFiles.js** | Locate and validate media files | `node findMediaFiles.js /path/to/media` |
 
 ## 📝 Workflow Details
+
+### notion-post-creator.json
+
+**What it does:**
+- Chat-based interface for creating social media posts
+- Analyzes past Instagram posts for style consistency
+- Generates platform-specific captions (Instagram, Facebook, YouTube)
+- Automatically creates Notion database entries with correct metadata
+- Maintains conversation context for multi-turn interactions
+
+**Triggers:**
+- Manual chat trigger from n8n UI
+- Accepts natural language requests like "Create posts for Final Friday" or "Make an Instagram post for [band name]"
+
+**Key Features:**
+- **Style Matching:** Analyzes past posts from `IG_PastPosts` Google Sheet to maintain consistent tone, emoji usage, and hashtag patterns
+- **Multi-Platform Creation:** Creates separate Notion entries for Instagram, Facebook, and YouTube with platform-specific metadata
+- **AI Agent:** Uses Google Gemini 2.0 Flash model with access to 3 tools:
+  - **Read Notion Posts:** Check existing posts to avoid duplicates
+  - **Create Notion Post:** Add new posts to the database with Status="Draft"
+  - **Think:** Reason through complex multi-post requests
+- **Conversation Memory:** Maintains context across multiple chat turns for iterative refinement
+
+**Workflow:**
+```
+Chat Input
+    ↓
+[Read Past Posts from Google Sheets]
+    ↓
+[Aggregate Posts for Style Reference]
+    ↓
+[AI Agent with Gemini Model]
+    ├─ Tool: Read Notion Posts (check duplicates)
+    ├─ Tool: Create Notion Post (write to database)
+    ├─ Tool: Think (reason about complex requests)
+    └─ Memory: Session-based context window
+    ↓
+[Notion Database Updated]
+    └─ Status="Draft" (user adds media URL, changes to Ready)
+```
+
+**Output:**
+- New Notion database entries with:
+  - Caption (full post text)
+  - Platform (IG/FB/YT)
+  - Status (Draft)
+  - Hashtags (platform-specific)
+  - Tags/Mentions (handles to tag)
+  - Post Date/Time
+  - Media Type (Reel, Image, Video)
+  - Optional: Notes, Privacy Status (YouTube), Playlist (YouTube)
+
+**Next Steps After Creation:**
+1. Open Notion database and find newly created posts (Status="Draft")
+2. Add Google Drive media URL to "Media Link" field
+3. Change Status to "Ready"
+4. Run `notion-to-social-media-posting.json` to publish
+
+**Chat Examples:**
+- "Create an Instagram post for Final Friday on February 28"
+- "Make posts for all platforms for The Groove Merchants"
+- "Create a Facebook post about Instant Noodles"
+- "Add another band to the posts we just made" (uses memory context)
 
 ### stpetemusic-post-manager.json
 
@@ -276,37 +364,67 @@ Before running workflows in production:
 - **YouTube Data API:** https://developers.google.com/youtube/v3/
 - **Notion API:** https://developers.notion.com/
 
-## 📋 Workflow Import Order (Phase 1)
+## 📋 Workflow Import Order
 
 For best results, set up workflows in this order:
 
-1. **notion-to-social-media-posting.json** - Main workflow
-2. **photo-video-optimizer.json** - For media optimization
-3. **ai-caption-metadata-generator.json** - For AI captions
-4. **stpetemusic-post-manager.json** - Post management hub (optional)
+**Phase 1: Post Creation & Publishing (Recommended)**
+1. **notion-post-creator.json** - Chat-based post creation (NEW - Start here!)
+2. **notion-to-social-media-posting.json** - Multi-platform publishing
+3. **photo-video-optimizer.json** - Media optimization (optional)
+
+**Phase 2: Alternative / Legacy (Optional)**
+4. **ai-caption-metadata-generator.json** - AI captions (if not using notion-post-creator)
+5. **stpetemusic-post-manager.json** - Post management hub (Google Sheets based, legacy)
 
 ## 🔄 Workflow Execution Flow
 
+### Complete Social Media Pipeline
+
 ```
-Notion Database (Status: "Ready")
+┌─ Chat Input (Natural Language)
+│
+├─→ [Notion Post Creator]
+│   ├─ Read past posts for style reference
+│   ├─ AI generates captions & metadata
+│   └─ Creates Notion entries (Status: "Draft")
+│
+├─ User Action: Add media URL + change Status to "Ready"
+│
+├─→ [Notion Database] (Status: "Ready")
+│   │
+│   ├─→ [Notion_to_Social_Media_Posting]
+│   │   ├─ Extract post data
+│   │   ├─ [Photo_Video_Optimizer] (optional)
+│   │   ├─ [AI_Caption_Generator] (optional)
+│   │   │
+│   │   ├─→ [Platform Router]
+│   │   │   ├─→ Instagram API
+│   │   │   ├─→ Facebook API
+│   │   │   └─→ YouTube API
+│   │   │
+│   │   └─ Update Notion Status
+│   │       ├─→ "Posted" (success)
+│   │       └─→ "Error" (failure)
+│   │
+│   └─ [Notion Database] (Status: "Posted" or "Error")
+```
+
+### Quick Start: Just Post (Without notion-post-creator)
+
+```
+[Manual Notion Entry]
     ↓
-[Notion_to_Social_Media_Posting.json]
-    ├─ [Photo_Video_Optimizer.json] (optional)
-    ├─ [AI_Caption_Generator.json] (optional)
+[Status: "Ready"]
     ↓
-[Platform Router]
-    ├─→ Instagram API
-    ├─→ Facebook API
-    └─→ YouTube API
+[Notion_to_Social_Media_Posting]
     ↓
-[Update Notion Status]
-    ├─→ "Posted" (success)
-    └─→ "Error" (failure)
+[Published to Platforms]
 ```
 
 ## 🛣️ Roadmap
 
-### Phase 1 (Current) ✅
+### Phase 1 (Complete) ✅
 - [x] Instagram posting from Notion
 - [x] Facebook posting from Notion
 - [x] YouTube video upload with scheduling
@@ -314,22 +432,26 @@ Notion Database (Status: "Ready")
 - [x] YouTube privacy status (Public, Unlisted, Private)
 - [x] Auto-add to Suite E Studios playlist
 
-### Phase 2 (Planned) 🔄
+### Phase 2 (Current) 🔄
+- [x] **Notion Post Creator Workflow:** AI-powered chat interface for post creation
+- [x] **AI Caption Generation:** Analyze past posts for style consistency
+- [x] **Conversation Memory:** Multi-turn chat with context preservation
 - [ ] **Batch Processing:** Point to a Google Drive folder and process all videos
 - [ ] **Playlist Selection:** Choose between multiple playlists from Notion
 - [ ] **Post History Workflow:** Archival and analytics tracking
-- [ ] **Notion Data Entry Workflow:** Auto-fill form for easier post creation
 - [ ] **Video Analytics:** Track views, engagement per video
 - [ ] **Scheduled Trigger:** Replace manual trigger with time-based scheduling
 - [ ] **Retry Logic:** Auto-retry failed uploads
+- [ ] **Update Notion Posts:** Edit existing posts via chat
 
 ### Phase 3 (Future) 💡
 - [ ] TikTok integration
 - [ ] Twitter/X integration
 - [ ] LinkedIn posting
-- [ ] Automated caption generation
 - [ ] Image carousel support
 - [ ] Community tab content
+- [ ] Automated hashtag suggestions
+- [ ] Content calendar sync (Google Calendar)
 
 ### Known Limitations
 - Instagram: Requires Business account (not Creator account)
@@ -339,6 +461,6 @@ Notion Database (Status: "Ready")
 
 ---
 
-**Last Updated:** February 12, 2026
-**Status:** Phase 1 - Multi-Platform Posting Setup (YouTube Enhanced)
+**Last Updated:** February 13, 2026
+**Status:** Phase 2 - Notion Post Creator (AI Chat Interface)
 **Maintained By:** Matt Taylor
