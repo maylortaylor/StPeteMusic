@@ -1,5 +1,5 @@
 {
-  "name": "Notion Post Creator v5 Final",
+  "name": "Notion Post Creator",
   "nodes": [
     {
       "parameters": {
@@ -10,10 +10,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3,
       "position": [
-        21808,
-        2720
+        22896,
+        2624
       ],
-      "id": "069bcc4f-7343-4e54-86df-d996f6b74a36",
+      "id": "bccc1e4c-45dd-4c62-b6b5-10cb4550cd0b",
       "name": "AI Agent"
     },
     {
@@ -25,10 +25,10 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        21856,
-        2928
+        22944,
+        2832
       ],
-      "id": "428234f2-2176-428f-8985-3d64ea380af7",
+      "id": "9b4ca106-47e1-4a99-8e6c-2ed99f4edaf6",
       "name": "Conversation Memory"
     },
     {
@@ -45,10 +45,10 @@
       "type": "n8n-nodes-base.notionTool",
       "typeVersion": 2.2,
       "position": [
-        22032,
-        2928
+        23120,
+        2832
       ],
-      "id": "49a1bc50-cc79-4d74-827d-f133c3270131",
+      "id": "d664b9a3-e20b-4d48-81ce-49ef63ac5fb3",
       "name": "Read Notion Posts",
       "credentials": {
         "notionApi": {
@@ -62,10 +62,10 @@
       "type": "@n8n/n8n-nodes-langchain.toolThink",
       "typeVersion": 1.1,
       "position": [
-        22192,
-        2928
+        23280,
+        2832
       ],
-      "id": "8286b6d7-e268-42e7-8611-66fd8e3768ac",
+      "id": "b42380d7-a9c0-4391-b033-a42ff9e9bc11",
       "name": "Think"
     },
     {
@@ -75,10 +75,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        22208,
-        2720
+        23296,
+        2624
       ],
-      "id": "b9877324-5c63-4eae-8628-37ac259fdc20",
+      "id": "99a187e9-711c-46f2-b5d1-94437577cded",
       "name": "Parse AI Output"
     },
     {
@@ -149,10 +149,10 @@
       "type": "n8n-nodes-base.notion",
       "typeVersion": 2.2,
       "position": [
-        22416,
-        2720
+        23504,
+        2624
       ],
-      "id": "f7823633-29a2-4a79-94b9-da6a5c187def",
+      "id": "8b0df641-913c-4f91-a7d4-b5b24b473239",
       "name": "Add Rows to Database",
       "credentials": {
         "notionApi": {
@@ -168,10 +168,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        21648,
-        2928
+        22736,
+        2832
       ],
-      "id": "f1cc3fe2-c3ea-411d-9caa-43ea0b9e0248",
+      "id": "d5796a0b-a15a-46ea-934f-d45a087143a3",
       "name": "Google Gemini Chat Model",
       "credentials": {
         "googlePalmApi": {
@@ -187,10 +187,10 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.4,
       "position": [
-        21472,
-        2704
+        22560,
+        2608
       ],
-      "id": "f5a481cd-8d76-4c51-be46-b1689e9664e0",
+      "id": "e9c8b0b7-3f74-44d8-a02a-0c25753c0ed0",
       "name": "When chat message received",
       "webhookId": "9be38fd8-eb1b-41fa-a042-3891d2a9fdc7"
     }
@@ -279,7 +279,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "ef336cad-b56b-46f6-a1c8-102ba9345514",
+  "versionId": "98c9f7a1-322f-4a87-a4fb-6a42598a8b1e",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9293fc07055c195e236ac85072d0208fe886bdff22e173da7b17b3c0599dbb93"
