@@ -21,7 +21,7 @@ n8n/
 
 ```bash
 cd n8n
-docker-compose up -d
+docker compose up -d
 ```
 
 n8n will be available at **http://localhost:5678**
@@ -29,7 +29,7 @@ n8n will be available at **http://localhost:5678**
 ### Stop n8n
 
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ## ⚙️ Configuration
