@@ -78,6 +78,61 @@ Extract band name, @ handle, venue, date, and time **EXACTLY** as provided.
 
 ---
 
+### YouTube Video Description
+
+**Full YouTube description structure:**
+
+```
+@artistInstagramHandle (band/artist description) at Suite E Studios St Pete, FL | MM.DD.YYYY #StPeteMusic #StPeteFL #BandHashtag
+
+Things you should check out:
+-- Suite E Studios || https://linktree.com/suite_e_studios
+-- St Pete Music || http://linktree.com/stpetemusic
+-- St Pete Music Instagram || https://www.instagram.com/stpetemusic/
+-- St Pete Music Facebook || https://www.facebook.com/stpeteflmusic/
+-- The Blueberry Patch || http://www.blueberrypatch.org/
+
+StPete Music is a youtube channel that is dedicated to showing off the best musicians, artists, bands, and performers in the Greater Tampa Bay and St Petersburg, FL area. Every venue filmed gets their own playlist dedicated to their location. Every artist, band, performer, etc captured is encouraged to help correct any misspellings of their artist name, song titles, and other mistakes that might be obvious to the public.
+
+If you would like a video removed please comment on the video asking for the video to be removed or contact the owner of this channel and ask them to remove the video.
+
+-==- email -==-
+TheBurgMusic@gmail.com
+or
+roboBOREALIS@gmail.com
+```
+
+**Rules for YouTube Description:**
+- **First line:** Artist Instagram handle + "at Suite E Studios St Pete, FL | MM.DD.YYYY" + hashtags
+  - Date format: `MM.DD.YYYY` (e.g., `02.13.2026`)
+  - Add band-specific hashtags if known
+- **Always include** the full boilerplate with venue links, channel description, and contact info
+- **Keep it consistent** — this is the standard StPete Music channel format
+
+**Example:**
+```
+Willie Jones Cocktail Hour (@williejones_cocktailhour) at Suite E Studios (@suite.e.studios) St Pete, FL | 02.13.2026 #StPeteMusic #StPeteFL #SuiteEStudios #WillieJonesCocktailHour
+
+Things you should check out:
+-- Suite E Studios || https://linktree.com/suite_e_studios
+-- St Pete Music || http://linktree.com/stpetemusic
+-- St Pete Music Instagram || https://www.instagram.com/stpetemusic/
+-- St Pete Music Facebook || https://www.facebook.com/stpeteflmusic/
+
+More things you should check out:
+-- The Blueberry Patch || http://www.blueberrypatch.org/
+
+
+StPete Music is a youtube channel that is dedicated to showing off the best musicians, artists, bands, and performers in the Greater Tampa Bay and St Petersburg, FL area. Currently stationed at Suite E Studios in St Petersburg, FL's Warehouse Arts District. Come see us for weekly events like WUSF Jazz Sundays, #FinalFriday Band showcase, or 2nd Saturday Art Walk.
+
+-==- email -==- 
+TheBurgMusic@gmail.com 
+or 
+suite.e.stpete@gmail.com
+```
+
+---
+
 ### Instagram & Facebook (Max 500 chars, target ~300 chars)
 
 - **Structure:** `[Main Info]\n\n\n[Vibe Message]\n\n\n[Hashtags]`
