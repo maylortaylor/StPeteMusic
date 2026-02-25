@@ -28,7 +28,7 @@ Extract band name, @ handle, venue, date, and time **EXACTLY** as provided.
       "platform": "IG",
       "postDate": "YYYY-MM-DD",
       "postTime": "11:00 AM",
-      "hashtags": "#StPeteMusic #StPeteFL",
+      "hashtags": "#StPeteMusic #SuiteEStudios #StPeteFL #TampaBay",
       "tags": "@suite.e.studios @bandInstagramHandle",
       "eventType": "Music",
       "mediaType": "Video"
@@ -38,7 +38,7 @@ Extract band name, @ handle, venue, date, and time **EXACTLY** as provided.
       "platform": "FB",
       "postDate": "YYYY-MM-DD",
       "postTime": "11:00 AM",
-      "hashtags": "#StPeteMusic #TampaBay",
+      "hashtags": "#StPeteMusic #SuiteEStudios #StPeteFL #TampaBay",
       "tags": "@SuiteEStudios @bandInstagramHandle",
       "eventType": "Music",
       "mediaType": "Video"
@@ -48,11 +48,11 @@ Extract band name, @ handle, venue, date, and time **EXACTLY** as provided.
       "platform": "YT",
       "postDate": "YYYY-MM-DD",
       "postTime": "11:00 AM",
-      "hashtags": "#StPeteMusic #LiveMusic",
+      "hashtags": "#StPeteMusic #SuiteEStudios #StPeteFL #TampaBay",
       "tags": "@StPeteMusic @bandInstagramHandle",
       "eventType": "Music",
       "mediaType": "Video",
-      "ytPlaylist": "URL or leave empty",
+      "ytPlaylist": "default to https://www.youtube.com/watch?v=-GzyL6WdNWA&list=PL5gTeopOibQREpXSSqHwVaZTWv1EdUuki",
       "ytTags": "relevant tags"
     }
   ]
@@ -73,14 +73,14 @@ Extract band name, @ handle, venue, date, and time **EXACTLY** as provided.
 - **NO** new lines or triple breaks
 
 **Examples:**
-- `🎸 02.23 @BadWolf @Suite.E.Studios` *(37 chars)*
-- `🎸 03.15 Wandering Hearts @Suite.E.Studios` *(43 chars)*
+- `🎸 02.23 @BadWolf at @Suite.E.Studios` *(37 chars)*
+- `🎸 03.15 Wandering Hearts at @Suite.E.Studios` *(43 chars)*
 
 ---
 
 ### Instagram & Facebook (Max 500 chars, target ~300 chars)
 
-- **Structure:** `[Main Info]\n\n\n[Vibe Message]`
+- **Structure:** `[Main Info]\n\n\n[Vibe Message]\n\n\n[Hashtags]`
 - **Main Info line:** `🎸 MM.DD @BandName || Suite.E.Studios`
   - Use `@` if they have IG; otherwise just name
   - Default venue: Suite.E.Studios
@@ -96,13 +96,19 @@ Extract band name, @ handle, venue, date, and time **EXACTLY** as provided.
 🎸 02.23 @BadWolf || Suite.E.Studios
 
 
-🔥 The energy was ELECTRIC last night! Bad Wolf absolutely crushed it!
+🔥 The vibes were perfect last night! Bad Wolf absolutely crushed it!
+
+
+#StPeteMusic #SuiteEStudios #StPeteFL #TampaBay
 ```
 ```
 🎸 03.15 Wandering Hearts || Suite.E.Studios
 
 
-✨ What an incredible vibe! Pure magic on that stage!
+✨ What an incredible night! Pure magic on that stage!
+
+
+#StPeteMusic #SuiteEStudios #StPeteFL #TampaBay
 ```
 
 ---
@@ -132,7 +138,7 @@ Extract band name, @ handle, venue, date, and time **EXACTLY** as provided.
 | **YT** | `@StPeteMusic @bandInstagramHandle` |
 
 - **Every platform** must include the band's Instagram handle
-- Always include `@Suite.E.Studios` or `@SuiteEStudios` on IG/FB
+- Always include `@Suite.E.Studios` (IG) or `@SuiteEStudios` (FB)
 - Only populate `ytPlaylist` for the YT platform — leave empty for IG/FB
 - Status defaults to **Draft**
 - Return valid JSON wrapped in a ` ```json ` code block
