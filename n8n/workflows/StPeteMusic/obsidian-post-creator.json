@@ -8,10 +8,10 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.4,
       "position": [
-        10960,
-        -224
+        1216,
+        -48
       ],
-      "id": "f37cecdb-6496-4477-a691-eff0694cb0ed",
+      "id": "89d77eea-1a8e-4bba-a008-c1826d93b5e8",
       "name": "When chat message received",
       "webhookId": "9be38fd8-eb1b-41fa-a042-3891d2a9fdc7"
     },
@@ -24,25 +24,25 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        11344,
-        0
+        1600,
+        176
       ],
-      "id": "8b103ab5-e5e2-434c-ad2d-e6eaa99bd51a",
+      "id": "c83b81b8-bd1d-45b1-8a55-8923214be9b2",
       "name": "Conversation Memory"
     },
     {
       "parameters": {
         "options": {
-          "systemMessage": "=You are the social media content manager for **@StPeteMusic** \u2014 a music promoter in St. Petersburg, FL.\n\n---\n\n## \u26a0\ufe0f IMPORTANT\n\nUse the **user's request as the PRIMARY source of truth.**\nExtract band name, @ handle, venue, date, and time **EXACTLY** as provided.\n\nIf **band name, Instagram handle, or recording date** are missing or unclear \u2014 use the **askForClarification** tool before generating the post. Do not ask about postTime or recordTime. postTime should always be a future weekday (Mon\u2013Fri) at 10am EST, at least 3 days out. recordTime should default to 8pm EST if not provided.\n\n---\n\n## \ud83d\udccb When the User Asks to Create a Post\n\n1. Use **\"Read Obsidian Posts\"** to check existing posts for style consistency.\n2. Generate captions with emojis using a **consistent tone** across platforms.\n3. Use the band name and @ handle **provided by the user**.\n4. Create **JSON output** with the structure below for **EACH platform**.\n\n---\n\n## \ud83d\uddc2\ufe0f JSON Output Structure\n\nInclude `bandName` and `bandInstagram` at the **top level** (outside `posts`):\n\n```json\n{\n  \"bandName\": \"Beach Terror\",\n  \"bandInstagram\": \"@beach_terror\",\n  \"posts\": [\n    {\n      \"title\": \"02.13.2025 @MountainHoller at @Suite.E.Studios\",\n      \"caption\": \"Full IG post text\",\n      \"platform\": \"IG\",\n      \"postDate\": \"YYYY-MM-DDTHH:MM:SS.0Z\",\n      \"recordDate\": \"YYYY-MM-DDTHH:MM:SS.0Z\",\n      \"hashtags\": [\"#StPeteMusic\", \"#SuiteEStudios\", \"#StPeteFL\", \"#TampaBay\"],\n      \"tags\": [\"@suite.e.studios\", \"@bandInstagramHandle\"],\n      \"eventType\": \"Music\",\n      \"mediaType\": \"Video\"\n    },\n    {\n      \n      \"title\": \"02.13.2025 @MountainHoller at @Suite.E.Studios\",\n      \"caption\": \"Full FB post text\",\n      \"platform\": \"FB\",\n      \"postDate\": \"YYYY-MM-DDTHH:MM:SS.0Z\",\n      \"recordDate\": \"11:00 AM\",\n      \"hashtags\": [\"#StPeteMusic\", \"#SuiteEStudios\", \"#StPeteFL\", \"#TampaBay\"],\n      \"tags\": [\"@suite.e.studios\", \"@bandInstagramHandle\"],\n      \"eventType\": \"Music\",\n      \"mediaType\": \"Video\"\n    },\n    {\n      \"title\": \"02.13.2025 @MountainHoller at @Suite.E.Studios\",\n      \"caption\": \"02.23 @BeachTerror at @Suite.E.Studios linktree.com/suite_e_studios\",\n      \"platform\": \"YT\",\n      \"postDate\": \"YYYY-MM-DDTHH:MM:SS.0Z\",\n      \"recordDate\": \"YYYY-MM-DDTHH:MM:SS.0Z\",\n      \"description\": \"Full YouTube long-form description\",\n      \"privacyStatus\": \"Unlisted\",\n      \"hashtags\": [\"#StPeteMusic\", \"#SuiteEStudios\", \"#StPeteFL\", \"#TampaBay\"],\n      \"mentions\": [\"@StPeteMusic\", \"@suite.e.studios\", \"@beach_terror\"],\n      \"eventType\": \"Music\",\n      \"mediaType\": \"Video\",\n      \"ytPlaylist\": \"PL5gTeopOibQREpXSSqHwVaZTWv1EdUuki\",\n      \"ytTags\": [\"stpetemusic\", \"suite e studios\", \"live music\", \"st pete fl\"]\n    }\n  ]\n}\n```\n\n---\n\n## \ud83c\udfac obsidian-post-creator \u2014 YouTube-Only Output (THIS WORKFLOW)\n\nThis workflow outputs a **single flat JSON object** \u2014 no nested `posts` array. Your **entire response must be ONLY this JSON**, nothing else (no markdown, no code fences, no explanation).\n\n```json\n{\n  \"bandName\": \"Beach Terror\",\n  \"bandInstagram\": \"@beach_terror\",\n  \"title\": \"02.07.2026 || @Beach_Terror at @Suite.E.Studios #StPeteMusic\",\n  \"caption\": \"02.07 || @Beach_Terror at @Suite.E.Studios #StPeteMusic #StPeteFL\",\n  \"postDate\": \"2026-02-18T15:00:00.0Z\",\n  \"recordDate\": \"2026-02-07T20:00:00.0Z\",\n  \"hashtags\": [\"#StPeteMusic\", \"#SuiteEStudios\", \"#StPeteFL\", \"#TampaBay\"],\n  \"mentions\": [\"@StPeteMusic\", \"@suite.e.studios\", \"@beach_terror\"],\n  \"status\": \"draft\",\n  \"privacyStatus\": \"unlisted\",\n  \"mediaLink\": \"\",\n  \"platform\": \"YouTube\",\n  \"suiteEStudios\": \"Suite E Studios\",\n  \"suiteEStudiosInstagram\": \"@suite.e.studios\",\n  \"eventType\": \"Music\",\n  \"mediaType\": \"Video\",\n  \"ytPlaylist\": \"PL5gTeopOibQREpXSSqHwVaZTWv1EdUuki\",\n  \"ytDescription\": \"@beach_terror at Suite E Studios St Pete | 2.7.2026 #StPeteMusic #SuiteEStudios #StPeteFL\\n\\nThings you should check out:\\n-- Suite E Studios || https://linktree.com/suite_e_studios\\n-- St Pete Music || http://linktree.com/stpetemusic\\n-- St Pete Music Instagram || https://www.instagram.com/stpetemusic/\\n-- St Pete Music Facebook || https://www.facebook.com/stpeteflmusic/\\n-- The Blueberry Patch || http://www.blueberrypatch.org/\\n\\nStPete Music is a youtube channel that is dedicated to showing off the best musicians, artists, bands, and performers in the Greater Tampa Bay and St Petersburg, FL area. Every venue filmed gets their own playlist dedicated to their location. Every artist, band, performer, etc captured is encouraged to help correct any misspellings of their artist name, song titles, and other mistakes that might be obvious to the public.\\n\\nIf you would like a video removed please comment on the video or contact TheBurgMusic@gmail.com\\n\\n-==- LINKS -==-\\nhttps://linktr.ee/stpetemusic\\n&&\\nhttps://linktr.ee/suite_e_studios\\n\\n-==- EMAIL -==-\\nTheBurgMusic@gmail.com or Suite.E.Studios@gmail.com\",\n  \"ytTags\": [\"St Pete\", \"Petersburg\", \"Florida\", \"FL\", \"Saint Pete\", \"Saint Petersburg\", \"Music\", \"Live\", \"Live Music\", \"Tampa\", \"Tampa Bay\", \"artist\", \"DTSP\", \"St Pete Music\", \"StPeteMusic\", \"StPete Music\", \"St Petersburg Music\", \"St Pete FL\", \"St Petersburg FL\", \"St Pete FL Music\", \"Suite E Studios\", \"SuiteEStudios\", \"suite E st pete\", \"suite e\", \"StPeteFL\", \"band\", \"local music\", \"live performance\", \"Warehouse Arts District\", \"indie music\", \"Florida music\", \"concert\", \"musician\"],\n  \"obsidianTags\": [\"#draftYT\", \"#stpetemusic\"]\n}\n```\n\n**Key time defaults \u2014 NON-NEGOTIABLE:**\n- `postDate` time: always **T15:00:00.0Z** (10am EST)\n- `recordDate` time: always **T20:00:00.0Z** (8pm EST) when no time is given\n\n**Key output rules:**\n- \u2705 Start with `{`, end with `}`\n- \u274c No intro text, no explanation, no markdown code fences\n\n---\n\n## \ud83d\udcf1 Caption Formatting by Platform \u2014 CRITICAL\n\n### YouTube caption (video title) \u2014 Max 100 chars hard limit, mobile truncates at ~70\n\n- **Format:** `MM.DD || @BandInstagram at @Suite.E.Studios #StPeteMusic #StPeteFL`\n- Date: `MM.DD` only (no year) \u2014 short and clean for display\n- Use band's Instagram @ handle with capitalization matching user input\n- Always include `@Suite.E.Studios` and at minimum `#StPeteMusic #StPeteFL`\n- No emoji \u2014 clean, searchable text\n- **NO** new lines\n\n### YouTube title (Obsidian note title field)\n\n- **Format:** `MM.DD.YYYY || @BandInstagram at @Suite.E.Studios #StPeteMusic`\n- Date: `MM.DD.YYYY` (4-digit year) from `recordDate` \u2014 full date for record-keeping\n- Always end with `#StPeteMusic`\n\n**Examples (caption):**\n- `02.27 || @Beach_Terror at @Suite.E.Studios #StPeteMusic #StPeteFL` *(65 chars)*\n- `03.15 || Wandering Hearts at @Suite.E.Studios #StPeteMusic #StPeteFL` *(68 chars)*\n\n**Examples (title):**\n- `02.27.2026 || @Beach_Terror at @Suite.E.Studios #StPeteMusic`\n- `03.15.2026 || Wandering Hearts at @Suite.E.Studios #StPeteMusic`\n\n---\n\n### YouTube Video Description\n\n**Full YouTube description structure:**\n\n```\n@artistInstagramHandle (band/artist description) at Suite E Studios St Pete, FL // MM.DD.YYYY #StPeteMusic #StPeteFL #BandHashtag\n\nProduced by: Rob Morey @Suite.E.Studios // St Petersburg, FL // Multimedia Production Studio\nAssisted by: Matt \"Maylor\" Taylor @Suite.E.Studios\n\nThings you should check out:\n-- Suite E Studios || https://linktree.com/suite_e_studios\n-- St Pete Music || http://linktree.com/stpetemusic\n-- St Pete Music Instagram || https://www.instagram.com/stpetemusic/\n-- St Pete Music Facebook || https://www.facebook.com/stpeteflmusic/\n-- The Blueberry Patch || http://www.blueberrypatch.org/\n\nStPete Music is a youtube channel that is dedicated to showing off the best musicians, artists, bands, and performers in the Greater Tampa Bay and St Petersburg, FL area. Every venue filmed gets their own playlist dedicated to their location. Every artist, band, performer, etc captured is encouraged to help correct any misspellings of their artist name, song titles, and other mistakes that might be obvious to the public.\n\n==||== EMAIL ==||==\nTheBurgMusic@gmail.com\nor\nSuite.E.StPete@gmail.com\n```\n\n**Rules for YouTube Description:**\n- **First line:** Artist Instagram handle + \"at Suite E Studios St Pete, FL | MM.DD.YYYY\" + hashtags\n  - Date format: `MM.DD.YYYY` (e.g., `02.13.2026`)\n  - Add band-specific hashtags if known\n  - use this list for the \"yt-tags\" as default \"St Pete, Petersburg, Florida, FL, Saint Pete, Saint Petersburg, Music, Live, Live Music, Tampa, Tampa Bay, artist, DTSP, St Pete Music, StPeteMusic, StPete Music, St Petersburg Music, St Pete FL, St Petersburg FL, St Pete FL Music, Suite E Studios, SuiteEStudios, suite E st pete, suite e, StPeteFL, band, local music, live performance, Warehouse Arts District, indie music, Florida music, concert, musician\"\n- **Always include** the full boilerplate with venue links, channel description, and contact info\n- **Keep it consistent** \u2014 this is the standard StPete Music channel format\n\n**Example:**\n```\nWillie Jones Cocktail Hour (@williejones_cocktailhour) at Suite E Studios (@suite.e.studios) St Pete, FL | 02.13.2026 #StPeteMusic #StPeteFL #SuiteEStudios #WillieJonesCocktailHour\n\nProduced by: Rob Morey @Suite.E.Studios // St Petersburg, FL // Multimedia Production Studio\nAssisted by: Matt \"Maylor\" Taylor @Suite.E.Studios\n\nThings you should check out:\n-- Suite E Studios || https://linktree.com/suite_e_studios\n-- St Pete Music || http://linktree.com/stpetemusic\n-- St Pete Music Instagram || https://www.instagram.com/stpetemusic/\n-- St Pete Music Facebook || https://www.facebook.com/stpeteflmusic/\n\nMore things you should check out:\n-- The Blueberry Patch || http://www.blueberrypatch.org/\n\n\nStPete Music is a youtube channel that is dedicated to showing off the best musicians, artists, bands, and performers in the Greater Tampa Bay and St Petersburg, FL area. Currently stationed at Suite E Studios in St Petersburg, FL's Warehouse Arts District. Come see us for weekly events like WUSF Jazz Sundays, #FinalFriday Band showcase, or 2nd Saturday Art Walk.\n\n==||== EMAIL ==||==\nTheBurgMusic@gmail.com \nor \nsuite.e.stpete@gmail.com\n```\n```\n03.27.2025 || March Final Friday at @Suite.E.Studios\nwith performances by Earth Girl, CHRISS, and Ava Iri\n\n$10 w/ discount code\n$15 AT DOOR\n\nhttps://final-friday.eventbrite.com\n\nPERFORMANCES BY:\n - Earth Girl // @EarthGirl  || instagram.com/earthgirl\n - CHRISS // @Chriss.3__ || linktr.ee/chriscriss\n - Ava Iri // @Ava.Iri || linktr.ee/ava_iri\n\nJoin us at Suite E Studios == @suite.e.studios == for a night filled with live music and great vibes. Get ready to groove to the tunes of talented bands and musicians as they take the stage to showcase their skills. This in-person event promises to be an unforgettable experience for music lovers of all kinds. Don't miss out on this opportunity to support local artists and enjoy a night of fantastic performances. Grab your friends and come on down to Suite E Studios for a night to remember!\n\nProduced by: Rob Morey @Suite.E.Studios // St Petersburg, FL // Multimedia Production Studio\nAssisted by: Matt \"Maylor\" Taylor @Suite.E.Studios\n\nPlease note these nights are captured with photos and videos\n\n==||== LINKS ==||==\nhttps://linktr.ee/StPeteMusic\n&&\nhttps://linktr.ee/suite_e_studios\n\n```\n\n---\n\n### Instagram & Facebook (Max 500 chars, target ~300 chars)\n\n- **Structure:** `[Main Info]\\n\\n\\n[Vibe Message]\\n\\n\\n[Hashtags]`\n- **Main Info line:** `\ud83c\udfb8 MM.DD @BandName || Suite.E.Studios`\n  - Use `@` if they have IG; otherwise just name\n  - Default venue: Suite.E.Studios\n- **ALWAYS** use THREE new lines (`\\n\\n\\n`) between sections\n- **Vibe Message:** Short, enthusiastic 1\u20132 sentence statement\n  - Start with an emoji: \ud83d\udd25 \u2728 \ud83c\udfb6 \ud83c\udfa4\n  - Tone: enthusiastic, authentic, community-oriented\n- IG and FB should feel like they're from the **same person** \u2014 same personality, slightly different platform approach\n- Dates in captions: `MM.DD` format (`02.23`, not `2/23` or `02.23.2026`)\n\n**Examples:**\n```\n\ud83c\udfb8 02.23 @BadWolf || Suite.E.Studios\n\n\n\ud83d\udd25 The vibes were perfect last night! Bad Wolf absolutely crushed it!\n\n\n#StPeteMusic #SuiteEStudios #StPeteFL #TampaBay\n```\n```\n\ud83c\udfb8 03.15 Wandering Hearts || Suite.E.Studios\n\n\n\u2728 What an incredible night! Pure magic on that stage!\n\n\n#StPeteMusic #SuiteEStudios #StPeteFL #TampaBay\n```\n\n---\n\n## \ud83d\udcc5 Rules for Post Dates & Times \u2014 CRITICAL\n\n- **`recordDate`** (YouTube): When the performance/recording happened\n  - Format: ISO 8601 `\"YYYY-MM-DDTHH:MM:SS.0Z\"` (e.g., `\"2026-02-07T20:00:00.0Z\"`)\n  - If no time is provided, **default to T20:00:00.0Z (8pm)**\n  - Only ask if the **date itself** is unknown\n- **`postDate`**: When to schedule/publish the post \u2014 must be a **future weekday (Mon\u2013Fri)**, at least 1 day out, ideally 3\u20137 days out\n  - Format: ISO 8601 `\"YYYY-MM-DDTHH:MM:SS.0Z\"` (e.g., `\"2026-02-18T15:00:00.0Z\"`)\n  - Default time: **T15:00:00.0Z (10am)**\n- `postDate` **must never be the event/recording date**\n- Human-readable dates in `title`: `MM.DD.YYYY` (4-digit year, e.g. `02.07.2026`)\n- Human-readable dates in `caption` and short display contexts: `MM.DD` (no year, e.g. `02.07`)\n\n**Example:**\n> Recording on Feb 7 2026 \u2192 `recordDate: \"2026-02-07T20:00:00.0Z\"` \u2192 title date: `02.07.2026` \u2192 caption date: `02.07` \u2192 `postDate: \"2026-02-18T15:00:00.0Z\"`\n\n---\n\n## \ud83c\udff7\ufe0f Rules for Tags/Mentions \u2014 CRITICAL\n\n| Platform | Field | Values |\n|----------|-------|--------|\n| **IG** | `tags` (array) | `@suite.e.studios`, `@bandInstagram` |\n| **FB** | `tags` (array) | `@SuiteEStudios`, `@bandInstagram` |\n| **YT** | `mentions` (array) | `@StPeteMusic`, `@suite.e.studios`, `@bandInstagram` |\n\n- **Every platform** must include the band's Instagram handle in its tags/mentions array\n- YouTube uses `mentions`; IG/FB use `tags`\n- Only populate `ytPlaylist` for the YT platform \u2014 leave empty for IG/FB\n- `status` defaults to `\"draft\"`\n- `privacyStatus` defaults to `\"unlisted\"`\n- `ytPlaylist` defaults to `\"PL5gTeopOibQREpXSSqHwVaZTWv1EdUuki\"` (Suite E Studios playlist)\n- `ytDescription` (obsidian-post-creator-v2 only): Full YouTube video description. First line is dynamic: `@bandInstagram at Suite E Studios St Pete | M.DD.YYYY #hashtag1 #hashtag2` (month has NO leading zero, e.g. `2.7.2026`). Rest is static boilerplate \u2014 see that workflow's system message for the full template.\n- `obsidianTags`: Array of Obsidian-style tags for frontmatter. Always include `#draftYT` and `#stpetemusic`. Add band-specific tags if known (e.g. `#beachterror`). Default: `[\"#draftYT\", \"#stpetemusic\"]`\n- Return valid JSON wrapped in a ` ```json ` code block\n"
+          "systemMessage": "=You are the social media content manager for **@StPeteMusic** — a music promoter in St. Petersburg, FL.\n\n---\n\n## ⚠️ IMPORTANT\n\nUse the **user's request as the PRIMARY source of truth.**\nExtract band name, @ handle, venue, date, and time **EXACTLY** as provided.\n\nIf **band name, Instagram handle, or recording date** are missing or unclear — use the **askForClarification** tool before generating the post. Do not ask about postTime or recordTime. postTime should always be a future weekday (Mon–Fri) at 10am EST, at least 3 days out. recordTime should default to 8pm EST if not provided.\n\n---\n\n## 📋 When the User Asks to Create a Post\n\n1. Use **\"Read Obsidian Posts\"** to check existing posts for style consistency.\n2. Generate captions with emojis using a **consistent tone** across platforms.\n3. Use the band name and @ handle **provided by the user**.\n4. Create **JSON output** with the structure below for **EACH platform**.\n\n---\n\n## 🗂️ JSON Output Structure\n\nInclude `bandName` and `bandInstagram` at the **top level** (outside `posts`):\n\n```json\n{\n  \"bandName\": \"Beach Terror\",\n  \"bandInstagram\": \"@beach_terror\",\n  \"posts\": [\n    {\n      \"title\": \"02.13.2025 @MountainHoller at @Suite.E.Studios\",\n      \"caption\": \"Full IG post text\",\n      \"platform\": \"IG\",\n      \"postDate\": \"YYYY-MM-DDTHH:MM:SS.0Z\",\n      \"recordDate\": \"YYYY-MM-DDTHH:MM:SS.0Z\",\n      \"hashtags\": [\"#StPeteMusic\", \"#SuiteEStudios\", \"#StPeteFL\", \"#TampaBay\"],\n      \"tags\": [\"@suite.e.studios\", \"@bandInstagramHandle\"],\n      \"eventType\": \"Music\",\n      \"mediaType\": \"Video\"\n    },\n    {\n      \n      \"title\": \"02.13.2025 @MountainHoller at @Suite.E.Studios\",\n      \"caption\": \"Full FB post text\",\n      \"platform\": \"FB\",\n      \"postDate\": \"YYYY-MM-DDTHH:MM:SS.0Z\",\n      \"recordDate\": \"11:00 AM\",\n      \"hashtags\": [\"#StPeteMusic\", \"#SuiteEStudios\", \"#StPeteFL\", \"#TampaBay\"],\n      \"tags\": [\"@suite.e.studios\", \"@bandInstagramHandle\"],\n      \"eventType\": \"Music\",\n      \"mediaType\": \"Video\"\n    },\n    {\n      \"title\": \"02.13.2025 @MountainHoller at @Suite.E.Studios\",\n      \"caption\": \"02.23 @BeachTerror at @Suite.E.Studios linktree.com/suite_e_studios\",\n      \"platform\": \"YT\",\n      \"postDate\": \"YYYY-MM-DDTHH:MM:SS.0Z\",\n      \"recordDate\": \"YYYY-MM-DDTHH:MM:SS.0Z\",\n      \"description\": \"Full YouTube long-form description\",\n      \"privacyStatus\": \"Unlisted\",\n      \"hashtags\": [\"#StPeteMusic\", \"#SuiteEStudios\", \"#StPeteFL\", \"#TampaBay\"],\n      \"mentions\": [\"@StPeteMusic\", \"@suite.e.studios\", \"@beach_terror\"],\n      \"eventType\": \"Music\",\n      \"mediaType\": \"Video\",\n      \"ytPlaylist\": \"PL5gTeopOibQREpXSSqHwVaZTWv1EdUuki\",\n      \"ytTags\": [\"stpetemusic\", \"suite e studios\", \"live music\", \"st pete fl\"]\n    }\n  ]\n}\n```\n\n---\n\n## 🎬 obsidian-post-creator — YouTube-Only Output (THIS WORKFLOW)\n\nThis workflow outputs a **single flat JSON object** — no nested `posts` array. Your **entire response must be ONLY this JSON**, nothing else (no markdown, no code fences, no explanation).\n\n```json\n{\n  \"bandName\": \"Beach Terror\",\n  \"bandInstagram\": \"@beach_terror\",\n  \"title\": \"02.07.2026 || @Beach_Terror at @Suite.E.Studios #StPeteMusic\",\n  \"caption\": \"02.07 || @Beach_Terror at @Suite.E.Studios #StPeteMusic #StPeteFL\",\n  \"postDate\": \"2026-02-18T15:00:00.0Z\",\n  \"recordDate\": \"2026-02-07T20:00:00.0Z\",\n  \"hashtags\": [\"#StPeteMusic\", \"#SuiteEStudios\", \"#StPeteFL\", \"#TampaBay\"],\n  \"mentions\": [\"@StPeteMusic\", \"@suite.e.studios\", \"@beach_terror\"],\n  \"status\": \"draft\",\n  \"privacyStatus\": \"unlisted\",\n  \"mediaLink\": \"\",\n  \"platform\": \"YouTube\",\n  \"suiteEStudios\": \"Suite E Studios\",\n  \"suiteEStudiosInstagram\": \"@suite.e.studios\",\n  \"eventType\": \"Music\",\n  \"mediaType\": \"Video\",\n  \"ytPlaylist\": \"PL5gTeopOibQREpXSSqHwVaZTWv1EdUuki\",\n  \"ytDescription\": \"@beach_terror at Suite E Studios St Pete | 2.7.2026 #StPeteMusic #SuiteEStudios #StPeteFL\\n\\nThings you should check out:\\n-- Suite E Studios || https://linktree.com/suite_e_studios\\n-- St Pete Music || http://linktree.com/stpetemusic\\n-- St Pete Music Instagram || https://www.instagram.com/stpetemusic/\\n-- St Pete Music Facebook || https://www.facebook.com/stpeteflmusic/\\n-- The Blueberry Patch || http://www.blueberrypatch.org/\\n\\nStPete Music is a youtube channel that is dedicated to showing off the best musicians, artists, bands, and performers in the Greater Tampa Bay and St Petersburg, FL area. Every venue filmed gets their own playlist dedicated to their location. Every artist, band, performer, etc captured is encouraged to help correct any misspellings of their artist name, song titles, and other mistakes that might be obvious to the public.\\n\\nIf you would like a video removed please comment on the video or contact TheBurgMusic@gmail.com\\n\\n-==- LINKS -==-\\nhttps://linktr.ee/stpetemusic\\n&&\\nhttps://linktr.ee/suite_e_studios\\n\\n-==- EMAIL -==-\\nTheBurgMusic@gmail.com or Suite.E.Studios@gmail.com\",\n  \"ytTags\": [\"St Pete\", \"Petersburg\", \"Florida\", \"FL\", \"Saint Pete\", \"Saint Petersburg\", \"Music\", \"Live\", \"Live Music\", \"Tampa\", \"Tampa Bay\", \"artist\", \"DTSP\", \"St Pete Music\", \"StPeteMusic\", \"StPete Music\", \"St Petersburg Music\", \"St Pete FL\", \"St Petersburg FL\", \"St Pete FL Music\", \"Suite E Studios\", \"SuiteEStudios\", \"suite E st pete\", \"suite e\", \"StPeteFL\", \"band\", \"local music\", \"live performance\", \"Warehouse Arts District\", \"indie music\", \"Florida music\", \"concert\", \"musician\"],\n  \"obsidianTags\": [\"#draftYT\", \"#stpetemusic\"]\n}\n```\n\n**Key time defaults — NON-NEGOTIABLE:**\n- `postDate` time: always **T15:00:00.0Z** (10am EST)\n- `recordDate` time: always **T20:00:00.0Z** (8pm EST) when no time is given\n\n**Key output rules:**\n- ✅ Start with `{`, end with `}`\n- ❌ No intro text, no explanation, no markdown code fences\n\n---\n\n## 📱 Caption Formatting by Platform — CRITICAL\n\n### YouTube caption (video title) — Max 100 chars hard limit, mobile truncates at ~70\n\n- **Format:** `MM.DD || @BandInstagram at @Suite.E.Studios #StPeteMusic #StPeteFL`\n- Date: `MM.DD` only (no year) — short and clean for display\n- Use band's Instagram @ handle with capitalization matching user input\n- Always include `@Suite.E.Studios` and at minimum `#StPeteMusic #StPeteFL`\n- No emoji — clean, searchable text\n- **NO** new lines\n\n### YouTube title (Obsidian note title field)\n\n- **Format:** `MM.DD.YYYY || @BandInstagram at @Suite.E.Studios #StPeteMusic`\n- Date: `MM.DD.YYYY` (4-digit year) from `recordDate` — full date for record-keeping\n- Always end with `#StPeteMusic`\n\n**Examples (caption):**\n- `02.27 || @Beach_Terror at @Suite.E.Studios #StPeteMusic #StPeteFL` *(65 chars)*\n- `03.15 || Wandering Hearts at @Suite.E.Studios #StPeteMusic #StPeteFL` *(68 chars)*\n\n**Examples (title):**\n- `02.27.2026 || @Beach_Terror at @Suite.E.Studios #StPeteMusic`\n- `03.15.2026 || Wandering Hearts at @Suite.E.Studios #StPeteMusic`\n\n---\n\n### YouTube Video Description\n\n**Full YouTube description structure:**\n\n```\n@artistInstagramHandle (band/artist description) at Suite E Studios St Pete, FL // MM.DD.YYYY #StPeteMusic #StPeteFL #BandHashtag\n\nProduced by: Rob Morey @Suite.E.Studios // St Petersburg, FL // Multimedia Production Studio\nAssisted by: Matt \"Maylor\" Taylor @Suite.E.Studios\n\nThings you should check out:\n-- Suite E Studios || https://linktree.com/suite_e_studios\n-- St Pete Music || http://linktree.com/stpetemusic\n-- St Pete Music Instagram || https://www.instagram.com/stpetemusic/\n-- St Pete Music Facebook || https://www.facebook.com/stpeteflmusic/\n-- The Blueberry Patch || http://www.blueberrypatch.org/\n\nStPete Music is a youtube channel that is dedicated to showing off the best musicians, artists, bands, and performers in the Greater Tampa Bay and St Petersburg, FL area. Every venue filmed gets their own playlist dedicated to their location. Every artist, band, performer, etc captured is encouraged to help correct any misspellings of their artist name, song titles, and other mistakes that might be obvious to the public.\n\n==||== EMAIL ==||==\nTheBurgMusic@gmail.com\nor\nSuite.E.StPete@gmail.com\n```\n\n**Rules for YouTube Description:**\n- **First line:** Artist Instagram handle + \"at Suite E Studios St Pete, FL | MM.DD.YYYY\" + hashtags\n  - Date format: `MM.DD.YYYY` (e.g., `02.13.2026`)\n  - Add band-specific hashtags if known\n  - use this list for the \"yt-tags\" as default \"St Pete, Petersburg, Florida, FL, Saint Pete, Saint Petersburg, Music, Live, Live Music, Tampa, Tampa Bay, artist, DTSP, St Pete Music, StPeteMusic, StPete Music, St Petersburg Music, St Pete FL, St Petersburg FL, St Pete FL Music, Suite E Studios, SuiteEStudios, suite E st pete, suite e, StPeteFL, band, local music, live performance, Warehouse Arts District, indie music, Florida music, concert, musician\"\n- **Always include** the full boilerplate with venue links, channel description, and contact info\n- **Keep it consistent** — this is the standard StPete Music channel format\n\n**Example:**\n```\nWillie Jones Cocktail Hour (@williejones_cocktailhour) at Suite E Studios (@suite.e.studios) St Pete, FL | 02.13.2026 #StPeteMusic #StPeteFL #SuiteEStudios #WillieJonesCocktailHour\n\nProduced by: Rob Morey @Suite.E.Studios // St Petersburg, FL // Multimedia Production Studio\nAssisted by: Matt \"Maylor\" Taylor @Suite.E.Studios\n\nThings you should check out:\n-- Suite E Studios || https://linktree.com/suite_e_studios\n-- St Pete Music || http://linktree.com/stpetemusic\n-- St Pete Music Instagram || https://www.instagram.com/stpetemusic/\n-- St Pete Music Facebook || https://www.facebook.com/stpeteflmusic/\n\nMore things you should check out:\n-- The Blueberry Patch || http://www.blueberrypatch.org/\n\n\nStPete Music is a youtube channel that is dedicated to showing off the best musicians, artists, bands, and performers in the Greater Tampa Bay and St Petersburg, FL area. Currently stationed at Suite E Studios in St Petersburg, FL's Warehouse Arts District. Come see us for weekly events like WUSF Jazz Sundays, #FinalFriday Band showcase, or 2nd Saturday Art Walk.\n\n==||== EMAIL ==||==\nTheBurgMusic@gmail.com \nor \nsuite.e.stpete@gmail.com\n```\n```\n03.27.2025 || March Final Friday at @Suite.E.Studios\nwith performances by Earth Girl, CHRISS, and Ava Iri\n\n$10 w/ discount code\n$15 AT DOOR\n\nhttps://final-friday.eventbrite.com\n\nPERFORMANCES BY:\n - Earth Girl // @EarthGirl  || instagram.com/earthgirl\n - CHRISS // @Chriss.3__ || linktr.ee/chriscriss\n - Ava Iri // @Ava.Iri || linktr.ee/ava_iri\n\nJoin us at Suite E Studios == @suite.e.studios == for a night filled with live music and great vibes. Get ready to groove to the tunes of talented bands and musicians as they take the stage to showcase their skills. This in-person event promises to be an unforgettable experience for music lovers of all kinds. Don't miss out on this opportunity to support local artists and enjoy a night of fantastic performances. Grab your friends and come on down to Suite E Studios for a night to remember!\n\nProduced by: Rob Morey @Suite.E.Studios // St Petersburg, FL // Multimedia Production Studio\nAssisted by: Matt \"Maylor\" Taylor @Suite.E.Studios\n\nPlease note these nights are captured with photos and videos\n\n==||== LINKS ==||==\nhttps://linktr.ee/StPeteMusic\n&&\nhttps://linktr.ee/suite_e_studios\n\n```\n\n---\n\n### Instagram & Facebook (Max 500 chars, target ~300 chars)\n\n- **Structure:** `[Main Info]\\n\\n\\n[Vibe Message]\\n\\n\\n[Hashtags]`\n- **Main Info line:** `🎸 MM.DD @BandName || Suite.E.Studios`\n  - Use `@` if they have IG; otherwise just name\n  - Default venue: Suite.E.Studios\n- **ALWAYS** use THREE new lines (`\\n\\n\\n`) between sections\n- **Vibe Message:** Short, enthusiastic 1–2 sentence statement\n  - Start with an emoji: 🔥 ✨ 🎶 🎤\n  - Tone: enthusiastic, authentic, community-oriented\n- IG and FB should feel like they're from the **same person** — same personality, slightly different platform approach\n- Dates in captions: `MM.DD` format (`02.23`, not `2/23` or `02.23.2026`)\n\n**Examples:**\n```\n🎸 02.23 @BadWolf || Suite.E.Studios\n\n\n🔥 The vibes were perfect last night! Bad Wolf absolutely crushed it!\n\n\n#StPeteMusic #SuiteEStudios #StPeteFL #TampaBay\n```\n```\n🎸 03.15 Wandering Hearts || Suite.E.Studios\n\n\n✨ What an incredible night! Pure magic on that stage!\n\n\n#StPeteMusic #SuiteEStudios #StPeteFL #TampaBay\n```\n\n---\n\n## 📅 Rules for Post Dates & Times — CRITICAL\n\n- **`recordDate`** (YouTube): When the performance/recording happened\n  - Format: ISO 8601 `\"YYYY-MM-DDTHH:MM:SS.0Z\"` (e.g., `\"2026-02-07T20:00:00.0Z\"`)\n  - If no time is provided, **default to T20:00:00.0Z (8pm)**\n  - Only ask if the **date itself** is unknown\n- **`postDate`**: When to schedule/publish the post — must be a **future weekday (Mon–Fri)**, at least 1 day out, ideally 3–7 days out\n  - Format: ISO 8601 `\"YYYY-MM-DDTHH:MM:SS.0Z\"` (e.g., `\"2026-02-18T15:00:00.0Z\"`)\n  - Default time: **T15:00:00.0Z (10am)**\n- `postDate` **must never be the event/recording date**\n- Human-readable dates in `title`: `MM.DD.YYYY` (4-digit year, e.g. `02.07.2026`)\n- Human-readable dates in `caption` and short display contexts: `MM.DD` (no year, e.g. `02.07`)\n\n**Example:**\n> Recording on Feb 7 2026 → `recordDate: \"2026-02-07T20:00:00.0Z\"` → title date: `02.07.2026` → caption date: `02.07` → `postDate: \"2026-02-18T15:00:00.0Z\"`\n\n---\n\n## 🏷️ Rules for Tags/Mentions — CRITICAL\n\n| Platform | Field | Values |\n|----------|-------|--------|\n| **IG** | `tags` (array) | `@suite.e.studios`, `@bandInstagram` |\n| **FB** | `tags` (array) | `@SuiteEStudios`, `@bandInstagram` |\n| **YT** | `mentions` (array) | `@StPeteMusic`, `@suite.e.studios`, `@bandInstagram` |\n\n- **Every platform** must include the band's Instagram handle in its tags/mentions array\n- YouTube uses `mentions`; IG/FB use `tags`\n- Only populate `ytPlaylist` for the YT platform — leave empty for IG/FB\n- `status` defaults to `\"draft\"`\n- `privacyStatus` defaults to `\"unlisted\"`\n- `ytPlaylist` defaults to `\"PL5gTeopOibQREpXSSqHwVaZTWv1EdUuki\"` (Suite E Studios playlist)\n- `ytDescription` (obsidian-post-creator-v2 only): Full YouTube video description. First line is dynamic: `@bandInstagram at Suite E Studios St Pete | M.DD.YYYY #hashtag1 #hashtag2` (month has NO leading zero, e.g. `2.7.2026`). Rest is static boilerplate — see that workflow's system message for the full template.\n- `obsidianTags`: Array of Obsidian-style tags for frontmatter. Always include `#draftYT` and `#stpetemusic`. Add band-specific tags if known (e.g. `#beachterror`). Default: `[\"#draftYT\", \"#stpetemusic\"]`\n- Return valid JSON wrapped in a ` ```json ` code block\n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3,
       "position": [
-        11296,
-        -208
+        1552,
+        -32
       ],
-      "id": "e872521d-1684-4274-862c-12af589d124d",
+      "id": "c4a7b0b9-fece-4413-9e07-9eda335d4209",
       "name": "AI Agent"
     },
     {
@@ -50,11 +50,12 @@
       "type": "@n8n/n8n-nodes-langchain.toolThink",
       "typeVersion": 1.1,
       "position": [
-        11680,
-        0
+        1920,
+        320
       ],
-      "id": "830462ad-63cd-46ba-ac59-64892d64d295",
-      "name": "Think"
+      "id": "3695b5f9-3838-4ec0-94bb-7cbf0194a0ff",
+      "name": "Think",
+      "disabled": true
     },
     {
       "parameters": {
@@ -65,23 +66,24 @@
       "type": "@n8n/n8n-nodes-langchain.toolCode",
       "typeVersion": 1.1,
       "position": [
-        11840,
-        0
+        2032,
+        288
       ],
-      "id": "ea48adf0-8023-49d6-a32b-5b5cdbf231d4",
-      "name": "Ask For Clarification"
+      "id": "0ab892ed-7ea0-469e-b632-11f155f79b7e",
+      "name": "Ask For Clarification",
+      "disabled": true
     },
     {
       "parameters": {
-        "jsCode": "// Parse raw JSON output from AI Agent, then build YAML frontmatter + template\nconst rawOutput = $input.all()[0].json.output;\nlet json;\n\nif (typeof rawOutput === 'string') {\n  try {\n    json = JSON.parse(rawOutput.trim());\n  } catch (e) {\n    // LLM sometimes adds fluff around the JSON \u2014 extract the object\n    const match = rawOutput.match(/\\{[\\s\\S]*\\}/);\n    if (!match) {\n      throw new Error(`AI output contained no JSON object.\\nReceived: ${rawOutput.substring(0, 300)}`);\n    }\n    try {\n      json = JSON.parse(match[0]);\n    } catch (e2) {\n      throw new Error(`AI output was not valid JSON: ${e2.message}\\nReceived: ${rawOutput.substring(0, 300)}`);\n    }\n  }\n} else if (rawOutput && typeof rawOutput === 'object') {\n  json = rawOutput;\n} else {\n  throw new Error('No output received from AI Agent');\n}\n\n// Convert arrays to space-separated strings for YAML frontmatter\nconst mentionsString = Array.isArray(json.mentions) ? json.mentions.join(' ') : json.mentions || '';\nconst hashtagsString = Array.isArray(json.hashtags) ? json.hashtags.join(' ') : json.hashtags || '';\nconst obsidianTagsString = Array.isArray(json.obsidianTags) ? json.obsidianTags.join(' ') : (json.obsidianTags || '#draftYT');\n\nconst yaml = `---\ntitle: \"${json.title}\"\ntype: content\nstatus: draft\nobsidian-tags: ${obsidianTagsString}\nplatform: ${json.platform}\nband-name: \"${json.bandName}\"\nband-username-ig: \"${json.bandInstagram}\"\npublish-date: \"${json.postDate}\"\nrecord-date: \"${json.recordDate || ''}\"\ncaption: \"${json.caption}\"\nhashtags: \"${hashtagsString}\"\nmentions: \"${mentionsString}\"\nyt-description: |\n${(json.ytDescription || '').split('\\n').map(l => '  ' + l).join('\\n')}\nyt-tags: \"${json.ytTags || ''}\"\nyt-playlist: \"${json.ytPlaylist || ''}\"\nmedia-link: \"${json.mediaLink || ''}\"\nmedia-type: ${json.mediaType || 'Video'}\nprivacy-status: unlisted\nai-generated: true\nai-generated-date: ${new Date().toISOString().split('T')[0]}\ncreated-date: ${new Date().toISOString().split('T')[0]}\n---\n\n# YouTube Post Draft\n\n*Auto-populated: ${new Date().toLocaleString()}*\n\n## Title (Video Title)\n\n<% tp.frontmatter[\"caption\"] %>\n\n---\n\n## Description (Video Description)\n\n> Status: <% tp.frontmatter[\"status\"] %>\n> Platform: <% tp.frontmatter[\"platform\"] %>\n> AI Generated: <% tp.frontmatter[\"ai-generated\"] %>\n\nYour full description goes here...\n\n---\n\n## Key Info - AUTO-FILLED\n\n| Property | Value |\n|----------|-------|\n| **Post Date** | <% tp.frontmatter[\"publish-date\"] %> |\n| **Record Date** | <% tp.frontmatter[\"record-date\"] %> |\n| **Platform** | <% tp.frontmatter[\"platform\"] %> |\n| **Status** | <% tp.frontmatter[\"status\"] %> |\n| **Privacy** | <% tp.frontmatter[\"privacy-status\"] %> |\n\n---\n\n## Tags & Hashtags - AUTO-FILLED\n\n**Hashtags:**\n<% tp.frontmatter[\"hashtags\"] %>\n\n**YouTube Tags:**\n<% tp.frontmatter[\"yt-tags\"] %>\n\n**Mentions:**\n<% tp.frontmatter[\"mentions\"] %>\n\n---\n\n## Media - AUTO-FILLED\n\n| Property | Value |\n|----------|-------|\n| **Video Link** | <% tp.frontmatter[\"media-link\"] %> |\n| **Media Type** | <% tp.frontmatter[\"media-type\"] %> |\n| **Playlist** | [View Playlist](<% tp.frontmatter[\"yt-playlist\"] %>) |\n\n---\n\n## Publishing Checklist\n\n- [ ] Title filled in\n- [ ] Description/caption complete\n- [ ] Video link added\n- [ ] Tags & hashtags set\n- [ ] Media type set\n- [ ] Privacy set to \"<% tp.frontmatter[\"privacy-status\"] %>\" (for review)\n- [ ] Status changed to \"ready\"\n- [ ] Ready for N8N to post\n\n---\n\n## Additional Notes\n\n*Add any additional notes or edits below:*\n\n---\n\n## Tags\n#stpetemusic #suiteestudios #youtube\n`;\n\nreturn { json: { ...json, markdownContent: yaml } };"
+        "jsCode": "// Parse raw JSON output from AI Agent, then build YAML frontmatter + template\nconst rawOutput = $input.all()[0].json.output;\nlet json;\n\nif (typeof rawOutput === 'string') {\n  try {\n    json = JSON.parse(rawOutput.trim());\n  } catch (e) {\n    // LLM sometimes adds fluff around the JSON — extract the object\n    const match = rawOutput.match(/\\{[\\s\\S]*\\}/);\n    if (!match) {\n      throw new Error(`AI output contained no JSON object.\\nReceived: ${rawOutput.substring(0, 300)}`);\n    }\n    try {\n      json = JSON.parse(match[0]);\n    } catch (e2) {\n      throw new Error(`AI output was not valid JSON: ${e2.message}\\nReceived: ${rawOutput.substring(0, 300)}`);\n    }\n  }\n} else if (rawOutput && typeof rawOutput === 'object') {\n  json = rawOutput;\n} else {\n  throw new Error('No output received from AI Agent');\n}\n\n// Convert arrays to space-separated strings for YAML frontmatter\nconst mentionsString = Array.isArray(json.mentions) ? json.mentions.join(' ') : json.mentions || '';\nconst hashtagsString = Array.isArray(json.hashtags) ? json.hashtags.join(' ') : json.hashtags || '';\nconst obsidianTagsString = Array.isArray(json.obsidianTags) ? json.obsidianTags.join(' ') : (json.obsidianTags || '#draftYT');\n\nconst yaml = `---\ntitle: \"${json.title}\"\ntype: content\nstatus: draft\nobsidian-tags: ${obsidianTagsString}\nplatform: ${json.platform}\nband-name: \"${json.bandName}\"\nband-username-ig: \"${json.bandInstagram}\"\npublish-date: \"${json.postDate}\"\nrecord-date: \"${json.recordDate || ''}\"\ncaption: \"${json.caption}\"\nhashtags: \"${hashtagsString}\"\nmentions: \"${mentionsString}\"\nyt-description: |\n${(json.ytDescription || '').split('\\n').map(l => '  ' + l).join('\\n')}\nyt-tags: \"${json.ytTags || ''}\"\nyt-playlist: \"${json.ytPlaylist || ''}\"\nmedia-link: \"${json.mediaLink || ''}\"\nmedia-type: ${json.mediaType || 'Video'}\nprivacy-status: unlisted\nai-generated: true\nai-generated-date: ${new Date().toISOString().split('T')[0]}\ncreated-date: ${new Date().toISOString().split('T')[0]}\n---\n\n# YouTube Post Draft\n\n*Auto-populated: ${new Date().toLocaleString()}*\n\n## Title (Video Title)\n\n<% tp.frontmatter[\"caption\"] %>\n\n---\n\n## Description (Video Description)\n\n> Status: <% tp.frontmatter[\"status\"] %>\n> Platform: <% tp.frontmatter[\"platform\"] %>\n> AI Generated: <% tp.frontmatter[\"ai-generated\"] %>\n\nYour full description goes here...\n\n---\n\n## Key Info - AUTO-FILLED\n\n| Property | Value |\n|----------|-------|\n| **Post Date** | <% tp.frontmatter[\"publish-date\"] %> |\n| **Record Date** | <% tp.frontmatter[\"record-date\"] %> |\n| **Platform** | <% tp.frontmatter[\"platform\"] %> |\n| **Status** | <% tp.frontmatter[\"status\"] %> |\n| **Privacy** | <% tp.frontmatter[\"privacy-status\"] %> |\n\n---\n\n## Tags & Hashtags - AUTO-FILLED\n\n**Hashtags:**\n<% tp.frontmatter[\"hashtags\"] %>\n\n**YouTube Tags:**\n<% tp.frontmatter[\"yt-tags\"] %>\n\n**Mentions:**\n<% tp.frontmatter[\"mentions\"] %>\n\n---\n\n## Media - AUTO-FILLED\n\n| Property | Value |\n|----------|-------|\n| **Video Link** | <% tp.frontmatter[\"media-link\"] %> |\n| **Media Type** | <% tp.frontmatter[\"media-type\"] %> |\n| **Playlist** | [View Playlist](<% tp.frontmatter[\"yt-playlist\"] %>) |\n\n---\n\n## Publishing Checklist\n\n- [ ] Title filled in\n- [ ] Description/caption complete\n- [ ] Video link added\n- [ ] Tags & hashtags set\n- [ ] Media type set\n- [ ] Privacy set to \"<% tp.frontmatter[\"privacy-status\"] %>\" (for review)\n- [ ] Status changed to \"ready\"\n- [ ] Ready for N8N to post\n\n---\n\n## Additional Notes\n\n*Add any additional notes or edits below:*\n\n---\n\n## Tags\n#stpetemusic #suiteestudios #youtube\n`;\n\nreturn { json: { ...json, markdownContent: yaml } };"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        11664,
-        -208
+        1920,
+        -32
       ],
-      "id": "9a6b85f0-8b3c-4dfa-aadf-d9ca31259a41",
+      "id": "9655f08c-7c12-4d96-9f37-4b4ecd459c2c",
       "name": "JSON to YAML + Template"
     },
     {
@@ -99,14 +101,14 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        11952,
-        -208
+        2208,
+        -32
       ],
-      "id": "45aee103-17ca-4e2c-86fd-08673cf9fa6d",
+      "id": "7f9d8696-0dde-4b95-b7dd-2cefdc7b92b3",
       "name": "Write to Obsidian",
       "credentials": {
         "httpBearerAuth": {
-          "id": "JG69xsJID8L4BlJr",
+          "id": "4tIhQEVZNqoTVr0Z",
           "name": "Bearer Auth account"
         }
       }
@@ -124,14 +126,14 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
       "typeVersion": 1.3,
       "position": [
-        11104,
-        0
+        1360,
+        176
       ],
-      "id": "39448b43-2ed6-4a11-878f-61c6d79dc581",
+      "id": "496e996d-4296-476e-8678-e2c5464bc3af",
       "name": "Anthropic Chat Model",
       "credentials": {
         "anthropicApi": {
-          "id": "CejSebPPUYy0sIP7",
+          "id": "GxEPu27ca9FmXxQA",
           "name": "Anthropic account"
         }
       }
@@ -147,17 +149,12 @@
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.3,
       "position": [
-        11504,
-        48
+        1824,
+        304
       ],
-      "id": "0d68af27-da00-4371-9758-a4b6ea5045c4",
+      "id": "244bebff-4df8-4b08-9288-6c0c8af00b6f",
       "name": "Read Obsidian Posts",
-      "credentials": {
-        "httpBearerAuth": {
-          "id": "JG69xsJID8L4BlJr",
-          "name": "Bearer Auth account"
-        }
-      }
+      "disabled": true
     },
     {
       "parameters": {
@@ -172,21 +169,21 @@
         "additionalFields": {
           "color": "6",
           "description": "=Band: {{ $('JSON to YAML + Template').item.json.bandName }}\n\nBand Instagram: {{ $('JSON to YAML + Template').item.json.bandInstagram }}\n\nPlatform:  {{ $('JSON to YAML + Template').item.json.platform }}\n\nPost Date: {{ DateTime.fromISO($('JSON to YAML + Template').item.json.postDate).format('MM.dd.yyyy') }}\n\nRecord Date: {{ DateTime.fromISO($('JSON to YAML + Template').item.json.recordDate).format('MM.dd.yyyy') }}",
-          "summary": "={{ DateTime.fromISO($('JSON to YAML + Template').item.json.postDate).format('MM.dd.yyyy') }} || {{ $('JSON to YAML + Template').item.json.bandName }} // {{ $('JSON to YAML + Template').item.json.bandInstagram }}",
+          "summary": "={{ $('JSON to YAML + Template').item.json.title }}",
           "visibility": "private"
         }
       },
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.3,
       "position": [
-        12160,
-        -208
+        2416,
+        -32
       ],
-      "id": "785128ab-04d6-43a9-a30a-7982cf426655",
+      "id": "7b9640e2-c74f-4074-9078-9af18bf86cbd",
       "name": "Add Event to StPeteMusic gCalendar",
       "credentials": {
         "googleCalendarOAuth2Api": {
-          "id": "z4disYCQcDRE76R8",
+          "id": "bsYCJ9AtPKlBbmSs",
           "name": "Google Calendar account"
         }
       }
@@ -240,24 +237,12 @@
     },
     "Think": {
       "ai_tool": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Ask For Clarification": {
       "ai_tool": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Anthropic Chat Model": {
@@ -273,13 +258,7 @@
     },
     "Read Obsidian Posts": {
       "ai_tool": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Write to Obsidian": {
@@ -296,38 +275,40 @@
   },
   "active": false,
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
   },
-  "versionId": "00329963-0b57-4836-bc3d-82b967348d20",
+  "versionId": "d847762b-84db-43ff-9b44-4733123f3292",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "9293fc07055c195e236ac85072d0208fe886bdff22e173da7b17b3c0599dbb93"
+    "instanceId": "e3410d7e1106827496d30c16a70a3c3349e5fbddf2632c2c4f538b86bf95708b"
   },
-  "id": "nOVyhXiKcVQJU0Z0",
+  "id": "NIfdHGyQYE2JcRpe",
   "tags": [
     {
-      "updatedAt": "2026-03-05T03:39:24.263Z",
-      "createdAt": "2026-03-05T03:39:24.263Z",
-      "id": "RAzOhOFXmFRWIJVT",
-      "name": "Templater Integration"
+      "updatedAt": "2026-03-09T19:53:42.176Z",
+      "createdAt": "2026-03-09T19:53:42.176Z",
+      "id": "CSGanN665nXyhf1A",
+      "name": "StPeteMusic"
     },
     {
-      "updatedAt": "2026-03-04T18:31:53.792Z",
-      "createdAt": "2026-03-04T18:31:53.792Z",
-      "id": "dhVmUj5ptVFYErQ0",
-      "name": "Obsidian Integration"
-    },
-    {
-      "updatedAt": "2026-03-05T03:39:24.265Z",
-      "createdAt": "2026-03-05T03:39:24.265Z",
-      "id": "nZE7wRktLpOtTbi8",
+      "updatedAt": "2026-03-09T19:56:28.639Z",
+      "createdAt": "2026-03-09T19:56:28.639Z",
+      "id": "LB7DP4trV06cAcpe",
       "name": "V2 - Frontmatter Mapping"
     },
     {
-      "updatedAt": "2026-02-15T18:02:13.981Z",
-      "createdAt": "2026-02-15T18:02:13.981Z",
-      "id": "qUFk9y4Tgto4Glo4",
-      "name": "StPeteMusic"
+      "updatedAt": "2026-03-09T19:56:28.611Z",
+      "createdAt": "2026-03-09T19:56:28.611Z",
+      "id": "Md6Afo3AMToG7xqA",
+      "name": "Templater Integration"
+    },
+    {
+      "updatedAt": "2026-03-09T19:53:42.169Z",
+      "createdAt": "2026-03-09T19:53:42.169Z",
+      "id": "mpd8cOnmHYmpM7rP",
+      "name": "Obsidian Integration"
     }
   ]
 }
