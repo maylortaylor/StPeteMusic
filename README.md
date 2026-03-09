@@ -12,10 +12,24 @@
 /
 ├── README.md                        # This file
 ├── CLAUDE.md                        # Claude Code guidance
-├── AWS_SETUP.md                     # AWS infrastructure reference
+├── AWS_SETUP.md                     # AWS infrastructure quick reference
 ├── .env.example                     # Environment variable template (commit this)
 ├── .env                             # Local secrets (DO NOT COMMIT)
 ├── .gitignore
+│
+├── infrastructure/                  # Terraform IaC (manages all AWS resources)
+│   ├── main.tf                      # Provider config + S3 remote backend
+│   ├── variables.tf                 # Input variables
+│   ├── outputs.tf                   # Output values (IP, URLs, SG ID)
+│   ├── ec2.tf                       # EC2 instance, Elastic IP, Security Group
+│   ├── backup.tf                    # S3 backup bucket (disabled, ready to enable)
+│   ├── database.tf                  # RDS PostgreSQL (disabled, ready to enable)
+│   └── terraform.tfvars.example     # Example variable values (no secrets)
+│
+├── .github/
+│   └── workflows/
+│       ├── terraform-plan.yml       # Runs terraform plan on PRs
+│       └── terraform-apply.yml      # Runs terraform apply on merge to main
 │
 ├── n8n/                             # n8n automation engine
 │   ├── CLAUDE.md                    # n8n-specific Claude guidance
@@ -41,7 +55,7 @@
 
 ## Infrastructure
 
-n8n runs on **AWS EC2 (t3.micro, free tier)** with HTTPS via Let's Encrypt.
+n8n runs on **AWS EC2 (t3.micro, free tier)** with HTTPS via Let's Encrypt. All infrastructure is managed with **Terraform** — see `infrastructure/`.
 
 | Resource | Value |
 |---|---|
@@ -51,22 +65,45 @@ n8n runs on **AWS EC2 (t3.micro, free tier)** with HTTPS via Let's Encrypt.
 | DNS | DuckDNS free subdomain |
 | SSL | Let's Encrypt (auto-renews) |
 
-> Full setup guide: `AWS_SETUP.md` — Quick reference for managing the server.
-> Step-by-step from scratch: `docs/AWS_DEPLOYMENT.md`
+> Quick reference: `AWS_SETUP.md` | Step-by-step from scratch: `docs/AWS_DEPLOYMENT.md`
 
 ### AWS Console — Quick Links
 
 All resources are in `us-east-1` (N. Virginia).
 
-| Resource | Console Link |
-|---|---|
-| EC2 Instance (`stpetemusic-n8n`) | [EC2 → Instances](https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#Instances) |
-| Elastic IP (`54.235.171.182`) | [EC2 → Elastic IPs](https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#Addresses) |
-| Security Group (`stpetemusic-n8n-sg`) | [EC2 → Security Groups](https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#SecurityGroups) |
-| EBS Volume (20GB gp3) | [EC2 → Volumes](https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#Volumes) |
-| Free Tier Usage | [Billing → Free Tier](https://us-east-1.console.aws.amazon.com/billing/home#/freetier) |
-| Billing Budgets / Alerts | [Billing → Budgets](https://us-east-1.console.aws.amazon.com/billing/home#/budgets) |
-| IAM User (`maylortaylor`) | [IAM → Users](https://us-east-1.console.aws.amazon.com/iam/home#/users) |
+| Resource | ID | Console Link |
+|---|---|---|
+| EC2 Instance | `i-03874197d725b0455` | [Open in Console](https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#Instances:instanceId=i-03874197d725b0455) |
+| Elastic IP | `54.235.171.182` | [Open in Console](https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#Addresses:AllocationId=eipalloc-0a2ebbeef75ce8009) |
+| Security Group | `sg-03a69e68cf7077cf3` | [Open in Console](https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#SecurityGroup:groupId=sg-03a69e68cf7077cf3) |
+| EBS Volume (20GB gp3) | — | [EC2 → Volumes](https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#Volumes) |
+| Free Tier Usage | — | [Billing → Free Tier](https://us-east-1.console.aws.amazon.com/billing/home#/freetier) |
+| Billing Budgets | — | [Billing → Budgets](https://us-east-1.console.aws.amazon.com/billing/home#/budgets) |
+| IAM User | `maylortaylor` | [IAM → Users](https://us-east-1.console.aws.amazon.com/iam/home#/users) |
+
+### Terraform State Backend
+
+Terraform remote state is stored in S3, locked via DynamoDB. **Never edit AWS resources manually** — always go through Terraform.
+
+| Resource | ID | Console Link |
+|---|---|---|
+| S3 State Bucket | `stpetemusic-terraform-state` | [Open in Console](https://s3.console.aws.amazon.com/s3/buckets/stpetemusic-terraform-state?region=us-east-1) |
+| DynamoDB Lock Table | `stpetemusic-terraform-locks` | [Open in Console](https://us-east-1.console.aws.amazon.com/dynamodbv2/home?region=us-east-1#table?name=stpetemusic-terraform-locks) |
+| GitHub Actions | — | [Actions → Runs](https://github.com/maylortaylor/StPeteMusic/actions) |
+
+**Terraform workflow:**
+```bash
+cd infrastructure
+terraform plan    # preview changes (also runs automatically on PRs)
+terraform apply   # apply changes (also runs automatically on merge to main)
+```
+
+**Import existing resources** (already done — documented here for reference):
+```bash
+terraform import aws_security_group.n8n sg-03a69e68cf7077cf3
+terraform import aws_instance.n8n i-03874197d725b0455
+terraform import aws_eip.n8n eipalloc-0a2ebbeef75ce8009
+```
 
 ---
 
@@ -186,6 +223,9 @@ https://n8n-stpetemusic.duckdns.org/rest/oauth2-credential/callback
 - [x] Obsidian → YouTube posting pipeline
 - [x] YouTube Shorts tracker
 - [x] Claude as default AI, Gemini as backup
+- [x] Terraform IaC — all AWS resources version-controlled in `infrastructure/`
+- [x] Terraform remote state — S3 bucket + DynamoDB lock table
+- [x] GitHub Actions — `terraform plan` on PRs, `terraform apply` on merge to main
 
 ### Next
 - [ ] Instagram access token (pending Facebook app review workaround)
@@ -193,8 +233,8 @@ https://n8n-stpetemusic.duckdns.org/rest/oauth2-credential/callback
 - [ ] Workflow: multi-platform posting (IG + FB + YouTube from one trigger)
 
 ### Future
-- [ ] PostgreSQL database (n8n conversation history + StPeteMusic data)
-- [ ] Automated S3 backups of n8n data
+- [ ] PostgreSQL database (n8n conversation history + StPeteMusic data) — `infrastructure/database.tf` ready to uncomment
+- [ ] Automated S3 backups of n8n data — `infrastructure/backup.tf` ready to uncomment
 - [ ] Obsidian → Instagram posting pipeline
 - [ ] Event management (EventBrite API)
 
@@ -220,4 +260,4 @@ https://n8n-stpetemusic.duckdns.org/rest/oauth2-credential/callback
 
 ---
 
-*Last updated: March 2026 | Maintained by Matt Taylor*
+*Last updated: March 2026 | Maintained by Matt Taylor (@maylortaylor)*

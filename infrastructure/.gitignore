@@ -1,0 +1,25 @@
+# Local Terraform state (never commit — remote state is in S3)
+*.tfstate
+*.tfstate.*
+
+# Terraform plan output
+tfplan
+*.tfplan
+
+# Variable overrides (contain secrets)
+terraform.tfvars
+*.auto.tfvars
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Terraform working directories (.terraform/ has large provider binaries — never commit)
+.terraform/
+# NOTE: .terraform.lock.hcl must be committed — do NOT add it here
+
+# Override files (local dev only)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
