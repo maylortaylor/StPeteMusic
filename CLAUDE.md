@@ -73,6 +73,22 @@ Always include:
 - **SSH:** `ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n-stpetemusic.duckdns.org`
 - **Quick reference:** `AWS_SETUP.md`
 - **Full deployment guide:** `docs/AWS_DEPLOYMENT.md`
+- **IaC:** Terraform — see `infrastructure/` (active, state in S3 `stpetemusic-terraform-state`)
+
+### Terraform
+- **State bucket:** `stpetemusic-terraform-state` (S3, `us-east-1`, versioned + encrypted)
+- **Lock table:** `stpetemusic-terraform-locks` (DynamoDB, pay-per-request)
+- **CI:** `terraform plan` on every PR touching `infrastructure/`; `terraform apply` on merge to main
+- **Rule:** Never edit AWS resources manually — always change `.tf` files and let CI apply
+- **Local commands:** `cd infrastructure && terraform plan` / `terraform apply`
+- **Managed resources:** Security Group `sg-03a69e68cf7077cf3`, EC2 `i-03874197d725b0455`, EIP `eipalloc-0a2ebbeef75ce8009`
+- **Pending (commented out):** RDS PostgreSQL (`database.tf`), S3 backup bucket (`backup.tf`)
+
+### Tailscale (Mac ↔ EC2 VPN)
+- Encrypted tunnel so n8n on EC2 can reach Obsidian running on your Mac
+- Mac Tailscale IP: run `tailscale ip -4` on your Mac to find it (do not hardcode in docs)
+- All Obsidian workflow nodes use `{{ $env.OBSIDIAN_HOST }}` — set to `http://<TAILSCALE_IP>:27123` in server `.env`
+- If Obsidian nodes fail: verify Tailscale is active on Mac and Obsidian Local REST API plugin is running
 
 ### AI Configuration
 - **Default AI:** Anthropic Claude (`CLAUDE_API_KEY_N8N_STPETEMUSIC`)

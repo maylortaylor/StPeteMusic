@@ -28,6 +28,7 @@ Current infrastructure for the StPeteMusic n8n automation server.
 EC2 t3.micro (Amazon Linux 2023)
   ├── nginx 1.28          — reverse proxy, handles HTTPS
   ├── Certbot             — Let's Encrypt SSL, auto-renews every 12h via cron
+  ├── Tailscale           — VPN tunnel to Mac (for Obsidian Local REST API)
   └── Docker 25
         └── n8nio/n8n:latest
               ├── volume: n8n_data      → /home/node/.n8n (workflows, credentials, DB)
@@ -226,8 +227,115 @@ aws ce get-cost-and-usage \
 
 ---
 
+## Tailscale (Mac ↔ EC2 VPN)
+
+Tailscale creates an encrypted tunnel so n8n on EC2 can reach Obsidian running on your Mac.
+
+| Device | Tailscale IP |
+|---|---|
+| Mac (maylortaylor) | run `tailscale ip -4` on your Mac |
+| EC2 server | assigned automatically |
+
+**Obsidian Local REST API** must be running on your Mac (port 27123) for Obsidian workflow nodes to work.
+
+```bash
+# Verify the tunnel is alive from EC2
+ping -c 2 $(tailscale ip -4)
+
+# Check Tailscale status on EC2
+sudo tailscale status
+```
+
+If the tunnel drops (rare), on EC2: `sudo tailscale up`
+
+---
+
+## OBSIDIAN_HOST Environment Variable
+
+Workflows use `{{ $env.OBSIDIAN_HOST }}` for all Obsidian API calls.
+
+| Environment | Value |
+|---|---|
+| Local dev (`docker-compose.yaml`) | `http://host.docker.internal:27123` (hardcoded) |
+| Production (`docker-compose.prod.yaml`) | `http://<TAILSCALE_IP>:27123` (from server `.env` — run `tailscale ip -4` on your Mac) |
+
+To update the production value:
+```bash
+# SSH in and edit .env
+ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n-stpetemusic.duckdns.org
+nano ~/stpetemusic/.env  # update OBSIDIAN_HOST=
+docker restart n8n
+```
+
+---
+
+## Terraform State Backend
+
+Terraform remote state is stored in S3 with DynamoDB locking.
+
+| Resource | Value |
+|---|---|
+| **S3 Bucket** | `stpetemusic-terraform-state` |
+| **State Key** | `stpetemusic/terraform.tfstate` |
+| **DynamoDB Table** | `stpetemusic-terraform-locks` |
+| **Region** | `us-east-1` |
+| **Profile** | `personal` |
+
+Bootstrap commands (run once, manually — already done):
+
+```bash
+# Create state bucket
+aws s3api create-bucket --bucket stpetemusic-terraform-state --region us-east-1 --profile personal
+
+# Enable versioning
+aws s3api put-bucket-versioning --bucket stpetemusic-terraform-state \
+  --versioning-configuration Status=Enabled --profile personal
+
+# Enable encryption
+aws s3api put-bucket-encryption --bucket stpetemusic-terraform-state \
+  --server-side-encryption-configuration \
+  '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}' \
+  --profile personal
+
+# Block public access
+aws s3api put-public-access-block --bucket stpetemusic-terraform-state \
+  --public-access-block-configuration \
+  "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true" \
+  --profile personal
+
+# Create DynamoDB lock table
+aws dynamodb create-table --table-name stpetemusic-terraform-locks \
+  --attribute-definitions AttributeName=LockID,AttributeType=S \
+  --key-schema AttributeName=LockID,KeyType=HASH \
+  --billing-mode PAY_PER_REQUEST --region us-east-1 --profile personal
+```
+
+## Terraform Workflow
+
+```bash
+cd infrastructure
+
+# First-time setup
+terraform init
+
+# Import existing resources (one-time, already done)
+terraform import aws_security_group.n8n sg-03a69e68cf7077cf3
+terraform import aws_instance.n8n i-03874197d725b0455
+terraform import aws_eip.n8n eipalloc-0a2ebbeef75ce8009
+
+# Normal workflow
+terraform plan    # preview changes
+terraform apply   # apply changes
+```
+
+CI/CD: `terraform plan` runs on every PR touching `infrastructure/`. `terraform apply` runs on merge to main.
+GitHub Secrets required: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`
+
+---
+
 ## Next Steps Planned
 
+- [x] Terraform — infrastructure as code (`infrastructure/` directory)
 - [ ] PostgreSQL database (see `docs/POSTGRES_PLAN.md` when created)
 - [ ] Automated S3 backups on a schedule
 - [ ] Pin n8n to a specific version tag instead of `latest`
