@@ -6,10 +6,10 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -1216,
-        -32
+        1040,
+        -80
       ],
-      "id": "ffa06809-9303-479d-825f-3e466f48ea68",
+      "id": "79428b36-aaf0-45c8-8c4a-3680bfbd176b",
       "name": "Manual Trigger"
     },
     {
@@ -24,10 +24,10 @@
       "type": "n8n-nodes-base.interval",
       "typeVersion": 1,
       "position": [
-        -1216,
-        96
+        1040,
+        48
       ],
-      "id": "4315478e-b4fa-4983-a7a2-7396f2f2dcb4",
+      "id": "27a02e8f-9662-43ae-beac-ff7fe59cb57c",
       "name": "Scheduled Trigger (Every 4 Hours)"
     },
     {
@@ -49,10 +49,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -1008,
-        -32
+        1248,
+        -80
       ],
-      "id": "c70cd726-0984-417c-be19-66954e0f340d",
+      "id": "68dc8da6-676f-4641-9b51-b3253eeb2576",
       "name": "Query Obsidian Vault",
       "credentials": {
         "httpBearerAuth": {
@@ -64,15 +64,15 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "// Parse the stringified data from Obsidian API\nconst parsed = JSON.parse($json.data);\nconst fm = parsed.frontmatter || {};\n\n// Only process posts with status 'ready'\nif (fm.status !== 'ready') {\n  return null;\n}\n\n// Return clean extracted data\nreturn {\n  filePath: parsed.path || '',\n  bandName: fm['band-name'] || '',\n  bandUsernameIG: fm['band-username-ig'] || '',\n  title: fm.title || '',\n  caption: fm.caption || '',\n  ytDescription: fm['yt-description'] || '',\n  platform: fm.platform || '',\n  postDate: fm['publish-date'] || '',\n  youtubePlaylist: fm['yt-playlist'] || '',\n  youtubeTags: fm['yt-tags'] || '',\n  mediaUrl: fm['media-link'] || '',\n  mediaType: fm['media-type'] || '',\n  hashtags: fm.hashtags || '',\n  mentions: fm.mentions || '',\n  privacyStatus: fm['privacy-status'] || 'unlisted',\n  status: fm.status,\n  aiGenerated: fm['ai-generated'] || false,\n  originalContent: parsed.content || ''\n};"
+        "jsCode": "// Parse the stringified data from Obsidian API\nconst parsed = JSON.parse($json.data);\nconst fm = parsed.frontmatter || {};\n\n// Only process posts with status 'ready'\nif (fm.status !== 'ready') {\n  return null;\n}\n\n// Return clean extracted data\nreturn {\n  filePath: parsed.path || '',\n  bandName: fm['band-name'] || '',\n  bandUsernameIG: fm['band-username-ig'] || '',\n  title: fm.title || '',\n  caption: fm.caption || '',\n  ytDescription: fm['yt-description'] || '',\n  platform: fm.platform || '',\n  postDate: (() => {\n    const raw = fm['publish-date'] || '';\n    if (!raw) return '';\n    // YouTube publishAt requires RFC 3339 with timezone\n    // St. Pete FL is Eastern: EDT (UTC-4) Mar-Nov, EST (UTC-5) Nov-Mar\n    const d = new Date(raw.replace(' ', 'T'));\n    return raw.replace(' ', 'T') + (d.getMonth() >= 2 && d.getMonth() <= 10 ? '-04:00' : '-05:00');\n  })(),\n    recordDate: (() => {\n    const raw = fm['record-date'] || '';\n    if (!raw) return '';\n    // YouTube recordDate requires RFC 3339 with timezone\n    // St. Pete FL is Eastern: EDT (UTC-4) Mar-Nov, EST (UTC-5) Nov-Mar\n    const d = new Date(raw.replace(' ', 'T'));\n    return raw.replace(' ', 'T') + (d.getMonth() >= 2 && d.getMonth() <= 10 ? '-04:00' : '-05:00');\n  })(),\n  youtubePlaylist: fm['yt-playlist'] || '',\n  youtubeTags: fm['yt-tags'] || '',\n  mediaUrl: fm['media-link'] || '',\n  mediaType: fm['media-type'] || '',\n  hashtags: fm.hashtags || '',\n  ytTags: fm['yt-tags'] || '',\n  mentions: fm.mentions || '',\n  privacyStatus: fm['privacy-status'] || 'unlisted',\n  status: fm.status,\n  aiGenerated: fm['ai-generated'] || false,\n  originalContent: parsed.content || ''\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -816,
-        -32
+        1440,
+        -80
       ],
-      "id": "3a5c4727-03a1-44c4-95fa-143108732805",
+      "id": "2800bd9d-143a-4fcd-8679-57b17b678101",
       "name": "Extract Post Data"
     },
     {
@@ -95,10 +95,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 1,
       "position": [
-        -608,
-        -32
+        1648,
+        -80
       ],
-      "id": "6be3b81f-a326-4e4b-9c74-7f944149c769",
+      "id": "7b70c26e-03dd-4ad8-ad72-20420198e347",
       "name": "Platform Check"
     },
     {
@@ -114,10 +114,10 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        -368,
-        -240
+        1888,
+        -288
       ],
-      "id": "d235570c-dca9-4ae4-82e6-bb092ed6e228",
+      "id": "be7c5040-43a3-4f3b-8b54-b5309307b7b0",
       "name": "Download file",
       "credentials": {
         "googleDriveOAuth2Api": {
@@ -134,25 +134,26 @@
         "regionCode": "US",
         "categoryId": "=10",
         "options": {
-          "defaultLanguage": "ES-US",
+          "defaultLanguage": "es-US",
           "description": "={{ $('Extract Post Data').item.json.ytDescription }}",
           "embeddable": false,
           "license": "creativeCommon",
           "notifySubscribers": false,
-          "privacyStatus": "={{ $('Extract Post Data').item.json.privacyStatus }}",
+          "privacyStatus": "private",
           "publicStatsViewable": true,
-          "publishAt": "={{ $('Extract Post Data').item.json.postDate }}",
+          "publishAt": "={{$json.postDate.slice(0,22)}}",
+          "recordingDate": "={{$json.recordDate.slice(0,22)}}",
           "selfDeclaredMadeForKids": false,
-          "tags": "={{ $('Extract Post Data').item.json.hashtags }}"
+          "tags": "={{ $('Extract Post Data').item.json.youtubeTags }}"
         }
       },
       "type": "n8n-nodes-base.youTube",
       "typeVersion": 1,
       "position": [
-        -128,
-        -240
+        2128,
+        -288
       ],
-      "id": "8893b55e-a4e9-4e15-bdbf-be78bcb9bc4b",
+      "id": "67981acf-8093-4d69-98c7-5cac801933d4",
       "name": "Upload a video",
       "credentials": {
         "youTubeOAuth2Api": {
@@ -164,17 +165,17 @@
     {
       "parameters": {
         "resource": "playlistItem",
-        "operation": "add",
         "playlistId": "={{ $('Extract Post Data').item.json.youtubePlaylist }}",
-        "videoId": "={{ $json.id }}"
+        "videoId": "={{ $json.uploadId }}",
+        "options": {}
       },
       "type": "n8n-nodes-base.youTube",
       "typeVersion": 1,
       "position": [
-        80,
-        -240
+        2336,
+        -288
       ],
-      "id": "05d40524-1b04-4716-8520-8e62dc6dc5b7",
+      "id": "8d681ef7-c08c-4227-9c59-f78ce079d141",
       "name": "Add to Playlist",
       "credentials": {
         "youTubeOAuth2Api": {
@@ -202,10 +203,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        280,
-        -240
+        2544,
+        -288
       ],
-      "id": "get-obsidian-file-content",
+      "id": "2d3a0056-4e0b-4521-b338-1b505b446336",
       "name": "Get Obsidian File Content",
       "credentials": {
         "httpBearerAuth": {
@@ -222,10 +223,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        464,
-        -240
+        2720,
+        -288
       ],
-      "id": "build-updated-content",
+      "id": "238b1023-db2a-443f-b7ed-d876f3f0386e",
       "name": "Build Updated Content"
     },
     {
@@ -235,16 +236,18 @@
         "authentication": "genericCredentialType",
         "genericAuthType": "httpBearerAuth",
         "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/html",
         "body": "={{ $json.updatedContent }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        672,
-        -240
+        2928,
+        -288
       ],
-      "id": "d24939ab-8209-4212-bcca-808c02bbfb87",
+      "id": "13a69029-9e47-4f10-919b-3fdd207c0940",
       "name": "Update Obsidian Status",
       "credentials": {
         "httpBearerAuth": {
@@ -308,8 +311,7 @@
             "type": "main",
             "index": 0
           }
-        ],
-        []
+        ]
       ]
     },
     "Download file": {
@@ -372,7 +374,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "01744183-8db5-4193-bf9a-127029845cbc",
+  "versionId": "077ee189-dac9-43b0-ba55-fce7587de487",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9293fc07055c195e236ac85072d0208fe886bdff22e173da7b17b3c0599dbb93"
