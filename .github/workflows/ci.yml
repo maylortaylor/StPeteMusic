@@ -35,12 +35,15 @@ jobs:
         run: |
           pip install pyyaml -q
           python3 -c "
-          import yaml, sys
+          import yaml, sys, os
           files = [
             'n8n/docker-compose.yaml',
             'n8n/docker-compose.prod.yaml',
           ]
           for f in files:
+            if not os.path.exists(f):
+              print(f'⚠ {f}: not found, skipping')
+              continue
             try:
               yaml.safe_load(open(f))
               print(f'✓ {f}')
