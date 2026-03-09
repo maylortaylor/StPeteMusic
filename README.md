@@ -226,15 +226,15 @@ https://n8n-stpetemusic.duckdns.org/rest/oauth2-credential/callback
 - [x] Terraform IaC — all AWS resources version-controlled in `infrastructure/`
 - [x] Terraform remote state — S3 bucket + DynamoDB lock table
 - [x] GitHub Actions — `terraform plan` on PRs, `terraform apply` on merge to main
+- [x] GitHub Actions — JSON validation, security scanning, Dependabot
+- [x] Automated S3 backups — daily cron, 30-day retention, IAM instance profile auth
 
 ### Next
 - [ ] Instagram access token (pending Facebook app review workaround)
-- [ ] GitHub Actions — JSON validation, security scanning, Dependabot
 - [ ] Workflow: multi-platform posting (IG + FB + YouTube from one trigger)
 
 ### Future
 - [ ] PostgreSQL database (n8n conversation history + StPeteMusic data) — `infrastructure/database.tf` ready to uncomment
-- [ ] Automated S3 backups of n8n data — `infrastructure/backup.tf` ready to uncomment
 - [ ] Obsidian → Instagram posting pipeline
 - [ ] Event management (EventBrite API)
 
