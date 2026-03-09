@@ -1,0 +1,43 @@
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    environment:
+      - N8N_HOST=n8n-stpetemusic.duckdns.org
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=https://n8n-stpetemusic.duckdns.org/
+      - GENERIC_TIMEZONE=America/New_York
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
+      - NODE_FUNCTION_ALLOW_BUILTIN=fs
+      - N8N_DEFAULT_BINARY_DATA_MODE=filesystem
+      - N8N_LOG_LEVEL=info
+      - N8N_API_KEY=${N8N_API_KEY}
+      - CLAUDE_API_KEY_N8N_STPETEMUSIC=${CLAUDE_API_KEY_N8N_STPETEMUSIC}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - N8N_GEMINI_API_KEY=${N8N_GEMINI_API_KEY}
+      - IG_USER_ID=${IG_USER_ID}
+      - IG_ACCESS_TOKEN=${IG_ACCESS_TOKEN}
+      - FB_PAGE_ID=${FB_PAGE_ID}
+      - FB_ACCESS_TOKEN=${FB_ACCESS_TOKEN}
+      - YOUTUBE_CLIENT_ID=${YOUTUBE_CLIENT_ID}
+      - YOUTUBE_CLIENT_SECRET=${YOUTUBE_CLIENT_SECRET}
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY}
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./local-files:/files
+    ports:
+      # Bound to localhost only — nginx proxies external traffic
+      - "127.0.0.1:5678:5678"
+    networks:
+      - n8n-net
+
+networks:
+  n8n-net:
+    driver: bridge
+
+volumes:
+  n8n_data:
+    driver: local
