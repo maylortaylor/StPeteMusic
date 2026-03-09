@@ -10,6 +10,7 @@ services:
       - WEBHOOK_URL=https://n8n-stpetemusic.duckdns.org/
       - GENERIC_TIMEZONE=America/New_York
       - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - OBSIDIAN_HOST=${OBSIDIAN_HOST}
       - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
       - NODE_FUNCTION_ALLOW_BUILTIN=fs
       - N8N_DEFAULT_BINARY_DATA_MODE=filesystem

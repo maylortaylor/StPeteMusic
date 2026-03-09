@@ -32,7 +32,7 @@
     },
     {
       "parameters": {
-        "url": "=http://host.docker.internal:27123/active/",
+        "url": "={{ $env.OBSIDIAN_HOST }}/active/",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpBearerAuth",
         "sendHeaders": true,
@@ -186,7 +186,7 @@
     },
     {
       "parameters": {
-        "url": "=http://host.docker.internal:27123/vault/{{ $('Extract Post Data').item.json.filePath }}",
+        "url": "={{ $env.OBSIDIAN_HOST }}/vault/{{ $('Extract Post Data').item.json.filePath }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpBearerAuth",
         "sendHeaders": true,
@@ -232,7 +232,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=http://host.docker.internal:27123/vault/{{ $json.filePath }}",
+        "url": "={{ $env.OBSIDIAN_HOST }}/vault/{{ $json.filePath }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpBearerAuth",
         "sendBody": true,

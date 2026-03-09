@@ -7,6 +7,7 @@ services:
       - "5678:5678"
     env_file: ../.env
     environment:
+      - OBSIDIAN_HOST=http://host.docker.internal:27123
       - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
       - NODE_FUNCTION_ALLOW_BUILTIN=fs
       - N8N_BASIC_AUTH_ACTIVE=false
