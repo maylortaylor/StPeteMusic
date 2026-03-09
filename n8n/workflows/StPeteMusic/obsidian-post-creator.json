@@ -90,7 +90,7 @@
         "url": "=http://host.docker.internal:27123/vault/StPeteMusic/Content/Drafts/{{ $json.platform }}/{{ DateTime.fromISO($json.postDate).format('MM.dd.yyyy') }} {{ $json.bandName }}.md",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpBearerAuth",
-        "sendBody": true
+        "sendBody": true,
         "contentType": "raw",
         "rawContentType": "text/html",
         "body": "={{ $json.markdownContent }}",
