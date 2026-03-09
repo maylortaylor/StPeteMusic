@@ -17,3 +17,8 @@ output "security_group_id" {
   description = "Security group ID"
   value       = aws_security_group.n8n.id
 }
+
+output "backup_bucket" {
+  description = "S3 bucket name for n8n backups"
+  value       = aws_s3_bucket.n8n_backups.id
+}
