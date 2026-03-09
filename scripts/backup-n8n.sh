@@ -2,7 +2,7 @@
 # backup-n8n.sh — backs up the n8n Docker volume to S3
 #
 # Run via cron on the EC2 server:
-#   0 2 * * * /home/ec2-user/stpetemusic/scripts/backup-n8n.sh >> /var/log/n8n-backup.log 2>&1
+#   0 4 */2 * * /home/ec2-user/stpetemusic/scripts/backup-n8n.sh >> /var/log/n8n-backup.log 2>&1
 #
 # Auth: uses the EC2 IAM instance profile — no keys needed.
 # Retention: S3 lifecycle rule expires objects after 30 days automatically.
