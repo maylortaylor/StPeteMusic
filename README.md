@@ -54,6 +54,20 @@ n8n runs on **AWS EC2 (t3.micro, free tier)** with HTTPS via Let's Encrypt.
 > Full setup guide: `AWS_SETUP.md` — Quick reference for managing the server.
 > Step-by-step from scratch: `docs/AWS_DEPLOYMENT.md`
 
+### AWS Console — Quick Links
+
+All resources are in `us-east-1` (N. Virginia).
+
+| Resource | Console Link |
+|---|---|
+| EC2 Instance (`stpetemusic-n8n`) | [EC2 → Instances](https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#Instances) |
+| Elastic IP (`54.235.171.182`) | [EC2 → Elastic IPs](https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#Addresses) |
+| Security Group (`stpetemusic-n8n-sg`) | [EC2 → Security Groups](https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#SecurityGroups) |
+| EBS Volume (20GB gp3) | [EC2 → Volumes](https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#Volumes) |
+| Free Tier Usage | [Billing → Free Tier](https://us-east-1.console.aws.amazon.com/billing/home#/freetier) |
+| Billing Budgets / Alerts | [Billing → Budgets](https://us-east-1.console.aws.amazon.com/billing/home#/budgets) |
+| IAM User (`maylortaylor`) | [IAM → Users](https://us-east-1.console.aws.amazon.com/iam/home#/users) |
+
 ---
 
 ## Active Workflows
