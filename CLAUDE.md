@@ -65,6 +65,53 @@ Always include:
 - **Support:** Rob Morey & Alex MacDonald
 - **@StPeteMusic:** Managed by Matt Taylor
 
+## N8N Workflows
+
+Workflows live in `n8n/workflows/StPeteMusic/`. The `system-prompt.md` file is the **source of truth** for AI agent instructions — always keep it in sync with the `systemMessage` field in the corresponding workflow JSON.
+
+### obsidian-post-creator-v2 (YouTube-only)
+
+**File:** `n8n/workflows/StPeteMusic/obsidian-post-creator-v2.json`
+**Purpose:** Chat-based agent that generates YouTube post metadata and writes drafts to Obsidian.
+
+**AI Output — single flat JSON object:**
+```json
+{
+  "bandName": "Beach Terror",
+  "bandInstagram": "@beach_terror",
+  "caption": "🎸 02.23 @BeachTerror at @Suite.E.Studios",
+  "postDate": "2026-02-18 11:00:00",
+  "recordDate": "2026-02-07 20:00:00",
+  "hashtags": ["#StPeteMusic", "#SuiteEStudios", "#StPeteFL", "#TampaBay"],
+  "mentions": ["@StPeteMusic", "@suite.e.studios", "@beach_terror"],
+  "status": "draft",
+  "platform": "YouTube",
+  "suiteEStudios": "Suite E Studios",
+  "suiteEStudiosInstagram": "@suite.e.studios",
+  "eventType": "Music",
+  "mediaType": "Video",
+  "mediaLink": ""
+}
+```
+
+**Date format:** `"YYYY-MM-DD HH:MM:SS"` — required by YouTube API.
+**`recordDate`**: when the performance happened (ask user if unknown).
+**`postDate`**: future weekday, 3–7 days out, default time `11:00:00`.
+
+**Tools on AI Agent:**
+- `Think` — internal reasoning
+- `Ask For Clarification` — call when band name, Instagram handle, or record date is missing
+- `Read Obsidian Posts` — reads existing drafts for style consistency
+
+**Workflow nodes:** Chat Trigger → AI Agent → Parse AI Output → JSON to YAML + Template → Write to Obsidian
+
+**When updating the system prompt:**
+1. Edit `system-prompt.md` first (readable source of truth)
+2. Sync the `systemMessage` field in the JSON workflow
+3. Commit both files
+
+---
+
 ## Technical Configuration
 
 ### Google Account
