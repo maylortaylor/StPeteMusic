@@ -26,6 +26,9 @@ jobs:
           script: |
             set -e
 
+            echo "── Ensuring git is installed ──"
+            command -v git >/dev/null 2>&1 || sudo dnf install git -y -q
+
             echo "── Pulling latest from GitHub ──"
             cd /tmp
             rm -rf stpetemusic-deploy
