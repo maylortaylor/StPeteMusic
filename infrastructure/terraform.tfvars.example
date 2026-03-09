@@ -1,0 +1,6 @@
+# Copy this file to terraform.tfvars and fill in your values.
+# terraform.tfvars is gitignored — never commit it.
+
+aws_region   = "us-east-1"
+project      = "stpetemusic"
+ssh_key_name = "stpetemusic-n8n"
