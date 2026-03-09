@@ -65,9 +65,34 @@ Always include:
 - **Support:** Rob Morey & Alex MacDonald
 - **@StPeteMusic:** Managed by Matt Taylor
 
+## Infrastructure
+
+### Production n8n
+- **URL:** https://n8n-stpetemusic.duckdns.org
+- **Server:** AWS EC2 t3.micro (`us-east-1`, free tier)
+- **SSH:** `ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n-stpetemusic.duckdns.org`
+- **Quick reference:** `AWS_SETUP.md`
+- **Full deployment guide:** `docs/AWS_DEPLOYMENT.md`
+
+### AI Configuration
+- **Default AI:** Anthropic Claude (`CLAUDE_API_KEY_N8N_STPETEMUSIC`)
+- **Backup AI:** Google Gemini (`N8N_GEMINI_API_KEY`)
+- Always use Claude as default in new workflow AI nodes
+
+### OAuth Redirect URI (for all platforms)
+```
+https://n8n-stpetemusic.duckdns.org/rest/oauth2-credential/callback
+```
+
+---
+
 ## N8N Workflows
 
-Workflows live in `n8n/workflows/StPeteMusic/`. The `system-prompt.md` file is the **source of truth** for AI agent instructions — always keep it in sync with the `systemMessage` field in the corresponding workflow JSON.
+**Active workflows only:** `n8n/workflows/StPeteMusic/` — do not import from other directories.
+
+See `n8n/CLAUDE.md` for detailed n8n guidance.
+
+The `system-prompt.md` file is the **source of truth** for AI agent instructions — always keep it in sync with the `systemMessage` field in the corresponding workflow JSON.
 
 ### obsidian-post-creator (YouTube-only)
 
@@ -119,3 +144,13 @@ Workflows live in `n8n/workflows/StPeteMusic/`. The `system-prompt.md` file is t
 - **Content Database:** [Google Sheets](https://docs.google.com/spreadsheets/d/1kzzR8zPxxNmNmp7hXFwzWMoVZh7ZLC9GZBnob1UNYo8/edit?usp=sharing)
   - `IG_PastPosts` tab: Archive of past Instagram posts for style reference
   - `PostSchedule` tab: Future posts queue for social media
+
+### Key Files
+| File | Purpose |
+|---|---|
+| `AWS_SETUP.md` | Production server quick reference |
+| `docs/AWS_DEPLOYMENT.md` | Full step-by-step AWS setup guide |
+| `n8n/CLAUDE.md` | n8n-specific Claude guidance |
+| `n8n/docker-compose.yaml` | Local development |
+| `n8n/docker-compose.prod.yaml` | Production (AWS) |
+| `.env.example` | Environment variable template |
