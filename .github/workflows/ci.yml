@@ -12,7 +12,7 @@ jobs:
     name: Validate Workflow JSON
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Validate all StPeteMusic workflow JSON files
         run: |
@@ -29,7 +29,7 @@ jobs:
     name: Validate Docker Compose
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Validate YAML syntax
         run: |
@@ -57,7 +57,7 @@ jobs:
     name: Secret Scanning
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0  # full history so gitleaks can scan all commits
 
