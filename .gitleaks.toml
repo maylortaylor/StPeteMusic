@@ -1,0 +1,22 @@
+title = "StPeteMusic Gitleaks Config"
+
+# Extend the default gitleaks ruleset
+[extend]
+useDefault = true
+
+# Allow known safe files that may contain placeholder-looking values
+[allowlist]
+  description = "Safe files and patterns"
+  paths = [
+    # Template file — contains placeholder keys, not real ones
+    '''^\.env\.example$''',
+    # Docs reference example patterns and commands
+    '''docs/AWS_DEPLOYMENT\.md$''',
+    '''AWS_SETUP\.md$''',
+    '''README\.md$''',
+  ]
+  regexes = [
+    # Ignore placeholder patterns used in docs
+    '''YOUR_[A-Z_]+''',
+    '''<YOUR_[A-Z_]+>''',
+  ]
