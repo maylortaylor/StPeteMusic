@@ -23,6 +23,7 @@ docker stop n8n
 
 echo "[$(date)] Creating volume snapshot..."
 docker run --rm \
+  --user "$(id -u):$(id -g)" \
   -v n8n_data:/source:ro \
   -v /tmp:/backup \
   alpine tar czf "/backup/n8n-backup-${TIMESTAMP}.tar.gz" -C /source .
