@@ -69,9 +69,9 @@ Always include:
 
 Workflows live in `n8n/workflows/StPeteMusic/`. The `system-prompt.md` file is the **source of truth** for AI agent instructions — always keep it in sync with the `systemMessage` field in the corresponding workflow JSON.
 
-### obsidian-post-creator-v2 (YouTube-only)
+### obsidian-post-creator (YouTube-only)
 
-**File:** `n8n/workflows/StPeteMusic/obsidian-post-creator-v2.json`
+**File:** `n8n/workflows/StPeteMusic/obsidian-post-creator.json`
 **Purpose:** Chat-based agent that generates YouTube post metadata and writes drafts to Obsidian.
 
 **AI Output — single flat JSON object:**
