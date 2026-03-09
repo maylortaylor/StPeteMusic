@@ -49,6 +49,7 @@ resource "aws_instance" "n8n" {
   instance_type          = "t3.micro"
   key_name               = var.ssh_key_name
   vpc_security_group_ids = [aws_security_group.n8n.id]
+  iam_instance_profile   = aws_iam_instance_profile.ec2_backup.name
 
   root_block_device {
     volume_size = 20
