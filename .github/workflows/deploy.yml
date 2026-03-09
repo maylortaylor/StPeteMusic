@@ -1,0 +1,49 @@
+name: Deploy to AWS
+
+# Runs automatically after CI passes on main.
+# Syncs workflow files and docker-compose to the EC2 server,
+# then applies any compose config changes (restarts n8n if needed).
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Sync to EC2
+    runs-on: ubuntu-latest
+    # Only deploy if CI actually passed — not on failure or cancellation
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+
+            echo "── Pulling latest from GitHub ──"
+            cd /tmp
+            rm -rf stpetemusic-deploy
+            git clone --depth 1 https://github.com/maylortaylor/StPeteMusic.git stpetemusic-deploy
+
+            echo "── Syncing workflow files ──"
+            mkdir -p ~/stpetemusic/n8n/workflows/StPeteMusic
+            cp -r stpetemusic-deploy/n8n/workflows/StPeteMusic/. ~/stpetemusic/n8n/workflows/StPeteMusic/
+
+            echo "── Syncing docker-compose.prod.yaml ──"
+            cp stpetemusic-deploy/n8n/docker-compose.prod.yaml ~/stpetemusic/n8n/docker-compose.prod.yaml
+
+            echo "── Applying compose config (restarts n8n if config changed) ──"
+            cd ~/stpetemusic/n8n
+            docker-compose -f docker-compose.prod.yaml --env-file ../.env up -d
+
+            echo "── Cleanup ──"
+            rm -rf /tmp/stpetemusic-deploy
+
+            echo "✓ Deploy complete"
+            docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep n8n
