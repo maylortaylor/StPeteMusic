@@ -111,6 +111,21 @@ https://n8n-stpetemusic.duckdns.org/rest/oauth2-credential/callback
 
 ---
 
+## OBSIDIAN_HOST Environment Variable
+
+All Obsidian HTTP request nodes use `{{ $env.OBSIDIAN_HOST }}` — never hardcode the URL.
+
+| Environment | Value |
+|---|---|
+| Local (`docker-compose.yaml`) | `http://host.docker.internal:27123` |
+| Production (`docker-compose.prod.yaml`) | `http://<TAILSCALE_IP>:27123` (run `tailscale ip -4` on your Mac) |
+
+**If the Obsidian nodes fail in production:** check Tailscale is running on both Mac and EC2, and that Obsidian's Local REST API plugin is active on the Mac.
+
+**If you re-import a workflow** that has the hardcoded URL, manually update each Obsidian node's URL field to `={{ $env.OBSIDIAN_HOST }}/...` (note the leading `=`).
+
+---
+
 ## local-files/ Directory
 
 Files placed in `n8n/local-files/` are mounted into the container at `/files`.
