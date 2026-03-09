@@ -14,9 +14,9 @@ terraform.tfvars
 crash.log
 crash.*.log
 
-# Terraform working directories
+# Terraform working directories (.terraform/ has large provider binaries — never commit)
 .terraform/
-.terraform.lock.hcl
+# NOTE: .terraform.lock.hcl must be committed — do NOT add it here
 
 # Override files (local dev only)
 override.tf

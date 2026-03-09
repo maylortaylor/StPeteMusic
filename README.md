@@ -69,7 +69,7 @@ n8n runs on **AWS EC2 (t3.micro, free tier)** with HTTPS via Let's Encrypt. All 
 
 ### AWS Console — Quick Links
 
-All resources are in `us-east-1` (N. Virginia) under account `767350869653`.
+All resources are in `us-east-1` (N. Virginia).
 
 | Resource | ID | Console Link |
 |---|---|---|

@@ -233,14 +233,14 @@ Tailscale creates an encrypted tunnel so n8n on EC2 can reach Obsidian running o
 
 | Device | Tailscale IP |
 |---|---|
-| Mac (maylortaylor) | `100.84.166.51` |
+| Mac (maylortaylor) | run `tailscale ip -4` on your Mac |
 | EC2 server | assigned automatically |
 
 **Obsidian Local REST API** must be running on your Mac (port 27123) for Obsidian workflow nodes to work.
 
 ```bash
 # Verify the tunnel is alive from EC2
-ping -c 2 100.84.166.51
+ping -c 2 $(tailscale ip -4)
 
 # Check Tailscale status on EC2
 sudo tailscale status
@@ -257,7 +257,7 @@ Workflows use `{{ $env.OBSIDIAN_HOST }}` for all Obsidian API calls.
 | Environment | Value |
 |---|---|
 | Local dev (`docker-compose.yaml`) | `http://host.docker.internal:27123` (hardcoded) |
-| Production (`docker-compose.prod.yaml`) | `http://100.84.166.51:27123` (from server `.env`) |
+| Production (`docker-compose.prod.yaml`) | `http://<TAILSCALE_IP>:27123` (from server `.env` — run `tailscale ip -4` on your Mac) |
 
 To update the production value:
 ```bash
