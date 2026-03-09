@@ -86,8 +86,8 @@ Always include:
 
 ### Tailscale (Mac ↔ EC2 VPN)
 - Encrypted tunnel so n8n on EC2 can reach Obsidian running on your Mac
-- Mac Tailscale IP: `100.84.166.51` (stable, doesn't change)
-- All Obsidian workflow nodes use `{{ $env.OBSIDIAN_HOST }}` — set to `http://100.84.166.51:27123` on the server
+- Mac Tailscale IP: run `tailscale ip -4` on your Mac to find it (do not hardcode in docs)
+- All Obsidian workflow nodes use `{{ $env.OBSIDIAN_HOST }}` — set to `http://<TAILSCALE_IP>:27123` in server `.env`
 - If Obsidian nodes fail: verify Tailscale is active on Mac and Obsidian Local REST API plugin is running
 
 ### AI Configuration
