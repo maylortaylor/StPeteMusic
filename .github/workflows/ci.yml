@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── 1. Validate n8n workflow JSON files ──────────────────────────────────
+  validate-workflows:
+    name: Validate Workflow JSON
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate all StPeteMusic workflow JSON files
+        run: |
+          fail=0
+          for f in n8n/workflows/StPeteMusic/*.json; do
+            python3 -c "import json; json.load(open('$f'))" \
+              && echo "✓ $f" \
+              || { echo "✗ $f — invalid JSON"; fail=1; }
+          done
+          exit $fail
+
+  # ── 2. Validate Docker Compose file syntax ───────────────────────────────
+  validate-compose:
+    name: Validate Docker Compose
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate YAML syntax
+        run: |
+          pip install pyyaml -q
+          python3 -c "
+          import yaml, sys
+          files = [
+            'n8n/docker-compose.yaml',
+            'n8n/docker-compose.prod.yaml',
+          ]
+          for f in files:
+            try:
+              yaml.safe_load(open(f))
+              print(f'✓ {f}')
+            except yaml.YAMLError as e:
+              print(f'✗ {f}: {e}')
+              sys.exit(1)
+          "
+
+  # ── 3. Scan for accidentally committed secrets ───────────────────────────
+  scan-secrets:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history so gitleaks can scan all commits
+
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
