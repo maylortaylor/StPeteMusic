@@ -4,18 +4,30 @@
 --   n8n/local-files/Contacts_StPeteMusic.csv
 --   n8n/workflows/StPeteMusic/system-prompt.md (AI prompt templates)
 --
--- IMPORTANT: All PII values (email, phone, payment) are placeholder strings
--- here for readability. In production, wrap them with pgp_sym_encrypt:
+-- ENCRYPTION: All PII fields (email, phone, venmo, zelle, other_payment) should be
+-- encrypted using pgp_sym_encrypt(). This seed currently uses placeholder values
+-- for development. For production with real PII:
 --
---   pgp_sym_encrypt('value', current_setting('app.encryption_key'))
+-- 1. Run with encryption key set:
+--    export PGPASSWORD="your_postgres_password"
+--    PGOPTIONS="-c app.encryption_key=YOUR_ENCRYPTION_KEY" \
+--      psql -U stpetemusic -d stpetemusic -f database/seed.sql
 --
--- For convenience, this file uses a helper approach: insert as plaintext and
--- let the encryption note below guide you. For a real production seed, replace
--- each quoted PII value with the pgp_sym_encrypt() call.
+-- 2. Replace PII values with encrypted versions:
+--    OLD:  email TEXT
+--    NEW:  email BYTEA = pgp_sym_encrypt('user@example.com', current_setting('app.encryption_key'))
 --
--- Run with encryption key set:
---   PGOPTIONS="-c app.encryption_key=YOUR_SECRET_KEY" \
---     psql -U stpetemusic -d stpetemusic -f database/seed.sql
+-- Example encrypted insert:
+--    INSERT INTO persons (first_name, last_name, email)
+--    VALUES (
+--      'John',
+--      'Doe',
+--      pgp_sym_encrypt('john@example.com', current_setting('app.encryption_key'))
+--    );
+--
+-- To decrypt in queries:
+--    SELECT pgp_sym_decrypt(email, current_setting('app.encryption_key'))::TEXT AS email
+--    FROM persons WHERE first_name = 'John';
 
 -- ---------------------------------------------------------------------------
 -- ARTISTS (from Contacts_StPeteMusic.csv)
