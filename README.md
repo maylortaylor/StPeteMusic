@@ -31,6 +31,10 @@
 │       ├── terraform-plan.yml       # Runs terraform plan on PRs
 │       └── terraform-apply.yml      # Runs terraform apply on merge to main
 │
+├── database/                        # PostgreSQL schema and seed data
+│   ├── schema.sql                   # Full table definitions + pgcrypto encryption
+│   └── seed.sql                     # Initial data from CSV contacts + templates
+│
 ├── n8n/                             # n8n automation engine
 │   ├── CLAUDE.md                    # n8n-specific Claude guidance
 │   ├── docker-compose.yaml          # Local development setup
@@ -227,14 +231,17 @@ https://n8n-stpetemusic.duckdns.org/rest/oauth2-credential/callback
 - [x] Terraform remote state — S3 bucket + DynamoDB lock table
 - [x] GitHub Actions — `terraform plan` on PRs, `terraform apply` on merge to main
 - [x] GitHub Actions — JSON validation, security scanning, Dependabot
-- [x] Automated S3 backups — daily cron, 30-day retention, IAM instance profile auth
+- [x] Automated S3 backups — every 2 days at 4am, 30-day retention, IAM instance profile auth
+- [x] PostgreSQL database — Docker on EC2, full schema for contacts/stats/templates, pgcrypto encryption
 
 ### Next
+- [ ] SSH setup + `docker-compose up` postgres on EC2 (run `database/seed.sql` to populate)
 - [ ] Instagram access token (pending Facebook app review workaround)
 - [ ] Workflow: multi-platform posting (IG + FB + YouTube from one trigger)
 
 ### Future
-- [ ] PostgreSQL database (n8n conversation history + StPeteMusic data) — `infrastructure/database.tf` ready to uncomment
+- [ ] Auto-update ig_mentions via n8n scheduled workflow
+- [ ] YouTube stats import (user to provide export data)
 - [ ] Obsidian → Instagram posting pipeline
 - [ ] Event management (EventBrite API)
 
