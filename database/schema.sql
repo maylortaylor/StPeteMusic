@@ -1,6 +1,14 @@
 -- StPeteMusic PostgreSQL Schema
 -- Requires: pgcrypto extension for column-level encryption
+--
 -- Run: psql -U postgres -d stpetemusic -f schema.sql
+--
+-- ENCRYPTION: All decryption of PII requires the encryption key to be set:
+--   psql: PGOPTIONS="-c app.encryption_key=YOUR_KEY" psql -U stpetemusic -d stpetemusic
+--   docker exec: docker exec -i postgres bash -c 'PGOPTIONS="-c app.encryption_key=YOUR_KEY" psql -U stpetemusic -d stpetemusic'
+--
+-- Example query to decrypt email:
+--   SELECT pgp_sym_decrypt(email, current_setting('app.encryption_key'))::TEXT FROM persons;
 
 -- ---------------------------------------------------------------------------
 -- EXTENSIONS

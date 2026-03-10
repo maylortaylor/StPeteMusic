@@ -49,7 +49,7 @@ rm -f "${BACKUP_FILE}"
 # ---------------------------------------------------------------------------
 echo "[$(date)] Dumping PostgreSQL database..."
 docker exec stpetemusic-postgres \
-  pg_dump -U "${POSTGRES_USER}" stpetemusic \
+  bash -c "PGPASSWORD=\"${POSTGRES_PASSWORD}\" pg_dump -U \"${POSTGRES_USER}\" stpetemusic" \
   | gzip > "${DB_DUMP_FILE}"
 
 echo "[$(date)] Uploading database dump to s3://${BUCKET}/${DB_S3_KEY}..."
