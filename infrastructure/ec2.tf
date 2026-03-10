@@ -54,7 +54,9 @@ resource "aws_instance" "n8n" {
   root_block_device {
     volume_size = 20
     volume_type = "gp3"
-    encrypted   = true
+    # encrypted = true requires stopping the instance, snapshotting the volume,
+    # copying with encryption, and swapping — cannot be done in-place.
+    # Migration plan: snapshot → encrypted copy → attach → terraform import new volume
   }
 
   tags = {
