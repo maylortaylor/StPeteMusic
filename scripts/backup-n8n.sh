@@ -13,15 +13,22 @@ BUCKET="stpetemusic-n8n-backups"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 BACKUP_FILE="/tmp/n8n-backup-${TIMESTAMP}.tar.gz"
 S3_KEY="n8n-data/n8n-backup-${TIMESTAMP}.tar.gz"
+DB_DUMP_FILE="/tmp/stpetemusic-db-${TIMESTAMP}.sql.gz"
+DB_S3_KEY="postgres/stpetemusic-db-${TIMESTAMP}.sql.gz"
 
-echo "[$(date)] Starting n8n backup..."
+# Load .env to get POSTGRES_USER and POSTGRES_PASSWORD
+# shellcheck disable=SC1090
+source /home/ec2-user/stpetemusic/.env
 
-# Stop n8n to ensure a consistent snapshot, then restart immediately
-# If you prefer a live backup (slightly less consistent), remove the stop/start lines
+echo "[$(date)] Starting backup..."
+
+# ---------------------------------------------------------------------------
+# 1. n8n volume backup
+# ---------------------------------------------------------------------------
 echo "[$(date)] Stopping n8n container..."
 docker stop n8n
 
-echo "[$(date)] Creating volume snapshot..."
+echo "[$(date)] Creating n8n volume snapshot..."
 docker run --rm \
   --user "$(id -u):$(id -g)" \
   -v n8n_data:/source:ro \
@@ -31,10 +38,27 @@ docker run --rm \
 echo "[$(date)] Restarting n8n container..."
 docker start n8n
 
-echo "[$(date)] Uploading ${BACKUP_FILE} to s3://${BUCKET}/${S3_KEY}..."
+echo "[$(date)] Uploading n8n backup to s3://${BUCKET}/${S3_KEY}..."
 aws s3 cp "${BACKUP_FILE}" "s3://${BUCKET}/${S3_KEY}" --region us-east-1
 
-echo "[$(date)] Cleaning up local file..."
+echo "[$(date)] Cleaning up n8n backup file..."
 rm -f "${BACKUP_FILE}"
 
-echo "[$(date)] Backup complete: s3://${BUCKET}/${S3_KEY}"
+# ---------------------------------------------------------------------------
+# 2. PostgreSQL database dump
+# ---------------------------------------------------------------------------
+echo "[$(date)] Dumping PostgreSQL database..."
+docker exec stpetemusic-postgres \
+  bash -c "PGPASSWORD=\"${POSTGRES_PASSWORD}\" pg_dump -U \"${POSTGRES_USER}\" stpetemusic" \
+  | gzip > "${DB_DUMP_FILE}"
+
+echo "[$(date)] Uploading database dump to s3://${BUCKET}/${DB_S3_KEY}..."
+aws s3 cp "${DB_DUMP_FILE}" "s3://${BUCKET}/${DB_S3_KEY}" --region us-east-1
+
+echo "[$(date)] Cleaning up database dump file..."
+rm -f "${DB_DUMP_FILE}"
+
+# ---------------------------------------------------------------------------
+echo "[$(date)] Backup complete."
+echo "[$(date)]   n8n volume: s3://${BUCKET}/${S3_KEY}"
+echo "[$(date)]   postgres:   s3://${BUCKET}/${DB_S3_KEY}"
