@@ -6,10 +6,10 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        1040,
-        -80
+        -48,
+        0
       ],
-      "id": "79428b36-aaf0-45c8-8c4a-3680bfbd176b",
+      "id": "78635bf2-7944-43e5-8ba7-fddfe6e4aeee",
       "name": "Manual Trigger"
     },
     {
@@ -24,10 +24,10 @@
       "type": "n8n-nodes-base.interval",
       "typeVersion": 1,
       "position": [
-        1040,
-        48
+        -48,
+        128
       ],
-      "id": "27a02e8f-9662-43ae-beac-ff7fe59cb57c",
+      "id": "46a52fc2-9507-49f6-b745-82a9ccf6307e",
       "name": "Scheduled Trigger (Every 4 Hours)"
     },
     {
@@ -49,14 +49,14 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1248,
-        -80
+        160,
+        0
       ],
-      "id": "68dc8da6-676f-4641-9b51-b3253eeb2576",
+      "id": "68c5d165-52c9-459a-a0b3-090c9154bbae",
       "name": "Query Obsidian Vault",
       "credentials": {
         "httpBearerAuth": {
-          "id": "JG69xsJID8L4BlJr",
+          "id": "4tIhQEVZNqoTVr0Z",
           "name": "Bearer Auth account"
         }
       }
@@ -69,10 +69,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1440,
-        -80
+        352,
+        0
       ],
-      "id": "2800bd9d-143a-4fcd-8679-57b17b678101",
+      "id": "78b9ed46-2983-467d-8a1e-ac8e784f160e",
       "name": "Extract Post Data"
     },
     {
@@ -95,10 +95,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 1,
       "position": [
-        1648,
-        -80
+        560,
+        0
       ],
-      "id": "7b70c26e-03dd-4ad8-ad72-20420198e347",
+      "id": "0de3f4cc-7664-4552-b2de-21f612d53b7e",
       "name": "Platform Check"
     },
     {
@@ -114,14 +114,14 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        1888,
-        -288
+        800,
+        -208
       ],
-      "id": "be7c5040-43a3-4f3b-8b54-b5309307b7b0",
+      "id": "1ebc2216-a1ca-4f6d-8ba9-826c34ffb5ce",
       "name": "Download file",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "puKV9r7d37Capu98",
+          "id": "1lmjEabrYVYL1Zk6",
           "name": "Google Drive account"
         }
       }
@@ -150,14 +150,14 @@
       "type": "n8n-nodes-base.youTube",
       "typeVersion": 1,
       "position": [
-        2128,
-        -288
+        1040,
+        -208
       ],
-      "id": "67981acf-8093-4d69-98c7-5cac801933d4",
+      "id": "036e8f47-4c4e-47d0-9fa5-da11c9534c51",
       "name": "Upload a video",
       "credentials": {
         "youTubeOAuth2Api": {
-          "id": "mTi24S9mwCIxSqWV",
+          "id": "w8B8vUgDNfhzHg63",
           "name": "YouTube account"
         }
       }
@@ -172,14 +172,14 @@
       "type": "n8n-nodes-base.youTube",
       "typeVersion": 1,
       "position": [
-        2336,
-        -288
+        1248,
+        -208
       ],
-      "id": "8d681ef7-c08c-4227-9c59-f78ce079d141",
+      "id": "8fc0e051-bfad-4fee-8b02-32a1c1caad6e",
       "name": "Add to Playlist",
       "credentials": {
         "youTubeOAuth2Api": {
-          "id": "mTi24S9mwCIxSqWV",
+          "id": "w8B8vUgDNfhzHg63",
           "name": "YouTube account"
         }
       }
@@ -203,14 +203,14 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2544,
-        -288
+        1456,
+        -208
       ],
-      "id": "2d3a0056-4e0b-4521-b338-1b505b446336",
+      "id": "f7c0be6d-7cc6-414e-a2e1-827d48900afd",
       "name": "Get Obsidian File Content",
       "credentials": {
         "httpBearerAuth": {
-          "id": "JG69xsJID8L4BlJr",
+          "id": "4tIhQEVZNqoTVr0Z",
           "name": "Bearer Auth account"
         }
       }
@@ -218,15 +218,15 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "// Replace 'status: ready' with 'status: posted' in YAML frontmatter\nconst rawMarkdown = $json.body || $json.data || '';\nconst updated = rawMarkdown.replace(/^status: ready$/m, 'status: posted');\nreturn {\n  json: {\n    updatedContent: updated,\n    filePath: $('Extract Post Data').item.json.filePath\n  }\n};"
+        "jsCode": "// Parse the markdown\nconst rawMarkdown = $json.body || $json.data || '';\nconst lines = rawMarkdown.split('\\n');\n\n// Extract the band name (defaults to lowercase for hashtag format)\nconst bandName = $('Extract Post Data').item.json.bandName \n  ? $('Extract Post Data').item.json.bandName.toLowerCase().replace(/\\s+/g, '')\n  : 'unknown';\n\n// Default tags that should always be present\nconst defaultTags = [\n  '#stpetemusic',\n  '#suiteestudios',\n  `#${bandName}`,\n  '#publishedYT'\n];\n\n// Check if \"## Tags\" section already exists\nconst tagsIndex = lines.findIndex(line => line.trim() === '## Tags');\nlet updatedLines = lines;\n\nif (tagsIndex !== -1) {\n  // Tags section exists - extract existing tags and merge\n  const existingTagsLine = lines[tagsIndex + 1] || '';\n  const existingTags = existingTagsLine.split(/\\s+/).filter(t => t.startsWith('#'));\n  \n  // Merge: combine defaults with existing, remove duplicates (case-insensitive)\n  const mergedTags = [...new Set([\n    ...defaultTags,\n    ...existingTags.map(t => t.toLowerCase())\n  ])];\n  \n  // Replace the tags line\n  updatedLines[tagsIndex + 1] = mergedTags.join(' ');\n} else {\n  // No tags section - create it at the end\n  updatedLines.push('', '## Tags', defaultTags.join(' '));\n}\n\n// Join back and replace status: ready with status: published\nlet finalContent = updatedLines.join('\\n');\nfinalContent = finalContent.replace(/^status: ready$/m, 'status: published');\nfinalContent = finalContent.replace(/^obsidian-tags: $/m, 'obsidian-tags: #publishedYT');\n\nreturn {\n  json: {\n    updatedContent: finalContent,\n    filePath: $('Extract Post Data').item.json.filePath\n  }\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2720,
-        -288
+        1632,
+        -208
       ],
-      "id": "238b1023-db2a-443f-b7ed-d876f3f0386e",
+      "id": "061b3060-b686-4623-9b5d-b867467d76fa",
       "name": "Build Updated Content"
     },
     {
@@ -244,14 +244,14 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2928,
-        -288
+        1840,
+        -208
       ],
-      "id": "13a69029-9e47-4f10-919b-3fdd207c0940",
+      "id": "51eb00d9-a827-4bbb-a5ee-5cde5c99fcae",
       "name": "Update Obsidian Status",
       "credentials": {
         "httpBearerAuth": {
-          "id": "JG69xsJID8L4BlJr",
+          "id": "4tIhQEVZNqoTVr0Z",
           "name": "Bearer Auth account"
         }
       }
@@ -372,31 +372,33 @@
   },
   "active": false,
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
   },
-  "versionId": "077ee189-dac9-43b0-ba55-fce7587de487",
+  "versionId": "f02a403a-4a70-4ab6-ad02-faca3f49bde9",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "9293fc07055c195e236ac85072d0208fe886bdff22e173da7b17b3c0599dbb93"
+    "instanceId": "e3410d7e1106827496d30c16a70a3c3349e5fbddf2632c2c4f538b86bf95708b"
   },
-  "id": "hxg4nR6HcLacqBNf",
+  "id": "YZFDQUe741C0HkWT",
   "tags": [
     {
-      "updatedAt": "2026-03-04T18:31:53.792Z",
-      "createdAt": "2026-03-04T18:31:53.792Z",
-      "id": "dhVmUj5ptVFYErQ0",
-      "name": "Obsidian Integration"
-    },
-    {
-      "updatedAt": "2026-02-15T18:02:13.981Z",
-      "createdAt": "2026-02-15T18:02:13.981Z",
-      "id": "qUFk9y4Tgto4Glo4",
+      "updatedAt": "2026-03-09T19:53:42.176Z",
+      "createdAt": "2026-03-09T19:53:42.176Z",
+      "id": "CSGanN665nXyhf1A",
       "name": "StPeteMusic"
     },
     {
-      "updatedAt": "2026-03-04T18:55:40.119Z",
-      "createdAt": "2026-03-04T18:55:40.119Z",
-      "id": "ul91wtLC3Lb9AEt3",
+      "updatedAt": "2026-03-09T19:53:42.169Z",
+      "createdAt": "2026-03-09T19:53:42.169Z",
+      "id": "mpd8cOnmHYmpM7rP",
+      "name": "Obsidian Integration"
+    },
+    {
+      "updatedAt": "2026-03-09T19:53:42.189Z",
+      "createdAt": "2026-03-09T19:53:42.189Z",
+      "id": "ubEwZ3lFI4vprooV",
       "name": "YouTube"
     }
   ]

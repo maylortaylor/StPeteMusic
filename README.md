@@ -220,6 +220,87 @@ https://n8n-stpetemusic.duckdns.org/rest/oauth2-credential/callback
 
 ---
 
+## Current Work (March 10, 2026)
+
+### 🔧 In Progress — Auto-Recovery & n8n Workflow Improvements
+
+**Status:** Changes committed, awaiting Terraform apply and server reboot
+
+**Completed:**
+1. ✅ **n8n Workflow: obsidian-to-youtube-posting.json**
+   - Updated "Build Updated Content" Code node with smart tag merging logic
+   - Now changes `status: ready` → `status: published`
+   - Auto-generates default tags: `#stpetemusic`, `#suiteestudios`, `#bandname`, `#publishedyt`
+   - Smart merge: detects existing "## Tags" section, merges tags without duplicates
+   - If no tags section exists, creates new one at end of file
+   - Tags tracked for platform status: `#publishedYT`, `#publishedIG`, etc.
+
+2. ✅ **Terraform: EC2 Auto Recovery**
+   - Added `maintenance_options { auto_recovery = "on" }` to `infrastructure/ec2.tf`
+   - Instance will auto-restart if it becomes unresponsive due to hardware/system issues
+   - Works alongside Docker's `restart: unless-stopped` policy (handles app crashes)
+
+**Pending (Tomorrow):**
+1. ⏳ **Terraform apply**
+   - Fix AWS credential chain issue (file path error in credential helper)
+   - Run `terraform plan` and `terraform apply` to enable auto-recovery
+   - Issue: `/Users/matttaylor/Documents/_dev/amver-hub/aws_token` file missing (likely PSD config bleed)
+
+2. ⏳ **Reboot EC2 instance**
+   - Instance is currently hung (n8n crashed during YouTube upload, won't respond to SSH)
+   - AWS confirms instance is "running" but needs restart
+   - After Terraform apply, reboot to test auto-recovery feature
+
+3. ⏳ **Create PR**
+   - Branch: new feature branch with workflow + Terraform changes
+   - PR should include:
+     - n8n workflow JSON update (smart tags)
+     - infrastructure/ec2.tf update (auto-recovery)
+     - Updated README (this section)
+
+**Known Blockers:**
+- AWS credential chain issue: Terraform/AWS CLI failing with reference to `/Users/matttaylor/Documents/_dev/amver-hub/aws_token`
+- Workaround: May need to manually configure AWS credentials or fix credential helper path
+- SSH timeout: EC2 instance not responding — waiting for Terraform to enable auto-recovery, then reboot
+
+**Testing Plan (Tomorrow):**
+1. Verify Terraform apply succeeds
+2. Reboot instance via AWS Console or CLI
+3. Verify n8n comes back online
+4. Test obsidian-to-youtube-posting workflow with tag generation
+5. Verify tags section created/merged correctly in Obsidian file
+
+---
+
+## Quick Setup
+
+First time? Run the setup script:
+
+```bash
+bash scripts/setup.sh
+```
+
+This validates your environment, credentials, and configuration in one command.
+
+See **CLAUDE.md** for detailed setup and troubleshooting.
+
+---
+
+## Safeguards
+
+To prevent issues like credential leakage or environment contamination:
+
+| Safeguard | How It Works |
+|-----------|------------|
+| **direnv (.envrc)** | Auto-isolates environment when you cd into the directory — unsets problematic global vars |
+| **Pre-commit hooks** | Prevents secrets and bad configs from being committed |
+| **Setup script** | Validates all dependencies and configuration |
+| **GitHub Actions** | Runs terraform plan on PRs to catch infrastructure issues |
+
+All three are now in place and active. See CLAUDE.md for setup instructions.
+
+---
+
 ## Roadmap
 
 ### Now — Active
@@ -233,17 +314,22 @@ https://n8n-stpetemusic.duckdns.org/rest/oauth2-credential/callback
 - [x] GitHub Actions — JSON validation, security scanning, Dependabot
 - [x] Automated S3 backups — every 2 days at 4am, 30-day retention, IAM instance profile auth
 - [x] PostgreSQL database — Docker on EC2, full schema for contacts/stats/templates, pgcrypto encryption
+- [x] EC2 Auto Recovery — automatically restart instance if unresponsive (in progress)
+- [x] n8n smart tag tracking — auto-generate and merge tags for post status tracking (in progress)
 
 ### Next
 - [ ] SSH setup + `docker-compose up` postgres on EC2 (run `database/seed.sql` to populate)
 - [ ] Instagram access token (pending Facebook app review workaround)
 - [ ] Workflow: multi-platform posting (IG + FB + YouTube from one trigger)
+- [ ] Fix AWS credential helper path issue (amver-hub reference)
 
 ### Future
 - [ ] Auto-update ig_mentions via n8n scheduled workflow
 - [ ] YouTube stats import (user to provide export data)
 - [ ] Obsidian → Instagram posting pipeline
 - [ ] Event management (EventBrite API)
+- [ ] CloudWatch monitoring + SNS alerts for critical failures
+- [ ] Health check script for n8n container (restart on hang)
 
 ---
 
