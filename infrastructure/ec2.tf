@@ -54,6 +54,7 @@ resource "aws_instance" "n8n" {
   root_block_device {
     volume_size = 20
     volume_type = "gp3"
+    encrypted   = true
   }
 
   tags = {

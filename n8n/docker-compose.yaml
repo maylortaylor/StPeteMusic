@@ -1,8 +1,30 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: stpetemusic-postgres
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      - POSTGRES_DB=stpetemusic
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    ports:
+      # Exposed locally for dev tools (TablePlus, psql, etc.)
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-stpetemusic} -d stpetemusic"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   n8n:
     image: n8nio/n8n:latest
     container_name: n8n
     restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
     ports:
       - "5678:5678"
     env_file: ../.env
@@ -16,10 +38,14 @@ services:
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
       - GENERIC_TIMEZONE=America/New_York
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=stpetemusic
     volumes:
       - n8n_data:/home/node/.n8n
       - ./local-files:/files
 
 volumes:
   n8n_data:
+    driver: local
+  postgres_data:
     driver: local
