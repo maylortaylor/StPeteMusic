@@ -38,7 +38,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "n8n_backups" {
     status = "Enabled"
     filter {}
     expiration {
-      days = 30
+      days = 7
     }
   }
 }
