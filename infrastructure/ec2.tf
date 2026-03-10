@@ -51,6 +51,9 @@ resource "aws_instance" "n8n" {
   vpc_security_group_ids = [aws_security_group.n8n.id]
   iam_instance_profile   = aws_iam_instance_profile.ec2_backup.name
 
+  # Configure DNS to use Google public DNS (fixes SERVFAIL on 100.100.100.100)
+  user_data = base64encode(file("${path.module}/user_data.sh"))
+
   root_block_device {
     volume_size = 20
     volume_type = "gp3"
