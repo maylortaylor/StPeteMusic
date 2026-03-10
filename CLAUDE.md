@@ -170,3 +170,180 @@ The `system-prompt.md` file is the **source of truth** for AI agent instructions
 | `n8n/docker-compose.yaml` | Local development |
 | `n8n/docker-compose.prod.yaml` | Production (AWS) |
 | `.env.example` | Environment variable template |
+| `.envrc` | direnv configuration (auto-loads environment) |
+| `.pre-commit-config.yaml` | Git pre-commit hooks (prevents credential leaks) |
+| `scripts/setup.sh` | One-command setup script |
+
+---
+
+## Setup & Environment Isolation
+
+### First-Time Setup
+
+Run the setup script to install dependencies and validate configuration:
+
+```bash
+bash scripts/setup.sh
+```
+
+This will:
+1. ✅ Check direnv is installed (or guide you to install it)
+2. ✅ Load `.envrc` to isolate environment
+3. ✅ Validate `.env` file with your credentials
+4. ✅ Verify AWS credentials are configured
+5. ✅ Validate Terraform syntax
+6. ✅ Validate n8n workflow JSON
+7. ✅ Check Docker is available
+
+### direnv (.envrc)
+
+When you `cd` into this directory, direnv automatically:
+- Unsets problematic global env vars (like `AWS_WEB_IDENTITY_TOKEN_FILE` from PSD projects)
+- Sets `AWS_PROFILE=personal` for AWS CLI
+- Loads your local `.env` file
+
+**Setup direnv:**
+```bash
+brew install direnv
+# Add to ~/.zshrc (or ~/.bashrc):
+# eval "$(direnv hook zsh)"
+# Then reload shell: exec zsh
+```
+
+**Allow direnv in this project:**
+```bash
+direnv allow
+```
+
+### Pre-Commit Hooks
+
+Git hooks automatically prevent:
+- ❌ Committing AWS credentials (AKIA keys)
+- ❌ Committing `.env` file
+- ❌ Bad Terraform syntax
+- ❌ Private keys
+- ❌ Large files
+
+**Install pre-commit hooks:**
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+**Run manually to test:**
+```bash
+pre-commit run --all-files
+```
+
+---
+
+## Troubleshooting
+
+### AWS Credentials Issues
+
+**Problem:** `Error: No valid credential sources found`
+
+**Solution:**
+1. Verify `.envrc` is allowed: `direnv allow`
+2. Configure AWS profile:
+   ```bash
+   aws configure --profile personal
+   ```
+3. Test: `AWS_PROFILE=personal aws sts get-caller-identity`
+
+**Problem:** AWS commands reference `/Users/matttaylor/Documents/_dev/amver-hub/aws_token`
+
+**Solution:** This is contamination from PSD projects. The `.envrc` file should clean this up automatically:
+```bash
+direnv allow
+cd .  # refresh environment
+AWS_PROFILE=personal aws sts get-caller-identity
+```
+
+If it persists, check your shell config (`.zshrc`, `.bashrc`) for `AWS_WEB_IDENTITY_TOKEN_FILE` and remove it.
+
+### Terraform Issues
+
+**Problem:** `Backend initialization required`
+
+**Solution:**
+```bash
+cd infrastructure
+AWS_PROFILE=personal terraform init -reconfigure
+```
+
+**Problem:** `terraform plan` shows no changes but changes are expected
+
+**Solution:** State might be out of sync:
+```bash
+AWS_PROFILE=personal terraform refresh
+AWS_PROFILE=personal terraform plan
+```
+
+### n8n Server Down
+
+**Problem:** `https://n8n-stpetemusic.duckdns.org` not responding
+
+**Solutions (in order):**
+1. Check AWS status:
+   ```bash
+   AWS_PROFILE=personal aws ec2 describe-instance-status \
+     --instance-ids i-03874197d725b0455 --region us-east-1
+   ```
+
+2. Restart Docker containers:
+   ```bash
+   ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n-stpetemusic.duckdns.org \
+     "cd ~/stpetemusic/n8n && docker-compose -f docker-compose.prod.yaml restart"
+   ```
+
+3. Reboot instance:
+   ```bash
+   AWS_PROFILE=personal aws ec2 reboot-instances \
+     --instance-ids i-03874197d725b0455 --region us-east-1
+   ```
+
+4. Full stop/start:
+   ```bash
+   AWS_PROFILE=personal aws ec2 stop-instances --instance-ids i-03874197d725b0455 --region us-east-1
+   sleep 30
+   AWS_PROFILE=personal aws ec2 start-instances --instance-ids i-03874197d725b0455 --region us-east-1
+   ```
+
+### SSH Access Denied
+
+**Problem:** `Connection refused` or `Operation timed out`
+
+**Reason:** SSH is restricted to a specific IP (see `infrastructure/ec2.tf`)
+
+**Solution:** Update the security group in Terraform:
+```hcl
+# In infrastructure/ec2.tf, find aws_security_group.n8n
+# Update cidr_blocks for port 22:
+cidr_blocks = ["YOUR.IP.ADDRESS/32"]  # Replace with your public IP
+```
+
+Then apply:
+```bash
+cd infrastructure
+AWS_PROFILE=personal terraform apply
+```
+
+### Environment Variable Leakage
+
+**Problem:** Global env vars from other projects interfere
+
+**Prevention:**
+- ✅ Always run from this project directory (direnv will isolate environment)
+- ✅ Use `AWS_PROFILE=personal` explicitly when not in directory
+- ✅ Pre-commit hooks prevent committing bad configs
+- ✅ Run setup.sh to validate clean environment
+
+**If contamination happens:**
+```bash
+unset AWS_WEB_IDENTITY_TOKEN_FILE
+unset DATABASE_URL
+unset KEYCLOAK_ISSUER
+direnv allow
+cd .  # refresh
+```

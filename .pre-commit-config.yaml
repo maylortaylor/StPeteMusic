@@ -1,0 +1,71 @@
+# Pre-commit hooks configuration
+# Prevents secrets, bad Terraform, and config issues from being committed
+# Install: pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  # Detect hardcoded secrets
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ["--baseline", ".secrets.baseline"]
+        exclude: |
+          (?x)^(
+            \.env\.example|
+            README\.md|
+            docs/
+          )
+
+  # Prevent large files from being committed
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: detect-private-key
+      - id: check-json
+        exclude: "n8n/workflows/"  # n8n workflow JSON has special format
+      - id: check-yaml
+        exclude: "n8n/"  # n8n docker-compose uses custom format
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  # Terraform validation
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.88.0
+    hooks:
+      - id: terraform_fmt
+        args: ["-recursive"]
+        files: "^infrastructure/"
+      - id: terraform_validate
+        files: "^infrastructure/"
+      - id: terraform_trivy
+        args: ["--minimum-severity=HIGH"]
+        files: "^infrastructure/"
+
+  # No AWS credentials in code
+  - repo: local
+    hooks:
+      - id: no-aws-credentials
+        name: No AWS credentials
+        entry: bash -c 'grep -r "AKIA\|aws_access_key\|aws_secret" . --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=.terraform --exclude=".pre-commit-config.yaml" --exclude="*.tfstate*" && exit 1 || exit 0'
+        language: system
+        stages: [commit]
+        pass_filenames: false
+
+      - id: no-env-in-git
+        name: No .env file in git
+        entry: bash -c 'if git ls-files --error-unmatch .env 2>/dev/null; then echo ".env should not be committed (it is git-ignored)"; exit 1; fi'
+        language: system
+        stages: [commit]
+        pass_filenames: false
+
+      - id: envrc-present
+        name: Check .envrc exists
+        entry: bash -c 'if [ ! -f .envrc ]; then echo ".envrc is missing - run: direnv allow"; exit 1; fi'
+        language: system
+        stages: [commit]
+        pass_filenames: false

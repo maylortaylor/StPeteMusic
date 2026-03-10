@@ -59,6 +59,13 @@ resource "aws_instance" "n8n" {
     # Migration plan: snapshot → encrypted copy → attach → terraform import new volume
   }
 
+  # Enable EC2 Auto Recovery: automatically restarts instance if it becomes unresponsive
+  # Note: Auto Recovery handles hardware failures & OS hangs, not application crashes.
+  # For n8n crashes, rely on docker-compose restart: unless-stopped policy (see docker-compose.prod.yaml)
+  maintenance_options {
+    auto_recovery = "default"
+  }
+
   tags = {
     Name    = "${var.project}-n8n"
     Project = var.project
