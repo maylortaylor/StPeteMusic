@@ -18,6 +18,14 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    mem_limit: 256m
+    memswap_limit: 320m
+    command: >
+      postgres
+      -c shared_buffers=64MB
+      -c effective_cache_size=128MB
+      -c work_mem=4MB
+      -c max_connections=20
 
   n8n:
     image: n8nio/n8n:latest
@@ -49,6 +57,7 @@ services:
       - YOUTUBE_CLIENT_ID=${YOUTUBE_CLIENT_ID}
       - YOUTUBE_CLIENT_SECRET=${YOUTUBE_CLIENT_SECRET}
       - YOUTUBE_API_KEY=${YOUTUBE_API_KEY}
+      - NODE_OPTIONS=--max-old-space-size=512
       - POSTGRES_HOST=postgres
       - POSTGRES_DB=stpetemusic
       - POSTGRES_USER=${POSTGRES_USER}
@@ -61,6 +70,8 @@ services:
       - "127.0.0.1:5678:5678"
     networks:
       - n8n-net
+    mem_limit: 512m
+    memswap_limit: 812m
 
 networks:
   n8n-net:
