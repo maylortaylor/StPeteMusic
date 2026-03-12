@@ -6,10 +6,10 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        320,
-        -96
+        1936,
+        -112
       ],
-      "id": "9b8603bd-b055-4aab-b6af-5a4fb3c7def4",
+      "id": "a9fb254d-f933-4b9e-8802-733c5a781a30",
       "name": "Manual Trigger"
     },
     {
@@ -24,10 +24,10 @@
       "type": "n8n-nodes-base.interval",
       "typeVersion": 1,
       "position": [
-        320,
-        32
+        1936,
+        16
       ],
-      "id": "022b90ea-c5f2-4b6e-a973-14ef51cedbb6",
+      "id": "ed96f4b9-5314-4554-a0ed-b27302ab3b88",
       "name": "Scheduled Trigger (Every 4 Hours)"
     },
     {
@@ -49,10 +49,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        528,
-        -96
+        2144,
+        -112
       ],
-      "id": "9a4cf380-8b92-458a-ae1d-64bf9b325900",
+      "id": "cc59a29f-b2a3-4033-bd93-3ec4488ce00b",
       "name": "Query Obsidian Vault",
       "credentials": {
         "httpBearerAuth": {
@@ -69,10 +69,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        720,
-        -96
+        2336,
+        -112
       ],
-      "id": "b1d7d9e3-b67b-4b4a-a9d1-edccdeca0994",
+      "id": "5fb08107-68ec-4275-8999-acef2d82057c",
       "name": "Extract Post Data"
     },
     {
@@ -88,10 +88,10 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        880,
-        -96
+        2560,
+        -336
       ],
-      "id": "0f111676-6a56-429c-a104-a70ea00f5fe2",
+      "id": "368d175e-742e-4512-8769-046c67eb6359",
       "name": "Download file",
       "credentials": {
         "googleDriveOAuth2Api": {
@@ -126,10 +126,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 1,
       "position": [
-        1072,
-        -160
+        2688,
+        -176
       ],
-      "id": "f19a31d3-1d86-4fb4-86dc-cd959ad2f5a1",
+      "id": "29f0a57d-6c72-4568-a1c1-e49ac09330af",
       "name": "Platform Check"
     },
     {
@@ -156,10 +156,10 @@
       "type": "n8n-nodes-base.youTube",
       "typeVersion": 1,
       "position": [
-        1264,
-        -304
+        2880,
+        -320
       ],
-      "id": "de4e57bc-4993-45dc-8b8c-2482536c3646",
+      "id": "87e4117b-9caa-478f-b0e8-d0d3d1442970",
       "name": "Upload a video",
       "credentials": {
         "youTubeOAuth2Api": {
@@ -178,10 +178,10 @@
       "type": "n8n-nodes-base.youTube",
       "typeVersion": 1,
       "position": [
-        1472,
-        -304
+        3088,
+        -320
       ],
-      "id": "5dc11ec8-20ae-4259-a426-0263a8104f42",
+      "id": "57b785a7-4f3a-4820-a498-711808a0cf1a",
       "name": "Add to Playlist",
       "credentials": {
         "youTubeOAuth2Api": {
@@ -212,6 +212,14 @@
             {
               "name": "access_token",
               "value": "={{ $env.IG_ACCESS_TOKEN }}"
+            },
+            {
+              "name": "published",
+              "value": "false"
+            },
+            {
+              "name": "scheduled_publish_time",
+              "value": "={{ Math.floor(new Date($('Extract Post Data').item.json.postDate).getTime() / 1000) }}"
             }
           ]
         },
@@ -220,10 +228,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        1472,
-        -80
+        3232,
+        -96
       ],
-      "id": "a2b3c4d5-e6f7-8901-a2b3-c4d5e6f78901",
+      "id": "e7a3fab8-d2e9-40b3-8312-f139f83cbd98",
       "name": "Create IG Container"
     },
     {
@@ -233,10 +241,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        1680,
-        -80
+        3424,
+        -192
       ],
-      "id": "b3c4d5e6-f7a8-9012-b3c4-d5e6f7a89012",
+      "id": "8abc9d04-a9a5-403e-aeb7-8b1b9a02e14d",
       "name": "Wait for IG Processing",
       "webhookId": "e6f7a8b9-c0d1-2345-e6f7-a8b9c0d12345"
     },
@@ -262,10 +270,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        2304,
-        -80
+        4032,
+        -144
       ],
-      "id": "c4d5e6f7-a8b9-0123-c4d5-e6f7a8b90123",
+      "id": "ca83d959-4f29-47f4-af1d-85cd5ca627e9",
       "name": "Publish IG Reel"
     },
     {
@@ -287,10 +295,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2096,
-        -200
+        4272,
+        -272
       ],
-      "id": "06a956e1-5863-46b1-9008-6884306660fa",
+      "id": "b0f072ab-e8d2-4f55-90e8-e378348bbcc3",
       "name": "Get Obsidian File Content",
       "credentials": {
         "httpBearerAuth": {
@@ -302,15 +310,15 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "// Parse the markdown\nconst rawMarkdown = $json.body || $json.data || '';\nconst lines = rawMarkdown.split('\\n');\n\n// Extract the band name (defaults to lowercase for hashtag format)\nconst bandName = $('Extract Post Data').item.json.bandName \n  ? $('Extract Post Data').item.json.bandName.toLowerCase().replace(/\\s+/g, '')\n  : 'unknown';\n\n// Default tags that should always be present\nconst defaultTags = [\n  '#stpetemusic',\n  '#suiteestudios',\n  `#${bandName}`,\n  '#publishedYT'\n];\n\n// Check if \"## Tags\" section already exists\nconst tagsIndex = lines.findIndex(line => line.trim() === '## Tags');\nlet updatedLines = lines;\n\nif (tagsIndex !== -1) {\n  // Tags section exists - extract existing tags and merge\n  const existingTagsLine = lines[tagsIndex + 1] || '';\n  const existingTags = existingTagsLine.split(/\\s+/).filter(t => t.startsWith('#'));\n  \n  // Merge: combine defaults with existing, remove duplicates (case-insensitive)\n  const mergedTags = [...new Set([\n    ...defaultTags,\n    ...existingTags.map(t => t.toLowerCase())\n  ])];\n  \n  // Replace the tags line\n  updatedLines[tagsIndex + 1] = mergedTags.join(' ');\n} else {\n  // No tags section - create it at the end\n  updatedLines.push('', '## Tags', defaultTags.join(' '));\n}\n\n// Join back and replace status: ready with status: published\nlet finalContent = updatedLines.join('\\n');\nfinalContent = finalContent.replace(/^status: ready$/m, 'status: published');\nfinalContent = finalContent.replace(/^obsidian-tags: $/m, 'obsidian-tags: #publishedYT');\n\nreturn {\n  json: {\n    updatedContent: finalContent,\n    filePath: $('Extract Post Data').item.json.filePath\n  }\n};"
+        "jsCode": "// Parse the markdown\nconst rawMarkdown = $json.body || $json.data || '';\nconst lines = rawMarkdown.split('\\n');\n\n// Extract the band name (defaults to lowercase for hashtag format)\nconst bandName = $('Extract Post Data').item.json.bandName \n  ? $('Extract Post Data').item.json.bandName.toLowerCase().replace(/\\s+/g, '')\n  : 'unknown';\n\n// Default tags that should always be present\nconst defaultTags = [\n  '#stpetemusic',\n  '#suiteestudios',\n  `#${bandName}`,\n  '#publishedYT'\n];\n\n// Check if \"## Tags\" section already exists\nconst tagsIndex = lines.findIndex(line => line.trim() === '## Tags');\nlet updatedLines = lines;\n\nif (tagsIndex !== -1) {\n  // Tags section exists - extract existing tags and merge\n  const existingTagsLine = lines[tagsIndex + 1] || '';\n  const existingTags = existingTagsLine.split(/\\s+/).filter(t => t.startsWith('#'));\n  \n  // Merge: combine defaults with existing, remove duplicates (case-insensitive)\n  const mergedTags = [...new Set([\n    ...defaultTags,\n    ...existingTags.map(t => t.toLowerCase())\n  ])];\n  \n  // Replace the tags line\n  updatedLines[tagsIndex + 1] = mergedTags.join(' ');\n} else {\n  // No tags section - create it at the end\n  updatedLines.push('', '## Tags', defaultTags.join(' '));\n}\n\n// Join back and replace status: ready with status: published\nlet finalContent = updatedLines.join('\\n');\nfinalContent = finalContent.replace(/^status: ready$/m, 'status: published');\nfinalContent = finalContent.replace(/^obsidian-tags: $/m, 'obsidian-tags: #PublishedYT');\n\nreturn {\n  json: {\n    updatedContent: finalContent,\n    filePath: $('Extract Post Data').item.json.filePath\n  }\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2272,
-        -200
+        4448,
+        -272
       ],
-      "id": "c89011dd-7894-4e95-ab0b-006e24b5d0aa",
+      "id": "664cc079-c844-40ef-b047-ddf75bc09872",
       "name": "Build Updated Content"
     },
     {
@@ -328,10 +336,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2464,
-        -200
+        4640,
+        -272
       ],
-      "id": "7df2e8dc-1787-481b-a7de-7ac306dbb75f",
+      "id": "638da423-e8b4-41d9-9a8c-4bd01dcc1793",
       "name": "Update Obsidian Status",
       "credentials": {
         "httpBearerAuth": {
@@ -342,49 +350,87 @@
     },
     {
       "parameters": {
-        "method": "GET",
         "url": "={{ 'https://drive.usercontent.google.com/download?id=' + $('Extract Post Data').item.json.googleDriveFileId + '&export=download&confirm=t' }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1264,
-        -80
+        2880,
+        -32
       ],
-      "id": "e6f7a8b9-c0d1-2345-e6f7-a8b9c0d12346",
+      "id": "1910b1ac-9c1e-47b9-a511-0a3c0abe5e5f",
       "name": "Download Drive File (IG)"
     },
     {
       "parameters": {
         "operation": "write",
         "fileName": "=/files/videos/{{ $('Extract Post Data').item.json.localFilename }}",
-        "dataPropertyName": "data",
         "options": {}
       },
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
       "position": [
-        1472,
-        -80
+        3056,
+        -96
       ],
-      "id": "f1a2b3c4-d5e6-7890-f1a2-b3c4d5e67890",
+      "id": "29ef5e9f-782c-472d-ab90-2615d8d1179d",
       "name": "Save to Videos Folder"
     },
     {
       "parameters": {
-        "method": "GET",
         "url": "={{ 'https://graph.facebook.com/v24.0/' + $('Create IG Container').item.json.id + '?fields=status_code,status&access_token=' + $env.IG_ACCESS_TOKEN }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        1888,
-        -80
+        3616,
+        -96
       ],
-      "id": "a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67891",
+      "id": "b114148b-d2d1-42af-91fc-053bcd3bc363",
       "name": "Check IG Status"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status_code }}",
+              "operation": "equals",
+              "value2": "FINISHED"
+            },
+            {
+              "value1": "={{ $json.status_code }}",
+              "operation": "equals",
+              "value2": "SCHEDULED"
+            }
+          ]
+        },
+        "combineOperation": "any"
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        3792,
+        -128
+      ],
+      "id": "e8dda336-c733-4415-bf20-9ecbedd87d9e",
+      "name": "Is Ready?"
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4032,
+        32
+      ],
+      "id": "1f33d737-7029-4423-90b1-dc371cea9f3c",
+      "name": "Retry Wait",
+      "webhookId": "d4e5f6a7-b8c9-0123-d4e5-f6a7b8c90124"
     },
     {
       "parameters": {
@@ -401,25 +447,11 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        2096,
-        -80
+        2304,
+        -200
       ],
-      "id": "b2c3d4e5-f6a7-8901-b2c3-d4e5f6a78902",
-      "name": "Is Ready?"
-    },
-    {
-      "parameters": {
-        "amount": 30
-      },
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
-      "position": [
-        2096,
-        80
-      ],
-      "id": "c3d4e5f6-a7b8-9012-c3d4-e5f6a7b89013",
-      "name": "Retry Wait",
-      "webhookId": "d4e5f6a7-b8c9-0123-d4e5-f6a7b8c90124"
+      "id": "e5f6a7b8-c9d0-1234-e5f6-a7b8c9d01235",
+      "name": "Should Publish Now?"
     }
   ],
   "pinData": {},
@@ -611,7 +643,7 @@
       "main": [
         [
           {
-            "node": "Publish IG Reel",
+            "node": "Should Publish Now?",
             "type": "main",
             "index": 0
           }
@@ -635,6 +667,24 @@
           }
         ]
       ]
+    },
+    "Should Publish Now?": {
+      "main": [
+        [
+          {
+            "node": "Publish IG Reel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Obsidian File Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -643,7 +693,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "3a1b2c3d-4e5f-6789-abcd-ef0123456789",
+  "versionId": "e1919895-d6f8-437c-9b13-8d53abbbf834",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e3410d7e1106827496d30c16a70a3c3349e5fbddf2632c2c4f538b86bf95708b"
