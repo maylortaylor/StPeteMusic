@@ -39,6 +39,7 @@ jobs:
           N8N_GEMINI_API_KEY: ${{ secrets.N8N_GEMINI_API_KEY }}
           # Instagram
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_APP_ID: ${{ secrets.IG_APP_ID }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           # Facebook
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
@@ -56,7 +57,7 @@ jobs:
           envs: >-
             POSTGRES_USER,POSTGRES_PASSWORD,DB_ENCRYPTION_KEY,N8N_ENCRYPTION_KEY,
             N8N_API_KEY,OBSIDIAN_HOST,CLAUDE_API_KEY_N8N_STPETEMUSIC,GROQ_API_KEY,
-            N8N_GEMINI_API_KEY,IG_USER_ID,IG_ACCESS_TOKEN,FB_PAGE_ID,FB_ACCESS_TOKEN,
+            N8N_GEMINI_API_KEY,IG_USER_ID,IG_APP_ID,IG_ACCESS_TOKEN,FB_PAGE_ID,FB_ACCESS_TOKEN,
             YOUTUBE_CLIENT_ID,YOUTUBE_CLIENT_SECRET,YOUTUBE_API_KEY,NOTION_API_KEY
           script: |
             set -e
@@ -90,6 +91,7 @@ jobs:
               printf 'GROQ_API_KEY=%s\n'                     "${GROQ_API_KEY}"
               printf 'N8N_GEMINI_API_KEY=%s\n'               "${N8N_GEMINI_API_KEY}"
               printf 'IG_USER_ID=%s\n'                       "${IG_USER_ID}"
+              printf 'IG_APP_ID=%s\n'                        "${IG_APP_ID}"
               printf 'IG_ACCESS_TOKEN=%s\n'                  "${IG_ACCESS_TOKEN}"
               printf 'FB_PAGE_ID=%s\n'                       "${FB_PAGE_ID}"
               printf 'FB_ACCESS_TOKEN=%s\n'                  "${FB_ACCESS_TOKEN}"

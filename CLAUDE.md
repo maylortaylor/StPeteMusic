@@ -135,6 +135,7 @@ GitHub Secrets → deploy.yml (on push to main) → writes ~/stpetemusic/.env �
 | `GROQ_API_KEY` | Groq LLM API key |
 | `N8N_GEMINI_API_KEY` | Google Gemini API key |
 | `IG_USER_ID` | Instagram Business Account ID (`17841461021088145`) |
+| `IG_APP_ID` | Instagram App ID (`1208357861136026`) |
 | `IG_ACCESS_TOKEN` | Instagram Page Access Token (rotate when expired) |
 | `FB_PAGE_ID` | Facebook Page ID (`686234848147122`) |
 | `FB_ACCESS_TOKEN` | Facebook Page Access Token |
