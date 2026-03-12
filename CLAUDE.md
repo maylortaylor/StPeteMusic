@@ -100,6 +100,64 @@ Always include:
 https://n8n-stpetemusic.duckdns.org/rest/oauth2-credential/callback
 ```
 
+### Secrets Management
+
+**GitHub Secrets are the single source of truth for all sensitive values.**
+
+Manage them at: `https://github.com/maylortaylor/StPeteMusic/settings/secrets/actions`
+
+**Do NOT:**
+- Edit `~/stpetemusic/.env` on EC2 directly — it is **overwritten on every deploy**
+- Commit any secrets to `.env` or any other file
+- SSH to rotate a token — update the GitHub Secret instead and let deploy apply it
+
+**How it works:**
+```
+GitHub Secrets → deploy.yml (on push to main) → writes ~/stpetemusic/.env → n8n restarts
+```
+
+**Required GitHub Secrets (all must be set for deploy to succeed):**
+
+> The table below uses **GitHub Secret names** (what you set in repo settings).
+> Some secrets are written to `.env` under a different variable name — noted in the Description column.
+
+| GitHub Secret Name | Written to `.env` as | Description |
+|--------------------|----------------------|-------------|
+| `EC2_HOST` | — | SSH target (used by deploy only, not in `.env`) |
+| `EC2_USER` | — | SSH user (used by deploy only, not in `.env`) |
+| `EC2_SSH_KEY` | — | SSH private key (used by deploy only, not in `.env`) |
+| `AWS_ACCESS_KEY_ID` | — | AWS credentials for Terraform only |
+| `AWS_SECRET_ACCESS_KEY` | — | AWS credentials for Terraform only |
+| `POSTGRES_USER` | `POSTGRES_USER` | PostgreSQL username |
+| `POSTGRES_PASSWORD` | `POSTGRES_PASSWORD` | PostgreSQL password |
+| `DB_ENCRYPTION_KEY` | `DB_ENCRYPTION_KEY` | pgcrypto column-level encryption key |
+| `N8N_ENCRYPTION_KEY` | `N8N_ENCRYPTION_KEY` | n8n credential encryption key |
+| `N8N_API_KEY` | `N8N_API_KEY` | n8n API key |
+| `OBSIDIAN_HOST` | `OBSIDIAN_HOST` | Tailscale URL for Obsidian REST API (e.g. `http://100.x.x.x:27123`) |
+| `ANTHROPIC_API_KEY` | `CLAUDE_API_KEY_N8N_STPETEMUSIC` | Anthropic Claude API key |
+| `GROQ_API_KEY` | `GROQ_API_KEY` | Groq LLM API key |
+| `N8N_GEMINI_API_KEY` | `N8N_GEMINI_API_KEY` | Google Gemini API key |
+| `IG_USER_ID` | `IG_USER_ID` | Instagram Business Account ID |
+| `IG_APP_ID` | `IG_APP_ID` | Instagram App ID |
+| `IG_ACCESS_TOKEN` | `IG_ACCESS_TOKEN` | Instagram Page Access Token (rotate when expired) |
+| `FB_PAGE_ID` | `FB_PAGE_ID` | Facebook Page ID |
+| `FB_ACCESS_TOKEN` | `FB_ACCESS_TOKEN` | Facebook Page Access Token |
+| `GOOGLE_CLIENT_ID` | `YOUTUBE_CLIENT_ID` | YouTube/Google OAuth2 client ID |
+| `GOOGLE_CLIENT_SECRET` | `YOUTUBE_CLIENT_SECRET` | YouTube/Google OAuth2 client secret |
+| `YOUTUBE_API_KEY` | `YOUTUBE_API_KEY` | YouTube Data API key |
+| `NOTION_API_KEY` | `NOTION_API_KEY` | Notion integration token *(optional)* |
+
+**To rotate a secret (e.g. IG_ACCESS_TOKEN):**
+1. Get the new token value
+2. Go to GitHub → Settings → Secrets → Actions → update `IG_ACCESS_TOKEN`
+3. Push any commit to `main` (or re-run the last deploy workflow) to apply it
+4. n8n picks up the new token after the container restarts
+
+**To update OBSIDIAN_HOST when your Tailscale IP changes:**
+1. Run `tailscale ip -4` on your Mac
+2. Update `OBSIDIAN_HOST` secret to `http://<new-ip>:27123`
+3. Push to main to deploy
+
 ---
 
 ## N8N Workflows
@@ -169,10 +227,11 @@ The `system-prompt.md` file is the **source of truth** for AI agent instructions
 | `n8n/CLAUDE.md` | n8n-specific Claude guidance |
 | `n8n/docker-compose.yaml` | Local development |
 | `n8n/docker-compose.prod.yaml` | Production (AWS) |
-| `.env.example` | Environment variable template |
+| `.env.example` | Environment variable template (safe to commit — no real values) |
 | `.envrc` | direnv configuration (auto-loads environment) |
 | `.pre-commit-config.yaml` | Git pre-commit hooks (prevents credential leaks) |
 | `scripts/setup.sh` | One-command setup script |
+| `.github/workflows/deploy.yml` | CI/CD deploy — writes `.env` on EC2 from GitHub Secrets |
 
 ---
 

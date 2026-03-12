@@ -5,11 +5,8 @@
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [
-        -48,
-        0
-      ],
-      "id": "78635bf2-7944-43e5-8ba7-fddfe6e4aeee",
+      "position": [320, -96],
+      "id": "9b8603bd-b055-4aab-b6af-5a4fb3c7def4",
       "name": "Manual Trigger"
     },
     {
@@ -23,11 +20,8 @@
       },
       "type": "n8n-nodes-base.interval",
       "typeVersion": 1,
-      "position": [
-        -48,
-        128
-      ],
-      "id": "46a52fc2-9507-49f6-b745-82a9ccf6307e",
+      "position": [320, 32],
+      "id": "022b90ea-c5f2-4b6e-a973-14ef51cedbb6",
       "name": "Scheduled Trigger (Every 4 Hours)"
     },
     {
@@ -48,11 +42,8 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [
-        160,
-        0
-      ],
-      "id": "68c5d165-52c9-459a-a0b3-090c9154bbae",
+      "position": [528, -96],
+      "id": "9a4cf380-8b92-458a-ae1d-64bf9b325900",
       "name": "Query Obsidian Vault",
       "credentials": {
         "httpBearerAuth": {
@@ -64,42 +55,13 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "// Parse the stringified data from Obsidian API\nconst parsed = JSON.parse($json.data);\nconst fm = parsed.frontmatter || {};\n\n// Only process posts with status 'ready'\nif (fm.status !== 'ready') {\n  return null;\n}\n\n// Return clean extracted data\nreturn {\n  filePath: parsed.path || '',\n  bandName: fm['band-name'] || '',\n  bandUsernameIG: fm['band-username-ig'] || '',\n  title: fm.title || '',\n  caption: fm.caption || '',\n  ytDescription: fm['yt-description'] || '',\n  platform: fm.platform || '',\n  postDate: (() => {\n    const raw = fm['publish-date'] || '';\n    if (!raw) return '';\n    // YouTube publishAt requires RFC 3339 with timezone\n    // St. Pete FL is Eastern: EDT (UTC-4) Mar-Nov, EST (UTC-5) Nov-Mar\n    const d = new Date(raw.replace(' ', 'T'));\n    return raw.replace(' ', 'T') + (d.getMonth() >= 2 && d.getMonth() <= 10 ? '-04:00' : '-05:00');\n  })(),\n    recordDate: (() => {\n    const raw = fm['record-date'] || '';\n    if (!raw) return '';\n    // YouTube recordDate requires RFC 3339 with timezone\n    // St. Pete FL is Eastern: EDT (UTC-4) Mar-Nov, EST (UTC-5) Nov-Mar\n    const d = new Date(raw.replace(' ', 'T'));\n    return raw.replace(' ', 'T') + (d.getMonth() >= 2 && d.getMonth() <= 10 ? '-04:00' : '-05:00');\n  })(),\n  youtubePlaylist: fm['yt-playlist'] || '',\n  youtubeTags: fm['yt-tags'] || '',\n  mediaUrl: fm['media-link'] || '',\n  mediaType: fm['media-type'] || '',\n  hashtags: fm.hashtags || '',\n  ytTags: fm['yt-tags'] || '',\n  mentions: fm.mentions || '',\n  privacyStatus: fm['privacy-status'] || 'unlisted',\n  status: fm.status,\n  aiGenerated: fm['ai-generated'] || false,\n  originalContent: parsed.content || ''\n};"
+        "jsCode": "// Parse the stringified data from Obsidian API\nconst parsed = JSON.parse($json.data);\nconst fm = parsed.frontmatter || {};\n\n// Only process posts with status 'ready'\nif (fm.status !== 'ready') {\n  return null;\n}\n\n// Compute local filename and public URL for nginx serving (Instagram path)\nconst bandSlug = (fm['band-name'] || 'video').toLowerCase().replace(/\\s+/g, '-');\nconst dateSlug = (fm['record-date'] || '').replace(/[^0-9-]/g, '').substring(0, 10);\nconst localFilename = `${dateSlug}-${bandSlug}.mp4`;\nconst publicUrl = `https://n8n-stpetemusic.duckdns.org/media/${localFilename}`;\n\n// Return clean extracted data\nreturn {\n  filePath: parsed.path || '',\n  bandName: fm['band-name'] || '',\n  bandUsernameIG: fm['band-username-ig'] || '',\n  title: fm.title || '',\n  caption: fm.caption || '',\n  ytDescription: fm['yt-description'] || '',\n  platform: fm.platform || '',\n  postDate: (() => {\n    const raw = fm['publish-date'] || '';\n    if (!raw) return '';\n    // YouTube publishAt requires RFC 3339 with timezone\n    // St. Pete FL is Eastern: EDT (UTC-4) Mar-Nov, EST (UTC-5) Nov-Mar\n    const d = new Date(raw.replace(' ', 'T'));\n    return raw.replace(' ', 'T') + (d.getMonth() >= 2 && d.getMonth() <= 10 ? '-04:00' : '-05:00');\n  })(),\n  recordDate: (() => {\n    const raw = fm['record-date'] || '';\n    if (!raw) return '';\n    // YouTube recordDate requires RFC 3339 with timezone\n    // St. Pete FL is Eastern: EDT (UTC-4) Mar-Nov, EST (UTC-5) Nov-Mar\n    const d = new Date(raw.replace(' ', 'T'));\n    return raw.replace(' ', 'T') + (d.getMonth() >= 2 && d.getMonth() <= 10 ? '-04:00' : '-05:00');\n  })(),\n  youtubePlaylist: fm['yt-playlist'] || '',\n  youtubeTags: fm['yt-tags'] || '',\n  mediaUrl: fm['media-link'] || '',\n  localFilename,\n  publicUrl,\n  mediaType: fm['media-type'] || '',\n  hashtags: fm.hashtags || '',\n  ytTags: fm['yt-tags'] || '',\n  mentions: fm.mentions || '',\n  privacyStatus: fm['privacy-status'] || 'unlisted',\n  status: fm.status,\n  aiGenerated: fm['ai-generated'] || false,\n  originalContent: parsed.content || ''\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        352,
-        0
-      ],
-      "id": "78b9ed46-2983-467d-8a1e-ac8e784f160e",
+      "position": [720, -96],
+      "id": "b1d7d9e3-b67b-4b4a-a9d1-edccdeca0994",
       "name": "Extract Post Data"
-    },
-    {
-      "parameters": {
-        "dataType": "string",
-        "value1": "={{ $json.platform }}",
-        "rules": {
-          "rules": [
-            {
-              "value2": "YouTube"
-            },
-            {
-              "operation": "notContains",
-              "value2": "YT",
-              "output": 1
-            }
-          ]
-        }
-      },
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 1,
-      "position": [
-        560,
-        0
-      ],
-      "id": "0de3f4cc-7664-4552-b2de-21f612d53b7e",
-      "name": "Platform Check"
     },
     {
       "parameters": {
@@ -113,11 +75,8 @@
       },
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
-      "position": [
-        800,
-        -208
-      ],
-      "id": "1ebc2216-a1ca-4f6d-8ba9-826c34ffb5ce",
+      "position": [880, -96],
+      "id": "0f111676-6a56-429c-a104-a70ea00f5fe2",
       "name": "Download file",
       "credentials": {
         "googleDriveOAuth2Api": {
@@ -125,6 +84,35 @@
           "name": "Google Drive account"
         }
       }
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $('Extract Post Data').item.json.platform }}",
+        "rules": {
+          "rules": [
+            {
+              "operation": "contains",
+              "value2": "YouTube"
+            },
+            {
+              "operation": "contains",
+              "value2": "IG",
+              "output": 1
+            },
+            {
+              "operation": "contains",
+              "value2": "FB",
+              "output": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [1072, -160],
+      "id": "f19a31d3-1d86-4fb4-86dc-cd959ad2f5a1",
+      "name": "Platform Check"
     },
     {
       "parameters": {
@@ -141,19 +129,16 @@
           "notifySubscribers": false,
           "privacyStatus": "private",
           "publicStatsViewable": true,
-          "publishAt": "={{$json.postDate.slice(0,22)}}",
-          "recordingDate": "={{$json.recordDate.slice(0,22)}}",
+          "publishAt": "={{ ($('Extract Post Data').item.json.postDate || '').slice(0,22) }}",
+          "recordingDate": "={{ ($('Extract Post Data').item.json.recordDate || '').slice(0,22) }}",
           "selfDeclaredMadeForKids": false,
           "tags": "={{ $('Extract Post Data').item.json.youtubeTags }}"
         }
       },
       "type": "n8n-nodes-base.youTube",
       "typeVersion": 1,
-      "position": [
-        1040,
-        -208
-      ],
-      "id": "036e8f47-4c4e-47d0-9fa5-da11c9534c51",
+      "position": [1264, -304],
+      "id": "de4e57bc-4993-45dc-8b8c-2482536c3646",
       "name": "Upload a video",
       "credentials": {
         "youTubeOAuth2Api": {
@@ -171,11 +156,8 @@
       },
       "type": "n8n-nodes-base.youTube",
       "typeVersion": 1,
-      "position": [
-        1248,
-        -208
-      ],
-      "id": "8fc0e051-bfad-4fee-8b02-32a1c1caad6e",
+      "position": [1472, -304],
+      "id": "5dc11ec8-20ae-4259-a426-0263a8104f42",
       "name": "Add to Playlist",
       "credentials": {
         "youTubeOAuth2Api": {
@@ -183,6 +165,88 @@
           "name": "YouTube account"
         }
       }
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/files/videos/{{ $('Extract Post Data').item.json.localFilename }}",
+        "dataPropertyName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [1264, -80],
+      "id": "f1a2b3c4-d5e6-7890-f1a2-b3c4d5e67890",
+      "name": "Save to Videos Folder"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://graph.facebook.com/v24.0/' + $env.IG_USER_ID + '/media' }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "media_type",
+              "value": "REELS"
+            },
+            {
+              "name": "video_url",
+              "value": "={{ $('Extract Post Data').item.json.publicUrl }}"
+            },
+            {
+              "name": "caption",
+              "value": "={{ $('Extract Post Data').item.json.caption }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $env.IG_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [1472, -80],
+      "id": "a2b3c4d5-e6f7-8901-a2b3-c4d5e6f78901",
+      "name": "Create IG Container"
+    },
+    {
+      "parameters": {
+        "amount": 60
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1680, -80],
+      "id": "b3c4d5e6-f7a8-9012-b3c4-d5e6f7a89012",
+      "name": "Wait for IG Processing",
+      "webhookId": "e6f7a8b9-c0d1-2345-e6f7-a8b9c0d12345"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://graph.facebook.com/v24.0/' + $env.IG_USER_ID + '/media_publish' }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "creation_id",
+              "value": "={{ $('Create IG Container').item.json.id }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $env.IG_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [1888, -80],
+      "id": "c4d5e6f7-a8b9-0123-c4d5-e6f7a8b90123",
+      "name": "Publish IG Reel"
     },
     {
       "parameters": {
@@ -202,11 +266,8 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [
-        1456,
-        -208
-      ],
-      "id": "f7c0be6d-7cc6-414e-a2e1-827d48900afd",
+      "position": [2096, -200],
+      "id": "06a956e1-5863-46b1-9008-6884306660fa",
       "name": "Get Obsidian File Content",
       "credentials": {
         "httpBearerAuth": {
@@ -222,11 +283,8 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        1632,
-        -208
-      ],
-      "id": "061b3060-b686-4623-9b5d-b867467d76fa",
+      "position": [2272, -200],
+      "id": "c89011dd-7894-4e95-ab0b-006e24b5d0aa",
       "name": "Build Updated Content"
     },
     {
@@ -243,11 +301,8 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [
-        1840,
-        -208
-      ],
-      "id": "51eb00d9-a827-4bbb-a5ee-5cde5c99fcae",
+      "position": [2464, -200],
+      "id": "7df2e8dc-1787-481b-a7de-7ac306dbb75f",
       "name": "Update Obsidian Status",
       "credentials": {
         "httpBearerAuth": {
@@ -296,17 +351,6 @@
       "main": [
         [
           {
-            "node": "Platform Check",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Platform Check": {
-      "main": [
-        [
-          {
             "node": "Download file",
             "type": "main",
             "index": 0
@@ -318,7 +362,25 @@
       "main": [
         [
           {
+            "node": "Platform Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Platform Check": {
+      "main": [
+        [
+          {
             "node": "Upload a video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save to Videos Folder",
             "type": "main",
             "index": 0
           }
@@ -337,6 +399,50 @@
       ]
     },
     "Add to Playlist": {
+      "main": [
+        [
+          {
+            "node": "Get Obsidian File Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Videos Folder": {
+      "main": [
+        [
+          {
+            "node": "Create IG Container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create IG Container": {
+      "main": [
+        [
+          {
+            "node": "Wait for IG Processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for IG Processing": {
+      "main": [
+        [
+          {
+            "node": "Publish IG Reel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish IG Reel": {
       "main": [
         [
           {
@@ -376,7 +482,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "f02a403a-4a70-4ab6-ad02-faca3f49bde9",
+  "versionId": "3a1b2c3d-4e5f-6789-abcd-ef0123456789",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e3410d7e1106827496d30c16a70a3c3349e5fbddf2632c2c4f538b86bf95708b"
