@@ -104,6 +104,11 @@ jobs:
             chmod 600 ~/stpetemusic/.env
             echo "✓ .env written ($(wc -l < ~/stpetemusic/.env) vars)"
 
+            echo "── Ensuring nginx can traverse home dir to serve /media/ ──"
+            chmod o+x /home/ec2-user
+            mkdir -p ~/stpetemusic/n8n/local-files/videos
+            chmod o+x ~/stpetemusic ~/stpetemusic/n8n ~/stpetemusic/n8n/local-files ~/stpetemusic/n8n/local-files/videos
+
             echo "── Applying compose config (restarts n8n if config changed) ──"
             cd ~/stpetemusic/n8n
             docker-compose -f docker-compose.prod.yaml --env-file ../.env up -d
