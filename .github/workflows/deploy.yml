@@ -1,8 +1,13 @@
 name: Deploy to AWS
 
 # Runs automatically after CI passes on main.
-# Syncs workflow files and docker-compose to the EC2 server,
-# then applies any compose config changes (restarts n8n if needed).
+# 1. Writes the .env file to EC2 from GitHub Secrets (source of truth)
+# 2. Syncs workflow files and docker-compose to the EC2 server
+# 3. Restarts n8n to apply any changes
+#
+# IMPORTANT: Never edit ~/stpetemusic/.env on EC2 directly —
+# it is overwritten on every deploy. Manage all secrets in:
+# https://github.com/maylortaylor/StPeteMusic/settings/secrets/actions
 on:
   workflow_run:
     workflows: ["CI"]
@@ -19,10 +24,42 @@ jobs:
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.5
+        env:
+          # n8n core
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          DB_ENCRYPTION_KEY: ${{ secrets.DB_ENCRYPTION_KEY }}
+          N8N_ENCRYPTION_KEY: ${{ secrets.N8N_ENCRYPTION_KEY }}
+          N8N_API_KEY: ${{ secrets.N8N_API_KEY }}
+          # Connectivity
+          OBSIDIAN_HOST: ${{ secrets.OBSIDIAN_HOST }}
+          # AI APIs
+          # Note: ANTHROPIC_API_KEY secret is reused as CLAUDE_API_KEY_N8N_STPETEMUSIC in .env
+          CLAUDE_API_KEY_N8N_STPETEMUSIC: ${{ secrets.ANTHROPIC_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          N8N_GEMINI_API_KEY: ${{ secrets.N8N_GEMINI_API_KEY }}
+          # Instagram
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_APP_ID: ${{ secrets.IG_APP_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          # Facebook
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_ACCESS_TOKEN: ${{ secrets.FB_ACCESS_TOKEN }}
+          # YouTube — GOOGLE_CLIENT_ID/SECRET secrets reused for YouTube OAuth
+          YOUTUBE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          # Notion
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          envs: >-
+            POSTGRES_USER,POSTGRES_PASSWORD,DB_ENCRYPTION_KEY,N8N_ENCRYPTION_KEY,
+            N8N_API_KEY,OBSIDIAN_HOST,CLAUDE_API_KEY_N8N_STPETEMUSIC,GROQ_API_KEY,
+            N8N_GEMINI_API_KEY,IG_USER_ID,IG_APP_ID,IG_ACCESS_TOKEN,FB_PAGE_ID,FB_ACCESS_TOKEN,
+            YOUTUBE_CLIENT_ID,YOUTUBE_CLIENT_SECRET,YOUTUBE_API_KEY,NOTION_API_KEY
           script: |
             set -e
 
@@ -40,6 +77,32 @@ jobs:
 
             echo "── Syncing docker-compose.prod.yaml ──"
             cp stpetemusic-deploy/n8n/docker-compose.prod.yaml ~/stpetemusic/n8n/docker-compose.prod.yaml
+
+            echo "── Writing .env from GitHub Secrets ──"
+            # printf '%s' is used for each value to safely handle special characters
+            # (colons, slashes, equals signs) without shell interpretation
+            {
+              printf 'POSTGRES_USER=%s\n'                    "${POSTGRES_USER}"
+              printf 'POSTGRES_PASSWORD=%s\n'                "${POSTGRES_PASSWORD}"
+              printf 'DB_ENCRYPTION_KEY=%s\n'                "${DB_ENCRYPTION_KEY}"
+              printf 'N8N_ENCRYPTION_KEY=%s\n'               "${N8N_ENCRYPTION_KEY}"
+              printf 'N8N_API_KEY=%s\n'                      "${N8N_API_KEY}"
+              printf 'OBSIDIAN_HOST=%s\n'                    "${OBSIDIAN_HOST}"
+              printf 'CLAUDE_API_KEY_N8N_STPETEMUSIC=%s\n'   "${CLAUDE_API_KEY_N8N_STPETEMUSIC}"
+              printf 'GROQ_API_KEY=%s\n'                     "${GROQ_API_KEY}"
+              printf 'N8N_GEMINI_API_KEY=%s\n'               "${N8N_GEMINI_API_KEY}"
+              printf 'IG_USER_ID=%s\n'                       "${IG_USER_ID}"
+              printf 'IG_APP_ID=%s\n'                        "${IG_APP_ID}"
+              printf 'IG_ACCESS_TOKEN=%s\n'                  "${IG_ACCESS_TOKEN}"
+              printf 'FB_PAGE_ID=%s\n'                       "${FB_PAGE_ID}"
+              printf 'FB_ACCESS_TOKEN=%s\n'                  "${FB_ACCESS_TOKEN}"
+              printf 'YOUTUBE_CLIENT_ID=%s\n'                "${YOUTUBE_CLIENT_ID}"
+              printf 'YOUTUBE_CLIENT_SECRET=%s\n'            "${YOUTUBE_CLIENT_SECRET}"
+              printf 'YOUTUBE_API_KEY=%s\n'                  "${YOUTUBE_API_KEY}"
+              printf 'NOTION_API_KEY=%s\n'                   "${NOTION_API_KEY}"
+            } > ~/stpetemusic/.env
+            chmod 600 ~/stpetemusic/.env
+            echo "✓ .env written ($(wc -l < ~/stpetemusic/.env) vars)"
 
             echo "── Applying compose config (restarts n8n if config changed) ──"
             cd ~/stpetemusic/n8n
