@@ -34,7 +34,8 @@ jobs:
           # Connectivity
           OBSIDIAN_HOST: ${{ secrets.OBSIDIAN_HOST }}
           # AI APIs
-          CLAUDE_API_KEY_N8N_STPETEMUSIC: ${{ secrets.CLAUDE_API_KEY_N8N_STPETEMUSIC }}
+          # Note: ANTHROPIC_API_KEY secret is reused as CLAUDE_API_KEY_N8N_STPETEMUSIC in .env
+          CLAUDE_API_KEY_N8N_STPETEMUSIC: ${{ secrets.ANTHROPIC_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           N8N_GEMINI_API_KEY: ${{ secrets.N8N_GEMINI_API_KEY }}
           # Instagram
@@ -44,9 +45,9 @@ jobs:
           # Facebook
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_ACCESS_TOKEN: ${{ secrets.FB_ACCESS_TOKEN }}
-          # YouTube
-          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
-          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          # YouTube — GOOGLE_CLIENT_ID/SECRET secrets reused for YouTube OAuth
+          YOUTUBE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           # Notion
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
