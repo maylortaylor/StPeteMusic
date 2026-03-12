@@ -139,7 +139,7 @@ GitHub Secrets → deploy.yml (on push to main) → writes ~/stpetemusic/.env �
 | `N8N_GEMINI_API_KEY` | `N8N_GEMINI_API_KEY` | Google Gemini API key |
 | `IG_USER_ID` | `IG_USER_ID` | Instagram Business Account ID |
 | `IG_APP_ID` | `IG_APP_ID` | Instagram App ID |
-| `IG_ACCESS_TOKEN` | `IG_ACCESS_TOKEN` | Instagram Page Access Token (rotate when expired) |
+| `IG_ACCESS_TOKEN` | `IG_ACCESS_TOKEN` | Instagram Page Access Token — use **permanent** Page token (derived from long-lived user token, never expires). See obsidian-to-youtube-posting section for rotation steps. |
 | `FB_PAGE_ID` | `FB_PAGE_ID` | Facebook Page ID |
 | `FB_ACCESS_TOKEN` | `FB_ACCESS_TOKEN` | Facebook Page Access Token |
 | `GOOGLE_CLIENT_ID` | `YOUTUBE_CLIENT_ID` | YouTube/Google OAuth2 client ID |
@@ -167,6 +167,54 @@ GitHub Secrets → deploy.yml (on push to main) → writes ~/stpetemusic/.env �
 See `n8n/CLAUDE.md` for detailed n8n guidance.
 
 The `system-prompt.md` file is the **source of truth** for AI agent instructions — always keep it in sync with the `systemMessage` field in the corresponding workflow JSON.
+
+### obsidian-to-youtube-posting (YouTube + Instagram)
+
+**File:** `n8n/workflows/StPeteMusic/obsidian-to-youtube-posting.json`
+**Trigger:** Manual + scheduled every 4 hours
+**Purpose:** Reads Obsidian posts with `status: ready`, downloads the video from Google Drive, and publishes to YouTube and/or Instagram based on the `platform` frontmatter field.
+
+**Flow:**
+```
+Query Obsidian Vault → Extract Post Data → Platform Check
+  [YouTube]: Download file (Google Drive) → Upload video → Add to Playlist
+  [IG]:      Download Drive File (HTTP Request, public URL) → Save to Videos Folder
+               → Create IG Container → Wait 30s → Check IG Status (poll every 30s)
+               → Is Ready? (FINISHED or SCHEDULED)
+                 → Should Publish Now?
+                   → FINISHED: Publish IG Reel (immediate)
+                   → SCHEDULED: skip (Instagram auto-publishes at postDate)
+Both paths → Get Obsidian File Content → Build Updated Content → Update Obsidian Status (published)
+```
+
+**Google Drive download:**
+- Files must be **public (shared-by-link)** — the IG branch downloads via public URL directly to disk (`/files/videos/`) without loading into Node.js heap
+- YouTube branch uses the Google Drive OAuth node (binary data required for YouTube API)
+- Direct download URL format: `https://drive.usercontent.google.com/download?id=FILE_ID&export=download&confirm=t`
+
+**Instagram scheduling:**
+- Uses Instagram Graph API scheduling: `published=false` + `scheduled_publish_time` (Unix timestamp from `postDate`)
+- `postDate` must be **10 min – 75 days** in the future when the container is created
+- If `postDate` is already past, the container stays `FINISHED` and the workflow calls `media_publish` immediately
+- Container status polling: checks `status_code` every 30s until `FINISHED` or `SCHEDULED`
+- No need to call `media_publish` for scheduled posts — Instagram handles it automatically
+
+**nginx `/media/` serving:**
+- Videos saved to `~/stpetemusic/n8n/local-files/videos/` on EC2 (mounted as `/files/videos/` in container)
+- nginx serves them at `https://n8n-stpetemusic.duckdns.org/media/<filename>` — this is the `video_url` sent to Instagram
+- **Requires:** `chmod o+x /home/ec2-user` so nginx can traverse the home dir (applied automatically by `deploy.yml` and `user_data.sh`)
+
+**Memory / stability:**
+- n8n container: `mem_limit: 1024m` — required for large video uploads to YouTube
+- Binary data mode: `filesystem` — binary stored on disk, not in Node.js heap
+- `N8N_RESTRICT_FILE_ACCESS_TO=/files` — required for `ReadWriteFile` node to write to `/files/videos/`
+
+**Instagram token:**
+- Uses `$env.IG_ACCESS_TOKEN` (Page Access Token, never expires if derived from a long-lived user token)
+- To rotate: generate short-lived User Token → exchange for long-lived → get Page Token from `950900529511914/owned_pages`
+- Update `IG_ACCESS_TOKEN` GitHub Secret — deploy applies it automatically
+
+---
 
 ### obsidian-post-creator (YouTube-only)
 
