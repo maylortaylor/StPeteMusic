@@ -342,16 +342,34 @@
     },
     {
       "parameters": {
-        "command": "=`curl -L \"https://drive.usercontent.google.com/download?id=${ $('Extract Post Data').item.json.googleDriveFileId }&export=download&confirm=t\" -o \"/files/videos/${ $('Extract Post Data').item.json.localFilename }\" 2>&1 && echo downloaded`"
+        "method": "GET",
+        "url": "={{ 'https://drive.usercontent.google.com/download?id=' + $('Extract Post Data').item.json.googleDriveFileId + '&export=download&confirm=t' }}",
+        "options": {}
       },
-      "type": "n8n-nodes-base.executeCommand",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
         1264,
         -80
       ],
-      "id": "d5e6f7a8-b9c0-1234-d5e6-f7a8b9c01234",
-      "name": "Download to Disk (IG)"
+      "id": "e6f7a8b9-c0d1-2345-e6f7-a8b9c0d12346",
+      "name": "Download Drive File (IG)"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/files/videos/{{ $('Extract Post Data').item.json.localFilename }}",
+        "dataPropertyName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1472,
+        -80
+      ],
+      "id": "f1a2b3c4-d5e6-7890-f1a2-b3c4d5e67890",
+      "name": "Save to Videos Folder"
     }
   ],
   "pinData": {},
@@ -422,7 +440,7 @@
         ],
         [
           {
-            "node": "Download to Disk (IG)",
+            "node": "Download Drive File (IG)",
             "type": "main",
             "index": 0
           }
@@ -506,7 +524,18 @@
         ]
       ]
     },
-    "Download to Disk (IG)": {
+    "Download Drive File (IG)": {
+      "main": [
+        [
+          {
+            "node": "Save to Videos Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Videos Folder": {
       "main": [
         [
           {
