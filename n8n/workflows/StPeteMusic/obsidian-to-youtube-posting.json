@@ -228,7 +228,7 @@
     },
     {
       "parameters": {
-        "amount": 60
+        "amount": 30
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
@@ -262,7 +262,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        1888,
+        2304,
         -80
       ],
       "id": "c4d5e6f7-a8b9-0123-c4d5-e6f7a8b90123",
@@ -370,6 +370,56 @@
       ],
       "id": "f1a2b3c4-d5e6-7890-f1a2-b3c4d5e67890",
       "name": "Save to Videos Folder"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://graph.facebook.com/v24.0/' + $('Create IG Container').item.json.id + '?fields=status_code,status&access_token=' + $env.IG_ACCESS_TOKEN }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1888,
+        -80
+      ],
+      "id": "a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67891",
+      "name": "Check IG Status"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status_code }}",
+              "operation": "equals",
+              "value2": "FINISHED"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        2096,
+        -80
+      ],
+      "id": "b2c3d4e5-f6a7-8901-b2c3-d4e5f6a78902",
+      "name": "Is Ready?"
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2096,
+        80
+      ],
+      "id": "c3d4e5f6-a7b8-9012-c3d4-e5f6a7b89013",
+      "name": "Retry Wait",
+      "webhookId": "d4e5f6a7-b8c9-0123-d4e5-f6a7b8c90124"
     }
   ],
   "pinData": {},
@@ -484,7 +534,7 @@
       "main": [
         [
           {
-            "node": "Publish IG Reel",
+            "node": "Check IG Status",
             "type": "main",
             "index": 0
           }
@@ -540,6 +590,46 @@
         [
           {
             "node": "Create IG Container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check IG Status": {
+      "main": [
+        [
+          {
+            "node": "Is Ready?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Ready?": {
+      "main": [
+        [
+          {
+            "node": "Publish IG Reel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Retry Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retry Wait": {
+      "main": [
+        [
+          {
+            "node": "Check IG Status",
             "type": "main",
             "index": 0
           }
