@@ -60,7 +60,7 @@ services:
       - YOUTUBE_CLIENT_ID=${YOUTUBE_CLIENT_ID}
       - YOUTUBE_CLIENT_SECRET=${YOUTUBE_CLIENT_SECRET}
       - YOUTUBE_API_KEY=${YOUTUBE_API_KEY}
-      - NODE_OPTIONS=--max-old-space-size=512
+      - NODE_OPTIONS=--max-old-space-size=768
       - POSTGRES_HOST=postgres
       - POSTGRES_DB=stpetemusic
       - POSTGRES_USER=${POSTGRES_USER}
@@ -73,8 +73,8 @@ services:
       - "127.0.0.1:5678:5678"
     networks:
       - n8n-net
-    mem_limit: 512m
-    memswap_limit: 812m
+    mem_limit: 1024m
+    memswap_limit: 2048m
 
 networks:
   n8n-net:
