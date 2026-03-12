@@ -37,3 +37,10 @@ echo 'vm.swappiness=10' >> /etc/sysctl.d/99-swap.conf
 echo 50 > /proc/sys/vm/vfs_cache_pressure
 echo 'vm.vfs_cache_pressure=50' >> /etc/sysctl.d/99-swap.conf
 echo "Swap configured successfully"
+
+# ---- NGINX FILE ACCESS ----
+# nginx runs as the 'nginx' user and needs execute (traverse) permission on
+# /home/ec2-user to serve files from subdirectories (e.g. local-files/videos/).
+# Without this, nginx returns 403 when Instagram tries to fetch video_url.
+chmod o+x /home/ec2-user
+echo "nginx home dir traverse permission set"
