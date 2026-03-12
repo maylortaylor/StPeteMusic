@@ -118,31 +118,34 @@ GitHub Secrets → deploy.yml (on push to main) → writes ~/stpetemusic/.env �
 
 **Required GitHub Secrets (all must be set for deploy to succeed):**
 
-| Secret | Description |
-|--------|-------------|
-| `EC2_HOST` | EC2 hostname (`n8n-stpetemusic.duckdns.org`) |
-| `EC2_USER` | EC2 SSH user (`ec2-user`) |
-| `EC2_SSH_KEY` | EC2 SSH private key (contents of `.pem` file) |
-| `AWS_ACCESS_KEY_ID` | AWS credentials for Terraform |
-| `AWS_SECRET_ACCESS_KEY` | AWS credentials for Terraform |
-| `POSTGRES_USER` | PostgreSQL username |
-| `POSTGRES_PASSWORD` | PostgreSQL password |
-| `DB_ENCRYPTION_KEY` | pgcrypto column-level encryption key |
-| `N8N_ENCRYPTION_KEY` | n8n credential encryption key |
-| `N8N_API_KEY` | n8n API key |
-| `OBSIDIAN_HOST` | Obsidian REST API URL (Tailscale IP, e.g. `http://100.x.x.x:27123`) |
-| `CLAUDE_API_KEY_N8N_STPETEMUSIC` | Anthropic Claude API key |
-| `GROQ_API_KEY` | Groq LLM API key |
-| `N8N_GEMINI_API_KEY` | Google Gemini API key |
-| `IG_USER_ID` | Instagram Business Account ID (`17841461021088145`) |
-| `IG_APP_ID` | Instagram App ID (`1208357861136026`) |
-| `IG_ACCESS_TOKEN` | Instagram Page Access Token (rotate when expired) |
-| `FB_PAGE_ID` | Facebook Page ID (`686234848147122`) |
-| `FB_ACCESS_TOKEN` | Facebook Page Access Token |
-| `YOUTUBE_CLIENT_ID` | YouTube OAuth2 client ID |
-| `YOUTUBE_CLIENT_SECRET` | YouTube OAuth2 client secret |
-| `YOUTUBE_API_KEY` | YouTube Data API key |
-| `NOTION_API_KEY` | Notion integration token (optional) |
+> The table below uses **GitHub Secret names** (what you set in repo settings).
+> Some secrets are written to `.env` under a different variable name — noted in the Description column.
+
+| GitHub Secret Name | Written to `.env` as | Description |
+|--------------------|----------------------|-------------|
+| `EC2_HOST` | — | SSH target (used by deploy only, not in `.env`) |
+| `EC2_USER` | — | SSH user (used by deploy only, not in `.env`) |
+| `EC2_SSH_KEY` | — | SSH private key (used by deploy only, not in `.env`) |
+| `AWS_ACCESS_KEY_ID` | — | AWS credentials for Terraform only |
+| `AWS_SECRET_ACCESS_KEY` | — | AWS credentials for Terraform only |
+| `POSTGRES_USER` | `POSTGRES_USER` | PostgreSQL username |
+| `POSTGRES_PASSWORD` | `POSTGRES_PASSWORD` | PostgreSQL password |
+| `DB_ENCRYPTION_KEY` | `DB_ENCRYPTION_KEY` | pgcrypto column-level encryption key |
+| `N8N_ENCRYPTION_KEY` | `N8N_ENCRYPTION_KEY` | n8n credential encryption key |
+| `N8N_API_KEY` | `N8N_API_KEY` | n8n API key |
+| `OBSIDIAN_HOST` | `OBSIDIAN_HOST` | Tailscale URL for Obsidian REST API (e.g. `http://100.x.x.x:27123`) |
+| `ANTHROPIC_API_KEY` | `CLAUDE_API_KEY_N8N_STPETEMUSIC` | Anthropic Claude API key |
+| `GROQ_API_KEY` | `GROQ_API_KEY` | Groq LLM API key |
+| `N8N_GEMINI_API_KEY` | `N8N_GEMINI_API_KEY` | Google Gemini API key |
+| `IG_USER_ID` | `IG_USER_ID` | Instagram Business Account ID |
+| `IG_APP_ID` | `IG_APP_ID` | Instagram App ID |
+| `IG_ACCESS_TOKEN` | `IG_ACCESS_TOKEN` | Instagram Page Access Token (rotate when expired) |
+| `FB_PAGE_ID` | `FB_PAGE_ID` | Facebook Page ID |
+| `FB_ACCESS_TOKEN` | `FB_ACCESS_TOKEN` | Facebook Page Access Token |
+| `GOOGLE_CLIENT_ID` | `YOUTUBE_CLIENT_ID` | YouTube/Google OAuth2 client ID |
+| `GOOGLE_CLIENT_SECRET` | `YOUTUBE_CLIENT_SECRET` | YouTube/Google OAuth2 client secret |
+| `YOUTUBE_API_KEY` | `YOUTUBE_API_KEY` | YouTube Data API key |
+| `NOTION_API_KEY` | `NOTION_API_KEY` | Notion integration token *(optional)* |
 
 **To rotate a secret (e.g. IG_ACCESS_TOKEN):**
 1. Get the new token value
