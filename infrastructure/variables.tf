@@ -17,3 +17,10 @@ variable "allowed_ssh_cidr" {
   description = "CIDR block allowed to SSH into the EC2 instance. Update if your IP changes (run: curl ifconfig.me)"
   default     = "66.117.37.36/32"
 }
+
+variable "github_token" {
+  description = "GitHub PAT (repo scope) for Amplify → GitHub repo connection. Set via TF_VAR_github_token in CI."
+  type        = string
+  sensitive   = true
+  default     = ""  # empty default allows terraform validate to pass in CI without the secret
+}
