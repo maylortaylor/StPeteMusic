@@ -11,7 +11,8 @@ resource "aws_amplify_app" "web" {
   # SSR mode — required because /api/newsletter/subscribe cannot be statically exported
   platform = "WEB_COMPUTE"
 
-  build_spec = file("${path.module}/../amplify.yml")
+  # No build_spec here — Amplify reads amplify.yml directly from the repo root.
+  # This means build spec changes never require a terraform apply.
 
   environment_variables = {
     NEXT_PUBLIC_SITE_URL = "https://www.stpetemusic.live"
