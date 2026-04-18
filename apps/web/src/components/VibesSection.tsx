@@ -11,7 +11,7 @@ const cells = [
   { span: 'col-span-3',             bg: 'linear-gradient(90deg, #1A1038, #0F183A, #152248)',   label: 'Suite E Studios · Warehouse Arts District', accent: '#E7A4E7', minH: '200px', depth: 80 },
 ];
 
-function ParallaxCell({ cell, index }: { cell: typeof cells[0]; index: number }) {
+function ParallaxCell({ cell }: { cell: typeof cells[0] }) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const rawY = useTransform(scrollYProgress, [0, 0.5, 1], [`${cell.depth}px`, '0px', `-${cell.depth * 0.3}px`]);
@@ -75,7 +75,7 @@ export function VibesSection() {
 
         <div className="grid grid-cols-3 gap-3" style={{ gridTemplateRows: 'auto auto auto' }}>
           {cells.map((cell, i) => (
-            <ParallaxCell key={i} cell={cell} index={i} />
+            <ParallaxCell key={i} cell={cell} />
           ))}
         </div>
       </div>
