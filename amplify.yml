@@ -17,4 +17,3 @@ applications:
         paths:
           - node_modules/**/*
           - apps/web/.next/cache/**/*
-    appRoot: apps/web
