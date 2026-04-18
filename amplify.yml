@@ -5,15 +5,16 @@ applications:
         preBuild:
           commands:
             - node --version
-            - npm ci
+            - cd $CODEBUILD_SRC_DIR && npm ci
         build:
           commands:
-            - npm run build --workspace=apps/web
+            - cd $CODEBUILD_SRC_DIR && npm run build --workspace=apps/web
       artifacts:
-        baseDirectory: apps/web/.next
+        baseDirectory: .next
         files:
           - '**/*'
       cache:
         paths:
-          - node_modules/**/*
-          - apps/web/.next/cache/**/*
+          - $CODEBUILD_SRC_DIR/node_modules/**/*
+          - .next/cache/**/*
+    appRoot: apps/web
