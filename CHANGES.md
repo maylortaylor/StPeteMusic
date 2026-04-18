@@ -42,7 +42,7 @@ Previous plan was Vercel — switched to AWS Amplify (SSR mode) to keep everythi
 
 ### Manual Steps Matt Must Complete
 
-- [ ] Create GitHub PAT (`repo` scope) → add as `GITHUB_TOKEN_AMPLIFY` GitHub Secret
+- [ ] Create GitHub PAT (`repo` scope) → add as `GH_TOKEN_AMPLIFY` GitHub Secret
 - [ ] Add `TF_VAR_github_token` to GitHub Actions → `terraform-plan.yml` + `terraform-apply.yml`
 - [ ] Merge PR to `main` → Terraform Apply creates Amplify app
 - [x] After apply: Amplify app ID = `d1fbansqjv3e63` → add as `AMPLIFY_APP_ID` GitHub Secret
