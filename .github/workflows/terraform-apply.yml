@@ -40,3 +40,5 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false
+        env:
+          TF_VAR_github_token: ${{ secrets.GITHUB_TOKEN_AMPLIFY }}

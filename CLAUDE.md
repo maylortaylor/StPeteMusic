@@ -67,6 +67,35 @@ Always include:
 
 ## Infrastructure
 
+### Web App (apps/web)
+
+| Item | Value |
+|---|---|
+| **Hosting** | AWS Amplify (SSR mode — `WEB_COMPUTE`, required for API routes) |
+| **Build spec** | `amplify.yml` at repo root |
+| **Production URL** | https://www.stpetemusic.live (after DNS setup) |
+| **Amplify default (prod)** | `https://main.<id>.amplifyapp.com` |
+| **Staging URL** | `https://develop.<id>.amplifyapp.com` |
+| **Amplify app ID** | See `AMPLIFY_APP_ID` GitHub Secret (set after first terraform apply) |
+| **Secrets in Amplify console** | `LISTMONK_USERNAME`, `LISTMONK_PASSWORD` (per branch, not in Terraform) |
+
+### Branch Workflow
+
+| Branch | Purpose | Auto-deploy |
+|---|---|---|
+| `main` | Production | Amplify (PRODUCTION environment) |
+| `develop` | Staging / integration | Amplify (DEVELOPMENT environment, PR previews enabled) |
+| `feature/*` | Feature work | No auto-deploy |
+
+**Working on a feature:**
+1. `git checkout -b feature/my-thing develop`
+2. Open PR → `develop` → `web-ci.yml` runs (lint, typecheck, test)
+3. Merge → Amplify auto-builds staging at `https://develop.<id>.amplifyapp.com`
+4. Open PR → `main` → same CI gates
+5. Merge → Amplify auto-builds production
+
+**Rule: Never push directly to main.** Branch protection requires CI + 1 PR review.
+
 ### Production n8n
 - **URL:** https://n8n-stpetemusic.duckdns.org
 - **Server:** AWS EC2 t3.micro (`us-east-1`, free tier)
