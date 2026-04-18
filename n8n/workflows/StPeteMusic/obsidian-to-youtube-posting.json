@@ -6,10 +6,10 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        1936,
-        -112
+        3568,
+        -208
       ],
-      "id": "a9fb254d-f933-4b9e-8802-733c5a781a30",
+      "id": "05d850e4-f8b9-404b-8a12-a80b3011351d",
       "name": "Manual Trigger"
     },
     {
@@ -24,10 +24,10 @@
       "type": "n8n-nodes-base.interval",
       "typeVersion": 1,
       "position": [
-        1936,
-        16
+        3568,
+        -80
       ],
-      "id": "ed96f4b9-5314-4554-a0ed-b27302ab3b88",
+      "id": "bd23a09d-88d5-46db-8f81-ecaa60c5b493",
       "name": "Scheduled Trigger (Every 4 Hours)"
     },
     {
@@ -49,10 +49,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2144,
-        -112
+        3776,
+        -208
       ],
-      "id": "cc59a29f-b2a3-4033-bd93-3ec4488ce00b",
+      "id": "57d18dd1-a6bd-4f9c-98eb-34be39ce05cd",
       "name": "Query Obsidian Vault",
       "credentials": {
         "httpBearerAuth": {
@@ -69,10 +69,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2336,
-        -112
+        3968,
+        -208
       ],
-      "id": "5fb08107-68ec-4275-8999-acef2d82057c",
+      "id": "4f8e718c-efc1-4a9f-9e84-37e826e0069d",
       "name": "Extract Post Data"
     },
     {
@@ -88,10 +88,10 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        2560,
-        -336
+        4496,
+        -672
       ],
-      "id": "368d175e-742e-4512-8769-046c67eb6359",
+      "id": "09d65a4f-d80a-4f78-afc3-073ed0c2253e",
       "name": "Download file",
       "credentials": {
         "googleDriveOAuth2Api": {
@@ -126,10 +126,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 1,
       "position": [
-        2688,
-        -176
+        4320,
+        -272
       ],
-      "id": "29f0a57d-6c72-4568-a1c1-e49ac09330af",
+      "id": "e9e30b93-a80f-41e9-9968-17d964dcbb27",
       "name": "Platform Check"
     },
     {
@@ -156,10 +156,10 @@
       "type": "n8n-nodes-base.youTube",
       "typeVersion": 1,
       "position": [
-        2880,
-        -320
+        4752,
+        -672
       ],
-      "id": "87e4117b-9caa-478f-b0e8-d0d3d1442970",
+      "id": "3ca640c8-0f2f-453a-a69c-9d3925d09ec9",
       "name": "Upload a video",
       "credentials": {
         "youTubeOAuth2Api": {
@@ -178,10 +178,10 @@
       "type": "n8n-nodes-base.youTube",
       "typeVersion": 1,
       "position": [
-        3088,
-        -320
+        5056,
+        -672
       ],
-      "id": "57b785a7-4f3a-4820-a498-711808a0cf1a",
+      "id": "81652be4-1117-4de7-8c10-2da4a17f5f9d",
       "name": "Add to Playlist",
       "credentials": {
         "youTubeOAuth2Api": {
@@ -228,10 +228,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        3232,
-        -96
+        4880,
+        -400
       ],
-      "id": "e7a3fab8-d2e9-40b3-8312-f139f83cbd98",
+      "id": "0e751dd5-5873-49b4-ba98-f755d1f76b58",
       "name": "Create IG Container"
     },
     {
@@ -241,10 +241,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        3424,
-        -192
+        5056,
+        -464
       ],
-      "id": "8abc9d04-a9a5-403e-aeb7-8b1b9a02e14d",
+      "id": "125e0c3a-7743-4151-81ff-8bfc09e9fdbf",
       "name": "Wait for IG Processing",
       "webhookId": "e6f7a8b9-c0d1-2345-e6f7-a8b9c0d12345"
     },
@@ -270,10 +270,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        4032,
-        -144
+        5952,
+        -336
       ],
-      "id": "ca83d959-4f29-47f4-af1d-85cd5ca627e9",
+      "id": "7064c603-2add-4b1b-9f74-6d37b662433e",
       "name": "Publish IG Reel"
     },
     {
@@ -295,10 +295,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        4272,
-        -272
+        6400,
+        -368
       ],
-      "id": "b0f072ab-e8d2-4f55-90e8-e378348bbcc3",
+      "id": "c9410c1b-c9b1-433c-a13a-ad59c154a938",
       "name": "Get Obsidian File Content",
       "credentials": {
         "httpBearerAuth": {
@@ -315,10 +315,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4448,
-        -272
+        6576,
+        -368
       ],
-      "id": "664cc079-c844-40ef-b047-ddf75bc09872",
+      "id": "d7b677cd-6b29-4d38-b636-e3af52301f04",
       "name": "Build Updated Content"
     },
     {
@@ -336,10 +336,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        4640,
-        -272
+        6768,
+        -368
       ],
-      "id": "638da423-e8b4-41d9-9a8c-4bd01dcc1793",
+      "id": "454aa8b4-d0ed-42ff-aca1-3c64318babd0",
       "name": "Update Obsidian Status",
       "credentials": {
         "httpBearerAuth": {
@@ -356,10 +356,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2880,
-        -32
+        4560,
+        -256
       ],
-      "id": "1910b1ac-9c1e-47b9-a511-0a3c0abe5e5f",
+      "id": "5ff3560c-0e91-4af0-bfb9-3d0497160e32",
       "name": "Download Drive File (IG)"
     },
     {
@@ -371,10 +371,10 @@
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
       "position": [
-        3056,
-        -96
+        4720,
+        -320
       ],
-      "id": "29ef5e9f-782c-472d-ab90-2615d8d1179d",
+      "id": "c0ac517e-ee86-41b9-8764-f0f1f0b939cb",
       "name": "Save to Videos Folder"
     },
     {
@@ -385,10 +385,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        3616,
-        -96
+        5248,
+        -384
       ],
-      "id": "b114148b-d2d1-42af-91fc-053bcd3bc363",
+      "id": "569be097-3744-4255-960f-58bb21fe75bc",
       "name": "Check IG Status"
     },
     {
@@ -412,10 +412,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        3792,
-        -128
+        5376,
+        -384
       ],
-      "id": "e8dda336-c733-4415-bf20-9ecbedd87d9e",
+      "id": "93ca5b7c-f228-4735-93f4-6892521dcecc",
       "name": "Is Ready?"
     },
     {
@@ -425,10 +425,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        4032,
-        32
+        5520,
+        -208
       ],
-      "id": "1f33d737-7029-4423-90b1-dc371cea9f3c",
+      "id": "334c8d2c-fbc5-4fc4-a063-f49d74c2313e",
       "name": "Retry Wait",
       "webhookId": "d4e5f6a7-b8c9-0123-d4e5-f6a7b8c90124"
     },
@@ -447,10 +447,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
       "position": [
-        2304,
-        -200
+        5760,
+        -224
       ],
-      "id": "e5f6a7b8-c9d0-1234-e5f6-a7b8c9d01235",
+      "id": "0e2d6864-dd10-4ad5-9df1-d21ccd35b4bb",
       "name": "Should Publish Now?"
     }
   ],
@@ -693,7 +693,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "e1919895-d6f8-437c-9b13-8d53abbbf834",
+  "versionId": "235fa942-ec00-41d4-b8c4-f68576fb359a",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e3410d7e1106827496d30c16a70a3c3349e5fbddf2632c2c4f538b86bf95708b"

@@ -22,3 +22,23 @@ output "backup_bucket" {
   description = "S3 bucket name for n8n backups"
   value       = aws_s3_bucket.n8n_backups.id
 }
+
+output "amplify_app_id" {
+  description = "AWS Amplify app ID — add as AMPLIFY_APP_ID GitHub Secret"
+  value       = aws_amplify_app.web.id
+}
+
+output "amplify_default_domain" {
+  description = "Amplify default domain (before custom domain is connected)"
+  value       = aws_amplify_app.web.default_domain
+}
+
+output "amplify_production_url" {
+  description = "Production URL on Amplify (main branch)"
+  value       = "https://main.${aws_amplify_app.web.default_domain}"
+}
+
+output "amplify_staging_url" {
+  description = "Staging URL on Amplify (develop branch)"
+  value       = "https://develop.${aws_amplify_app.web.default_domain}"
+}
