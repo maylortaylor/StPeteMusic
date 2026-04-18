@@ -8,7 +8,7 @@ applications:
             - npm ci
         build:
           commands:
-            - npm run build --workspace=apps/web
+            - npm run build
       artifacts:
         baseDirectory: .next
         files:
