@@ -74,9 +74,9 @@ Always include:
 | **Hosting** | AWS Amplify (SSR mode — `WEB_COMPUTE`, required for API routes) |
 | **Build spec** | `amplify.yml` at repo root |
 | **Production URL** | https://www.stpetemusic.live (after DNS setup) |
-| **Amplify default (prod)** | https://main.d1fjwgk99cbqor.amplifyapp.com |
-| **Staging URL** | https://develop.d1fjwgk99cbqor.amplifyapp.com |
-| **Amplify app ID** | `d1fjwgk99cbqor` (also set as `AMPLIFY_APP_ID` GitHub Secret) |
+| **Amplify default (prod)** | https://main.d1fbansqjv3e63.amplifyapp.com |
+| **Staging URL** | https://develop.d1fbansqjv3e63.amplifyapp.com |
+| **Amplify app ID** | `d1fbansqjv3e63` (also set as `AMPLIFY_APP_ID` GitHub Secret) |
 | **Secrets in Amplify console** | `LISTMONK_USERNAME`, `LISTMONK_PASSWORD` (per branch, not in Terraform) |
 
 ### Branch Workflow
