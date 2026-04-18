@@ -45,7 +45,7 @@ Previous plan was Vercel — switched to AWS Amplify (SSR mode) to keep everythi
 - [ ] Create GitHub PAT (`repo` scope) → add as `GITHUB_TOKEN_AMPLIFY` GitHub Secret
 - [ ] Add `TF_VAR_github_token` to GitHub Actions → `terraform-plan.yml` + `terraform-apply.yml`
 - [ ] Merge PR to `main` → Terraform Apply creates Amplify app
-- [ ] After apply: `cd infrastructure && terraform output amplify_app_id` → add as `AMPLIFY_APP_ID` secret
+- [x] After apply: Amplify app ID = `d1fbansqjv3e63` → add as `AMPLIFY_APP_ID` GitHub Secret
 - [ ] In Amplify console → `stpetemusic-web` → `main` branch → set env vars:
   - `LISTMONK_USERNAME`, `LISTMONK_PASSWORD`
 - [ ] Trigger first build: push empty commit to `develop` or click "Run job" in Amplify console

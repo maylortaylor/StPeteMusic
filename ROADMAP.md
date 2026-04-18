@@ -150,8 +150,8 @@ Ordered by dependency. Items marked **(you)** require manual action.
 - [ ] After apply: `cd infrastructure && terraform output amplify_app_id` → add as `AMPLIFY_APP_ID` GitHub Secret
 - [ ] In Amplify console → `stpetemusic-web` → `main` branch → set env vars: `LISTMONK_USERNAME`, `LISTMONK_PASSWORD`
 - [ ] Trigger first build: push empty commit to `develop` or click "Run job" in Amplify console
-- [ ] Verify staging at `https://develop.<id>.amplifyapp.com`
-- [ ] Verify production at `https://main.<id>.amplifyapp.com`
+- [ ] Verify staging at https://develop.d1fbansqjv3e63.amplifyapp.com
+- [ ] Verify production at https://main.d1fbansqjv3e63.amplifyapp.com
 - [ ] In Cloudflare DNS: add CNAMEs for `www` + `@` pointing to Amplify's provided domain
 - [ ] Uncomment `aws_amplify_domain_association` in `amplify.tf` → re-apply
 
