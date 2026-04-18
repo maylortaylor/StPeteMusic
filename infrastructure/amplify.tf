@@ -14,8 +14,7 @@ resource "aws_amplify_app" "web" {
   build_spec = file("${path.module}/../amplify.yml")
 
   environment_variables = {
-    AMPLIFY_MONOREPO_APP_ROOT = "apps/web"
-    NEXT_PUBLIC_SITE_URL      = "https://www.stpetemusic.live"
+    NEXT_PUBLIC_SITE_URL = "https://www.stpetemusic.live"
 
     # Non-secret Listmonk config — secrets set in Amplify console per branch
     LISTMONK_API_URL = "https://newsletter.stpetemusic.live"
