@@ -1,0 +1,47 @@
+version: '3.8'
+
+# Local development stack for stpetemusic.com
+# Run: docker compose -f docker-compose.dev.yml up -d
+# Then: cd apps/web && npm run dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: stpetemusic-db-dev
+    environment:
+      POSTGRES_USER: stpetemusic
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_DB: stpetemusic_dev
+    ports:
+      - '5433:5432'  # 5433 on host to avoid conflicts with other postgres instances
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U stpetemusic -d stpetemusic_dev']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  listmonk:
+    image: listmonk/listmonk:latest
+    container_name: stpetemusic-listmonk-dev
+    ports:
+      - '9000:9000'
+    environment:
+      LISTMONK_app__address: '0.0.0.0:9000'
+      LISTMONK_db__host: postgres
+      LISTMONK_db__port: 5432
+      LISTMONK_db__user: stpetemusic
+      LISTMONK_db__password: devpassword
+      LISTMONK_db__database: stpetemusic_dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: [sh, -c, 'yes | ./listmonk --install && ./listmonk']
+    volumes:
+      - listmonk_uploads:/listmonk/uploads
+
+volumes:
+  postgres_dev_data:
+  listmonk_uploads:

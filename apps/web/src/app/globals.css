@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    background-color: #0D0B1E;
+    color: #FBFFFF;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #0D0B1E;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+@layer utilities {
+  .glow-lavender {
+    box-shadow: 0 0 28px rgba(231, 164, 231, 0.5);
+  }
+
+  .glow-blue {
+    box-shadow: 0 0 28px rgba(25, 87, 164, 0.5);
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 28px rgba(72, 62, 142, 0.6);
+  }
+
+  /* keep old names */
+  .glow-azure   { box-shadow: 0 0 28px rgba(171, 145, 232, 0.45); }
+  .glow-magenta { box-shadow: 0 0 28px rgba(231, 164, 231, 0.45); }
+
+  .text-balance { text-wrap: balance; }
+
+  .text-gradient-spm {
+    background: linear-gradient(90deg, #E7A4E7 0%, #AB91E8 45%, #1957A4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}

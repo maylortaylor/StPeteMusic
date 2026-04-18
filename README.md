@@ -59,15 +59,16 @@
 
 ## Infrastructure
 
-n8n runs on **AWS EC2 (t3.micro, free tier)** with HTTPS via Let's Encrypt. All infrastructure is managed with **Terraform** — see `infrastructure/`.
+All AWS resources are managed with **Terraform** — see `infrastructure/`. **Never edit AWS resources manually** — change the `.tf` files and let CI apply them.
 
 | Resource | Value |
 |---|---|
 | n8n URL | https://n8n-stpetemusic.duckdns.org |
-| Server | AWS EC2 t3.micro, `us-east-1` |
+| Server | AWS EC2 t3.micro, `us-east-1`, IP `54.235.171.182` |
 | SSH Key | `~/.ssh/stpetemusic-n8n.pem` |
-| DNS | DuckDNS free subdomain |
+| DNS | DuckDNS (migrating to Cloudflare `stpetemusic.com` in Phase 1) |
 | SSL | Let's Encrypt (auto-renews) |
+| Database | PostgreSQL 16 (Docker on EC2) |
 
 > Quick reference: `AWS_SETUP.md` | Step-by-step from scratch: `docs/AWS_DEPLOYMENT.md`
 
@@ -220,55 +221,16 @@ https://n8n-stpetemusic.duckdns.org/rest/oauth2-credential/callback
 
 ---
 
-## Current Work (March 10, 2026)
+## Current Phase
 
-### 🔧 In Progress — Auto-Recovery & n8n Workflow Improvements
+**Phase 0 — Documentation Cleanup** (in progress)
 
-**Status:** Changes committed, awaiting Terraform apply and server reboot
+- [x] Infrastructure running: EC2, Terraform, n8n, PostgreSQL, GitHub Actions
+- [x] ROADMAP.md rewritten — accurate current state, Terraform IaC, cost estimates
+- [x] Workspace `package.json` added (npm workspaces)
+- [ ] Phase 1 next: Cloudflare domain + media S3 via Terraform, then Next.js frontend
 
-**Completed:**
-1. ✅ **n8n Workflow: obsidian-to-youtube-posting.json**
-   - Updated "Build Updated Content" Code node with smart tag merging logic
-   - Now changes `status: ready` → `status: published`
-   - Auto-generates default tags: `#stpetemusic`, `#suiteestudios`, `#bandname`, `#publishedyt`
-   - Smart merge: detects existing "## Tags" section, merges tags without duplicates
-   - If no tags section exists, creates new one at end of file
-   - Tags tracked for platform status: `#publishedYT`, `#publishedIG`, etc.
-
-2. ✅ **Terraform: EC2 Auto Recovery**
-   - Added `maintenance_options { auto_recovery = "on" }` to `infrastructure/ec2.tf`
-   - Instance will auto-restart if it becomes unresponsive due to hardware/system issues
-   - Works alongside Docker's `restart: unless-stopped` policy (handles app crashes)
-
-**Pending (Tomorrow):**
-1. ⏳ **Terraform apply**
-   - Fix AWS credential chain issue (file path error in credential helper)
-   - Run `terraform plan` and `terraform apply` to enable auto-recovery
-   - Issue: `/Users/matttaylor/Documents/_dev/amver-hub/aws_token` file missing (likely PSD config bleed)
-
-2. ⏳ **Reboot EC2 instance**
-   - Instance is currently hung (n8n crashed during YouTube upload, won't respond to SSH)
-   - AWS confirms instance is "running" but needs restart
-   - After Terraform apply, reboot to test auto-recovery feature
-
-3. ⏳ **Create PR**
-   - Branch: new feature branch with workflow + Terraform changes
-   - PR should include:
-     - n8n workflow JSON update (smart tags)
-     - infrastructure/ec2.tf update (auto-recovery)
-     - Updated README (this section)
-
-**Known Blockers:**
-- AWS credential chain issue: Terraform/AWS CLI failing with reference to `/Users/matttaylor/Documents/_dev/amver-hub/aws_token`
-- Workaround: May need to manually configure AWS credentials or fix credential helper path
-- SSH timeout: EC2 instance not responding — waiting for Terraform to enable auto-recovery, then reboot
-
-**Testing Plan (Tomorrow):**
-1. Verify Terraform apply succeeds
-2. Reboot instance via AWS Console or CLI
-3. Verify n8n comes back online
-4. Test obsidian-to-youtube-posting workflow with tag generation
-5. Verify tags section created/merged correctly in Obsidian file
+See **ROADMAP.md** for the full phased plan.
 
 ---
 
