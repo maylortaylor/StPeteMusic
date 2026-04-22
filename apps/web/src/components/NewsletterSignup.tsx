@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { AnimateIn, ParallaxOrb } from './AnimateIn';
+import { AnimateIn } from './AnimateIn';
 
 interface NewsletterSignupProps {
   variant?: 'inline' | 'section';
@@ -47,14 +47,14 @@ export function NewsletterSignup({ variant = 'section' }: NewsletterSignupProps)
           placeholder="your@email.com"
           required
           disabled={status === 'loading' || status === 'success'}
-          className="flex-1 text-text-primary placeholder-text-muted rounded-full px-6 py-3 focus:outline-none text-base disabled:opacity-50"
-          style={{ background: '#1D1942', border: '1px solid #2D2860' }}
+          className="flex-1 text-text-primary placeholder-text-muted rounded-sm px-6 py-3 focus:outline-none focus:border-brand-blue text-base disabled:opacity-50"
+          style={{ background: '#1C1C1C', border: '1px solid #488DB5' }}
         />
         <button
           type="submit"
           disabled={status === 'loading' || status === 'success'}
-          className="text-white px-6 py-3 rounded-full font-montserrat font-bold text-sm uppercase tracking-wide hover:opacity-90 transition-opacity whitespace-nowrap disabled:opacity-50"
-          style={{ background: 'linear-gradient(90deg, #E7A4E7, #483E8E)' }}
+          className="text-white px-6 py-3 rounded-sm font-montserrat font-bold text-sm uppercase tracking-wide hover:opacity-90 transition-opacity whitespace-nowrap disabled:opacity-50"
+          style={{ background: '#d71679' }}
         >
           {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
         </button>
@@ -64,39 +64,18 @@ export function NewsletterSignup({ variant = 'section' }: NewsletterSignupProps)
 
   return (
     <section
-      style={{ background: '#13102A' }}
-      className="relative px-6 py-40 overflow-hidden"
+      className="relative px-6 py-40 overflow-hidden grain"
+      style={{ background: '#3A3A3A' }}
     >
-      <ParallaxOrb
-        className="absolute pointer-events-none"
-        speed={0.2}
-        style={{
-          width: '600px',
-          height: '600px',
-          top: '50%',
-          left: '50%',
-          marginTop: '-300px',
-          marginLeft: '-300px',
-          background: 'radial-gradient(circle, rgba(231,164,231,0.1) 0%, rgba(72,62,142,0.05) 40%, transparent 65%)',
-          borderRadius: '50%',
-        }}
-      />
-
       <div className="relative z-10 max-w-3xl mx-auto text-center">
-        <AnimateIn as="p" className="font-oswald text-text-muted text-sm tracking-[0.5em] uppercase mb-6">
+        <AnimateIn as="p" className="font-oswald text-sm tracking-[0.5em] uppercase mb-6" style={{ color: '#B57048' }}>
           Stay in the loop
         </AnimateIn>
 
         <AnimateIn delay={0.1}>
           <h2
-            className="font-montserrat font-black uppercase leading-none mb-8"
-            style={{
-              fontSize: 'clamp(3.5rem, 9vw, 8rem)',
-              background: 'linear-gradient(160deg, #FBFFFF 0%, #E7A4E7 60%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
+            className="font-montserrat font-black uppercase leading-none mb-8 text-text-primary"
+            style={{ fontSize: 'clamp(3.5rem, 9vw, 8rem)' }}
           >
             Don&apos;t Miss<br />a Show.
           </h2>
@@ -118,14 +97,14 @@ export function NewsletterSignup({ variant = 'section' }: NewsletterSignupProps)
                 placeholder="your@email.com"
                 required
                 disabled={status === 'loading'}
-                className="flex-1 text-text-primary placeholder-text-muted rounded-full px-6 py-4 focus:outline-none text-base disabled:opacity-50"
-                style={{ background: '#0D0B1E', border: '1px solid #2D2860' }}
+                className="flex-1 text-text-primary placeholder-text-muted rounded-sm px-6 py-4 focus:outline-none text-base disabled:opacity-50 transition-colors"
+                style={{ background: '#1C1C1C', border: '1px solid #488DB5' }}
               />
               <button
                 type="submit"
                 disabled={status === 'loading'}
-                className="text-white px-8 py-4 rounded-full font-montserrat font-bold text-base uppercase tracking-wide hover:opacity-90 transition-opacity whitespace-nowrap disabled:opacity-50"
-                style={{ background: 'linear-gradient(90deg, #E7A4E7, #483E8E)' }}
+                className="text-white px-8 py-4 rounded-sm font-montserrat font-bold text-base uppercase tracking-wide hover:opacity-90 transition-opacity whitespace-nowrap disabled:opacity-50"
+                style={{ background: '#d71679' }}
               >
                 {status === 'loading' ? '...' : 'Subscribe'}
               </button>

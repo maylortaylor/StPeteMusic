@@ -1,3 +1,15 @@
+# RECENT FIX
+Amplify Custom Domain — DNS Fix (stpetemusic.live)
+Problem: SSL creation was failing with [AmplifyWaitTimeout] — CNAME records not found.
+Root Cause: Cloudflare DNS for stpetemusic.live and www were pointing to an old/wrong CloudFront distribution (d6q9oiwscagw.cloudfront.net) instead of the one Amplify assigned.
+Correct DNS Records in Cloudflare (stpetemusic.live zone):
+TypeNameValueCNAME_ddf1b33c5eab2d60eddc95848a12d240_bf19e363018afabe1b2e49737993dac9.jkddzztszm.acm-validations.aws.CNAMEstpetemusic.lived11vn9njq9bzhq.cloudfront.netCNAMEwwwd11vn9njq9bzhq.cloudfront.net
+Amplify App: d1fjwgk99cbqor (stpetemusic-web)
+CloudFront Distribution: d11vn9njq9bzhq.cloudfront.net
+SSL: Amplify managed (ACM)
+DNS Provider: Cloudflare (proxy status: DNS only — must stay DNS only, not proxied, for Amplify SSL to work)
+Fix: Update the stpetemusic.live and www CNAME targets in Cloudflare to match the CloudFront URL shown in Amplify → Actions → View DNS Records.
+
 # AWS Setup — Quick Reference
 
 Current infrastructure for the StPeteMusic n8n automation server.

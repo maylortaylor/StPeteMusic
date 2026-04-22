@@ -1,23 +1,22 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export function Nav() {
   return (
     <nav
       className="sticky top-0 z-50 border-b border-border"
-      style={{ backgroundColor: 'rgba(13,11,30,0.96)' }}
+      style={{ backgroundColor: 'rgba(28,28,28,0.96)', backdropFilter: 'blur(8px)' }}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
-        <Link
-          href="/"
-          className="font-montserrat font-black text-xl tracking-[0.2em] uppercase"
-          style={{
-            background: 'linear-gradient(90deg, #E7A4E7, #AB91E8)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-          }}
-        >
-          StPeteMusic
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/images/brand/spm-logo-main.png"
+            alt="StPeteMusic"
+            width={156}
+            height={62}
+            className="object-contain"
+            style={{ height: 52, width: 'auto' }}
+          />
         </Link>
 
         <div className="hidden md:flex items-center gap-10">
@@ -31,8 +30,8 @@ export function Nav() {
           href="https://final-friday.eventbrite.com/"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-white font-montserrat font-bold text-sm uppercase tracking-wide px-5 py-2 rounded-full transition-opacity hover:opacity-85"
-          style={{ background: 'linear-gradient(90deg, #E7A4E7, #483E8E)' }}
+          className="font-montserrat font-bold text-sm uppercase tracking-wide px-5 py-2 rounded-sm transition-all hover:bg-brand-orange hover:text-white"
+          style={{ border: '1px solid #B57048', color: '#B57048' }}
         >
           Get Tickets
         </a>

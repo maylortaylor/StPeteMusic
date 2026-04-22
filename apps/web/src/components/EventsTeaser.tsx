@@ -1,9 +1,16 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import Image from 'next/image';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import Link from 'next/link';
 import { AnimateIn } from './AnimateIn';
+import focalPoints from '@/config/focal-points.json';
+
+function getFocalPosition(src: string, fallback?: string): string {
+  const fp = focalPoints[src as keyof typeof focalPoints];
+  return fp?.objectPosition ?? fallback ?? '50% 30%';
+}
 
 interface Event {
   label: string;
@@ -12,9 +19,10 @@ interface Event {
   date: string;
   venue: string;
   ticketUrl?: string;
-  accentFrom: string;
-  accentTo: string;
-  visualBg: string;
+  presenter?: { name: string; links: { label: string; href: string }[] };
+  photoSrc: string;
+  photoPosition?: string; // fallback only — prefer running detect-faces script
+  logoSrc?: string;
 }
 
 const EVENTS: Event[] = [
@@ -25,35 +33,45 @@ const EVENTS: Event[] = [
     date: 'April 25, 2026',
     venue: 'Suite E Studios · Doors 7pm',
     ticketUrl: 'https://final-friday.eventbrite.com/',
-    accentFrom: '#E7A4E7',
-    accentTo: '#AB91E8',
-    visualBg: 'linear-gradient(135deg, #1A1038 0%, #2D1A5E 50%, #1957A4 100%)',
+    photoSrc: '/images/events/final-friday/hero.jpg',
+    photoPosition: '65% bottom',
+    logoSrc: '/images/brand/ff-logo-magenta.png',
   },
   {
-    label: 'Monthly · Last Wednesday',
-    title: 'Instant Noodles.',
-    body: "St. Pete's community jam — building the band from the ground up, every last Wednesday. Free to attend. Open to all.",
-    date: 'April 29, 2026',
-    venue: 'Suite E Studios · Doors 6pm',
-    accentFrom: '#AB91E8',
-    accentTo: '#483E8E',
-    visualBg: 'linear-gradient(135deg, #0F183A 0%, #1A1840 50%, #2D2860 100%)',
+    label: 'Monthly · 4th Wednesday · Prophessor J Events',
+    title: 'Final Wednesday.',
+    body: 'Community jam night & listening lounge — live instruments, local artists, and great vibes. $5 entry includes a raffle for free studio time. Guitar, drums, bass, piano, mics, and full recording gear provided.',
+    date: 'April 23, 2026',
+    venue: 'Suite E Studios · 615 27th St S, St. Pete · 7–10pm',
+    presenter: {
+      name: 'Prophessor J Events',
+      links: [
+        { label: 'FB Community', href: 'https://www.facebook.com/groups/803946243670033' },
+        { label: 'FB Page', href: 'https://www.facebook.com/profile.php?id=100090049310435' },
+      ],
+    },
+    photoSrc: '/images/vibes/strip-10.jpg',
+    photoPosition: '15% bottom',
   },
 ];
 
 function EventRow({ event, index }: { event: Event; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [photoLoaded, setPhotoLoaded] = useState(false);
+  const [photoError, setPhotoError] = useState(false);
+
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
 
-  // Text card slides in from left/right
   const rawText = useTransform(scrollYProgress, [0, 0.4, 1], [index % 2 === 0 ? '-8%' : '8%', '0%', '0%']);
   const textX = useSpring(rawText, { stiffness: 60, damping: 22 });
 
-  // Visual panel slides in from the opposite side
   const rawVis = useTransform(scrollYProgress, [0, 0.4, 1], [index % 2 === 0 ? '8%' : '-8%', '0%', '0%']);
   const visX = useSpring(rawVis, { stiffness: 60, damping: 22 });
 
-  // Shared opacity
+  const rawPhotoY = useTransform(scrollYProgress, [0, 1], ['6%', '-6%']);
+  const photoY = useSpring(rawPhotoY, { stiffness: 50, damping: 20 });
+
+  const scale = useTransform(scrollYProgress, [0, 0.3], [0.95, 1]);
   const opacity = useTransform(scrollYProgress, [0, 0.25, 0.85, 1], [0, 1, 1, 1]);
 
   return (
@@ -61,23 +79,17 @@ function EventRow({ event, index }: { event: Event; index: number }) {
       ref={ref}
       className={`grid grid-cols-1 lg:grid-cols-2 gap-4 ${index % 2 === 0 ? '' : 'lg:[direction:rtl]'}`}
     >
-      {/* Text side */}
+      {/* Text side — container-type enables cqi units so title scales to THIS box, not viewport */}
       <motion.div
-        className="flex flex-col justify-center px-12 py-16 rounded-3xl lg:[direction:ltr]"
-        style={{ background: '#13102A', border: '1px solid #2D2860', x: textX, opacity }}
+        className="flex flex-col justify-center px-12 py-16 lg:[direction:ltr]"
+        style={{ background: '#3A3A3A', border: '1px solid #488DB5', borderRadius: '2px', x: textX, opacity, scale, containerType: 'inline-size' }}
       >
-        <p className="font-oswald text-sm tracking-[0.45em] uppercase mb-5" style={{ color: event.accentFrom }}>
+        <p className="font-oswald text-sm tracking-[0.45em] uppercase mb-5" style={{ color: '#B57048' }}>
           {event.label}
         </p>
         <h3
-          className="font-montserrat font-black uppercase leading-none mb-6"
-          style={{
-            fontSize: 'clamp(3rem, 6vw, 5.5rem)',
-            background: `linear-gradient(135deg, ${event.accentFrom}, ${event.accentTo})`,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-          }}
+          className="font-montserrat font-black uppercase leading-none mb-6 text-text-primary"
+          style={{ fontSize: 'clamp(2rem, 9cqi, 5rem)' }}
         >
           {event.title}
         </h3>
@@ -91,44 +103,94 @@ function EventRow({ event, index }: { event: Event; index: number }) {
             href={event.ticketUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="self-start text-white font-montserrat font-bold text-sm uppercase tracking-widest px-8 py-3 rounded-full hover:opacity-85 transition-opacity"
-            style={{ background: `linear-gradient(90deg, ${event.accentFrom}, ${event.accentTo})` }}
+            className="self-start text-white font-montserrat font-bold text-sm uppercase tracking-widest px-8 py-3 rounded-sm hover:opacity-85 transition-opacity"
+            style={{ background: '#B57048' }}
           >
             Get Tickets
           </a>
         ) : (
-          <span className="font-oswald text-text-muted text-base uppercase tracking-widest">Free · No tickets needed</span>
+          <span className="font-oswald text-text-muted text-base uppercase tracking-widest">$5 at the door · No reservation needed</span>
+        )}
+
+        {event.presenter && (
+          <div className="mt-6 pt-6 border-t" style={{ borderColor: 'rgba(72,141,181,0.25)' }}>
+            <p className="font-oswald text-xs tracking-[0.3em] uppercase mb-2 text-text-muted">
+              Presented by {event.presenter.name}
+            </p>
+            <div className="flex gap-4">
+              {event.presenter.links.map(link => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-open-sans text-sm text-text-muted hover:text-text-secondary transition-colors"
+                >
+                  {link.label} →
+                </a>
+              ))}
+            </div>
+          </div>
         )}
       </motion.div>
 
-      {/* Visual side */}
+      {/* Visual side — large photo dominates */}
       <motion.div
-        className="rounded-3xl min-h-[400px] lg:[direction:ltr]"
-        style={{ background: event.visualBg, border: '1px solid #2D2860', x: visX, opacity }}
-      />
+        className="min-h-[400px] lg:min-h-[560px] lg:[direction:ltr] overflow-hidden relative"
+        style={{ background: '#2A2A2A', border: '1px solid #488DB5', borderRadius: '2px', x: visX, opacity, scale }}
+      >
+        {!photoError && (
+          <motion.div className="absolute inset-0" style={{ y: photoY, scale: 1.12 }}>
+            <Image
+              src={event.photoSrc}
+              alt={event.title}
+              fill
+              className={`object-cover transition-opacity duration-700 ${photoLoaded ? 'opacity-100' : 'opacity-0'}`}
+              style={{ objectPosition: getFocalPosition(event.photoSrc, event.photoPosition) }}
+              onLoad={() => setPhotoLoaded(true)}
+              onError={() => setPhotoError(true)}
+            />
+          </motion.div>
+        )}
+
+        {/* Gradient scrim */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'linear-gradient(135deg, rgba(28,28,28,0.3) 0%, transparent 50%, rgba(28,28,28,0.5) 100%)',
+          }}
+        />
+
+        {event.logoSrc && (
+          <div className="absolute bottom-5 right-5 pointer-events-none">
+            <Image
+              src={event.logoSrc}
+              alt={event.title}
+              width={96}
+              height={96}
+              className="object-contain opacity-80"
+              style={{ width: 80, height: 'auto' }}
+            />
+          </div>
+        )}
+      </motion.div>
     </div>
   );
 }
 
 export function EventsTeaser() {
   return (
-    <section style={{ background: '#0D0B1E' }} className="px-6 py-32">
+    <section style={{ background: '#1C1C1C' }} className="px-6 py-32">
       <div className="max-w-7xl mx-auto">
 
         <div className="mb-20">
-          <AnimateIn as="p" className="font-oswald text-text-muted text-sm tracking-[0.5em] uppercase mb-4">
+          <AnimateIn as="p" className="font-oswald text-sm tracking-[0.5em] uppercase mb-4" style={{ color: '#B57048' }}>
             Upcoming
           </AnimateIn>
           <AnimateIn delay={0.1}>
             <h2
-              className="font-montserrat font-black uppercase leading-none"
-              style={{
-                fontSize: 'clamp(3rem, 8vw, 7rem)',
-                background: 'linear-gradient(90deg, #FBFFFF, #AB91E8)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
+              className="font-montserrat font-black uppercase leading-none text-text-primary"
+              style={{ fontSize: 'clamp(3rem, 8vw, 7rem)' }}
             >
               Shows &amp; Events
             </h2>
