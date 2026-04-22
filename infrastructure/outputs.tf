@@ -42,3 +42,23 @@ output "amplify_staging_url" {
   description = "Staging URL on Amplify (develop branch)"
   value       = "https://develop.${aws_amplify_app.web.default_domain}"
 }
+
+output "linktree_api_url" {
+  description = "Base URL for the Linktree API — use this in WordPress and Next.js fetch calls"
+  value       = aws_apigatewayv2_api.linktree.api_endpoint
+}
+
+output "linktree_api_all_profiles" {
+  description = "Full URL to fetch all Linktree profiles"
+  value       = "${aws_apigatewayv2_api.linktree.api_endpoint}/linktree"
+}
+
+output "linktree_api_stpetemusic" {
+  description = "Full URL to fetch the stpetemusic profile"
+  value       = "${aws_apigatewayv2_api.linktree.api_endpoint}/linktree/stpetemusic"
+}
+
+output "linktree_api_suite_e_studios" {
+  description = "Full URL to fetch the suite_e_studios profile"
+  value       = "${aws_apigatewayv2_api.linktree.api_endpoint}/linktree/suite_e_studios"
+}

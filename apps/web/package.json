@@ -9,7 +9,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "detect-faces": "node scripts/detect-faces.mjs"
   },
   "dependencies": {
     "@stpetemusic/types": "*",
@@ -19,6 +20,7 @@
     "react-dom": "^18.3.0"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.90.0",
     "@testing-library/jest-dom": "^6.4.0",
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.0",

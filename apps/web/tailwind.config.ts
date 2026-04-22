@@ -9,26 +9,18 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: '#0D0B1E',
-        surface: '#13102A',
-        'surface-raised': '#1D1942',
-        border: '#2D2860',
-        'border-bright': '#483E8E',
-        'text-primary': '#FBFFFF',
-        'text-secondary': '#AB91E8',
-        'text-muted': '#6B5C99',
+        background: '#1C1C1C',
+        surface: '#545454',
+        'surface-raised': '#3A3A3A',
+        border: '#488DB5',
+        'border-bright': '#B57048',
+        'text-primary': '#FFFFFF',
+        'text-secondary': '#CCCCCC',
+        'text-muted': '#888888',
         brand: {
-          lavender: '#E7A4E7',
-          blue: '#1957A4',
-          purple: '#483E8E',
-          soft: '#AB91E8',
-          white: '#FBFFFF',
-          // aliases so existing classes don't break
-          azure: '#AB91E8',
-          magenta: '#E7A4E7',
-          salmon: '#E7A4E7',
-          pink: '#E7A4E7',
-          cyan: '#AB91E8',
+          orange: '#B57048',
+          blue: '#488DB5',
+          magenta: '#d71679',
         },
       },
       fontFamily: {

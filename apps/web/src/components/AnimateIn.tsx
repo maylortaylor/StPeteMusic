@@ -6,7 +6,7 @@ import {
   useTransform,
   useSpring,
   type Variants,
-  type MotionValue,  // used in useScrollFade return type
+  type MotionValue,
 } from 'framer-motion';
 import { useRef, type ReactNode } from 'react';
 
@@ -104,4 +104,27 @@ export function useScrollFade(speed = 0.6): {
   const rawOrb = useTransform(scrollYProgress, [0, 1], [0, 220]);
   const orbY = useSpring(rawOrb, { stiffness: 35, damping: 15 });
   return { ref, opacity, contentY, orbY };
+}
+
+/* ─── Pinned-section scroll progress ─── */
+// Attach outerRef to a tall section (e.g. height: 250vh).
+// Inner container should be sticky + h-screen.
+// Returns 0→1 progress across the full scroll travel.
+export function useScrollPinned(ref: React.RefObject<HTMLElement | null>): {
+  scrollYProgress: MotionValue<number>;
+} {
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
+  return { scrollYProgress };
+}
+
+/* ─── Consistent depth-layer parallax ─── */
+// Maps scrollYProgress [0→1] to a Y pixel offset with spring smoothing.
+// outputRange: [startPx, endPx] — e.g. [40, -40] moves up 80px over the scroll range.
+export function useParallaxLayer(
+  scrollYProgress: MotionValue<number>,
+  outputRange: [number, number],
+  inputRange: [number, number] = [0, 1],
+): MotionValue<number> {
+  const raw = useTransform(scrollYProgress, inputRange, outputRange);
+  return useSpring(raw, { stiffness: 45, damping: 18 });
 }

@@ -1,0 +1,130 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "settings": {
+    "appearanceTools": true,
+    "useRootPaddingAwareAlignments": true,
+    "layout": {
+      "contentSize": "1280px",
+      "wideSize": "100%"
+    },
+    "color": {
+      "defaultPalette": false,
+      "palette": [
+        { "slug": "suite-black",   "color": "#000000", "name": "Suite Black"   },
+        { "slug": "suite-white",   "color": "#FFFFFF", "name": "Suite White"   },
+        { "slug": "suite-grey",    "color": "#545454", "name": "Suite Grey"    },
+        { "slug": "burnt-orange",  "color": "#B57048", "name": "Burnt Orange"  },
+        { "slug": "suite-orange",  "color": "#FF8C00", "name": "Suite Orange"  },
+        { "slug": "nature-blue",   "color": "#488DB5", "name": "Nature Blue"   },
+        { "slug": "neutral",       "color": "#F5F0EB", "name": "Neutral Cream" }
+      ],
+      "gradients": [
+        {
+          "slug": "orange-to-yellow",
+          "gradient": "linear-gradient(to right, #FF8C00, #EAB308)",
+          "name": "Orange to Yellow"
+        },
+        {
+          "slug": "orange-to-yellow-diagonal",
+          "gradient": "linear-gradient(to bottom right, #FF8C00, #EAB308)",
+          "name": "Orange to Yellow (Diagonal)"
+        }
+      ]
+    },
+    "typography": {
+      "defaultFontSizes": false,
+      "fontFamilies": [
+        {
+          "fontFamily": "Inter, system-ui, -apple-system, sans-serif",
+          "slug": "inter",
+          "name": "Inter"
+        }
+      ],
+      "fontSizes": [
+        { "slug": "xs",   "size": "0.75rem",  "name": "Extra Small" },
+        { "slug": "sm",   "size": "0.875rem", "name": "Small"       },
+        { "slug": "base", "size": "1rem",     "name": "Base"        },
+        { "slug": "lg",   "size": "1.125rem", "name": "Large"       },
+        { "slug": "xl",   "size": "1.25rem",  "name": "X-Large"     },
+        { "slug": "2xl",  "size": "1.5rem",   "name": "2X-Large"    },
+        { "slug": "3xl",  "size": "1.875rem", "name": "3X-Large"    },
+        { "slug": "4xl",  "size": "2.25rem",  "name": "4X-Large"    },
+        { "slug": "5xl",  "size": "3rem",     "name": "5X-Large"    },
+        { "slug": "6xl",  "size": "3.75rem",  "name": "6X-Large"    }
+      ]
+    },
+    "spacing": {
+      "units": ["px", "em", "rem", "%", "vw"],
+      "spacingSizes": [
+        { "slug": "4",  "size": "1rem",   "name": "Small"        },
+        { "slug": "6",  "size": "1.5rem", "name": "Medium"       },
+        { "slug": "8",  "size": "2rem",   "name": "Large"        },
+        { "slug": "12", "size": "3rem",   "name": "X-Large"      },
+        { "slug": "16", "size": "4rem",   "name": "Section"      },
+        { "slug": "24", "size": "6rem",   "name": "Section Wide" }
+      ]
+    },
+    "blocks": {
+      "core/image": {
+        "lightbox": { "enabled": false }
+      },
+      "core/gallery": {
+        "lightbox": { "enabled": false }
+      }
+    }
+  },
+  "styles": {
+    "color": {
+      "background": "#FFFFFF",
+      "text": "#000000"
+    },
+    "typography": {
+      "fontFamily": "var(--wp--preset--font-family--inter)",
+      "fontSize": "var(--wp--preset--font-size--base)",
+      "lineHeight": "1.6",
+      "fontSmoothing": "antialiased"
+    },
+    "spacing": {
+      "blockGap": "0"
+    },
+    "blocks": {
+      "core/heading": {
+        "typography": {
+          "fontFamily": "var(--wp--preset--font-family--inter)",
+          "fontWeight": "900"
+        }
+      },
+      "core/paragraph": {
+        "typography": {
+          "fontFamily": "var(--wp--preset--font-family--inter)"
+        }
+      },
+      "core/button": {
+        "typography": {
+          "fontFamily": "var(--wp--preset--font-family--inter)",
+          "fontWeight": "700",
+          "fontSize": "var(--wp--preset--font-size--sm)"
+        },
+        "border": {
+          "radius": "0"
+        },
+        "spacing": {
+          "padding": {
+            "top": "0.75rem",
+            "bottom": "0.75rem",
+            "left": "2rem",
+            "right": "2rem"
+          }
+        }
+      }
+    }
+  },
+  "templateParts": [
+    { "name": "header", "title": "Header", "area": "header" },
+    { "name": "footer", "title": "Footer", "area": "footer" }
+  ],
+  "customTemplates": [
+    { "name": "front-page", "title": "Front Page", "postTypes": ["page"] }
+  ]
+}
