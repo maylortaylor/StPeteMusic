@@ -8,6 +8,8 @@ import { LightboxImage } from './LightboxImage';
 import { AnimateIn } from './AnimateIn';
 import focalPoints from '@/config/focal-points.json';
 
+const SCROLL_AMOUNT = 420;
+
 function getFocalPosition(src: string): string {
   const fp = focalPoints[src as keyof typeof focalPoints];
   return fp?.objectPosition ?? '50% 30%';
@@ -91,6 +93,7 @@ function StripCard({
 
 export function PhotoStrip() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
@@ -99,25 +102,46 @@ export function PhotoStrip() {
     offset: ['start end', 'end start'],
   });
 
-  const rawX = useTransform(scrollYProgress, [0, 1], ['8%', '-72%']);
-  const x = useSpring(rawX, { stiffness: 38, damping: 20 });
-
   const slides = STRIP_PHOTOS.map(photo => ({ src: photo.src, alt: photo.caption }));
+
+  function scroll(dir: 'left' | 'right') {
+    scrollRef.current?.scrollBy({ left: dir === 'right' ? SCROLL_AMOUNT : -SCROLL_AMOUNT, behavior: 'smooth' });
+  }
 
   return (
     <section
       ref={sectionRef}
       className="relative overflow-hidden py-16 bg-white"
     >
-      <div className="max-w-7xl mx-auto px-6 mb-10">
-        <AnimateIn as="p" className="font-inter font-medium text-sm tracking-[0.5em] uppercase" style={{ color: '#B57048' }}>
-          The Scene
-        </AnimateIn>
-        <span className="section-underline" />
+      <div className="max-w-7xl mx-auto px-6 mb-10 flex items-end justify-between">
+        <div>
+          <AnimateIn as="p" className="font-inter font-medium text-sm tracking-[0.5em] uppercase" style={{ color: '#B57048' }}>
+            The Scene
+          </AnimateIn>
+          <span className="section-underline" />
+        </div>
+
+        <div className="flex gap-2">
+          {(['left', 'right'] as const).map(dir => (
+            <motion.button
+              key={dir}
+              onClick={() => scroll(dir)}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-9 h-9 flex items-center justify-center border transition-colors duration-200"
+              style={{ borderColor: '#E5E5E5', color: '#B57048' }}
+              onMouseEnter={e => (e.currentTarget.style.borderColor = '#B57048')}
+              onMouseLeave={e => (e.currentTarget.style.borderColor = '#E5E5E5')}
+              aria-label={`Scroll ${dir}`}
+            >
+              {dir === 'left' ? '←' : '→'}
+            </motion.button>
+          ))}
+        </div>
       </div>
 
-      <div className="overflow-hidden">
-        <motion.div className="flex gap-3 pl-6 md:pl-16 pb-4" style={{ x }}>
+      <div ref={scrollRef} className="overflow-x-auto scrollbar-hide">
+        <div className="flex gap-3 pl-6 md:pl-16 pb-4">
           {STRIP_PHOTOS.map((photo, i) => (
             <StripCard
               key={photo.caption}
@@ -130,7 +154,7 @@ export function PhotoStrip() {
               }}
             />
           ))}
-        </motion.div>
+        </div>
       </div>
 
       <Lightbox

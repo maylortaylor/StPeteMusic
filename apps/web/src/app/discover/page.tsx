@@ -36,10 +36,10 @@ export default function DiscoverPage() {
                 key={artist.name}
                 className="bg-surface border border-border rounded-xl p-6 hover:border-brand-azure transition-colors"
               >
-                <p className="text-brand-salmon font-oswald text-xs uppercase tracking-widest mb-2">
+                <p className="font-inter font-medium text-xs uppercase tracking-widest mb-2" style={{ color: '#FF8C00' }}>
                   {artist.type}
                 </p>
-                <h3 className="font-oswald font-semibold text-lg text-white mb-1">
+                <h3 className="font-inter font-bold text-lg text-black mb-1">
                   {artist.name}
                 </h3>
                 <a
