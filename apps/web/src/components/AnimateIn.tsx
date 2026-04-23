@@ -46,7 +46,7 @@ export function AnimateIn({ children, delay = 0, className, style, as = 'div' }:
       className={className}
       style={style}
     >
-      {children}
+      {children as React.ReactNode}
     </Tag>
   );
 }
@@ -67,7 +67,7 @@ export function ParallaxLayer({ children, className, style, speed = -0.3 }: Para
 
   return (
     <motion.div ref={ref} className={className} style={{ ...style, y: smoothY }} aria-hidden="true">
-      {children}
+      {children as React.ReactNode}
     </motion.div>
   );
 }

@@ -1,14 +1,58 @@
-# RECENT FIX
-Amplify Custom Domain — DNS Fix (stpetemusic.live)
-Problem: SSL creation was failing with [AmplifyWaitTimeout] — CNAME records not found.
-Root Cause: Cloudflare DNS for stpetemusic.live and www were pointing to an old/wrong CloudFront distribution (d6q9oiwscagw.cloudfront.net) instead of the one Amplify assigned.
-Correct DNS Records in Cloudflare (stpetemusic.live zone):
-TypeNameValueCNAME_ddf1b33c5eab2d60eddc95848a12d240_bf19e363018afabe1b2e49737993dac9.jkddzztszm.acm-validations.aws.CNAMEstpetemusic.lived11vn9njq9bzhq.cloudfront.netCNAMEwwwd11vn9njq9bzhq.cloudfront.net
-Amplify App: d1fjwgk99cbqor (stpetemusic-web)
-CloudFront Distribution: d11vn9njq9bzhq.cloudfront.net
-SSL: Amplify managed (ACM)
-DNS Provider: Cloudflare (proxy status: DNS only — must stay DNS only, not proxied, for Amplify SSL to work)
-Fix: Update the stpetemusic.live and www CNAME targets in Cloudflare to match the CloudFront URL shown in Amplify → Actions → View DNS Records.
+## Amplify Custom Domain — Troubleshooting Notes (stpetemusic.live)
+
+### Problem Summary
+SSL creation/configuration kept failing when adding `stpetemusic.live` as a custom domain in AWS Amplify.
+
+### Root Causes Identified
+
+**1. Wrong CloudFront distribution in Cloudflare DNS**
+Every time you delete and re-add the domain in Amplify, AWS creates a **new** CloudFront distribution with a different URL. The `www` CNAME in Cloudflare must be updated each time to the new URL shown in **Amplify → Actions → View DNS Records**.
+
+**2. Cloudflare CNAME flattening at root domain**
+Cloudflare silently converts CNAME records at the root/apex domain (`stpetemusic.live`) into A records (CNAME Flattening). AWS ACM cannot validate against a flattened A record, causing SSL configuration to hang for hours then timeout.
+- **Fix:** Use `www` as the only active subdomain in Amplify. Enable the "Setup redirect from stpetemusic.live to www.stpetemusic.live" checkbox. Click "Exclude root" to remove the root as an active subdomain.
+
+**3. Stale CloudFront alias lock**
+When Amplify deletes a domain, the underlying CloudFront distribution takes **5–15 minutes** to fully release the `www.stpetemusic.live` alias. Re-adding the domain immediately causes a new error: "DNS record points to another CloudFront distribution."
+- **Fix:** After deleting the domain in Amplify, wait at least 10 minutes before re-adding it.
+
+### Correct Cloudflare DNS Records
+
+| Type | Name | Content | Proxy Status |
+|---|---|---|---|
+| CNAME | `_ddf1b33c5eab2d60eddc95848a12d240` | `_bf19e363018afabe1b2e49737993dac9.jkddzztszm.acm-validations.aws.` | DNS only |
+| CNAME | `www` | `<CloudFront URL from Amplify View DNS Records>` | DNS only ✅ |
+
+> ⚠️ Do NOT add a CNAME for the root `stpetemusic.live` — Cloudflare will flatten it and break SSL validation.
+> ⚠️ Do NOT enable Cloudflare proxy (orange cloud) — Amplify's CloudFront handles CDN/SSL.
+
+### Correct Amplify Domain Configuration
+
+- Domain: `stpetemusic.live`
+- Active subdomains: `www → main` only (root excluded)
+- Redirect: `https://stpetemusic.live → https://www.stpetemusic.live` ✅ checked
+- SSL: Amplify managed certificate
+
+### Step-by-Step Fix Process
+
+1. In Amplify → Custom Domains → **Delete** the existing `stpetemusic.live` domain
+2. **Wait 10+ minutes** for AWS to release the CloudFront alias lock
+3. In Cloudflare → DNS → delete the `stpetemusic.live` root CNAME (keep `www` and ACM verification CNAME)
+4. In Amplify → Add domain → type `stpetemusic.live` → Configure domain
+5. Click **"Exclude root"** to remove root from active subdomains
+6. Ensure `www → main` is set and redirect checkbox is checked
+7. Click **Add domain**
+8. Immediately go to **Actions → View DNS Records** — copy the new CloudFront URL (e.g. `dXXXXXXXXXX.cloudfront.net`)
+9. In Cloudflare → update `www` CNAME to the new CloudFront URL
+10. Wait 5–15 minutes for SSL creation and configuration to complete
+
+### Amplify App Details
+
+| Resource | Value |
+|---|---|
+| Amplify App ID | `d1fjwgk99cbqor` |
+| App Name | stpetemusic-web |
+| Default Domain | `d1fjwgk99cbqor.amplifyapp.com` |
 
 # AWS Setup — Quick Reference
 

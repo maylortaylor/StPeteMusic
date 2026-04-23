@@ -1,11 +1,23 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Montserrat, Oswald, Open_Sans } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({
+const montserrat = Montserrat({
   subsets: ['latin'],
-  weight: ['400', '500', '700', '900'],
-  variable: '--font-inter',
+  weight: ['400', '600', '700', '800', '900'],
+  variable: '--font-montserrat',
+});
+
+const oswald = Oswald({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-oswald',
+});
+
+const openSans = Open_Sans({
+  subsets: ['latin'],
+  weight: ['400', '600'],
+  variable: '--font-open-sans',
 });
 
 export const metadata: Metadata = {
@@ -33,8 +45,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="bg-background text-text-primary font-inter antialiased">
+    <html
+      lang="en"
+      className={`${montserrat.variable} ${oswald.variable} ${openSans.variable}`}
+    >
+      <body className="bg-background text-white font-open-sans antialiased">
         {children}
       </body>
     </html>
