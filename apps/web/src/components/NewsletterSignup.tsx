@@ -47,14 +47,12 @@ export function NewsletterSignup({ variant = 'section' }: NewsletterSignupProps)
           placeholder="your@email.com"
           required
           disabled={status === 'loading' || status === 'success'}
-          className="flex-1 text-text-primary placeholder-text-muted rounded-sm px-6 py-3 focus:outline-none focus:border-brand-blue text-base disabled:opacity-50"
-          style={{ background: '#1C1C1C', border: '1px solid #488DB5' }}
+          className="flex-1 text-white placeholder-text-muted bg-white/10 border border-white/30 px-6 py-3 focus:outline-none focus:border-brand-orange text-base disabled:opacity-50"
         />
         <button
           type="submit"
           disabled={status === 'loading' || status === 'success'}
-          className="text-white px-6 py-3 rounded-sm font-montserrat font-bold text-sm uppercase tracking-wide hover:opacity-90 transition-opacity whitespace-nowrap disabled:opacity-50"
-          style={{ background: '#d71679' }}
+          className="text-white px-6 py-3 font-inter font-bold text-sm uppercase tracking-wide hover:opacity-90 transition-opacity whitespace-nowrap disabled:opacity-50 bg-brand-orange"
         >
           {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
         </button>
@@ -63,31 +61,29 @@ export function NewsletterSignup({ variant = 'section' }: NewsletterSignupProps)
   }
 
   return (
-    <section
-      className="relative px-6 py-40 overflow-hidden grain"
-      style={{ background: '#3A3A3A' }}
-    >
+    <section className="relative px-6 py-40 overflow-hidden bg-black">
       <div className="relative z-10 max-w-3xl mx-auto text-center">
-        <AnimateIn as="p" className="font-oswald text-sm tracking-[0.5em] uppercase mb-6" style={{ color: '#B57048' }}>
+        <AnimateIn as="p" className="font-inter font-medium text-sm tracking-[0.5em] uppercase mb-6" style={{ color: '#FF8C00' }}>
           Stay in the loop
         </AnimateIn>
 
         <AnimateIn delay={0.1}>
           <h2
-            className="font-montserrat font-black uppercase leading-none mb-8 text-text-primary"
+            className="font-inter font-black uppercase leading-none mb-3 text-white"
             style={{ fontSize: 'clamp(3.5rem, 9vw, 8rem)' }}
           >
             Don&apos;t Miss<br />a Show.
           </h2>
+          <span className="section-underline mx-auto mb-8" style={{ display: 'block' }} />
         </AnimateIn>
 
-        <AnimateIn delay={0.2} as="p" className="font-open-sans text-text-secondary text-xl mb-12 max-w-md mx-auto leading-relaxed">
+        <AnimateIn delay={0.2} as="p" className="font-inter text-white/70 text-xl mb-12 max-w-md mx-auto leading-relaxed">
           Monthly roundup of Final Friday lineups, new artists, and what&apos;s happening in St. Pete.
         </AnimateIn>
 
         <AnimateIn delay={0.3}>
           {status === 'success' ? (
-            <p className="text-text-secondary font-open-sans text-xl">{message}</p>
+            <p className="text-white/80 font-inter text-xl">{message}</p>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
               <input
@@ -97,14 +93,12 @@ export function NewsletterSignup({ variant = 'section' }: NewsletterSignupProps)
                 placeholder="your@email.com"
                 required
                 disabled={status === 'loading'}
-                className="flex-1 text-text-primary placeholder-text-muted rounded-sm px-6 py-4 focus:outline-none text-base disabled:opacity-50 transition-colors"
-                style={{ background: '#1C1C1C', border: '1px solid #488DB5' }}
+                className="flex-1 text-white placeholder-white/40 bg-white/10 border border-white/20 px-6 py-4 focus:outline-none focus:border-brand-orange text-base disabled:opacity-50 transition-colors"
               />
               <button
                 type="submit"
                 disabled={status === 'loading'}
-                className="text-white px-8 py-4 rounded-sm font-montserrat font-bold text-base uppercase tracking-wide hover:opacity-90 transition-opacity whitespace-nowrap disabled:opacity-50"
-                style={{ background: '#d71679' }}
+                className="text-white px-8 py-4 font-inter font-bold text-base uppercase tracking-wide hover:opacity-90 transition-opacity whitespace-nowrap disabled:opacity-50 bg-brand-orange"
               >
                 {status === 'loading' ? '...' : 'Subscribe'}
               </button>
@@ -113,7 +107,7 @@ export function NewsletterSignup({ variant = 'section' }: NewsletterSignupProps)
         </AnimateIn>
 
         {status === 'error' && <p className="text-red-400 text-base mt-4">{message}</p>}
-        <AnimateIn delay={0.4} as="p" className="font-open-sans text-text-muted text-base mt-6">
+        <AnimateIn delay={0.4} as="p" className="font-inter text-white/40 text-base mt-6">
           No spam. Unsubscribe anytime.
         </AnimateIn>
       </div>
