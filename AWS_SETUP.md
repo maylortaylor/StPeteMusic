@@ -1,14 +1,43 @@
-# RECENT FIX
-Amplify Custom Domain — DNS Fix (stpetemusic.live)
-Problem: SSL creation was failing with [AmplifyWaitTimeout] — CNAME records not found.
-Root Cause: Cloudflare DNS for stpetemusic.live and www were pointing to an old/wrong CloudFront distribution (d6q9oiwscagw.cloudfront.net) instead of the one Amplify assigned.
-Correct DNS Records in Cloudflare (stpetemusic.live zone):
-TypeNameValueCNAME_ddf1b33c5eab2d60eddc95848a12d240_bf19e363018afabe1b2e49737993dac9.jkddzztszm.acm-validations.aws.CNAMEstpetemusic.lived11vn9njq9bzhq.cloudfront.netCNAMEwwwd11vn9njq9bzhq.cloudfront.net
-Amplify App: d1fjwgk99cbqor (stpetemusic-web)
-CloudFront Distribution: d11vn9njq9bzhq.cloudfront.net
-SSL: Amplify managed (ACM)
-DNS Provider: Cloudflare (proxy status: DNS only — must stay DNS only, not proxied, for Amplify SSL to work)
-Fix: Update the stpetemusic.live and www CNAME targets in Cloudflare to match the CloudFront URL shown in Amplify → Actions → View DNS Records.
+# Web App — Amplify + Cloudflare DNS
+
+## Current State
+
+| Item | Value |
+|---|---|
+| **Amplify App ID** | `d1fjwgk99cbqor` |
+| **CloudFront Distribution** | `d35nc2e8nr92q9.cloudfront.net` |
+| **Domain** | `stpetemusic.live` |
+| **DNS Provider** | Cloudflare (Route 53 hosted zone deleted — no longer in use) |
+| **Amplify Domain Status** | Check with command below |
+
+## Cloudflare DNS Records
+
+All 3 records must be **DNS only (grey cloud — NOT proxied)** for Amplify SSL to work.
+
+| Type | Name | Target |
+|---|---|---|
+| CNAME | `_ddf1b33c5eab2d60eddc95848a12d240` | `_bf19e363018afabe1b2e49737993dac9.jkddzztszm.acm-validations.aws.` |
+| CNAME | `www` | `d35nc2e8nr92q9.cloudfront.net` |
+| CNAME | `@` (apex) | `d35nc2e8nr92q9.cloudfront.net` |
+
+Add at: dash.cloudflare.com → stpetemusic.live → DNS → Records
+
+> ⚠️ Do NOT enable Cloudflare proxy (orange cloud) — Amplify ACM SSL validation requires direct DNS resolution.
+
+## Check Domain Status
+
+```bash
+cd /Users/matt.taylor/Documents/_dev/maylortaylor/StPeteMusic
+unset AWS_WEB_IDENTITY_TOKEN_FILE; AWS_PROFILE=personal aws amplify get-domain-association \
+  --app-id d1fjwgk99cbqor \
+  --domain-name stpetemusic.live \
+  --region us-east-1 \
+  --query 'domainAssociation.{status: domainStatus, verified: subDomains[*].verified}'
+```
+
+You're looking for `"status": "AVAILABLE"`.
+
+---
 
 # AWS Setup — Quick Reference
 

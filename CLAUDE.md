@@ -73,11 +73,26 @@ Always include:
 |---|---|
 | **Hosting** | AWS Amplify (SSR mode — `WEB_COMPUTE`, required for API routes) |
 | **Build spec** | `amplify.yml` at repo root |
-| **Production URL** | https://www.stpetemusic.live (after DNS setup) |
-| **Amplify default (prod)** | https://main.d1fbansqjv3e63.amplifyapp.com |
-| **Staging URL** | https://develop.d1fbansqjv3e63.amplifyapp.com |
-| **Amplify app ID** | `d1fbansqjv3e63` (also set as `AMPLIFY_APP_ID` GitHub Secret) |
+| **Production URL** | https://www.stpetemusic.live |
+| **Amplify default (prod)** | https://main.d1fjwgk99cbqor.amplifyapp.com |
+| **Staging URL** | https://develop.d1fjwgk99cbqor.amplifyapp.com |
+| **Amplify app ID** | `d1fjwgk99cbqor` (also set as `AMPLIFY_APP_ID` GitHub Secret) |
 | **Secrets in Amplify console** | `LISTMONK_USERNAME`, `LISTMONK_PASSWORD` (per branch, not in Terraform) |
+
+### DNS (Cloudflare)
+
+Route 53 hosted zone deleted — Cloudflare is the sole DNS provider.
+CloudFront distribution: `d35nc2e8nr92q9.cloudfront.net`
+
+All 3 records must be **DNS only (grey cloud — NOT proxied)**:
+
+| Type | Name | Target |
+|---|---|---|
+| CNAME | `_ddf1b33c5eab2d60eddc95848a12d240` | `_bf19e363018afabe1b2e49737993dac9.jkddzztszm.acm-validations.aws.` |
+| CNAME | `www` | `d35nc2e8nr92q9.cloudfront.net` |
+| CNAME | `@` (apex) | `d35nc2e8nr92q9.cloudfront.net` |
+
+> ⚠️ Cloudflare proxy (orange cloud) must stay OFF — Amplify ACM SSL requires direct DNS resolution.
 
 ### Branch Workflow
 
