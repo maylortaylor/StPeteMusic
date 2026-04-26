@@ -1,16 +1,31 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-background: #FFFFFF;
+  --color-surface: #F5F0EB;
+  --color-surface-raised: #F0EBE3;
+  --color-surface-dark: #000000;
+  --color-border: #E5E5E5;
+  --color-border-bright: #B57048;
+  --color-text-primary: #000000;
+  --color-text-secondary: #545454;
+  --color-text-muted: #888888;
+  --color-brand-orange: #FF8C00;
+  --color-brand-burnt: #B57048;
+  --color-brand-blue: #488DB5;
+  --color-brand-yellow: #EAB308;
+  --font-inter: var(--font-inter), system-ui, sans-serif;
+}
 
 @layer base {
   html {
-    background-color: #1C1C1C;
-    color: #FFFFFF;
+    background-color: #FFFFFF;
+    color: #000000;
     scroll-behavior: smooth;
   }
 
   body {
-    background-color: #1C1C1C;
+    background-color: #FFFFFF;
   }
 
   * {
@@ -19,60 +34,41 @@
 }
 
 @layer utilities {
-  .glow-orange {
-    box-shadow: 0 0 28px rgba(181, 112, 72, 0.5);
-  }
-
-  .glow-blue {
-    box-shadow: 0 0 28px rgba(72, 141, 181, 0.5);
-  }
-
-  .glow-magenta {
-    box-shadow: 0 0 28px rgba(215, 22, 121, 0.5);
-  }
-
   .text-balance { text-wrap: balance; }
 
-  .text-gradient-spm {
-    background: linear-gradient(90deg, #B57048 0%, #d71679 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  /* Orange-to-yellow gradient — nav, hero accent, footer */
+  .bg-gradient-orange {
+    background: linear-gradient(to right, #FF8C00, #EAB308);
   }
 
-  /* Grain/noise texture overlay — gritty warehouse aesthetic */
-  .grain::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-    opacity: 0.045;
-    pointer-events: none;
-    mix-blend-mode: overlay;
+  /* Burnt orange underline accent shown under section headings */
+  .section-underline {
+    display: block;
+    width: 4rem;
+    height: 4px;
+    background-color: #B57048;
+    margin-top: 0.75rem;
+    margin-bottom: 0;
   }
 
-  /* ─── Photo card utilities ─── */
-
-  /* Standard dark scrim for photo legibility — bottom-weighted */
+  /* Photo overlay for image legibility on dark sections */
   .photo-overlay {
     @apply absolute inset-0 pointer-events-none;
-    background: linear-gradient(to top, rgba(28,28,28,0.9) 0%, rgba(28,28,28,0.3) 45%, transparent 100%);
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 50%, transparent 100%);
   }
 
-  /* Wrapper for any image card needing overflow clipping + border */
+  /* Image card wrapper */
   .photo-card {
-    @apply relative overflow-hidden rounded-3xl;
-    border: 1px solid #488DB5;
+    @apply relative overflow-hidden;
+    border: 1px solid #E5E5E5;
   }
 
-  /* Subtle noise grain over photo sections */
-  .photo-noise::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-    opacity: 0.035;
-    pointer-events: none;
-    mix-blend-mode: overlay;
+  /* Hide scrollbar while keeping scroll functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }

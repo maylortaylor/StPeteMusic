@@ -5,10 +5,10 @@ import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { AnimateIn } from './AnimateIn';
 
 const ARTISTS = [
-  { artist: 'Movie Props',    date: 'Feb 7, 2026',  accent: '#B57048' },
-  { artist: 'Viorica',        date: 'Feb 7, 2026',  accent: '#488DB5' },
-  { artist: 'Aliqua',         date: 'Feb 7, 2026',  accent: '#d71679' },
-  { artist: 'Physical Plant', date: 'Jan 30, 2026', accent: '#B57048' },
+  { artist: 'Movie Props',    date: 'Feb 7, 2026',  accent: '#B57048', youtubeUrl: 'https://www.youtube.com/live/T_bzHYN_PE4?si=gntKfGPM1Y3Js4n8&t=1323' },
+  { artist: 'Viorica',        date: 'Feb 7, 2026',  accent: '#488DB5', youtubeUrl: 'https://www.youtube.com/live/T_bzHYN_PE4?si=PsMFMgo3uTvxvO_8&t=7372' },
+  { artist: 'Aliqua',         date: 'Feb 7, 2026',  accent: '#FF8C00', youtubeUrl: 'https://www.youtube.com/live/T_bzHYN_PE4?si=MK_PmsUF7eJtSrdj&t=3839' },
+  { artist: 'Physical Plant', date: 'Jan 30, 2026', accent: '#B57048', youtubeUrl: 'https://youtu.be/TelVx8eCEBk?si=od7jCVzwYS6nJYVj' },
 ];
 
 const PLAYLIST_ID = 'PL5gTeopOibQREpXSSqHwVaZTWv1EdUuki';
@@ -25,7 +25,7 @@ function ParallaxEmbed() {
     <motion.div
       ref={ref}
       className="overflow-hidden aspect-video mb-6"
-      style={{ border: '1px solid #488DB5', borderRadius: '2px', y, opacity, scale }}
+      style={{ border: '1px solid #E5E5E5', y, opacity, scale }}
     >
       <iframe
         src={`https://www.youtube.com/embed/videoseries?list=${PLAYLIST_ID}&autoplay=0`}
@@ -40,20 +40,21 @@ function ParallaxEmbed() {
 
 export function YouTubeGrid() {
   return (
-    <section className="px-6 py-32 grain" style={{ background: '#3A3A3A' }}>
+    <section className="px-6 py-32 bg-surface">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14">
           <div>
-            <AnimateIn as="p" className="font-oswald text-sm tracking-[0.5em] uppercase mb-5" style={{ color: '#B57048' }}>
+            <AnimateIn as="p" className="font-inter font-medium text-sm tracking-[0.5em] uppercase mb-5" style={{ color: '#B57048' }}>
               Latest from the scene
             </AnimateIn>
             <AnimateIn delay={0.1}>
               <h2
-                className="font-montserrat font-black uppercase leading-none text-text-primary"
+                className="font-inter font-black uppercase leading-none text-black"
                 style={{ fontSize: 'clamp(3rem, 8vw, 7rem)' }}
               >
                 Live at Suite E
               </h2>
+              <span className="section-underline" />
             </AnimateIn>
           </div>
           <AnimateIn delay={0.2}>
@@ -61,7 +62,7 @@ export function YouTubeGrid() {
               href="https://youtube.com/@StPeteMusic"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-oswald text-text-muted hover:text-text-secondary text-base tracking-[0.3em] uppercase transition-colors shrink-0"
+              className="font-inter font-medium text-text-muted hover:text-text-secondary text-base tracking-[0.3em] uppercase transition-colors shrink-0"
             >
               All Videos →
             </a>
@@ -72,16 +73,23 @@ export function YouTubeGrid() {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {ARTISTS.map((v, i) => (
-            <AnimateIn
+            <a
               key={v.artist}
-              delay={i * 0.1}
-              className="overflow-hidden p-6 transition-all duration-300 hover:-translate-y-1 hover:border-brand-orange"
-              style={{ background: '#2A2A2A', border: '1px solid #488DB5', borderRadius: '2px' }}
+              href={v.youtubeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block"
             >
-              <p className="font-oswald text-sm uppercase tracking-[0.3em] mb-2" style={{ color: v.accent }}>{v.date}</p>
-              <p className="font-montserrat font-bold text-text-primary text-xl leading-tight">{v.artist}</p>
-              <p className="font-open-sans text-text-muted text-base mt-1">Suite E Studios</p>
-            </AnimateIn>
+              <AnimateIn
+                delay={i * 0.1}
+                className="overflow-hidden p-6 transition-all duration-300 hover:-translate-y-1 bg-white border border-border hover:border-brand-burnt h-full"
+              >
+                <p className="font-inter font-medium text-sm uppercase tracking-[0.3em] mb-2" style={{ color: v.accent }}>{v.date}</p>
+                <p className="font-inter font-bold text-black text-xl leading-tight">{v.artist}</p>
+                <p className="font-inter text-text-muted text-base mt-1">Suite E Studios</p>
+                <p className="font-inter font-medium text-xs tracking-widest uppercase mt-4" style={{ color: v.accent }}>Watch →</p>
+              </AnimateIn>
+            </a>
           ))}
         </div>
       </div>

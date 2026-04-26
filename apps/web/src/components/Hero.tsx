@@ -28,7 +28,7 @@ export function Hero() {
       style={{ height: '160vh' }}
       className="relative"
     >
-      <div className="sticky top-0 h-screen overflow-hidden flex flex-col items-center justify-center text-center px-6 bg-background">
+      <div className="sticky top-0 h-screen overflow-hidden flex flex-col items-center justify-center text-center px-6 bg-black">
 
         {/* Video loop — cinematic hero background */}
         <motion.div
@@ -44,7 +44,6 @@ export function Hero() {
             className="absolute inset-0 w-full h-full object-cover"
           >
             <source src="/videos/hero.mp4" type="video/mp4" />
-            {/* Fallback image if video fails */}
             <Image
               src="/images/hero/hero-1.jpg"
               alt="Live music at Suite E Studios"
@@ -55,12 +54,12 @@ export function Hero() {
           </video>
         </motion.div>
 
-        {/* Dark overlay — ensures legibility, adds gritty depth */}
+        {/* Warm orange-tinted overlay — bridges video to Suite E brand palette */}
         <div
-          className="absolute inset-0 pointer-events-none grain"
+          className="absolute inset-0 pointer-events-none"
           aria-hidden="true"
           style={{
-            background: 'linear-gradient(to bottom, rgba(28,28,28,0.6) 0%, rgba(28,28,28,0.25) 40%, rgba(28,28,28,0.75) 100%)',
+            background: 'linear-gradient(to bottom, rgba(255,140,0,0.25) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.7) 100%)',
           }}
         />
 
@@ -70,8 +69,7 @@ export function Hero() {
           style={{ y: contentY, opacity: contentOpacity }}
         >
           <motion.p
-            className="font-oswald text-sm tracking-[0.5em] uppercase"
-            style={{ color: '#B57048' }}
+            className="font-inter font-medium text-sm tracking-[0.5em] uppercase text-white/90"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
@@ -96,7 +94,7 @@ export function Hero() {
           </motion.div>
 
           <motion.p
-            className="font-open-sans text-text-secondary text-2xl md:text-3xl tracking-wide max-w-2xl"
+            className="font-inter text-white/80 text-2xl md:text-3xl tracking-wide max-w-2xl"
             initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.45 }}
@@ -114,8 +112,7 @@ export function Hero() {
               href="https://final-friday.eventbrite.com/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white font-montserrat font-bold text-base uppercase tracking-widest px-10 py-4 rounded-sm transition-opacity hover:opacity-85"
-              style={{ background: '#B57048' }}
+              className="text-white font-inter font-bold text-base uppercase tracking-widest px-10 py-4 bg-black hover:opacity-85 transition-opacity"
             >
               See Events
             </a>
@@ -123,8 +120,7 @@ export function Hero() {
               href="https://youtube.com/@StPeteMusic"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-montserrat font-bold text-base uppercase tracking-widest px-10 py-4 rounded-sm transition-all hover:bg-white/10"
-              style={{ border: '1px solid #488DB5', color: '#488DB5' }}
+              className="text-white font-inter font-bold text-base uppercase tracking-widest px-10 py-4 border border-white hover:bg-white/10 transition-all"
             >
               Watch on YouTube
             </a>
@@ -140,9 +136,9 @@ export function Hero() {
           style={{ opacity: scrollCueOpacity }}
         >
           <motion.div
-            className="w-px bg-gradient-to-b from-transparent via-text-muted to-transparent"
-            style={{ height: '60px' }}
-            animate={{ scaleY: [0.4, 1, 0.4], opacity: [0.3, 0.7, 0.3] }}
+            className="w-px"
+            style={{ height: '60px', background: 'linear-gradient(to bottom, transparent, rgba(255,140,0,0.8), transparent)' }}
+            animate={{ scaleY: [0.4, 1, 0.4], opacity: [0.3, 0.8, 0.3] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           />
         </motion.div>

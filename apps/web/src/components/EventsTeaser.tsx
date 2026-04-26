@@ -4,6 +4,9 @@ import { useRef, useState } from 'react';
 import Image from 'next/image';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import Link from 'next/link';
+import Lightbox from 'yet-another-react-lightbox';
+import Zoom from 'yet-another-react-lightbox/plugins/zoom';
+import { LightboxImage } from './LightboxImage';
 import { AnimateIn } from './AnimateIn';
 import focalPoints from '@/config/focal-points.json';
 
@@ -21,7 +24,7 @@ interface Event {
   ticketUrl?: string;
   presenter?: { name: string; links: { label: string; href: string }[] };
   photoSrc: string;
-  photoPosition?: string; // fallback only — prefer running detect-faces script
+  photoPosition?: string;
   logoSrc?: string;
 }
 
@@ -55,7 +58,7 @@ const EVENTS: Event[] = [
   },
 ];
 
-function EventRow({ event, index }: { event: Event; index: number }) {
+function EventRow({ event, index, onOpenPhoto }: { event: Event; index: number; onOpenPhoto: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const [photoLoaded, setPhotoLoaded] = useState(false);
   const [photoError, setPhotoError] = useState(false);
@@ -79,42 +82,42 @@ function EventRow({ event, index }: { event: Event; index: number }) {
       ref={ref}
       className={`grid grid-cols-1 lg:grid-cols-2 gap-4 ${index % 2 === 0 ? '' : 'lg:[direction:rtl]'}`}
     >
-      {/* Text side — container-type enables cqi units so title scales to THIS box, not viewport */}
+      {/* Text side */}
       <motion.div
         className="flex flex-col justify-center px-12 py-16 lg:[direction:ltr]"
-        style={{ background: '#3A3A3A', border: '1px solid #488DB5', borderRadius: '2px', x: textX, opacity, scale, containerType: 'inline-size' }}
+        style={{ background: '#FFFFFF', border: '1px solid #E5E5E5', x: textX, opacity, scale, containerType: 'inline-size' }}
       >
-        <p className="font-oswald text-sm tracking-[0.45em] uppercase mb-5" style={{ color: '#B57048' }}>
+        <p className="font-inter font-medium text-sm tracking-[0.45em] uppercase mb-5" style={{ color: '#B57048' }}>
           {event.label}
         </p>
         <h3
-          className="font-montserrat font-black uppercase leading-none mb-6 text-text-primary"
+          className="font-inter font-black uppercase leading-none mb-3 text-black"
           style={{ fontSize: 'clamp(2rem, 9cqi, 5rem)' }}
         >
           {event.title}
         </h3>
-        <p className="font-open-sans text-text-secondary text-xl leading-relaxed mb-8 max-w-md">
+        <span className="section-underline mb-6" />
+        <p className="font-inter text-text-secondary text-xl leading-relaxed mb-8 max-w-md">
           {event.body}
         </p>
-        <p className="font-open-sans text-text-muted text-base mb-1">{event.date}</p>
-        <p className="font-open-sans text-text-muted text-base mb-8">{event.venue}</p>
+        <p className="font-inter text-text-muted text-base mb-1">{event.date}</p>
+        <p className="font-inter text-text-muted text-base mb-8">{event.venue}</p>
         {event.ticketUrl ? (
           <a
             href={event.ticketUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="self-start text-white font-montserrat font-bold text-sm uppercase tracking-widest px-8 py-3 rounded-sm hover:opacity-85 transition-opacity"
-            style={{ background: '#B57048' }}
+            className="self-start text-white font-inter font-bold text-sm uppercase tracking-widest px-8 py-3 hover:opacity-85 transition-opacity bg-black"
           >
             Get Tickets
           </a>
         ) : (
-          <span className="font-oswald text-text-muted text-base uppercase tracking-widest">$5 at the door · No reservation needed</span>
+          <span className="font-inter font-medium text-text-muted text-base uppercase tracking-widest">$5 at the door · No reservation needed</span>
         )}
 
         {event.presenter && (
-          <div className="mt-6 pt-6 border-t" style={{ borderColor: 'rgba(72,141,181,0.25)' }}>
-            <p className="font-oswald text-xs tracking-[0.3em] uppercase mb-2 text-text-muted">
+          <div className="mt-6 pt-6 border-t border-border">
+            <p className="font-inter font-medium text-xs tracking-[0.3em] uppercase mb-2 text-text-muted">
               Presented by {event.presenter.name}
             </p>
             <div className="flex gap-4">
@@ -124,7 +127,7 @@ function EventRow({ event, index }: { event: Event; index: number }) {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-open-sans text-sm text-text-muted hover:text-text-secondary transition-colors"
+                  className="font-inter text-sm text-text-muted hover:text-text-secondary transition-colors"
                 >
                   {link.label} →
                 </a>
@@ -134,18 +137,19 @@ function EventRow({ event, index }: { event: Event; index: number }) {
         )}
       </motion.div>
 
-      {/* Visual side — large photo dominates */}
+      {/* Visual side — large photo */}
       <motion.div
-        className="min-h-[400px] lg:min-h-[560px] lg:[direction:ltr] overflow-hidden relative"
-        style={{ background: '#2A2A2A', border: '1px solid #488DB5', borderRadius: '2px', x: visX, opacity, scale }}
+        className="min-h-[400px] lg:min-h-[560px] lg:[direction:ltr] overflow-hidden relative cursor-zoom-in"
+        onClick={onOpenPhoto}
+        style={{ background: '#F5F0EB', border: '1px solid #E5E5E5', x: visX, opacity, scale }}
       >
         {!photoError && (
           <motion.div className="absolute inset-0" style={{ y: photoY, scale: 1.12 }}>
-            <Image
+            <LightboxImage
               src={event.photoSrc}
               alt={event.title}
               fill
-              className={`object-cover transition-opacity duration-700 ${photoLoaded ? 'opacity-100' : 'opacity-0'}`}
+              className={`object-cover transition-opacity duration-700 pointer-events-none ${photoLoaded ? 'opacity-100' : 'opacity-0'}`}
               style={{ objectPosition: getFocalPosition(event.photoSrc, event.photoPosition) }}
               onLoad={() => setPhotoLoaded(true)}
               onError={() => setPhotoError(true)}
@@ -153,12 +157,10 @@ function EventRow({ event, index }: { event: Event; index: number }) {
           </motion.div>
         )}
 
-        {/* Gradient scrim */}
+        {/* Light scrim */}
         <div
           className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'linear-gradient(135deg, rgba(28,28,28,0.3) 0%, transparent 50%, rgba(28,28,28,0.5) 100%)',
-          }}
+          style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(0,0,0,0.3) 100%)' }}
         />
 
         {event.logoSrc && (
@@ -179,32 +181,54 @@ function EventRow({ event, index }: { event: Event; index: number }) {
 }
 
 export function EventsTeaser() {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  const slides = EVENTS.map(event => ({ src: event.photoSrc, alt: event.title }));
+
   return (
-    <section style={{ background: '#1C1C1C' }} className="px-6 py-32">
+    <section className="px-6 py-32 bg-surface">
       <div className="max-w-7xl mx-auto">
 
         <div className="mb-20">
-          <AnimateIn as="p" className="font-oswald text-sm tracking-[0.5em] uppercase mb-4" style={{ color: '#B57048' }}>
+          <AnimateIn as="p" className="font-inter font-medium text-sm tracking-[0.5em] uppercase mb-4" style={{ color: '#B57048' }}>
             Upcoming
           </AnimateIn>
           <AnimateIn delay={0.1}>
             <h2
-              className="font-montserrat font-black uppercase leading-none text-text-primary"
+              className="font-inter font-black uppercase leading-none text-black"
               style={{ fontSize: 'clamp(3rem, 8vw, 7rem)' }}
             >
               Shows &amp; Events
             </h2>
+            <span className="section-underline" />
           </AnimateIn>
         </div>
 
         <div className="flex flex-col gap-4">
           {EVENTS.map((event, i) => (
-            <EventRow key={event.title} event={event} index={i} />
+            <EventRow
+              key={event.title}
+              event={event}
+              index={i}
+              onOpenPhoto={() => {
+                setLightboxIndex(i);
+                setLightboxOpen(true);
+              }}
+            />
           ))}
         </div>
 
+        <Lightbox
+          open={lightboxOpen}
+          close={() => setLightboxOpen(false)}
+          index={lightboxIndex}
+          slides={slides}
+          plugins={[Zoom]}
+        />
+
         <AnimateIn delay={0.1} className="mt-12 text-center">
-          <Link href="/events" className="font-oswald text-text-muted hover:text-text-secondary text-base tracking-[0.3em] uppercase transition-colors">
+          <Link href="/events" className="font-inter font-medium text-text-muted hover:text-text-secondary text-base tracking-[0.3em] uppercase transition-colors">
             View Full Calendar →
           </Link>
         </AnimateIn>
