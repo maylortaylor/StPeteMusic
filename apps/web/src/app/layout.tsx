@@ -22,6 +22,14 @@ export const metadata: Metadata = {
     'Tampa Bay music',
     'Final Friday',
   ],
+  icons: {
+    icon: [
+      { url: '/images/brand/favicon/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/images/brand/favicon/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/images/brand/favicon/favicon.ico' },
+    ],
+    apple: '/images/brand/favicon/apple-touch-icon.png',
+  },
   openGraph: {
     title: 'StPeteMusic — St. Petersburg FL Live Music',
     description: 'Live music from the St. Pete scene.',
