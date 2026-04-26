@@ -30,6 +30,7 @@ export const metadata: Metadata = {
     ],
     apple: '/images/brand/favicon/apple-touch-icon.png',
   },
+  manifest: '/images/brand/favicon/site.webmanifest',
   openGraph: {
     title: 'StPeteMusic — St. Petersburg FL Live Music',
     description: 'Live music from the St. Pete scene.',
