@@ -11,7 +11,9 @@
       "Bash(gh run:*)",
       "Bash(npm install:*)",
       "Bash(npx next:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(npm list:*)",
+      "Bash(node:*)"
     ]
   }
 }
