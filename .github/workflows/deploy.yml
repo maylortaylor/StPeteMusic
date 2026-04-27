@@ -9,17 +9,23 @@ name: Deploy to AWS
 # it is overwritten on every deploy. Manage all secrets in:
 # https://github.com/maylortaylor/StPeteMusic/settings/secrets/actions
 on:
+  # Fires after CI passes on a PR merge to main
   workflow_run:
     workflows: ["CI"]
     types: [completed]
     branches: [main]
+  # Fires on any direct push to main (e.g. infra-only commits that don't trigger CI)
+  push:
+    branches: [main]
+  # Allows manual trigger from the GitHub Actions UI
+  workflow_dispatch:
 
 jobs:
   deploy:
     name: Sync to EC2
     runs-on: ubuntu-latest
-    # Only deploy if CI actually passed — not on failure or cancellation
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # For workflow_run: only deploy if CI passed. For push/dispatch: always deploy.
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Deploy via SSH
@@ -128,7 +134,7 @@ jobs:
               || echo "✓ listmonk database already exists"
 
             echo "── Setting up nginx for listmonk.stpetemusic.live ──"
-            sudo cp stpetemusic-deploy/n8n/nginx/listmonk.conf /etc/nginx/conf.d/listmonk.conf
+            sudo cp /tmp/stpetemusic-deploy/n8n/nginx/listmonk.conf /etc/nginx/conf.d/listmonk.conf
             sudo nginx -t && sudo systemctl reload nginx
             echo "✓ nginx config written and reloaded"
 
