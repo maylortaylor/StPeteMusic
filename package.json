@@ -9,8 +9,11 @@
     "node": ">=20"
   },
   "scripts": {
+    "dev": "docker-compose -f docker-compose.dev.yml up -d && npm run dev --workspace=apps/web",
     "dev:web": "npm run dev --workspace=apps/web",
     "dev:cms": "npm run dev --workspace=apps/cms",
+    "dev:services": "docker-compose -f docker-compose.dev.yml up -d",
+    "dev:stop": "docker-compose -f docker-compose.dev.yml down",
     "build": "npm run build --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present"
