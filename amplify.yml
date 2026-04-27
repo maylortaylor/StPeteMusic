@@ -9,12 +9,15 @@ applications:
         build:
           commands:
             - npm run build
+            # Copy public/ into .next/ so both land at the artifact root.
+            # Amplify SSR requires required-server-files.json at artifact root
+            # (hence baseDirectory: .next), and Next.js needs public/ at that
+            # same root to serve static assets at runtime.
+            - cp -r public .next/
       artifacts:
-        # baseDirectory is relative to appRoot (apps/web)
-        baseDirectory: .
+        baseDirectory: .next
         files:
-          - .next/**/*
-          - public/**/*
+          - '**/*'
       cache:
         paths:
           - node_modules/**/*
