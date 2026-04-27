@@ -10,9 +10,11 @@ applications:
           commands:
             - npm run build
       artifacts:
-        baseDirectory: .next
+        # baseDirectory is relative to appRoot (apps/web)
+        baseDirectory: .
         files:
-          - '**/*'
+          - .next/**/*
+          - public/**/*
       cache:
         paths:
           - node_modules/**/*

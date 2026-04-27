@@ -16,20 +16,25 @@ export async function POST(req: NextRequest) {
 
   const credentials = Buffer.from(`${LISTMONK_USERNAME}:${LISTMONK_PASSWORD}`).toString('base64');
 
-  const res = await fetch(`${LISTMONK_API_URL}/api/subscribers`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Basic ${credentials}`,
-    },
-    body: JSON.stringify({
-      email,
-      name: '',
-      status: 'enabled',
-      lists: [LISTMONK_LIST_ID],
-      preconfirm_subscriptions: true,
-    }),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${LISTMONK_API_URL}/api/subscribers`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${credentials}`,
+      },
+      body: JSON.stringify({
+        email,
+        name: '',
+        status: 'enabled',
+        lists: [LISTMONK_LIST_ID],
+        preconfirm_subscriptions: true,
+      }),
+    });
+  } catch {
+    return NextResponse.json({ message: 'Newsletter service unavailable. Try again later.' }, { status: 503 });
+  }
 
   if (res.ok) {
     return NextResponse.json({ message: 'Subscribed.' }, { status: 200 });
