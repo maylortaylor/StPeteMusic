@@ -129,6 +129,21 @@ jobs:
             mkdir -p ~/stpetemusic/n8n/local-files/videos
             chmod o+x ~/stpetemusic ~/stpetemusic/n8n ~/stpetemusic/n8n/local-files ~/stpetemusic/n8n/local-files/videos
 
+            echo "── Configuring Docker daemon DNS ──"
+            # EC2 default DNS (100.100.100.100) can't resolve Docker Hub or GitHub.
+            # Configure the daemon to use Google DNS for all image pulls.
+            # Only restarts Docker if the config has changed — minimises downtime.
+            DAEMON_JSON='{"dns": ["8.8.8.8", "8.8.4.4"]}'
+            CURRENT=$(sudo cat /etc/docker/daemon.json 2>/dev/null || echo "")
+            if [ "$CURRENT" != "$DAEMON_JSON" ]; then
+              echo "$DAEMON_JSON" | sudo tee /etc/docker/daemon.json > /dev/null
+              sudo systemctl restart docker
+              sleep 5
+              echo "✓ Docker daemon restarted with Google DNS"
+            else
+              echo "✓ Docker daemon DNS already configured"
+            fi
+
             echo "── Applying compose config (restarts changed containers) ──"
             cd ~/stpetemusic/n8n
             docker-compose -f docker-compose.prod.yaml --env-file ../.env up -d
