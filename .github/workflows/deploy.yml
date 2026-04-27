@@ -130,18 +130,17 @@ jobs:
             chmod o+x ~/stpetemusic ~/stpetemusic/n8n ~/stpetemusic/n8n/local-files ~/stpetemusic/n8n/local-files/videos
 
             echo "── Configuring Docker daemon DNS ──"
-            # EC2 default DNS (100.100.100.100) can't resolve Docker Hub or GitHub.
-            # Configure the daemon to use Google DNS for all image pulls.
-            # Only restarts Docker if the config has changed — minimises downtime.
-            DAEMON_JSON='{"dns": ["8.8.8.8", "8.8.4.4"]}'
-            CURRENT=$(sudo cat /etc/docker/daemon.json 2>/dev/null || echo "")
-            if [ "$CURRENT" != "$DAEMON_JSON" ]; then
-              echo "$DAEMON_JSON" | sudo tee /etc/docker/daemon.json > /dev/null
-              sudo systemctl restart docker
-              sleep 5
-              echo "✓ Docker daemon restarted with Google DNS"
+            # EC2 default DNS (100.100.100.100) can't resolve Docker Hub.
+            # Check what the *running* daemon is actually using (not just what's in daemon.json)
+            # and restart only if it's not already on Google DNS.
+            echo '{"dns": ["8.8.8.8", "8.8.4.4"]}' | sudo tee /etc/docker/daemon.json > /dev/null
+            if sudo docker info 2>/dev/null | grep -q "8.8.8.8"; then
+              echo "✓ Docker daemon already using Google DNS"
             else
-              echo "✓ Docker daemon DNS already configured"
+              echo "Restarting Docker daemon to activate Google DNS..."
+              sudo systemctl restart docker
+              sleep 10
+              echo "✓ Docker daemon restarted with Google DNS"
             fi
 
             echo "── Applying compose config (restarts changed containers) ──"
