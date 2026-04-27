@@ -129,19 +129,17 @@ jobs:
             mkdir -p ~/stpetemusic/n8n/local-files/videos
             chmod o+x ~/stpetemusic ~/stpetemusic/n8n ~/stpetemusic/n8n/local-files ~/stpetemusic/n8n/local-files/videos
 
-            echo "── Configuring Docker daemon DNS ──"
-            # EC2 default DNS (100.100.100.100) can't resolve Docker Hub.
-            # Check what the *running* daemon is actually using (not just what's in daemon.json)
-            # and restart only if it's not already on Google DNS.
+            echo "── Fixing host DNS so Docker can reach Docker Hub ──"
+            # Root cause: daemon.json 'dns' only controls container DNS, NOT the daemon's
+            # own DNS for image pulls. The daemon reads /etc/resolv.conf for pulls, which
+            # on EC2 is 100.100.100.100 (AWS metadata DNS that can't reach Docker Hub).
+            # Fix: write resolv.conf FIRST, then restart Docker so it reads good DNS.
+            echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" | sudo tee /etc/resolv.conf > /dev/null
+            # daemon.json still needed for container DNS (n8n, listmonk runtime)
             echo '{"dns": ["8.8.8.8", "8.8.4.4"]}' | sudo tee /etc/docker/daemon.json > /dev/null
-            if sudo docker info 2>/dev/null | grep -q "8.8.8.8"; then
-              echo "✓ Docker daemon already using Google DNS"
-            else
-              echo "Restarting Docker daemon to activate Google DNS..."
-              sudo systemctl restart docker
-              sleep 10
-              echo "✓ Docker daemon restarted with Google DNS"
-            fi
+            sudo systemctl restart docker
+            sleep 8
+            echo "✓ Host DNS and Docker daemon configured"
 
             echo "── Applying compose config (restarts changed containers) ──"
             cd ~/stpetemusic/n8n
