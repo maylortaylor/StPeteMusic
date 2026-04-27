@@ -112,9 +112,9 @@ All 3 records must be **DNS only (grey cloud — NOT proxied)**:
 **Rule: Never push directly to main.** Branch protection requires CI + 1 PR review.
 
 ### Production n8n
-- **URL:** https://n8n-stpetemusic.duckdns.org
+- **URL:** https://n8n.stpetemusic.live
 - **Server:** AWS EC2 t3.micro (`us-east-1`, free tier)
-- **SSH:** `ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n-stpetemusic.duckdns.org`
+- **SSH:** `ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n.stpetemusic.live`
 - **Quick reference:** `AWS_SETUP.md`
 - **Full deployment guide:** `docs/AWS_DEPLOYMENT.md`
 - **IaC:** Terraform — see `infrastructure/` (active, state in S3 `stpetemusic-terraform-state`)
@@ -141,7 +141,7 @@ All 3 records must be **DNS only (grey cloud — NOT proxied)**:
 
 ### OAuth Redirect URI (for all platforms)
 ```
-https://n8n-stpetemusic.duckdns.org/rest/oauth2-credential/callback
+https://n8n.stpetemusic.live/rest/oauth2-credential/callback
 ```
 
 ### Secrets Management
@@ -247,7 +247,7 @@ Both paths → Get Obsidian File Content → Build Updated Content → Update Ob
 
 **nginx `/media/` serving:**
 - Videos saved to `~/stpetemusic/n8n/local-files/videos/` on EC2 (mounted as `/files/videos/` in container)
-- nginx serves them at `https://n8n-stpetemusic.duckdns.org/media/<filename>` — this is the `video_url` sent to Instagram
+- nginx serves them at `https://n8n.stpetemusic.live/media/<filename>` — this is the `video_url` sent to Instagram
 - **Requires:** `chmod o+x /home/ec2-user` so nginx can traverse the home dir (applied automatically by `deploy.yml` and `user_data.sh`)
 
 **Memory / stability:**
@@ -435,7 +435,7 @@ AWS_PROFILE=personal terraform plan
 
 ### n8n Server Down
 
-**Problem:** `https://n8n-stpetemusic.duckdns.org` not responding
+**Problem:** `https://n8n.stpetemusic.live` not responding
 
 **Solutions (in order):**
 1. Check AWS status:
@@ -446,7 +446,7 @@ AWS_PROFILE=personal terraform plan
 
 2. Restart Docker containers:
    ```bash
-   ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n-stpetemusic.duckdns.org \
+   ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n.stpetemusic.live \
      "cd ~/stpetemusic/n8n && docker-compose -f docker-compose.prod.yaml restart"
    ```
 

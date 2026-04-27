@@ -40,6 +40,7 @@ jobs:
           mkdir -p deploy-pkg/workflows
           cp n8n/docker-compose.prod.yaml deploy-pkg/docker-compose.prod.yaml
           cp n8n/nginx/listmonk.conf      deploy-pkg/listmonk.conf
+          cp n8n/nginx/n8n.conf           deploy-pkg/n8n.conf
           cp -r n8n/workflows/StPeteMusic  deploy-pkg/workflows/StPeteMusic
           tar czf deploy.tar.gz -C deploy-pkg .
           echo "✓ deploy.tar.gz built ($(du -sh deploy.tar.gz | cut -f1))"
@@ -179,6 +180,18 @@ jobs:
               --keep-until-expiring 2>/dev/null \
               && echo "✓ SSL cert active for listmonk.stpetemusic.live" \
               || echo "⚠ Certbot skipped — DNS for listmonk.stpetemusic.live may not be set yet"
+
+            echo "── Setting up nginx for n8n.stpetemusic.live ──"
+            sudo cp /tmp/deploy-pkg/n8n.conf /etc/nginx/conf.d/n8n.conf
+            sudo nginx -t && sudo systemctl reload nginx
+            echo "✓ n8n nginx config written and reloaded"
+
+            echo "── Requesting SSL cert for n8n.stpetemusic.live ──"
+            sudo certbot --nginx -d n8n.stpetemusic.live \
+              --non-interactive --agree-tos -m TheBurgMusic@gmail.com \
+              --keep-until-expiring 2>/dev/null \
+              && echo "✓ SSL cert active for n8n.stpetemusic.live" \
+              || echo "⚠ Certbot skipped — DNS for n8n.stpetemusic.live may not be set yet"
 
             echo "── Cleanup ──"
             rm -rf /tmp/deploy-pkg /tmp/deploy.tar.gz

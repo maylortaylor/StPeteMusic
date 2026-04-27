@@ -38,10 +38,10 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      - N8N_HOST=n8n-stpetemusic.duckdns.org
+      - N8N_HOST=n8n.stpetemusic.live
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
-      - WEBHOOK_URL=https://n8n-stpetemusic.duckdns.org/
+      - WEBHOOK_URL=https://n8n.stpetemusic.live/
       - GENERIC_TIMEZONE=America/New_York
       - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
       - OBSIDIAN_HOST=${OBSIDIAN_HOST}
