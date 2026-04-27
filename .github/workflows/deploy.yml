@@ -34,15 +34,15 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
       - name: Package deployment files
-        # Build a tarball with a flat, predictable structure so EC2 doesn't
-        # need to care about the repo's directory layout.
+        # Build tarball inside GITHUB_WORKSPACE — scp-action runs in a Docker
+        # container that mounts the workspace, so /tmp/ on the runner is not visible.
         run: |
-          mkdir -p /tmp/deploy-pkg/workflows
-          cp n8n/docker-compose.prod.yaml /tmp/deploy-pkg/docker-compose.prod.yaml
-          cp n8n/nginx/listmonk.conf      /tmp/deploy-pkg/listmonk.conf
-          cp -r n8n/workflows/StPeteMusic  /tmp/deploy-pkg/workflows/StPeteMusic
-          tar czf /tmp/deploy.tar.gz -C /tmp/deploy-pkg .
-          echo "✓ deploy.tar.gz built ($(du -sh /tmp/deploy.tar.gz | cut -f1))"
+          mkdir -p deploy-pkg/workflows
+          cp n8n/docker-compose.prod.yaml deploy-pkg/docker-compose.prod.yaml
+          cp n8n/nginx/listmonk.conf      deploy-pkg/listmonk.conf
+          cp -r n8n/workflows/StPeteMusic  deploy-pkg/workflows/StPeteMusic
+          tar czf deploy.tar.gz -C deploy-pkg .
+          echo "✓ deploy.tar.gz built ($(du -sh deploy.tar.gz | cut -f1))"
 
       - name: Upload deploy package to EC2
         uses: appleboy/scp-action@v0.1.7
@@ -50,7 +50,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: /tmp/deploy.tar.gz
+          source: deploy.tar.gz
           target: /tmp/
           overwrite: true
 
