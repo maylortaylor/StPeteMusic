@@ -10,7 +10,7 @@ output "instance_id" {
 
 output "n8n_url" {
   description = "Public URL for n8n"
-  value       = "https://n8n-stpetemusic.duckdns.org"
+  value       = "https://n8n.stpetemusic.live"
 }
 
 output "security_group_id" {

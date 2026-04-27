@@ -69,11 +69,11 @@ Environment variables load from `../.env` (project root).
 
 ## Production
 
-n8n runs on AWS EC2 at https://n8n-stpetemusic.duckdns.org
+n8n runs on AWS EC2 at https://n8n.stpetemusic.live
 
 ```bash
 # SSH into server
-ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n-stpetemusic.duckdns.org
+ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n.stpetemusic.live
 
 # On server — start/restart n8n
 cd ~/stpetemusic/n8n
@@ -82,7 +82,7 @@ docker-compose -f docker-compose.prod.yaml --env-file ../.env up -d
 # Deploy updated workflows to server (run from Mac)
 scp -i ~/.ssh/stpetemusic-n8n.pem -r \
   ./workflows/StPeteMusic/ \
-  ec2-user@n8n-stpetemusic.duckdns.org:~/stpetemusic/n8n/workflows/
+  ec2-user@n8n.stpetemusic.live:~/stpetemusic/n8n/workflows/
 ```
 
 See `../AWS_SETUP.md` for full production reference.
@@ -93,7 +93,7 @@ See `../AWS_SETUP.md` for full production reference.
 
 | Setting | Local | Production |
 |---|---|---|
-| URL | `http://localhost:5678` | `https://n8n-stpetemusic.duckdns.org` |
+| URL | `http://localhost:5678` | `https://n8n.stpetemusic.live` |
 | Protocol | http | https |
 | Port exposed | `5678:5678` | `127.0.0.1:5678:5678` (nginx proxies) |
 | Auth | None | Owner account login required |
@@ -106,7 +106,7 @@ See `../AWS_SETUP.md` for full production reference.
 For all OAuth credential setup (YouTube, Instagram, Facebook) in n8n or external developer portals:
 
 ```
-https://n8n-stpetemusic.duckdns.org/rest/oauth2-credential/callback
+https://n8n.stpetemusic.live/rest/oauth2-credential/callback
 ```
 
 ---
