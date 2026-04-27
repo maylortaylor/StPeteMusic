@@ -19,7 +19,7 @@ resource "aws_amplify_app" "web" {
     NEXT_PUBLIC_SITE_URL      = "https://www.stpetemusic.live"
 
     # Non-secret Listmonk config — secrets set in Amplify console per branch
-    LISTMONK_API_URL = "https://newsletter.stpetemusic.live"
+    LISTMONK_API_URL = "https://listmonk.stpetemusic.live"
     LISTMONK_LIST_ID = "1"
   }
 
