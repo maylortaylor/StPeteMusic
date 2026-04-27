@@ -190,6 +190,8 @@ GitHub Secrets → deploy.yml (on push to main) → writes ~/stpetemusic/.env �
 | `GOOGLE_CLIENT_SECRET` | `YOUTUBE_CLIENT_SECRET` | YouTube/Google OAuth2 client secret |
 | `YOUTUBE_API_KEY` | `YOUTUBE_API_KEY` | YouTube Data API key |
 | `NOTION_API_KEY` | `NOTION_API_KEY` | Notion integration token *(optional)* |
+| `LISTMONK_USERNAME` | `LISTMONK_USERNAME` | Listmonk admin username — also used by Next.js newsletter API |
+| `LISTMONK_PASSWORD` | `LISTMONK_PASSWORD` | Listmonk admin password — also used by Next.js newsletter API |
 
 **To rotate a secret (e.g. IG_ACCESS_TOKEN):**
 1. Get the new token value

@@ -51,6 +51,9 @@ jobs:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           # Notion
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          # Newsletter — Listmonk admin credentials
+          LISTMONK_USERNAME: ${{ secrets.LISTMONK_USERNAME }}
+          LISTMONK_PASSWORD: ${{ secrets.LISTMONK_PASSWORD }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
@@ -59,7 +62,8 @@ jobs:
             POSTGRES_USER,POSTGRES_PASSWORD,DB_ENCRYPTION_KEY,N8N_ENCRYPTION_KEY,
             N8N_API_KEY,OBSIDIAN_HOST,CLAUDE_API_KEY_N8N_STPETEMUSIC,GROQ_API_KEY,
             N8N_GEMINI_API_KEY,IG_USER_ID,IG_APP_ID,IG_ACCESS_TOKEN,FB_PAGE_ID,FB_ACCESS_TOKEN,
-            YOUTUBE_CLIENT_ID,YOUTUBE_CLIENT_SECRET,YOUTUBE_API_KEY,NOTION_API_KEY
+            YOUTUBE_CLIENT_ID,YOUTUBE_CLIENT_SECRET,YOUTUBE_API_KEY,NOTION_API_KEY,
+            LISTMONK_USERNAME,LISTMONK_PASSWORD
           script: |
             set -e
 
@@ -100,6 +104,8 @@ jobs:
               printf 'YOUTUBE_CLIENT_SECRET=%s\n'            "${YOUTUBE_CLIENT_SECRET}"
               printf 'YOUTUBE_API_KEY=%s\n'                  "${YOUTUBE_API_KEY}"
               printf 'NOTION_API_KEY=%s\n'                   "${NOTION_API_KEY}"
+              printf 'LISTMONK_USERNAME=%s\n'               "${LISTMONK_USERNAME}"
+              printf 'LISTMONK_PASSWORD=%s\n'               "${LISTMONK_PASSWORD}"
             } > ~/stpetemusic/.env
             chmod 600 ~/stpetemusic/.env
             echo "✓ .env written ($(wc -l < ~/stpetemusic/.env) vars)"
@@ -109,12 +115,59 @@ jobs:
             mkdir -p ~/stpetemusic/n8n/local-files/videos
             chmod o+x ~/stpetemusic ~/stpetemusic/n8n ~/stpetemusic/n8n/local-files ~/stpetemusic/n8n/local-files/videos
 
-            echo "── Applying compose config (restarts n8n if config changed) ──"
+            echo "── Applying compose config (restarts changed containers) ──"
             cd ~/stpetemusic/n8n
             docker-compose -f docker-compose.prod.yaml --env-file ../.env up -d
+
+            echo "── Creating listmonk database if it doesn't exist ──"
+            # Wait for postgres to be ready (it should already be running)
+            sleep 3
+            docker exec stpetemusic-postgres psql -U "${POSTGRES_USER}" \
+              -c "CREATE DATABASE listmonk;" 2>/dev/null \
+              && echo "✓ listmonk database created" \
+              || echo "✓ listmonk database already exists"
+
+            echo "── Setting up nginx for listmonk.stpetemusic.live ──"
+            if [ ! -f /etc/nginx/conf.d/listmonk.conf ]; then
+              sudo tee /etc/nginx/conf.d/listmonk.conf > /dev/null <<'NGINX_CONF'
+server {
+    listen 80;
+    server_name listmonk.stpetemusic.live;
+
+    # Required for certbot ACME challenge
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:9000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 300s;
+        client_max_body_size 20M;
+    }
+}
+NGINX_CONF
+              sudo nginx -t && sudo systemctl reload nginx
+              echo "✓ nginx config written and reloaded"
+            else
+              echo "✓ nginx config already exists, skipping"
+            fi
+
+            echo "── Requesting SSL cert for listmonk.stpetemusic.live ──"
+            # --keep-until-expiring: skips if cert has >30 days left (safe to run on every deploy)
+            # Fails gracefully if DNS isn't pointing here yet — HTTP will still work
+            sudo certbot --nginx -d listmonk.stpetemusic.live \
+              --non-interactive --agree-tos -m TheBurgMusic@gmail.com \
+              --keep-until-expiring 2>/dev/null \
+              && echo "✓ SSL cert active for listmonk.stpetemusic.live" \
+              || echo "⚠ Certbot skipped — add DNS CNAME listmonk → $(curl -s ifconfig.me) in Cloudflare first"
 
             echo "── Cleanup ──"
             rm -rf /tmp/stpetemusic-deploy
 
             echo "✓ Deploy complete"
-            docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep n8n
+            docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"

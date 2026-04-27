@@ -25,7 +25,7 @@ services:
       -c shared_buffers=64MB
       -c effective_cache_size=128MB
       -c work_mem=4MB
-      -c max_connections=20
+      -c max_connections=30
 
   n8n:
     image: n8nio/n8n:latest
@@ -77,6 +77,35 @@ services:
     mem_limit: 1024m
     memswap_limit: 2048m
 
+  listmonk:
+    image: listmonk/listmonk:latest
+    container_name: stpetemusic-listmonk
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - LISTMONK_app__address=0.0.0.0:9000
+      - LISTMONK_app__admin_username=${LISTMONK_USERNAME}
+      - LISTMONK_app__admin_password=${LISTMONK_PASSWORD}
+      - LISTMONK_db__host=postgres
+      - LISTMONK_db__port=5432
+      - LISTMONK_db__user=${POSTGRES_USER}
+      - LISTMONK_db__password=${POSTGRES_PASSWORD}
+      - LISTMONK_db__database=listmonk
+    # 'yes |' answers the "proceed with install?" prompt automatically
+    # --install is idempotent — safe to run on every container start
+    command: [sh, -c, 'yes | ./listmonk --install && ./listmonk']
+    ports:
+      # Bound to localhost only — nginx proxies external traffic
+      - "127.0.0.1:9000:9000"
+    networks:
+      - n8n-net
+    volumes:
+      - listmonk_uploads:/listmonk/uploads
+    mem_limit: 256m
+    memswap_limit: 512m
+
 networks:
   n8n-net:
     driver: bridge
@@ -85,4 +114,6 @@ volumes:
   n8n_data:
     driver: local
   postgres_data:
+    driver: local
+  listmonk_uploads:
     driver: local

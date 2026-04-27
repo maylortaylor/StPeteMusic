@@ -16,6 +16,7 @@
 | **GitHub Secrets** | https://github.com/maylortaylor/StPeteMusic/settings/secrets/actions |
 | **Cloudflare DNS** | https://dash.cloudflare.com → stpetemusic.live → DNS → Records |
 | **n8n automation** | https://n8n-stpetemusic.duckdns.org |
+| **Listmonk (newsletter)** | https://listmonk.stpetemusic.live |
 | **AWS console** | https://us-east-1.console.aws.amazon.com (us-east-1, N. Virginia) |
 
 ---
@@ -35,6 +36,7 @@
 | CNAME | `_ddf1b33c5eab2d...` | `_bf19e363018afab...` | DNS only ✅ | ACM SSL validation (do not touch) |
 | CNAME | `stpetemusic.live` | `d6q9oiwscagw.cloudfront.net` | ⚠️ Proxied | Apex domain → Amplify |
 | CNAME | `www` | `d6q9oiwscagw.cloudfront.net` | ⚠️ Proxied | www → Amplify |
+| A | `listmonk` | `54.235.171.182` | DNS only ✅ | Listmonk newsletter admin → EC2 |
 | NS | — | `cora.ns.cloudflare.com` | — | Nameserver |
 | NS | — | `kurt.ns.cloudflare.com` | — | Nameserver |
 
@@ -89,6 +91,8 @@ These are set per-branch directly in the Amplify console (not in Terraform or Gi
 |--------|---------|
 | `LISTMONK_USERNAME` | Newsletter signup API route |
 | `LISTMONK_PASSWORD` | Newsletter signup API route |
+| `LISTMONK_API_URL` | Newsletter signup API route — set to `https://listmonk.stpetemusic.live` |
+| `LISTMONK_LIST_ID` | Newsletter signup API route — set to `1` (the default first list) |
 
 ---
 
@@ -136,6 +140,58 @@ These are set per-branch directly in the Amplify console (not in Terraform or Gi
 | `GOOGLE_CLIENT_SECRET` | `YOUTUBE_CLIENT_SECRET` | YouTube/Google OAuth2 client secret |
 | `YOUTUBE_API_KEY` | `YOUTUBE_API_KEY` | YouTube Data API key |
 | `NOTION_API_KEY` | `NOTION_API_KEY` | Notion integration token (optional) |
+| `LISTMONK_USERNAME` | `LISTMONK_USERNAME` | Listmonk admin username (also used by Next.js API route) |
+| `LISTMONK_PASSWORD` | `LISTMONK_PASSWORD` | Listmonk admin password (also used by Next.js API route) |
+
+---
+
+## Newsletter — Listmonk on EC2
+
+**URL:** https://listmonk.stpetemusic.live
+**Admin login:** uses `LISTMONK_USERNAME` / `LISTMONK_PASSWORD` GitHub Secrets
+**Container:** `stpetemusic-listmonk` in `n8n/docker-compose.prod.yaml`
+**Database:** `listmonk` (separate DB in the shared Postgres container)
+
+### How the newsletter works end-to-end
+
+```
+User fills form on www.stpetemusic.live
+  → POST /api/newsletter/subscribe (Next.js API route on Amplify)
+  → HTTP Basic Auth POST to https://listmonk.stpetemusic.live/api/subscribers
+  → Listmonk stores subscriber in its DB
+  → You send campaigns from Listmonk admin UI
+```
+
+### SMTP configuration (required for sending emails)
+
+Listmonk needs an outgoing SMTP server to send newsletters. Configure it in the admin UI:
+**Settings → SMTP → Add SMTP server**
+
+Recommended: **AWS SES** (already have AWS account, ~$0.10/1,000 emails)
+1. Verify `stpetemusic.live` domain in SES console (us-east-1)
+2. Create SMTP credentials in SES (not IAM — use SES-specific SMTP user)
+3. In Listmonk Settings → SMTP:
+   - Host: `email-smtp.us-east-1.amazonaws.com`
+   - Port: `587`, TLS: STARTTLS
+   - Username/Password: from SES SMTP credentials
+   - From email: `newsletter@stpetemusic.live`
+
+Alternative: **Resend** (free tier: 3,000 emails/month)
+- SMTP host: `smtp.resend.com`, port `587`
+- Username: `resend`, Password: your Resend API key
+- Verify `stpetemusic.live` domain at resend.com first
+
+### First-time setup checklist
+
+1. ☐ Add DNS A record in Cloudflare: `listmonk` → `54.235.171.182` (DNS only, grey cloud)
+2. ☐ Add `LISTMONK_USERNAME` + `LISTMONK_PASSWORD` to GitHub Secrets
+3. ☐ Push to `main` → deploy runs → Listmonk starts + nginx config + certbot SSL issued
+4. ☐ In Amplify console → main branch env vars → add:
+   - `LISTMONK_API_URL` = `https://listmonk.stpetemusic.live`
+   - `LISTMONK_LIST_ID` = `1`
+5. ☐ Login to `https://listmonk.stpetemusic.live` → confirm the "Newsletter" list exists (ID 1)
+6. ☐ Configure SMTP (see above) so Listmonk can actually send emails
+7. ☐ Trigger Amplify redeploy (or push a commit) so new env vars take effect
 
 ---
 
@@ -284,8 +340,13 @@ AWS_PROFILE=personal aws ec2 reboot-instances \
 
 ---
 
-## Current Action Items (as of 2026-04-19)
+## Current Action Items (as of 2026-04-27)
 
 - [ ] **Fix Cloudflare proxy** — toggle `stpetemusic.live` and `www` CNAMEs from Proxied → DNS only to unblock Amplify domain activation
 - [ ] **Verify domain activation** — after Cloudflare fix, watch Amplify console for step 3 completion
 - [ ] **Add photos** — drop hero/event/vibes/strip photos into `apps/web/public/images/` to activate photo sections on the site
+- [ ] **Newsletter — Cloudflare DNS** — add A record: `listmonk` → `54.235.171.182`, DNS only (grey cloud)
+- [ ] **Newsletter — GitHub Secrets** — add `LISTMONK_USERNAME` + `LISTMONK_PASSWORD` at github.com/maylortaylor/StPeteMusic/settings/secrets/actions
+- [ ] **Newsletter — push to main** — triggers deploy: starts Listmonk container, creates DB, issues SSL cert
+- [ ] **Newsletter — Amplify env vars** — in Amplify console (main branch): add `LISTMONK_API_URL=https://listmonk.stpetemusic.live` and `LISTMONK_LIST_ID=1`
+- [ ] **Newsletter — SMTP** — login to listmonk.stpetemusic.live → Settings → SMTP → configure AWS SES or Resend so emails actually send
