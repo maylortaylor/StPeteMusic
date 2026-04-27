@@ -14,8 +14,8 @@ variable "ssh_key_name" {
 }
 
 variable "allowed_ssh_cidr" {
-  description = "CIDR block allowed to SSH into the EC2 instance. Update if your IP changes (run: curl ifconfig.me)"
-  default     = "66.117.37.36/32"
+  description = "CIDR block allowed to SSH into the EC2 instance. Open to all — SSH key auth is the protection."
+  default     = "0.0.0.0/0"
 }
 
 variable "github_token" {
