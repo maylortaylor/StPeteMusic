@@ -81,6 +81,9 @@ services:
     image: listmonk/listmonk:latest
     container_name: stpetemusic-listmonk
     restart: unless-stopped
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     depends_on:
       postgres:
         condition: service_healthy
