@@ -45,14 +45,17 @@ jobs:
           echo "✓ deploy.tar.gz built ($(du -sh deploy.tar.gz | cut -f1))"
 
       - name: Upload deploy package to EC2
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: deploy.tar.gz
-          target: /tmp/
-          overwrite: true
+        # Use native scp on the host runner (same network env as appleboy/ssh-action).
+        # appleboy/scp-action runs inside Docker with broken DNS — host runner works fine.
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > /tmp/deploy_key
+          chmod 600 /tmp/deploy_key
+          scp -i /tmp/deploy_key \
+            -o StrictHostKeyChecking=no \
+            -o ConnectTimeout=30 \
+            deploy.tar.gz \
+            ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/tmp/deploy.tar.gz
+          rm -f /tmp/deploy_key
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.5
