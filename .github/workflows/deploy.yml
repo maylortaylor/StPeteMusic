@@ -104,10 +104,14 @@ jobs:
             set -e
 
             echo "── Extracting deploy package ──"
+            echo "Tarball size: $(du -sh /tmp/deploy.tar.gz | cut -f1)"
+            echo "Tarball contents:"
+            tar tzf /tmp/deploy.tar.gz
             rm -rf /tmp/deploy-pkg
             mkdir -p /tmp/deploy-pkg
             tar xzf /tmp/deploy.tar.gz -C /tmp/deploy-pkg
-            echo "✓ Extracted: $(find /tmp/deploy-pkg -type f | wc -l) files"
+            echo "✓ Extracted files:"
+            find /tmp/deploy-pkg -type f | sort
 
             echo "── Syncing workflow files ──"
             mkdir -p ~/stpetemusic/n8n/workflows/StPeteMusic
