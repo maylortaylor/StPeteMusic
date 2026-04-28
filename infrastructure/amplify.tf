@@ -29,7 +29,7 @@ resource "aws_amplify_app" "web" {
     AMPLIFY_MONOREPO_APP_ROOT = "apps/web"  # tells Amplify where to find package.json for framework detection
     NEXT_PUBLIC_SITE_URL      = "https://www.stpetemusic.live"
     LISTMONK_API_URL          = "https://listmonk.stpetemusic.live"
-    LISTMONK_LIST_ID          = "1"
+    LISTMONK_LIST_ID          = "3"
     LISTMONK_USERNAME         = data.aws_ssm_parameter.listmonk_username.value
     LISTMONK_PASSWORD         = data.aws_ssm_parameter.listmonk_password.value
   }
