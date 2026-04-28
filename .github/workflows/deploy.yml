@@ -191,7 +191,7 @@ jobs:
             echo "── Requesting SSL cert for listmonk.stpetemusic.live ──"
             sudo certbot --nginx -d listmonk.stpetemusic.live \
               --non-interactive --agree-tos -m TheBurgMusic@gmail.com \
-              --keep-until-expiring 2>/dev/null \
+              --reinstall 2>/dev/null \
               && echo "✓ SSL cert active for listmonk.stpetemusic.live" \
               || echo "⚠ Certbot skipped — DNS for listmonk.stpetemusic.live may not be set yet"
 
@@ -203,7 +203,7 @@ jobs:
             echo "── Requesting SSL cert for n8n.stpetemusic.live ──"
             sudo certbot --nginx -d n8n.stpetemusic.live \
               --non-interactive --agree-tos -m TheBurgMusic@gmail.com \
-              --keep-until-expiring 2>/dev/null \
+              --reinstall 2>/dev/null \
               && echo "✓ SSL cert active for n8n.stpetemusic.live" \
               || echo "⚠ Certbot skipped — DNS for n8n.stpetemusic.live may not be set yet"
 
