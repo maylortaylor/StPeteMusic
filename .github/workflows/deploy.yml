@@ -94,9 +94,7 @@ jobs:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           # Notion
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
-          # Newsletter — Listmonk admin credentials
-          LISTMONK_USERNAME: ${{ secrets.LISTMONK_USERNAME }}
-          LISTMONK_PASSWORD: ${{ secrets.LISTMONK_PASSWORD }}
+          # Listmonk credentials are read from SSM on EC2 (not injected here)
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
@@ -105,8 +103,7 @@ jobs:
             DEPLOY_RUN_ID,POSTGRES_USER,POSTGRES_PASSWORD,DB_ENCRYPTION_KEY,N8N_ENCRYPTION_KEY,
             N8N_API_KEY,OBSIDIAN_HOST,CLAUDE_API_KEY_N8N_STPETEMUSIC,GROQ_API_KEY,
             N8N_GEMINI_API_KEY,IG_USER_ID,IG_APP_ID,IG_ACCESS_TOKEN,FB_PAGE_ID,FB_ACCESS_TOKEN,
-            YOUTUBE_CLIENT_ID,YOUTUBE_CLIENT_SECRET,YOUTUBE_API_KEY,NOTION_API_KEY,
-            LISTMONK_USERNAME,LISTMONK_PASSWORD
+            YOUTUBE_CLIENT_ID,YOUTUBE_CLIENT_SECRET,YOUTUBE_API_KEY,NOTION_API_KEY
           script: |
             set -e
 
@@ -129,6 +126,15 @@ jobs:
 
             echo "── Syncing docker-compose.prod.yaml ──"
             cp "${DEPLOY_DIR}/docker-compose.prod.yaml" ~/stpetemusic/n8n/docker-compose.prod.yaml
+
+            echo "── Reading Listmonk credentials from SSM ──"
+            LISTMONK_USERNAME=$(aws ssm get-parameter \
+              --name "/stpetemusic/listmonk/username" \
+              --with-decryption --query 'Parameter.Value' --output text --region us-east-1)
+            LISTMONK_PASSWORD=$(aws ssm get-parameter \
+              --name "/stpetemusic/listmonk/password" \
+              --with-decryption --query 'Parameter.Value' --output text --region us-east-1)
+            echo "✓ Listmonk credentials loaded from SSM"
 
             echo "── Writing .env from GitHub Secrets ──"
             # printf '%s' is used for each value to safely handle special characters
