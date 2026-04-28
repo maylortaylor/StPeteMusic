@@ -41,4 +41,6 @@ jobs:
       - name: OpenTofu Apply
         run: tofu apply -auto-approve -input=false
         env:
-          TF_VAR_github_token: ${{ secrets.GH_TOKEN_AMPLIFY }}
+          TF_VAR_github_token:       ${{ secrets.GH_TOKEN_AMPLIFY }}
+          TF_VAR_listmonk_username:  ${{ secrets.LISTMONK_USERNAME }}
+          TF_VAR_listmonk_password:  ${{ secrets.LISTMONK_PASSWORD }}
