@@ -1,32 +1,4 @@
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: stpetemusic-postgres
-    restart: unless-stopped
-    environment:
-      - POSTGRES_DB=stpetemusic
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ../database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
-    # Port NOT exposed to host — only accessible within Docker network and via SSH tunnel
-    networks:
-      - n8n-net
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d stpetemusic"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    mem_limit: 256m
-    memswap_limit: 320m
-    command: >
-      postgres
-      -c shared_buffers=64MB
-      -c effective_cache_size=128MB
-      -c work_mem=4MB
-      -c max_connections=30
-
   n8n:
     image: n8nio/n8n:latest
     container_name: n8n
@@ -34,9 +6,6 @@ services:
     dns:
       - 8.8.8.8
       - 8.8.4.4
-    depends_on:
-      postgres:
-        condition: service_healthy
     environment:
       - N8N_HOST=n8n.stpetemusic.live
       - N8N_PORT=5678
@@ -62,8 +31,8 @@ services:
       - YOUTUBE_CLIENT_SECRET=${YOUTUBE_CLIENT_SECRET}
       - YOUTUBE_API_KEY=${YOUTUBE_API_KEY}
       - NODE_OPTIONS=--max-old-space-size=768
-      - POSTGRES_HOST=postgres
-      - POSTGRES_DB=stpetemusic
+      - POSTGRES_HOST=${RDS_HOST}
+      - POSTGRES_DB=n8n
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
@@ -84,21 +53,17 @@ services:
     dns:
       - 8.8.8.8
       - 8.8.4.4
-    depends_on:
-      postgres:
-        condition: service_healthy
     environment:
       - LISTMONK_app__address=0.0.0.0:9000
       - LISTMONK_app__admin_username=${LISTMONK_USERNAME}
       - LISTMONK_app__admin_password=${LISTMONK_PASSWORD}
-      - LISTMONK_db__host=postgres
+      - LISTMONK_db__host=${RDS_HOST}
       - LISTMONK_db__port=5432
       - LISTMONK_db__user=${POSTGRES_USER}
       - LISTMONK_db__password=${POSTGRES_PASSWORD}
-      - LISTMONK_db__database=listmonk
-    # 'yes |' answers the "proceed with install?" prompt automatically
-    # --install is idempotent — safe to run on every container start
-    command: [sh, -c, 'yes | ./listmonk --install && ./listmonk']
+      - LISTMONK_db__database=listmonk_stpetemusic
+    # --yes skips interactive prompts without wiping existing data (unlike piping "yes")
+    command: [sh, -c, './listmonk --install --yes && ./listmonk']
     ports:
       # Bound to localhost only — nginx proxies external traffic
       - "127.0.0.1:9000:9000"
@@ -115,8 +80,6 @@ networks:
 
 volumes:
   n8n_data:
-    driver: local
-  postgres_data:
     driver: local
   listmonk_uploads:
     driver: local

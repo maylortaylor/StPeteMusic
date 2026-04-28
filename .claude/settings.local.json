@@ -13,7 +13,9 @@
       "Bash(npx next:*)",
       "Bash(git stash:*)",
       "Bash(npm list:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(grep:*)",
+      "Bash(gh auth:*)"
     ]
   }
 }

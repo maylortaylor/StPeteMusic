@@ -17,7 +17,7 @@ data "aws_ssm_parameter" "listmonk_password" {
 resource "aws_amplify_app" "web" {
   name         = "${var.project}-web"
   repository   = "https://github.com/maylortaylor/StPeteMusic"
-  access_token = var.github_token
+  access_token = var.github_token != "" ? var.github_token : null
 
   # SSR mode — required because /api/newsletter/subscribe cannot be statically exported
   platform = "WEB_COMPUTE"
@@ -40,6 +40,12 @@ resource "aws_amplify_app" "web" {
   tags = {
     Name    = "${var.project}-web"
     Project = var.project
+  }
+
+  # access_token is only needed on initial creation — ignore changes so plan
+  # succeeds even when GH_TOKEN_AMPLIFY is not available in tofu-plan CI.
+  lifecycle {
+    ignore_changes = [access_token]
   }
 }
 
