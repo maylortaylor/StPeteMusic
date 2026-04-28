@@ -41,6 +41,12 @@ resource "aws_amplify_app" "web" {
     Name    = "${var.project}-web"
     Project = var.project
   }
+
+  # access_token is only needed on initial creation — ignore changes so plan
+  # succeeds even when GH_TOKEN_AMPLIFY is not available in tofu-plan CI.
+  lifecycle {
+    ignore_changes = [access_token]
+  }
 }
 
 resource "aws_amplify_branch" "main" {
