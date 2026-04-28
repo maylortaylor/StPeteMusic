@@ -16,9 +16,13 @@ export async function POST(req: NextRequest) {
 
   const credentials = Buffer.from(`${LISTMONK_USERNAME}:${LISTMONK_PASSWORD}`).toString('base64');
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+
   let res: Response;
   try {
     res = await fetch(`${LISTMONK_API_URL}/api/subscribers`, {
+      signal: controller.signal,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -32,8 +36,12 @@ export async function POST(req: NextRequest) {
         preconfirm_subscriptions: true,
       }),
     });
-  } catch {
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[newsletter] Listmonk unreachable:', msg, LISTMONK_API_URL);
     return NextResponse.json({ message: 'Newsletter service unavailable. Try again later.' }, { status: 503 });
+  } finally {
+    clearTimeout(timeout);
   }
 
   if (res.ok) {
