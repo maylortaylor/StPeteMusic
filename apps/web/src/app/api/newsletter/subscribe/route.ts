@@ -39,7 +39,10 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error('[newsletter] Listmonk unreachable:', msg, LISTMONK_API_URL);
-    return NextResponse.json({ message: 'Newsletter service unavailable. Try again later.' }, { status: 503 });
+    return NextResponse.json(
+      { message: 'Newsletter service unavailable. Try again later.', _debug: { error: msg, url: LISTMONK_API_URL } },
+      { status: 503 }
+    );
   } finally {
     clearTimeout(timeout);
   }
