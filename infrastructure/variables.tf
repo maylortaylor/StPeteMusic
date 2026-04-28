@@ -29,12 +29,20 @@ variable "listmonk_username" {
   description = "Listmonk admin API username. Set via TF_VAR_listmonk_username in CI."
   type        = string
   sensitive   = true
-  default     = ""
+
+  validation {
+    condition     = length(var.listmonk_username) > 0
+    error_message = "listmonk_username must not be empty. Set the LISTMONK_USERNAME GitHub Secret."
+  }
 }
 
 variable "listmonk_password" {
   description = "Listmonk admin API password. Set via TF_VAR_listmonk_password in CI."
   type        = string
   sensitive   = true
-  default     = ""
+
+  validation {
+    condition     = length(var.listmonk_password) > 0
+    error_message = "listmonk_password must not be empty. Set the LISTMONK_PASSWORD GitHub Secret."
+  }
 }
