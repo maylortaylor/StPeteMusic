@@ -3,6 +3,17 @@
 # Branches: main (production) + develop (staging)
 # Build spec: amplify.yml at repo root
 
+# Read Listmonk credentials from SSM so Amplify env vars stay in sync with EC2
+data "aws_ssm_parameter" "listmonk_username" {
+  name            = aws_ssm_parameter.listmonk_username.name
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "listmonk_password" {
+  name            = aws_ssm_parameter.listmonk_password.name
+  with_decryption = true
+}
+
 resource "aws_amplify_app" "web" {
   name         = "${var.project}-web"
   repository   = "https://github.com/maylortaylor/StPeteMusic"
@@ -17,10 +28,10 @@ resource "aws_amplify_app" "web" {
   environment_variables = {
     AMPLIFY_MONOREPO_APP_ROOT = "apps/web"  # tells Amplify where to find package.json for framework detection
     NEXT_PUBLIC_SITE_URL      = "https://www.stpetemusic.live"
-
-    # Non-secret Listmonk config — secrets set in Amplify console per branch
-    LISTMONK_API_URL = "https://listmonk.stpetemusic.live"
-    LISTMONK_LIST_ID = "1"
+    LISTMONK_API_URL          = "https://listmonk.stpetemusic.live"
+    LISTMONK_LIST_ID          = "1"
+    LISTMONK_USERNAME         = data.aws_ssm_parameter.listmonk_username.value
+    LISTMONK_PASSWORD         = data.aws_ssm_parameter.listmonk_password.value
   }
 
   enable_auto_branch_creation = false
