@@ -117,14 +117,14 @@ All 3 records must be **DNS only (grey cloud — NOT proxied)**:
 - **SSH:** `ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n.stpetemusic.live`
 - **Quick reference:** `AWS_SETUP.md`
 - **Full deployment guide:** `docs/AWS_DEPLOYMENT.md`
-- **IaC:** Terraform — see `infrastructure/` (active, state in S3 `stpetemusic-terraform-state`)
+- **IaC:** OpenTofu — see `infrastructure/` (active, state in S3 `stpetemusic-terraform-state`)
 
-### Terraform
+### OpenTofu
 - **State bucket:** `stpetemusic-terraform-state` (S3, `us-east-1`, versioned + encrypted)
 - **Lock table:** `stpetemusic-terraform-locks` (DynamoDB, pay-per-request)
-- **CI:** `terraform plan` on every PR touching `infrastructure/`; `terraform apply` on merge to main
+- **CI:** `tofu plan` on every PR touching `infrastructure/`; `tofu apply` on merge to main
 - **Rule:** Never edit AWS resources manually — always change `.tf` files and let CI apply
-- **Local commands:** `cd infrastructure && terraform plan` / `terraform apply`
+- **Local commands:** `cd infrastructure && AWS_PROFILE=personal tofu plan` / `tofu apply`
 - **Managed resources:** Security Group `sg-03a69e68cf7077cf3`, EC2 `i-03874197d725b0455`, EIP `eipalloc-0a2ebbeef75ce8009`
 - **Pending (commented out):** RDS PostgreSQL (`database.tf`), S3 backup bucket (`backup.tf`)
 
@@ -422,15 +422,16 @@ If it persists, check your shell config (`.zshrc`, `.bashrc`) for `AWS_WEB_IDENT
 **Solution:**
 ```bash
 cd infrastructure
-AWS_PROFILE=personal terraform init -reconfigure
+unset AWS_WEB_IDENTITY_TOKEN_FILE && AWS_PROFILE=personal tofu init -reconfigure
 ```
 
-**Problem:** `terraform plan` shows no changes but changes are expected
+**Problem:** `tofu plan` shows no changes but changes are expected
 
 **Solution:** State might be out of sync:
 ```bash
-AWS_PROFILE=personal terraform refresh
-AWS_PROFILE=personal terraform plan
+unset AWS_WEB_IDENTITY_TOKEN_FILE
+AWS_PROFILE=personal tofu refresh
+AWS_PROFILE=personal tofu plan
 ```
 
 ### n8n Server Down
@@ -479,7 +480,7 @@ cidr_blocks = ["YOUR.IP.ADDRESS/32"]  # Replace with your public IP
 Then apply:
 ```bash
 cd infrastructure
-AWS_PROFILE=personal terraform apply
+unset AWS_WEB_IDENTITY_TOKEN_FILE && AWS_PROFILE=personal tofu apply
 ```
 
 ### Environment Variable Leakage

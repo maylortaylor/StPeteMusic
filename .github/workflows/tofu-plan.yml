@@ -1,4 +1,4 @@
-name: Terraform Plan
+name: OpenTofu Plan
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  terraform-plan:
+  tofu-plan:
     name: Plan
     runs-on: ubuntu-latest
     defaults:
@@ -21,10 +21,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85  # v4.0.0
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
         with:
-          terraform_version: '~1.6'
+          tofu_version: '~1.9'
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37  # v6.1.0
@@ -33,17 +33,17 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Terraform Init
+      - name: OpenTofu Init
         id: init
-        run: terraform init -backend-config="profile=" # profile set via env vars in CI
+        run: tofu init -backend-config="profile="
 
-      - name: Terraform Validate
+      - name: OpenTofu Validate
         id: validate
-        run: terraform validate
+        run: tofu validate
 
-      - name: Terraform Plan
+      - name: OpenTofu Plan
         id: plan
-        run: terraform plan -no-color -out=tfplan
+        run: tofu plan -no-color -out=tfplan
         continue-on-error: true
         env:
           TF_VAR_github_token: ${{ secrets.GH_TOKEN_AMPLIFY }}
@@ -52,20 +52,26 @@ jobs:
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3  # v9.0.0
         with:
           script: |
-            const output = `#### Terraform Plan 📖
-            **Init:** \`${{ steps.init.outcome }}\`
-            **Validate:** \`${{ steps.validate.outcome }}\`
-            **Plan:** \`${{ steps.plan.outcome }}\`
+            const initOutcome = '${{ steps.init.outcome }}';
+            const validateOutcome = '${{ steps.validate.outcome }}';
+            const planOutcome = '${{ steps.plan.outcome }}';
+            const planOutput = `${{ steps.plan.outputs.stdout }}`;
+            const workflow = '${{ github.workflow }}';
+            const actor = '${{ github.actor }}';
+            const output = `#### OpenTofu Plan 📖
+            **Init:** \`${initOutcome}\`
+            **Validate:** \`${validateOutcome}\`
+            **Plan:** \`${planOutcome}\`
 
             <details><summary>Show Plan</summary>
 
-            \`\`\`terraform
-            ${{ steps.plan.outputs.stdout }}
+            \`\`\`hcl
+            ${planOutput}
             \`\`\`
 
             </details>
 
-            *Workflow: \`${{ github.workflow }}\` | Actor: \`${{ github.actor }}\`*`;
+            *Workflow: \`${workflow}\` | Actor: \`${actor}\`*`;
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
