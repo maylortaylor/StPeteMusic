@@ -94,7 +94,7 @@ jobs:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           # Notion
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
-          # Listmonk credentials are read from SSM on EC2 (not injected here)
+          # Listmonk credentials and RDS host are read from SSM on EC2 (not injected here)
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
@@ -136,6 +136,12 @@ jobs:
               --with-decryption --query 'Parameter.Value' --output text --region us-east-1)
             echo "✓ Listmonk credentials loaded from SSM"
 
+            echo "── Reading RDS host from SSM ──"
+            RDS_HOST=$(aws ssm get-parameter \
+              --name "/stpetemusic/rds/host" \
+              --query 'Parameter.Value' --output text --region us-east-1)
+            echo "✓ RDS host: ${RDS_HOST}"
+
             echo "── Writing .env from GitHub Secrets ──"
             # printf '%s' is used for each value to safely handle special characters
             # (colons, slashes, equals signs) without shell interpretation
@@ -160,6 +166,7 @@ jobs:
               printf 'NOTION_API_KEY=%s\n'                   "${NOTION_API_KEY}"
               printf 'LISTMONK_USERNAME=%s\n'               "${LISTMONK_USERNAME}"
               printf 'LISTMONK_PASSWORD=%s\n'               "${LISTMONK_PASSWORD}"
+              printf 'RDS_HOST=%s\n'                        "${RDS_HOST}"
             } > ~/stpetemusic/.env
             chmod 600 ~/stpetemusic/.env
             echo "✓ .env written ($(wc -l < ~/stpetemusic/.env) vars)"
@@ -182,12 +189,36 @@ jobs:
             cd ~/stpetemusic/n8n
             docker-compose -f docker-compose.prod.yaml --env-file ../.env up -d
 
-            echo "── Creating listmonk database if it doesn't exist ──"
-            sleep 3
-            docker exec stpetemusic-postgres psql -U "${POSTGRES_USER}" \
-              -c "CREATE DATABASE listmonk;" 2>/dev/null \
-              && echo "✓ listmonk database created" \
-              || echo "✓ listmonk database already exists"
+            echo "── Creating listmonk_stpetemusic database on RDS if needed ──"
+            docker run --rm \
+              -e PGPASSWORD="${POSTGRES_PASSWORD}" \
+              postgres:16-alpine \
+              psql -h "${RDS_HOST}" -U "${POSTGRES_USER}" -d n8n \
+              -c "CREATE DATABASE listmonk_stpetemusic;" 2>/dev/null \
+              && echo "✓ listmonk_stpetemusic database created" \
+              || echo "✓ listmonk_stpetemusic database already exists"
+
+            echo "── Waiting for Listmonk to be ready (up to 60s) ──"
+            for i in $(seq 1 20); do
+              curl -sf http://localhost:9000/api/health > /dev/null 2>&1 && break
+              sleep 3
+            done
+
+            echo "── Bootstrapping default mailing list ──"
+            LIST_COUNT=$(curl -sf -u "${LISTMONK_USERNAME}:${LISTMONK_PASSWORD}" \
+              http://localhost:9000/api/lists \
+              | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['data']['total'])" \
+              2>/dev/null || echo "0")
+            if [ "${LIST_COUNT}" = "0" ]; then
+              curl -sf -X POST -u "${LISTMONK_USERNAME}:${LISTMONK_PASSWORD}" \
+                -H "Content-Type: application/json" \
+                http://localhost:9000/api/lists \
+                -d '{"name":"StPeteMusic Newsletter","type":"public","optin":"single","tags":["newsletter"]}' \
+                && echo "✓ Default mailing list created (ID=1)" \
+                || echo "⚠ Could not create mailing list — Listmonk may still be starting"
+            else
+              echo "✓ Mailing list already exists (${LIST_COUNT} found)"
+            fi
 
             echo "── Setting up nginx for listmonk.stpetemusic.live ──"
             sudo cp "${DEPLOY_DIR}/listmonk.conf" /etc/nginx/conf.d/listmonk.conf

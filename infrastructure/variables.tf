@@ -25,6 +25,28 @@ variable "github_token" {
   default     = ""  # empty default allows terraform validate to pass in CI without the secret
 }
 
+variable "db_username" {
+  description = "RDS master username. Set via TF_VAR_db_username in CI."
+  type        = string
+  sensitive   = true
+
+  validation {
+    condition     = length(var.db_username) > 0
+    error_message = "db_username must not be empty. Set the POSTGRES_USER GitHub Secret."
+  }
+}
+
+variable "db_password" {
+  description = "RDS master password. Set via TF_VAR_db_password in CI."
+  type        = string
+  sensitive   = true
+
+  validation {
+    condition     = length(var.db_password) > 0
+    error_message = "db_password must not be empty. Set the POSTGRES_PASSWORD GitHub Secret."
+  }
+}
+
 variable "listmonk_username" {
   description = "Listmonk admin API username. Set via TF_VAR_listmonk_username in CI."
   type        = string

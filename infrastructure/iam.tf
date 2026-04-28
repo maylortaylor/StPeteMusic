@@ -20,6 +20,7 @@ resource "aws_iam_role_policy" "ec2_ssm_listmonk" {
       Resource = [
         aws_ssm_parameter.listmonk_username.arn,
         aws_ssm_parameter.listmonk_password.arn,
+        aws_ssm_parameter.rds_host.arn,
       ]
     }]
   })
