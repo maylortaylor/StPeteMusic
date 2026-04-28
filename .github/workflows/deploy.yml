@@ -136,19 +136,10 @@ jobs:
               --with-decryption --query 'Parameter.Value' --output text --region us-east-1)
             echo "✓ Listmonk credentials loaded from SSM"
 
-            echo "── Reading RDS host from SSM (waits for tofu-apply if RDS is still provisioning) ──"
-            RDS_HOST=""
-            for i in $(seq 1 30); do
-              RDS_HOST=$(aws ssm get-parameter \
-                --name "/stpetemusic/rds/host" \
-                --query 'Parameter.Value' --output text --region us-east-1 2>/dev/null) && break
-              echo "  SSM param not ready yet, waiting 30s (attempt ${i}/30)..."
-              sleep 30
-            done
-            if [ -z "${RDS_HOST}" ]; then
-              echo "✗ /stpetemusic/rds/host not found after 15 min — tofu-apply may have failed"
-              exit 1
-            fi
+            echo "── Reading RDS host from SSM ──"
+            RDS_HOST=$(aws ssm get-parameter \
+              --name "/stpetemusic/rds/host" \
+              --query 'Parameter.Value' --output text --region us-east-1)
             echo "✓ RDS host: ${RDS_HOST}"
 
             echo "── Writing .env from GitHub Secrets ──"
