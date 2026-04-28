@@ -1,4 +1,4 @@
-name: Terraform Apply
+name: OpenTofu Apply
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 jobs:
-  terraform-apply:
+  tofu-apply:
     name: Apply
     runs-on: ubuntu-latest
     environment: production
@@ -23,10 +23,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85  # v4.0.0
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
         with:
-          terraform_version: '~1.6'
+          tofu_version: '~1.9'
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37  # v6.1.0
@@ -35,10 +35,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Terraform Init
-        run: terraform init -backend-config="profile="
+      - name: OpenTofu Init
+        run: tofu init -backend-config="profile="
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -input=false
+      - name: OpenTofu Apply
+        run: tofu apply -auto-approve -input=false
         env:
           TF_VAR_github_token: ${{ secrets.GH_TOKEN_AMPLIFY }}
