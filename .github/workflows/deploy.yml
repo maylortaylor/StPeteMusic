@@ -22,6 +22,12 @@ on:
   # Allows manual trigger from the GitHub Actions UI
   workflow_dispatch:
 
+# Prevent two deploys from stomping each other on EC2 (/tmp/deploy-pkg is shared).
+# cancel-in-progress: false queues the newer deploy rather than aborting it.
+concurrency:
+  group: ec2-deploy
+  cancel-in-progress: false
+
 jobs:
   deploy:
     name: Sync to EC2
@@ -61,6 +67,7 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.5
         env:
+          DEPLOY_RUN_ID: ${{ github.run_id }}
           # n8n core
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
@@ -95,7 +102,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           envs: >-
-            POSTGRES_USER,POSTGRES_PASSWORD,DB_ENCRYPTION_KEY,N8N_ENCRYPTION_KEY,
+            DEPLOY_RUN_ID,POSTGRES_USER,POSTGRES_PASSWORD,DB_ENCRYPTION_KEY,N8N_ENCRYPTION_KEY,
             N8N_API_KEY,OBSIDIAN_HOST,CLAUDE_API_KEY_N8N_STPETEMUSIC,GROQ_API_KEY,
             N8N_GEMINI_API_KEY,IG_USER_ID,IG_APP_ID,IG_ACCESS_TOKEN,FB_PAGE_ID,FB_ACCESS_TOKEN,
             YOUTUBE_CLIENT_ID,YOUTUBE_CLIENT_SECRET,YOUTUBE_API_KEY,NOTION_API_KEY,
@@ -103,22 +110,25 @@ jobs:
           script: |
             set -e
 
+            # Use a run-specific directory so concurrent deploys cannot stomp each other.
+            # DEPLOY_RUN_ID is injected via the envs: list above.
+            DEPLOY_DIR="/tmp/deploy-pkg-${DEPLOY_RUN_ID}"
+            TARBALL="/tmp/deploy-${DEPLOY_RUN_ID}.tar.gz"
+
+            # Move the tarball from the fixed upload path to the run-specific path.
+            mv /tmp/deploy.tar.gz "${TARBALL}"
+
             echo "── Extracting deploy package ──"
-            echo "Tarball size: $(du -sh /tmp/deploy.tar.gz | cut -f1)"
-            echo "Tarball contents:"
-            tar tzf /tmp/deploy.tar.gz
-            rm -rf /tmp/deploy-pkg
-            mkdir -p /tmp/deploy-pkg
-            tar xzf /tmp/deploy.tar.gz -C /tmp/deploy-pkg
-            echo "✓ Extracted files:"
-            find /tmp/deploy-pkg -type f | sort
+            mkdir -p "${DEPLOY_DIR}"
+            tar xzf "${TARBALL}" -C "${DEPLOY_DIR}"
+            echo "✓ Extracted: $(find "${DEPLOY_DIR}" -type f | wc -l) files"
 
             echo "── Syncing workflow files ──"
             mkdir -p ~/stpetemusic/n8n/workflows/StPeteMusic
-            cp -r /tmp/deploy-pkg/workflows/StPeteMusic/. ~/stpetemusic/n8n/workflows/StPeteMusic/
+            cp -r "${DEPLOY_DIR}/workflows/StPeteMusic/." ~/stpetemusic/n8n/workflows/StPeteMusic/
 
             echo "── Syncing docker-compose.prod.yaml ──"
-            cp /tmp/deploy-pkg/docker-compose.prod.yaml ~/stpetemusic/n8n/docker-compose.prod.yaml
+            cp "${DEPLOY_DIR}/docker-compose.prod.yaml" ~/stpetemusic/n8n/docker-compose.prod.yaml
 
             echo "── Writing .env from GitHub Secrets ──"
             # printf '%s' is used for each value to safely handle special characters
@@ -174,7 +184,7 @@ jobs:
               || echo "✓ listmonk database already exists"
 
             echo "── Setting up nginx for listmonk.stpetemusic.live ──"
-            sudo cp /tmp/deploy-pkg/listmonk.conf /etc/nginx/conf.d/listmonk.conf
+            sudo cp "${DEPLOY_DIR}/listmonk.conf" /etc/nginx/conf.d/listmonk.conf
             sudo nginx -t && sudo systemctl reload nginx
             echo "✓ nginx config written and reloaded"
 
@@ -186,7 +196,7 @@ jobs:
               || echo "⚠ Certbot skipped — DNS for listmonk.stpetemusic.live may not be set yet"
 
             echo "── Setting up nginx for n8n.stpetemusic.live ──"
-            sudo cp /tmp/deploy-pkg/n8n.conf /etc/nginx/conf.d/n8n.conf
+            sudo cp "${DEPLOY_DIR}/n8n.conf" /etc/nginx/conf.d/n8n.conf
             sudo nginx -t && sudo systemctl reload nginx
             echo "✓ n8n nginx config written and reloaded"
 
@@ -198,7 +208,7 @@ jobs:
               || echo "⚠ Certbot skipped — DNS for n8n.stpetemusic.live may not be set yet"
 
             echo "── Cleanup ──"
-            rm -rf /tmp/deploy-pkg /tmp/deploy.tar.gz
+            rm -rf "${DEPLOY_DIR}" "${TARBALL}"
 
             echo "✓ Deploy complete"
             docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
