@@ -194,11 +194,8 @@ jobs:
             sleep 8
             echo "✓ Host DNS and Docker daemon configured"
 
-            echo "── Applying compose config (restarts changed containers) ──"
-            cd ~/stpetemusic/n8n
-            docker-compose -f docker-compose.prod.yaml --env-file ../.env up -d
-
             echo "── Creating listmonk_stpetemusic database on RDS if needed ──"
+            # Must run BEFORE docker-compose up so Listmonk --install finds the DB
             docker run --rm \
               -e PGPASSWORD="${POSTGRES_PASSWORD}" \
               -e PGSSLMODE=require \
@@ -208,11 +205,25 @@ jobs:
               && echo "✓ listmonk_stpetemusic database created" \
               || echo "✓ listmonk_stpetemusic database already exists"
 
-            echo "── Waiting for Listmonk to be ready (up to 60s) ──"
-            for i in $(seq 1 20); do
-              curl -sf http://localhost:9000/api/health > /dev/null 2>&1 && break
+            echo "── Applying compose config (restarts changed containers) ──"
+            cd ~/stpetemusic/n8n
+            docker-compose -f docker-compose.prod.yaml --env-file ../.env up -d
+
+            echo "── Waiting for Listmonk to be ready (up to 90s) ──"
+            LISTMONK_READY=0
+            for i in $(seq 1 30); do
+              curl -sf http://localhost:9000/api/health > /dev/null 2>&1 && LISTMONK_READY=1 && break
               sleep 3
             done
+
+            echo "── Listmonk container logs (last 40 lines) ──"
+            docker logs stpetemusic-listmonk --tail 40 2>&1 || true
+
+            if [ "${LISTMONK_READY}" = "0" ]; then
+              echo "⚠ Listmonk did not become healthy in 90s — see logs above"
+            else
+              echo "✓ Listmonk healthy"
+            fi
 
             echo "── Bootstrapping default mailing list ──"
             LIST_COUNT=$(curl -sf -u "${LISTMONK_USERNAME}:${LISTMONK_PASSWORD}" \
