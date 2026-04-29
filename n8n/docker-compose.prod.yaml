@@ -70,8 +70,9 @@ services:
       - LISTMONK_db__password=${POSTGRES_PASSWORD}
       - LISTMONK_db__database=listmonk_stpetemusic
       - LISTMONK_db__ssl_mode=require
-    # --idempotent skips install if tables already exist — safe to run on every start
-    command: [sh, -c, './listmonk --install --idempotent && ./listmonk']
+    # echo y answers the "continue (y/N)?" prompt on first install (no TTY in Docker).
+    # --idempotent skips install entirely if tables already exist — safe on every restart.
+    command: [sh, -c, 'echo y | ./listmonk --install --idempotent && ./listmonk']
     ports:
       # Bound to localhost only — nginx proxies external traffic
       - "127.0.0.1:9000:9000"
