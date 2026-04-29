@@ -11,6 +11,13 @@ on:
 permissions:
   contents: read
 
+# Shares the same concurrency group as deploy.yml so tofu-apply and deploy
+# never run simultaneously. If both fire on the same push (infra + app changes),
+# tofu-apply runs first (instance type change, etc.), then deploy SSH runs safely.
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
 jobs:
   tofu-apply:
     name: Apply

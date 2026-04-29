@@ -24,8 +24,10 @@ on:
 
 # Prevent two deploys from stomping each other on EC2 (/tmp/deploy-pkg is shared).
 # cancel-in-progress: false queues the newer deploy rather than aborting it.
+# Uses the same group as tofu-apply.yml — ensures tofu finishes (instance type
+# changes, etc.) before this workflow tries to SSH into the instance.
 concurrency:
-  group: ec2-deploy
+  group: production-deploy
   cancel-in-progress: false
 
 jobs:
@@ -200,13 +202,20 @@ jobs:
             echo 10 | sudo tee /proc/sys/vm/swappiness > /dev/null
 
             echo "── Fixing host DNS so Docker can reach Docker Hub ──"
-            # daemon.json 'dns' only controls container DNS, NOT the daemon's own DNS for
-            # image pulls. The daemon reads /etc/resolv.conf, which EC2 sets to 100.100.100.100.
+            # daemon.json 'dns' controls container DNS; /etc/resolv.conf controls daemon image-pull DNS.
+            # Always update resolv.conf (cheap, no restart needed).
+            # Only restart Docker daemon if daemon.json changed — restarting stops all containers briefly.
             echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" | sudo tee /etc/resolv.conf > /dev/null
-            echo '{"dns": ["8.8.8.8", "8.8.4.4"]}' | sudo tee /etc/docker/daemon.json > /dev/null
-            sudo systemctl restart docker
-            sleep 8
-            echo "✓ Host DNS and Docker daemon configured"
+            DESIRED_DOCKER_DNS='{"dns": ["8.8.8.8", "8.8.4.4"]}'
+            CURRENT_DOCKER_DNS=$(cat /etc/docker/daemon.json 2>/dev/null || echo "")
+            if [ "${CURRENT_DOCKER_DNS}" != "${DESIRED_DOCKER_DNS}" ]; then
+              echo "${DESIRED_DOCKER_DNS}" | sudo tee /etc/docker/daemon.json > /dev/null
+              sudo systemctl restart docker
+              sleep 8
+              echo "✓ Docker DNS updated and daemon restarted"
+            else
+              echo "✓ Docker DNS already correct — no restart needed"
+            fi
 
             echo "── Creating listmonk_stpetemusic database on RDS if needed ──"
             # Must run BEFORE docker-compose up so Listmonk --install finds the DB
@@ -223,18 +232,45 @@ jobs:
             cd ~/stpetemusic/n8n
             docker-compose -f docker-compose.prod.yaml --env-file ../.env up -d
 
-            echo "── Waiting for Listmonk to be ready (up to 90s) ──"
+            echo "── Installing systemd service for auto-start on reboot ──"
+            # Writes (or overwrites) the unit file on every deploy so it stays in sync
+            # with any docker-compose changes. Containers will auto-start after EC2 reboots.
+            {
+              echo '[Unit]'
+              echo 'Description=StPeteMusic Docker Compose'
+              echo 'After=docker.service network-online.target'
+              echo 'Requires=docker.service'
+              echo ''
+              echo '[Service]'
+              echo 'Type=oneshot'
+              echo 'User=ec2-user'
+              echo 'WorkingDirectory=/home/ec2-user/stpetemusic/n8n'
+              echo 'ExecStart=/usr/bin/docker-compose -f docker-compose.prod.yaml --env-file ../.env up -d'
+              echo 'RemainAfterExit=yes'
+              echo 'TimeoutStartSec=300'
+              echo ''
+              echo '[Install]'
+              echo 'WantedBy=multi-user.target'
+            } | sudo tee /etc/systemd/system/stpetemusic.service > /dev/null
+            sudo systemctl daemon-reload
+            sudo systemctl enable stpetemusic.service
+            echo "✓ stpetemusic.service installed and enabled"
+
+            echo "── Waiting for Listmonk to be ready (up to 300s) ──"
+            # n8n can take up to 150s to become healthy (start_period:60s + 3*retries*30s).
+            # Listmonk won't start until n8n is healthy (depends_on: service_healthy).
+            # 300s gives both enough time to start without false failure warnings.
             LISTMONK_READY=0
-            for i in $(seq 1 30); do
+            for i in $(seq 1 60); do
               curl -sf http://localhost:9000/api/health > /dev/null 2>&1 && LISTMONK_READY=1 && break
-              sleep 3
+              sleep 5
             done
 
             echo "── Listmonk container logs (last 40 lines) ──"
             docker logs stpetemusic-listmonk --tail 40 2>&1 || true
 
             if [ "${LISTMONK_READY}" = "0" ]; then
-              echo "⚠ Listmonk did not become healthy in 90s — see logs above"
+              echo "⚠ Listmonk did not become healthy in 300s — see logs above"
             else
               echo "✓ Listmonk healthy"
             fi
