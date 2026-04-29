@@ -185,6 +185,20 @@ jobs:
             mkdir -p ~/stpetemusic/n8n/local-files/videos
             chmod o+x ~/stpetemusic ~/stpetemusic/n8n ~/stpetemusic/n8n/local-files ~/stpetemusic/n8n/local-files/videos
 
+            echo "── Ensuring swap is active (2GB) ──"
+            # user_data.sh sets up swap on first boot only — this ensures it's active
+            # on every deploy in case the instance was stopped/started since first boot.
+            if ! swapon --show | grep -q '/swapfile'; then
+              sudo fallocate -l 2G /swapfile 2>/dev/null || true
+              sudo chmod 600 /swapfile
+              sudo mkswap /swapfile 2>/dev/null || true
+              sudo swapon /swapfile && echo "✓ Swap activated (2GB)" || echo "⚠ Could not activate swap"
+            else
+              SWAP_GB=$(swapon --show --bytes | awk 'NR>1{sum+=$3} END{printf "%.1fGB", sum/1073741824}')
+              echo "✓ Swap already active (${SWAP_GB})"
+            fi
+            echo 10 | sudo tee /proc/sys/vm/swappiness > /dev/null
+
             echo "── Fixing host DNS so Docker can reach Docker Hub ──"
             # daemon.json 'dns' only controls container DNS, NOT the daemon's own DNS for
             # image pulls. The daemon reads /etc/resolv.conf, which EC2 sets to 100.100.100.100.

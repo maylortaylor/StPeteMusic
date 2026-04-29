@@ -6,6 +6,12 @@ services:
     dns:
       - 8.8.8.8
       - 8.8.4.4
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
     environment:
       - N8N_HOST=n8n.stpetemusic.live
       - N8N_PORT=5678
@@ -50,6 +56,9 @@ services:
     image: listmonk/listmonk:latest
     container_name: stpetemusic-listmonk
     restart: unless-stopped
+    depends_on:
+      n8n:
+        condition: service_healthy
     dns:
       - 8.8.8.8
       - 8.8.4.4
@@ -70,6 +79,12 @@ services:
       - n8n-net
     volumes:
       - listmonk_uploads:/listmonk/uploads
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
     mem_limit: 256m
     memswap_limit: 512m
 
