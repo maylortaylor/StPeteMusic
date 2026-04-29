@@ -55,16 +55,14 @@ services:
       - 8.8.4.4
     environment:
       - LISTMONK_app__address=0.0.0.0:9000
-      - LISTMONK_app__admin_username=${LISTMONK_USERNAME}
-      - LISTMONK_app__admin_password=${LISTMONK_PASSWORD}
       - LISTMONK_db__host=${RDS_HOST}
       - LISTMONK_db__port=5432
       - LISTMONK_db__user=${POSTGRES_USER}
       - LISTMONK_db__password=${POSTGRES_PASSWORD}
       - LISTMONK_db__database=listmonk_stpetemusic
       - LISTMONK_db__ssl_mode=require
-    # --yes skips interactive prompts without wiping existing data (unlike piping "yes")
-    command: [sh, -c, './listmonk --install --yes && ./listmonk']
+    # --idempotent skips install if tables already exist — safe to run on every start
+    command: [sh, -c, './listmonk --install --idempotent && ./listmonk']
     ports:
       # Bound to localhost only — nginx proxies external traffic
       - "127.0.0.1:9000:9000"
