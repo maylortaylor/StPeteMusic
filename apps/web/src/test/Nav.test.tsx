@@ -12,7 +12,7 @@ vi.mock('next/link', () => ({
 describe('Nav', () => {
   it('renders the StPeteMusic brand link', () => {
     render(<Nav />);
-    expect(screen.getByText('StPeteMusic')).toBeInTheDocument();
+    expect(screen.getByAltText('StPeteMusic')).toBeInTheDocument();
   });
 
   it('renders all navigation links', () => {
@@ -31,7 +31,7 @@ describe('Nav', () => {
 
   it('brand link points to homepage', () => {
     render(<Nav />);
-    const brand = screen.getByText('StPeteMusic');
+    const brand = screen.getByAltText('StPeteMusic');
     expect(brand.closest('a')).toHaveAttribute('href', '/');
   });
 });
