@@ -10,7 +10,7 @@ services:
       test: ["CMD", "wget", "-qO-", "http://localhost:5678/healthz"]
       interval: 30s
       timeout: 10s
-      retries: 5
+      retries: 3       # 3 retries = max 150s to healthy (60s start + 3×30s); deploy waits 300s
       start_period: 60s
     environment:
       - N8N_HOST=n8n.stpetemusic.live
