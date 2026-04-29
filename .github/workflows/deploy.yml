@@ -201,6 +201,7 @@ jobs:
             echo "── Creating listmonk_stpetemusic database on RDS if needed ──"
             docker run --rm \
               -e PGPASSWORD="${POSTGRES_PASSWORD}" \
+              -e PGSSLMODE=require \
               postgres:16-alpine \
               psql -h "${RDS_HOST}" -U "${POSTGRES_USER}" -d n8n \
               -c "CREATE DATABASE listmonk_stpetemusic;" 2>/dev/null \

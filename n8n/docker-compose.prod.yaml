@@ -62,6 +62,7 @@ services:
       - LISTMONK_db__user=${POSTGRES_USER}
       - LISTMONK_db__password=${POSTGRES_PASSWORD}
       - LISTMONK_db__database=listmonk_stpetemusic
+      - LISTMONK_db__ssl_mode=require
     # --yes skips interactive prompts without wiping existing data (unlike piping "yes")
     command: [sh, -c, './listmonk --install --yes && ./listmonk']
     ports:
