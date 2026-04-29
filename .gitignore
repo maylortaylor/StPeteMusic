@@ -26,6 +26,9 @@ node_modules/
 *.pem
 *.key
 
+# gh CLI config (GH_CONFIG_DIR — stores OAuth token, must not be committed)
+/workspace/.gh-config/
+
 # Large data files that can be regenerated
 data/archive/
 data/secrets/

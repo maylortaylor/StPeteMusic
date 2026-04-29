@@ -5,7 +5,7 @@ import { Footer } from '@/components/Footer';
 describe('Footer', () => {
   it('renders the StPeteMusic brand name', () => {
     render(<Footer />);
-    expect(screen.getByText('StPeteMusic')).toBeInTheDocument();
+    expect(screen.getByAltText('StPeteMusic')).toBeInTheDocument();
   });
 
   it('renders all link column headings', () => {
