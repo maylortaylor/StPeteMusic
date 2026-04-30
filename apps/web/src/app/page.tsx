@@ -7,6 +7,7 @@ import { Hero } from '@/components/Hero';
 import { StatsSection } from '@/components/StatsSection';
 import { YouTubeGrid } from '@/components/YouTubeGrid';
 import { NewsletterSignup } from '@/components/NewsletterSignup';
+import { LinkTreeSection } from '@/components/LinkTreeSection';
 import { Footer } from '@/components/Footer';
 
 export const dynamic = 'force-dynamic';
@@ -39,6 +40,8 @@ export default function HomePage() {
         <YouTubeGrid />
 
         <NewsletterSignup variant="section" />
+
+        <LinkTreeSection />
       </main>
       <Footer />
     </>
