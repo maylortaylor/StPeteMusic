@@ -8,8 +8,6 @@ useDefault = true
 [allowlist]
   description = "Safe files and patterns"
   paths = [
-    # Template file — contains placeholder keys, not real ones
-    '''^\.env\.example$''',
     # Docs reference example patterns and commands
     '''docs/AWS_DEPLOYMENT\.md$''',
     '''AWS_SETUP\.md$''',

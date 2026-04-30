@@ -53,5 +53,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: 'Already subscribed.' }, { status: 200 });
   }
 
+  const errorBody = await res.text().catch(() => '(unreadable)');
+  console.error('[newsletter] Listmonk error:', res.status, errorBody, { listId: LISTMONK_LIST_ID, apiUrl: LISTMONK_API_URL });
   return NextResponse.json({ message: 'Subscription failed. Try again.' }, { status: 500 });
 }

@@ -1,4 +1,7 @@
 {
+  "env": {
+    "GH_CONFIG_DIR": "/workspace/.gh-config"
+  },
   "permissions": {
     "allow": [
       "Bash(git fetch:*)",
@@ -15,7 +18,16 @@
       "Bash(npm list:*)",
       "Bash(node:*)",
       "Bash(grep:*)",
-      "Bash(gh auth:*)"
+      "Bash(gh auth:*)",
+      "Bash(git merge-tree:*)",
+      "Bash(git pull:*)",
+      "Bash(git remote:*)",
+      "Bash(ls /workspace/StPeteMusic/*.md)",
+      "Bash(git config:*)",
+      "Bash(GH_CONFIG_DIR=/workspace/.gh-config gh auth:*)",
+      "Bash(npm test:*)",
+      "Bash(xargs ls:*)",
+      "Bash(npm why:*)"
     ]
   }
 }

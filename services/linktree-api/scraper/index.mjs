@@ -18,7 +18,8 @@ const PROFILES = JSON.parse(process.env.LINKTREE_PROFILES ?? '[]');
 
 /** Extract the __NEXT_DATA__ JSON blob from Linktree HTML */
 function extractNextData(html) {
-  const match = html.match(/<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/);
+  // Linktree added crossorigin="anonymous" to this tag — use a flexible match
+  const match = html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
   if (!match) throw new Error('__NEXT_DATA__ script tag not found');
   return JSON.parse(match[1]);
 }
@@ -26,13 +27,15 @@ function extractNextData(html) {
 /** Normalize the raw Linktree pageProps into a clean shape */
 function normalize(profile, pageProps) {
   const account = pageProps?.account ?? {};
-  const links = (pageProps?.links ?? []).map((l) => ({
-    id: l.id ?? null,
-    title: l.title ?? '',
-    url: l.url ?? '',
-    thumbnailUrl: l.thumbnailUrl ?? null,
-    position: l.position ?? 0,
-  }));
+  const links = (pageProps?.links ?? [])
+    .filter((l) => l.url)
+    .map((l) => ({
+      id: l.id ?? null,
+      title: l.title ?? '',
+      url: l.url,
+      thumbnailUrl: l.thumbnailUrl ?? null,
+      position: l.position ?? 0,
+    }));
   const socialLinks = (pageProps?.socialLinks ?? []).map((s) => ({
     type: s.type ?? '',
     url: s.url ?? '',
@@ -40,7 +43,7 @@ function normalize(profile, pageProps) {
 
   return {
     profile,
-    name: account.name ?? '',
+    name: account.pageTitle ?? account.name ?? '',
     bio: account.description ?? '',
     avatarUrl: account.profilePictureUrl ?? null,
     links,

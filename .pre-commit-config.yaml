@@ -12,7 +12,6 @@ repos:
         args: ["--baseline", ".secrets.baseline"]
         exclude: |
           (?x)^(
-            \.env\.example|
             README\.md|
             docs/
           )

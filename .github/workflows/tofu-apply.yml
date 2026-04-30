@@ -11,6 +11,13 @@ on:
 permissions:
   contents: read
 
+# Shares the same concurrency group as deploy.yml so tofu-apply and deploy
+# never run simultaneously. If both fire on the same push (infra + app changes),
+# tofu-apply runs first (instance type change, etc.), then deploy SSH runs safely.
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
 jobs:
   tofu-apply:
     name: Apply
@@ -25,7 +32,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
       - name: Setup OpenTofu
-        uses: opentofu/setup-opentofu@v1
+        uses: opentofu/setup-opentofu@v2
         with:
           tofu_version: '~1.9'
 

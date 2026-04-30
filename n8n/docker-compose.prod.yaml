@@ -6,6 +6,12 @@ services:
     dns:
       - 8.8.8.8
       - 8.8.4.4
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3       # 3 retries = max 150s to healthy (60s start + 3×30s); deploy waits 300s
+      start_period: 60s
     environment:
       - N8N_HOST=n8n.stpetemusic.live
       - N8N_PORT=5678
@@ -61,8 +67,9 @@ services:
       - LISTMONK_db__password=${POSTGRES_PASSWORD}
       - LISTMONK_db__database=listmonk_stpetemusic
       - LISTMONK_db__ssl_mode=require
-    # --idempotent skips install if tables already exist — safe to run on every start
-    command: [sh, -c, './listmonk --install --idempotent && ./listmonk']
+    # echo y answers the "continue (y/N)?" prompt on first install (no TTY in Docker).
+    # --idempotent skips install entirely if tables already exist — safe on every restart.
+    command: [sh, -c, 'echo y | ./listmonk --install --idempotent && ./listmonk']
     ports:
       # Bound to localhost only — nginx proxies external traffic
       - "127.0.0.1:9000:9000"
@@ -70,6 +77,12 @@ services:
       - n8n-net
     volumes:
       - listmonk_uploads:/listmonk/uploads
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
     mem_limit: 256m
     memswap_limit: 512m
 
