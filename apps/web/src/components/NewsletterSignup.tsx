@@ -78,7 +78,7 @@ export function NewsletterSignup({ variant = 'section' }: NewsletterSignupProps)
         </AnimateIn>
 
         <AnimateIn delay={0.2} as="p" className="font-inter text-white/70 text-xl mb-12 max-w-md mx-auto leading-relaxed">
-          Monthly roundup of Final Friday lineups, new artists, and what&apos;s happening in St. Pete.
+          Monthly roundup of what&apos;s happening in St Pete&apos;s music scene, emerging artists in the area, and what you should be excited for.
         </AnimateIn>
 
         <AnimateIn delay={0.3}>
