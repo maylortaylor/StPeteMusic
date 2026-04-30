@@ -69,12 +69,12 @@ export function Hero() {
           style={{ y: contentY, opacity: contentOpacity }}
         >
           <motion.p
-            className="font-inter font-medium text-sm tracking-[0.5em] uppercase text-white/90"
+            className="font-inter font-medium text-sm tracking-[0.5em] uppercase text-white/90 mt-40"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
           >
-            St. Petersburg, FL · Warehouse Arts District
+            St. Petersburg, FL - Community Driven Music
           </motion.p>
 
           <motion.div
@@ -88,7 +88,7 @@ export function Hero() {
               width={500}
               height={500}
               className="object-contain"
-              style={{ maxWidth: 'min(500px, 75vw)', height: 'auto' }}
+              style={{ maxWidth: 'min(500px, 75vw)', height: 'auto', marginTop: '-75px', marginBottom: '-75px' }}
               priority
             />
           </motion.div>
@@ -103,7 +103,7 @@ export function Hero() {
           </motion.p>
 
           <motion.div
-            className="flex flex-col sm:flex-row gap-4 mt-4"
+            className="flex flex-col sm:flex-row gap-4 mt-4 mb-40"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.65 }}
@@ -123,6 +123,14 @@ export function Hero() {
               className="text-white font-inter font-bold text-base uppercase tracking-widest px-10 py-4 border border-white hover:bg-white/10 transition-all"
             >
               Watch on YouTube
+            </a>
+            <a
+              href="https://final-friday.eventbrite.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white font-inter font-bold text-base uppercase tracking-widest px-10 py-4 bg-brand-orange hover:opacity-85 transition-opacity"
+            >
+              Get Tickets
             </a>
           </motion.div>
         </motion.div>

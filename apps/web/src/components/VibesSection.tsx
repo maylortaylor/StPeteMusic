@@ -15,7 +15,7 @@ function getFocalPosition(src: string): string {
 
 const cells = [
   {
-    span: 'col-span-2 row-span-2',
+    span: 'md:col-span-2 md:row-span-2',
     photoSrc: '/images/vibes/vibe-1.jpg',
     label: 'Final Friday',
     accent: '#FF8C00',
@@ -39,7 +39,7 @@ const cells = [
     depth: 240,
   },
   {
-    span: 'col-span-3',
+    span: 'md:col-span-3',
     photoSrc: '/images/vibes/vibe-4.jpg',
     label: 'Suite E Studios · Warehouse Arts District',
     accent: '#FF8C00',
@@ -146,7 +146,7 @@ export function VibesSection() {
           </AnimateIn>
         </div>
 
-        <div className="grid grid-cols-3 gap-3" style={{ gridTemplateRows: 'auto auto auto' }}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3" style={{ gridTemplateRows: 'auto auto auto' }}>
           {cells.map((cell, i) => (
             <ParallaxCell
               key={i}
