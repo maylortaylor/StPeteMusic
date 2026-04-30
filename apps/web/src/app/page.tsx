@@ -1,4 +1,3 @@
-import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
 import 'yet-another-react-lightbox/styles.css';
 import { Nav } from '@/components/Nav';
@@ -8,6 +7,7 @@ import { YouTubeGrid } from '@/components/YouTubeGrid';
 import { NewsletterSignup } from '@/components/NewsletterSignup';
 import { LinkTreeSection } from '@/components/LinkTreeSection';
 import { Footer } from '@/components/Footer';
+import { PhotoStrip, EventsTeaser, VibesSection } from '@/components/ClientSections';
 
 export const metadata: Metadata = {
   title: 'Live Music in St. Petersburg, FL',
@@ -38,16 +38,6 @@ const orgJsonLd = {
 };
 
 export const dynamic = 'force-dynamic';
-
-const PhotoStrip = dynamicImport(() => import('@/components/PhotoStrip').then(m => m.PhotoStrip), {
-  ssr: false,
-});
-const VibesSection = dynamicImport(() => import('@/components/VibesSection').then(m => m.VibesSection), {
-  ssr: false,
-});
-const EventsTeaser = dynamicImport(() => import('@/components/EventsTeaser').then(m => m.EventsTeaser), {
-  ssr: false,
-});
 
 export default function HomePage() {
   return (
