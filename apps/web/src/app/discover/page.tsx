@@ -1,5 +1,18 @@
+import type { Metadata } from 'next';
 import { Nav } from '@/components/Nav';
 import { Footer } from '@/components/Footer';
+
+export const metadata: Metadata = {
+  title: 'Discover St. Pete Artists',
+  description:
+    'Explore bands, DJs, solo artists, and venues from the greater St. Petersburg, FL area. All genres, all types, no gatekeeping.',
+  openGraph: {
+    title: 'St. Pete Music | Discover St. Pete Artists',
+    description:
+      'Explore bands, DJs, solo artists, and venues from the greater St. Petersburg, FL area. All genres, all types, no gatekeeping.',
+    url: 'https://www.stpetemusic.live/discover',
+  },
+};
 
 const FEATURED_ARTISTS = [
   { name: 'Movie Props', instagram: '@moviepropsband', type: 'Band' },
@@ -8,9 +21,23 @@ const FEATURED_ARTISTS = [
   { name: 'Physical Plant', instagram: '@physical_plant', type: 'Band' },
 ];
 
+const artistsJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Featured St. Pete Artists',
+  description: 'Local bands and artists featured on @StPeteMusic in St. Petersburg, FL',
+  itemListElement: FEATURED_ARTISTS.map((artist, i) => ({
+    '@type': 'MusicGroup',
+    position: i + 1,
+    name: artist.name,
+    sameAs: `https://www.instagram.com/${artist.instagram.replace('@', '')}`,
+  })),
+};
+
 export default function DiscoverPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(artistsJsonLd) }} />
       <Nav />
       <main className="min-h-screen px-4 sm:px-6 lg:px-8 py-20">
         <div className="max-w-7xl mx-auto">
