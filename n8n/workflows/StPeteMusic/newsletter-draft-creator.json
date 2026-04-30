@@ -1,0 +1,252 @@
+{
+  "name": "Newsletter Draft Creator",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 160],
+      "id": "a1b2c3d4-0001-0001-0001-000000000001",
+      "name": "Manual Trigger"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 1 * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300],
+      "id": "a1b2c3d4-0002-0002-0002-000000000002",
+      "name": "Schedule: 1st of Month (9am ET)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Compute current month info for file paths and prompts\nconst now = new Date();\nconst year = now.getFullYear().toString();\nconst month = String(now.getMonth() + 1).padStart(2, '0');\nconst monthName = now.toLocaleString('en-US', { month: 'long' });\n// Send date: 3rd of the month\nconst sendDate = `${year}-${month}-03`;\n\nreturn {\n  json: {\n    year,\n    month,\n    monthName,\n    monthYear: `${monthName} ${year}`,\n    sendDate,\n    obsidianPath: `StPeteMusic/newsletters/${year}/${month}-newsletter.md`,\n    newsletterTitle: `St Pete Music Newsletter - ${monthName} ${year}`\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 220],
+      "id": "a1b2c3d4-0003-0003-0003-000000000003",
+      "name": "Get Month Info"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1kzzR8zPxxNmNmp7hXFwzWMoVZh7ZLC9GZBnob1UNYo8",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "PostSchedule",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [720, 120],
+      "id": "a1b2c3d4-0004-0004-0004-000000000004",
+      "name": "Read PostSchedule",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1kzzR8zPxxNmNmp7hXFwzWMoVZh7ZLC9GZBnob1UNYo8",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "IG_PastPosts",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [720, 300],
+      "id": "a1b2c3d4-0005-0005-0005-000000000005",
+      "name": "Read IG_PastPosts",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [960, 220],
+      "id": "a1b2c3d4-0006-0006-0006-000000000006",
+      "name": "Merge Sheets Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine PostSchedule + IG_PastPosts into a single structured prompt context.\n// The merge node passes both sheet results — index 0 = PostSchedule, index 1 = IG_PastPosts.\n// We grab all items and separate them by their source.\n\n// Get context from Get Month Info node\nconst monthCtx = $('Get Month Info').first().json;\n\n// PostSchedule rows (all items from first Merge input)\nconst scheduleRows = $('Read PostSchedule').all().map(i => i.json);\n\n// IG_PastPosts rows\nconst igRows = $('Read IG_PastPosts').all().map(i => i.json);\n\n// Format PostSchedule as readable text\nconst scheduleText = scheduleRows.length > 0\n  ? scheduleRows\n      .map(r => Object.entries(r).map(([k, v]) => `${k}: ${v}`).join(' | '))\n      .join('\\n')\n  : 'No upcoming events data available.';\n\n// Format recent IG posts (last 10)\nconst igText = igRows.length > 0\n  ? igRows\n      .slice(-10)\n      .map(r => Object.entries(r).map(([k, v]) => `${k}: ${v}`).join(' | '))\n      .join('\\n')\n  : 'No recent IG post data available.';\n\nconst prompt = `You are drafting the monthly newsletter for StPeteMusic for ${monthCtx.monthYear}.\n\nHere is the upcoming event/post schedule data (PostSchedule sheet):\n${scheduleText}\n\nHere are recent Instagram post records for the Social Roundup section (IG_PastPosts sheet):\n${igText}\n\nUsing the data above, write the full newsletter body HTML following your style guidelines.\nFocus on Suite E Studios events. For the Social Roundup, pick 2-3 of the most recent IG/YouTube posts.\nRemember: output ONLY the four-section HTML body. No extra text or markdown fences.`;\n\nreturn {\n  json: {\n    ...monthCtx,\n    prompt\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 220],
+      "id": "a1b2c3d4-0007-0007-0007-000000000007",
+      "name": "Build AI Prompt"
+    },
+    {
+      "parameters": {
+        "prompt": "={{ $json.prompt }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [1440, 220],
+      "id": "a1b2c3d4-0008-0008-0008-000000000008",
+      "name": "Draft Newsletter HTML"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-sonnet-4-6",
+          "mode": "list",
+          "cachedResultName": "Claude Sonnet 4.6"
+        },
+        "options": {
+          "systemMessage": "You are the newsletter editor for @StPeteMusic — a music and arts community organization in St. Petersburg, FL, centered around Suite E Studios in the Warehouse Arts District.\n\nYour job is to draft the monthly newsletter body as clean HTML using only inline styles.\nOutput nothing but the four-section HTML body. No markdown fences, no explanation.\n\nThe email template has a WHITE background — use dark text on light backgrounds.\n\nBrand voice: Enthusiastic, authentic, community-oriented, welcoming. Slightly informal but not sloppy.\n\n## HTML Styles\n\nSection header:\n<h2 style=\"margin:28px 0 12px 0;font-size:20px;font-weight:700;color:#e85d26;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Section Title</h2>\n\nBody paragraph:\n<p style=\"margin:0 0 16px 0;font-size:15px;color:#333333;line-height:1.7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Text here.</p>\n\nEvent card (light warm bg with orange left border):\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" width=\"100%\" style=\"background-color:#f8f5f2;border-radius:8px;margin:0 0 16px 0;border-left:4px solid #e85d26;\">\n  <tr><td style=\"padding:16px 20px;\">\n    <p style=\"margin:0 0 3px 0;font-size:11px;color:#e85d26;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">DATE · TIME</p>\n    <p style=\"margin:0 0 8px 0;font-size:17px;font-weight:700;color:#1a1a1a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">EVENT / BAND NAME</p>\n    <p style=\"margin:0 0 12px 0;font-size:14px;color:#666666;line-height:1.6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Short description.</p>\n    <a href=\"URL\" style=\"display:inline-block;background-color:#e85d26;color:#ffffff;text-decoration:none;font-size:13px;font-weight:600;padding:8px 18px;border-radius:6px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Get Tickets →</a>\n  </td></tr>\n</table>\n\nSection divider: <hr style=\"border:none;border-top:1px solid #eeece9;margin:24px 0;\">\n\nSocial roundup item:\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" width=\"100%\" style=\"background-color:#f8f5f2;border-radius:8px;margin:0 0 12px 0;\">\n  <tr><td style=\"padding:14px 18px;\">\n    <p style=\"margin:0 0 4px 0;font-size:11px;color:#e85d26;font-weight:700;text-transform:uppercase;letter-spacing:1px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Platform</p>\n    <p style=\"margin:0 0 8px 0;font-size:15px;color:#1a1a1a;line-height:1.5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Description.</p>\n    <a href=\"URL\" style=\"color:#e85d26;text-decoration:none;font-size:13px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Watch / View →</a>\n  </td></tr>\n</table>\n\nInline link: <a href=\"URL\" style=\"color:#e85d26;text-decoration:none;font-weight:500;\">Link text</a>\n\n## Sections (write all four in order)\n1. Suite E Events This Month — event cards for upcoming shows, tickets link to https://www.eventbrite.com/o/st-pete-music-105663485881 as fallback\n2. Featured Bands — spotlight 1-2 artists, Instagram handle as inline link\n3. Venue & Community News — Suite E Studios updates, brief 2-4 sentences, link to https://linktr.ee/suite_e_studios\n4. Social Roundup — 2-3 recent YouTube/IG posts using social roundup item cards\n\nEnd with: <hr style=\"border:none;border-top:1px solid #eeece9;margin:24px 0;\">"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [1440, 400],
+      "id": "a1b2c3d4-0009-0009-0009-000000000009",
+      "name": "Claude Sonnet",
+      "credentials": {
+        "anthropicApi": {
+          "id": "GxEPu27ca9FmXxQA",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build the full Obsidian markdown file with YAML frontmatter.\n// Uses String.fromCharCode(96) for backtick chars to avoid JSON escape issues.\nconst llmOutput = $input.first().json.text || '';\nconst monthCtx = $('Get Month Info').first().json;\nconst today = new Date().toISOString().split('T')[0];\nconst bt = String.fromCharCode(96);\n\nconst lines = [\n  '---',\n  'title: \"' + monthCtx.newsletterTitle + '\"',\n  'month: \"' + monthCtx.year + '-' + monthCtx.month + '\"',\n  'sendDate: \"' + monthCtx.sendDate + '\"',\n  'status: \"draft\"',\n  'listmonkCampaignId: \"\"',\n  'ai-generated: true',\n  'created-date: ' + today,\n  '---',\n  '',\n  '# ' + monthCtx.newsletterTitle,\n  '',\n  '> **Status:** draft — Edit this file, then change status to ' + bt + 'approved' + bt + ' to publish.',\n  '>',\n  '> **To publish:** Run the ' + bt + 'Newsletter Publisher' + bt + ' workflow in n8n.',\n  '',\n  '---',\n  '',\n  '## Campaign Subject Line',\n  '',\n  '\\uD83C\\uDFB5 What\\'s Happening in St. Pete This Month \\u2014 ' + monthCtx.monthName + ' ' + monthCtx.year,\n  '',\n  '*Edit the subject above if needed, then copy it into Listmonk when sending.*',\n  '',\n  '---',\n  '',\n  '## Newsletter Body HTML',\n  '',\n  llmOutput,\n  '',\n  '---',\n  '',\n  '## Notes',\n  '',\n  '*Add any edits or notes here before approving:*',\n  ''\n];\n\nconst markdownContent = lines.join('\\n');\n\nreturn {\n  json: {\n    ...monthCtx,\n    markdownContent,\n    obsidianPath: monthCtx.obsidianPath\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1680, 220],
+      "id": "a1b2c3d4-0010-0010-0010-000000000010",
+      "name": "Build Newsletter Markdown"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $env.OBSIDIAN_HOST }}/vault/{{ $json.obsidianPath }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/markdown",
+        "body": "={{ $json.markdownContent }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1920, 220],
+      "id": "a1b2c3d4-0011-0011-0011-000000000011",
+      "name": "Write Draft to Obsidian",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "4tIhQEVZNqoTVr0Z",
+          "name": "Bearer Auth account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [{"node": "Get Month Info", "type": "main", "index": 0}]
+      ]
+    },
+    "Schedule: 1st of Month (9am ET)": {
+      "main": [
+        [{"node": "Get Month Info", "type": "main", "index": 0}]
+      ]
+    },
+    "Get Month Info": {
+      "main": [
+        [
+          {"node": "Read PostSchedule", "type": "main", "index": 0},
+          {"node": "Read IG_PastPosts", "type": "main", "index": 0}
+        ]
+      ]
+    },
+    "Read PostSchedule": {
+      "main": [
+        [{"node": "Merge Sheets Data", "type": "main", "index": 0}]
+      ]
+    },
+    "Read IG_PastPosts": {
+      "main": [
+        [{"node": "Merge Sheets Data", "type": "main", "index": 1}]
+      ]
+    },
+    "Merge Sheets Data": {
+      "main": [
+        [{"node": "Build AI Prompt", "type": "main", "index": 0}]
+      ]
+    },
+    "Build AI Prompt": {
+      "main": [
+        [{"node": "Draft Newsletter HTML", "type": "main", "index": 0}]
+      ]
+    },
+    "Draft Newsletter HTML": {
+      "main": [
+        [{"node": "Build Newsletter Markdown", "type": "main", "index": 0}]
+      ]
+    },
+    "Claude Sonnet": {
+      "ai_languageModel": [
+        [{"node": "Draft Newsletter HTML", "type": "ai_languageModel", "index": 0}]
+      ]
+    },
+    "Build Newsletter Markdown": {
+      "main": [
+        [{"node": "Write Draft to Obsidian", "type": "main", "index": 0}]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/New_York"
+  },
+  "versionId": "newsletter-draft-creator-v1",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "id": "newsletter-draft-creator",
+  "tags": [
+    {"name": "newsletter"},
+    {"name": "stpetemusic"}
+  ]
+}
