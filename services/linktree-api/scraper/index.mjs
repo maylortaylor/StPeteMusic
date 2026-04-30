@@ -27,13 +27,15 @@ function extractNextData(html) {
 /** Normalize the raw Linktree pageProps into a clean shape */
 function normalize(profile, pageProps) {
   const account = pageProps?.account ?? {};
-  const links = (pageProps?.links ?? []).map((l) => ({
-    id: l.id ?? null,
-    title: l.title ?? '',
-    url: l.url ?? '',
-    thumbnailUrl: l.thumbnailUrl ?? null,
-    position: l.position ?? 0,
-  }));
+  const links = (pageProps?.links ?? [])
+    .filter((l) => l.url)
+    .map((l) => ({
+      id: l.id ?? null,
+      title: l.title ?? '',
+      url: l.url,
+      thumbnailUrl: l.thumbnailUrl ?? null,
+      position: l.position ?? 0,
+    }));
   const socialLinks = (pageProps?.socialLinks ?? []).map((s) => ({
     type: s.type ?? '',
     url: s.url ?? '',

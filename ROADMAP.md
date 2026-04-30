@@ -1,6 +1,6 @@
 # StPeteMusic — Project Roadmap
 
-> **Status:** Phase 1 complete — working on Phase 1.5 (Linktree API + newsletter pipeline)
+> **Status:** Phase 1.5 in progress — Linktree integration complete, newsletter pipeline remaining
 > **Last Updated:** April 30, 2026
 > **Author:** Matt Taylor (@maylortaylor)
 > **Stack:** Next.js 16 · Listmonk · Payload CMS · PostgreSQL (RDS) · AWS (OpenTofu IaC) · n8n · AWS Amplify
@@ -67,7 +67,9 @@
 
 | Component | Status | Details |
 |---|---|---|
-| **Linktree API** | 🟡 Code done | Lambda scraper + API + DynamoDB + EventBridge written — needs `tofu apply` |
+| **Linktree API** | ✅ Deployed | Lambda + DynamoDB + API GW live at `qag1q0ijn5.execute-api.us-east-1.amazonaws.com` |
+| **LinkTreeSection (stpetemusic.live)** | ✅ Live | Homepage "Find Us Everywhere" section — fetches via `/api/linktree` proxy, renders sorted link cards |
+| **WordPress Widget (suiteestudios.com)** | ✅ Ready | `apps/web/public/linktree-widget.html` — paste-ready snippet with Suite E brand styling; install guide in `docs/wordpress-linktree-widget.md` |
 | **Newsletter n8n Workflows** | 🟡 Files exist | `newsletter-draft-creator.json`, `newsletter-publisher.json` — not yet imported into n8n UI |
 
 ### Not Yet Started
@@ -131,21 +133,21 @@ Linktree scraper (Phase 1.5)
 
 ## 4. Next Steps — Phase 1.5
 
-### A — Deploy Linktree API
+### ~~A — Deploy Linktree API~~ ✅ Complete
 
-Code is complete. This is infrastructure-only work.
+API is live at `https://qag1q0ijn5.execute-api.us-east-1.amazonaws.com/linktree`.
 
-1. `cd infrastructure && AWS_PROFILE=personal tofu plan` — verify creates DynamoDB + 2 Lambdas + API Gateway + EventBridge
-2. `AWS_PROFILE=personal tofu apply`
-3. Note the API Gateway URL from `tofu output linktree_api_url`
-4. Manually invoke scraper once to seed data: `aws lambda invoke --function-name linktree_scraper --profile personal /tmp/out.json`
-5. Smoke test: `curl https://<api-gw-url>/linktree` — expect both profiles with links
+- `GET /linktree` — returns array of all profiles (stpetemusic + suite_e_studios)
+- Scraped hourly via EventBridge + Lambda → DynamoDB
+- `/api/linktree` proxy route on stpetemusic.live avoids CORS in local dev + caches 5 min in prod
 
-**API endpoints after deploy:**
-- `GET /linktree` — all profiles (stpetemusic + suite_e_studios)
-- `GET /linktree/{profile}` — single profile
+### ~~Embed linktree data on stpetemusic.live~~ ✅ Complete
 
-**CORS allowed origins:** `www.stpetemusic.live`, `stpetemusic.live`, `www.suiteestudios.com`, `suiteestudios.com`
+`LinkTreeSection` component on homepage fetches and renders sorted links + socials for the `stpetemusic` profile.
+
+### ~~Share linktree API with Suite E Studios~~ ✅ Complete
+
+`apps/web/public/linktree-widget.html` — self-contained HTML/CSS/JS snippet with Suite E brand styling (black cards, orange hover, Helvetica Neue). Install guide: `docs/wordpress-linktree-widget.md`.
 
 ### B — Test Newsletter Send
 
@@ -206,12 +208,12 @@ Merge this branch to prevent a race condition on fresh EC2 deploys. Not urgent (
 
 > **Status: In Progress** | See Section 4 for detailed next steps
 
-- [ ] Deploy Linktree API (`tofu apply` — code already written)
+- [x] Deploy Linktree API (Lambda + DynamoDB + API GW live)
+- [x] Embed linktree data on `www.stpetemusic.live` — `LinkTreeSection` component + `/api/linktree` proxy
+- [x] Share linktree widget with Suite E Studios — `linktree-widget.html` + WordPress install guide
 - [ ] Test newsletter send end-to-end (Resend → subscriber inbox)
 - [ ] Import newsletter n8n workflows + wire credentials
 - [ ] Merge `fix/listmonk-startup-order` branch
-- [ ] Embed linktree data on `www.stpetemusic.live` (fetch from API, replace hardcoded links)
-- [ ] Share linktree API URL with Suite E Studios WordPress site
 
 ---
 
@@ -359,6 +361,7 @@ Log into listmonk.stpetemusic.live → Campaigns → Send
   - Upcoming events teaser (3 cards, hardcoded → Phase 2: Payload API)
   - YouTube playlist embed (→ Phase 3: YouTube Data API)
   - Full newsletter section
+  - "Find Us Everywhere" Linktree links section ✅ (auto-fetched from API)
   - Social links footer
 
 /events                 → Events calendar stub ✅ built (→ Phase 2: Payload data)
@@ -458,9 +461,6 @@ LISTMONK_API_URL=https://listmonk.stpetemusic.live  # prod; http://localhost:900
 LISTMONK_USERNAME=stpetemusic-newsletter-api         # API user (NOT admin login)
 LISTMONK_PASSWORD=                                   # API user access key (from Listmonk Settings → API credentials)
 LISTMONK_LIST_ID=3                                   # "StPeteMusic Newsletter" list
-
-# Phase 1.5 (after linktree API deployed)
-# NEXT_PUBLIC_LINKTREE_API_URL=https://<api-gw-id>.execute-api.us-east-1.amazonaws.com
 
 # Phase 2
 # NEXT_PUBLIC_PAYLOAD_API_URL=https://cms.stpetemusic.live
