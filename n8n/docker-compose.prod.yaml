@@ -56,9 +56,6 @@ services:
     image: listmonk/listmonk:latest
     container_name: stpetemusic-listmonk
     restart: unless-stopped
-    depends_on:
-      n8n:
-        condition: service_healthy
     dns:
       - 8.8.8.8
       - 8.8.4.4
