@@ -1,6 +1,6 @@
 # Listmonk Status — StPeteMusic
 
-> Last updated: 2026-04-29
+> Last updated: 2026-04-30
 > Branch: `fix/listmonk-startup-order`
 
 This document captures the current state of the Listmonk newsletter feature, what has been completed, what is actively broken, and what the next steps are.
@@ -32,6 +32,35 @@ RDS (PostgreSQL 16, db.t4g.micro):
 ```
 
 Secrets are managed in GitHub Secrets → injected into EC2 `.env` on every deploy. Listmonk credentials are also stored in AWS SSM Parameter Store and read by the deploy script and by OpenTofu (for Amplify env vars).
+
+---
+
+## Newsletter Subscribe — Fixed (2026-04-30)
+
+The subscribe form on `www.stpetemusic.live` was returning HTTP 500. Root cause and fix:
+
+**Root cause:** Triple mismatch between Listmonk, SSM, and Amplify credentials:
+1. SSM had username `stpetemusic-listmonk-admin` — but Listmonk's API user is `stpetemusic-newsletter-api`
+2. SSM had an incorrect/default password that didn't match the API user's key
+3. Amplify was reading from SSM, so it was sending wrong credentials to Listmonk → 403 → 500
+
+**What Listmonk API auth actually uses:**
+- The API does **not** use the admin login credentials (those are session-based for the UI only)
+- The API uses a **dedicated API user** created in the Listmonk admin panel under Settings → API credentials
+- The API user for this project is `stpetemusic-newsletter-api`
+
+**Fix applied (2026-04-30):**
+1. Updated SSM `/stpetemusic/listmonk/username` → `stpetemusic-newsletter-api`
+2. Updated SSM `/stpetemusic/listmonk/password` → the API user's access key (from Listmonk Settings)
+3. Updated Amplify env vars directly via AWS CLI with the correct SSM values
+4. Triggered Amplify rebuild (job #76) — build succeeded
+5. Verified: `GET /api/newsletter/health` returns `status: 409` (credentials accepted; test email already exists)
+
+**To rotate the API key in the future:**
+1. Login to `https://listmonk.stpetemusic.live` → Settings → API credentials → regenerate key
+2. Update GitHub Secret `LISTMONK_PASSWORD` to the new key
+3. Run `cd infrastructure && AWS_PROFILE=personal tofu apply` (pushes to SSM + Amplify)
+4. Trigger Amplify rebuild or push to main
 
 ---
 
@@ -70,39 +99,29 @@ Secrets are managed in GitHub Secrets → injected into EC2 `.env` on every depl
 
 ---
 
-## Current Issue — Listmonk Container Crash Loop
+## Pending — Startup Order Fix (fix/listmonk-startup-order, not yet merged)
 
-**Symptom:** After every deploy, `docker ps` shows:
-```
-stpetemusic-listmonk   Restarting (1) 19 seconds ago
-```
-Exit code `1` means the Listmonk process itself exited non-zero.
+The subscribe form is now working (credentials fixed), but the `fix/listmonk-startup-order` branch should still be merged to prevent future deploy crashes.
 
-**Root cause identified (fix in progress):**  
-The deploy script was running `CREATE DATABASE listmonk_stpetemusic` *after* `docker-compose up -d`. Since `docker-compose up -d` is non-blocking, Listmonk started and ran `--install --idempotent` before the database existed on RDS. Result: connection error → exit 1 → restart loop.
+**What the branch fixes:**
+- `echo y` piped to listmonk install command (prevents TTY hang on non-interactive Docker)
+- `CREATE DATABASE listmonk_stpetemusic` moved to run **before** `docker-compose up -d` (previously ran after — race condition on fresh deploys)
+- Deploy race condition fixes, auto-start systemd service, EC2 access improvements
+- Docker logs printed in CI output after health check (no SSH needed to debug crashes)
 
-**Fix in `fix/listmonk-startup-order` (pending merge):**
-```
-Before:
-  1. docker-compose up -d  ← Listmonk starts, --install fails (DB doesn't exist yet)
-  2. CREATE DATABASE listmonk_stpetemusic
+**The original crash loop:**
+The deploy script was running `CREATE DATABASE listmonk_stpetemusic` *after* `docker-compose up -d`. Since compose is non-blocking, Listmonk started and ran `--install --idempotent` before the database existed on RDS → connection error → exit 1 → restart loop.
 
-After:
-  1. CREATE DATABASE listmonk_stpetemusic  ← DB exists before Listmonk starts
-  2. docker-compose up -d
-```
-
-Also added: `docker logs stpetemusic-listmonk --tail 40` is now printed in the GitHub Actions log after the health check. Any future crash reason will be visible directly in the Actions run output without needing SSH.
+Now that the database tables already exist, `--idempotent` skips the install step and Listmonk starts fine. But the next time the database is wiped or a fresh EC2 is provisioned, this race will resurface. Merge the branch to prevent it.
 
 ---
 
 ## What Still Needs to Be Done
 
-### Immediate (unblock Listmonk)
-- [ ] Merge `fix/listmonk-startup-order` → `main` and let deploy run
-- [ ] Confirm `docker ps` shows `stpetemusic-listmonk   Up X minutes`
-- [ ] Confirm `https://listmonk.stpetemusic.live` loads the admin UI
-- [ ] Confirm newsletter subscribe form on `https://www.stpetemusic.live` works end-to-end
+### Immediate
+- [x] ~~Confirm `https://listmonk.stpetemusic.live` loads the admin UI~~ ✓ working
+- [x] ~~Confirm newsletter subscribe form on `https://www.stpetemusic.live` works end-to-end~~ ✓ fixed 2026-04-30
+- [ ] Merge `fix/listmonk-startup-order` → `main` (startup order + race condition fixes)
 
 ### Cleanup
 - [ ] Remove old orphan `stpetemusic-postgres` Docker container from EC2 if present
