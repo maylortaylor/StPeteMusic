@@ -1,6 +1,6 @@
 # StPeteMusic — Project Roadmap
 
-> **Status:** Phase 1.5 in progress — Linktree integration complete, newsletter pipeline remaining
+> **Status:** Phase 1.5 nearly complete — newsletter live + tracked, SEO pass done, n8n workflows pending
 > **Last Updated:** April 30, 2026
 > **Author:** Matt Taylor (@maylortaylor)
 > **Stack:** Next.js 16 · Listmonk · Payload CMS · PostgreSQL (RDS) · AWS (OpenTofu IaC) · n8n · AWS Amplify
@@ -60,6 +60,8 @@
 | **n8n** | ✅ Running | https://n8n.stpetemusic.live (Docker on EC2, nginx, Let's Encrypt) |
 | **Listmonk** | ✅ Running | https://listmonk.stpetemusic.live (Docker on EC2, nginx, Let's Encrypt) |
 | **Newsletter Signup** | ✅ Working | `POST /api/newsletter/subscribe` → Listmonk list ID 3 |
+| **Newsletter Send** | ✅ Working | Resend SMTP configured in Listmonk admin (smtp.resend.com:465, from: `newsletter@stpetemusic.live`) |
+| **Newsletter Analytics** | ✅ Active | Open tracking (`{{ TrackView }}`), click tracking (per-campaign), UTM params on site links |
 | **Resend SMTP** | ✅ Configured | Domain `stpetemusic.live` verified, from: `newsletter@stpetemusic.live` |
 | **S3 Backup Bucket** | ✅ Active | `stpetemusic-n8n-backups`, 7-day lifecycle, every 2 days at 4am |
 
@@ -72,12 +74,26 @@
 | **WordPress Widget (suiteestudios.com)** | ✅ Ready | `apps/web/public/linktree-widget.html` — paste-ready snippet with Suite E brand styling; install guide in `docs/wordpress-linktree-widget.md` |
 | **Newsletter n8n Workflows** | 🟡 Files exist | `newsletter-draft-creator.json`, `newsletter-publisher.json` — not yet imported into n8n UI |
 
+### Completed This Session (April 30, 2026)
+
+| Component | Details |
+|---|---|
+| **Newsletter end-to-end test** | Resend SMTP configured in Listmonk admin UI; test campaign sent and verified |
+| **Newsletter open tracking** | `{{ TrackView }}` pixel added to `newsletter-base.html` template |
+| **Newsletter click tracking** | Enabled per-campaign in Listmonk UI; per-link stats visible in campaign Analytics tab |
+| **Newsletter UTM params** | All stpetemusic.live links in template tagged with `utm_source=newsletter&utm_medium=email&utm_campaign=monthly` + unique `utm_content` per link |
+| **SEO — metadata** | `layout.tsx`: `metadataBase`, title template (`St. Pete Music \| %s`), updated description, OG image (`/images/hero/hero-1.jpg`) |
+| **SEO — per-page metadata** | `generateMetadata()` on homepage, `/events`, `/discover` with page-specific titles + descriptions |
+| **SEO — structured data** | Organization + MusicVenue JSON-LD on homepage; MusicEvent JSON-LD on `/events` (Final Friday + Instant Noodles); MusicGroup JSON-LD on `/discover` (4 featured artists) |
+| **Branded 404 page** | `not-found.tsx` — Nav + orange "404" + copy + CTAs (Home, Events) + Footer |
+| **Branded error page** | `global-error.tsx` — "Try Again" + "Back to Home" with brand styling |
+
 ### Not Yet Started
 
 | Component | Phase |
 |---|---|
-| Test newsletter send end-to-end (Resend → subscriber inbox) | Phase 1.5 |
 | Import newsletter n8n workflows + set up Google Sheets + Listmonk credentials | Phase 1.5 |
+| Merge `fix/listmonk-startup-order` branch | Phase 1.5 |
 | S3 media bucket for images/video | Phase 2 |
 | Payload CMS (`apps/cms/`) | Phase 2 |
 | Real event/artist data from CMS | Phase 2 |
@@ -149,14 +165,11 @@ API is live at `https://qag1q0ijn5.execute-api.us-east-1.amazonaws.com/linktree`
 
 `apps/web/public/linktree-widget.html` — self-contained HTML/CSS/JS snippet with Suite E brand styling (black cards, orange hover, Helvetica Neue). Install guide: `docs/wordpress-linktree-widget.md`.
 
-### B — Test Newsletter Send
+### ~~B — Test Newsletter Send~~ ✅ Complete
 
-SMTP is configured (Resend). The subscribe flow works. The gap is sending a real campaign.
+Resend SMTP configured in Listmonk admin UI (`smtp.resend.com:465`, username: `resend`, password: API key, from: `newsletter@stpetemusic.live`). Test campaign sent and verified in inbox + Resend dashboard.
 
-1. Log into https://listmonk.stpetemusic.live
-2. Create a test campaign (subject + simple HTML body)
-3. Set recipient to a test email
-4. Send → verify delivery in inbox and Resend dashboard
+Also completed: open tracking pixel (`{{ TrackView }}`), click tracking (per-campaign setting), and UTM parameters on all stpetemusic.live links in the base template.
 
 ### C — Import Newsletter n8n Workflows
 
@@ -201,18 +214,22 @@ Merge this branch to prevent a race condition on fresh EC2 deploys. Not urgent (
 - [x] n8n migrated to `n8n.stpetemusic.live` (OAuth URIs updated)
 - [x] Newsletter email base template created (`apps/web/src/email-templates/newsletter-base.html`)
 - [x] n8n newsletter automation workflows created (not yet deployed to n8n UI)
+- [x] SEO: `metadataBase`, title template, OG image, per-page `generateMetadata()` on all pages
+- [x] SEO: JSON-LD structured data — Organization+MusicVenue (homepage), MusicEvent (/events), MusicGroup (/discover)
+- [x] Branded 404 (`not-found.tsx`) and error (`global-error.tsx`) pages
 
 ---
 
 ### Phase 1.5 — Linktree API + Newsletter Pipeline
 
-> **Status: In Progress** | See Section 4 for detailed next steps
+> **Status: Nearly Complete** — n8n workflow wiring is the only remaining item
 
 - [x] Deploy Linktree API (Lambda + DynamoDB + API GW live)
 - [x] Embed linktree data on `www.stpetemusic.live` — `LinkTreeSection` component + `/api/linktree` proxy
 - [x] Share linktree widget with Suite E Studios — `linktree-widget.html` + WordPress install guide
-- [ ] Test newsletter send end-to-end (Resend → subscriber inbox)
-- [ ] Import newsletter n8n workflows + wire credentials
+- [x] Test newsletter send end-to-end (Resend SMTP configured + campaign verified in inbox)
+- [x] Newsletter analytics: open tracking pixel, click tracking, UTM params on template links
+- [ ] Import newsletter n8n workflows + wire Google Sheets + Listmonk credentials
 - [ ] Merge `fix/listmonk-startup-order` branch
 
 ---

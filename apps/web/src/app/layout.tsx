@@ -9,9 +9,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'StPeteMusic — St. Petersburg FL Live Music',
+  metadataBase: new URL('https://www.stpetemusic.live'),
+  title: {
+    template: 'St. Pete Music | %s',
+    default: 'St. Pete Music | Live Music in St. Petersburg, FL',
+  },
   description:
-    'Documenting, promoting, and showcasing local musicians and bands in the St. Petersburg, Florida area. YouTube shorts, live shows, and community events.',
+    'The home for live music in St. Petersburg, FL. Discover local bands, find upcoming shows, and stay connected to the Tampa Bay music scene.',
   keywords: [
     'St Pete Music',
     'St Petersburg FL music',
@@ -21,6 +25,8 @@ export const metadata: Metadata = {
     'Warehouse Arts District',
     'Tampa Bay music',
     'Final Friday',
+    'Instant Noodles',
+    'Florida live music',
   ],
   icons: {
     icon: [
@@ -32,11 +38,20 @@ export const metadata: Metadata = {
   },
   manifest: '/images/brand/favicon/site.webmanifest',
   openGraph: {
-    title: 'StPeteMusic — St. Petersburg FL Live Music',
-    description: 'Live music from the St. Pete scene.',
-    url: 'https://stpetemusic.com',
-    siteName: 'StPeteMusic',
+    title: 'St. Pete Music | Live Music in St. Petersburg, FL',
+    description:
+      'The home for live music in St. Petersburg, FL. Discover local bands, find upcoming shows, and stay connected to the Tampa Bay music scene.',
+    url: 'https://www.stpetemusic.live',
+    siteName: 'St. Pete Music',
     type: 'website',
+    images: [
+      {
+        url: '/images/hero/hero-1.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Live music at Suite E Studios — St. Pete Music',
+      },
+    ],
   },
 };
 
