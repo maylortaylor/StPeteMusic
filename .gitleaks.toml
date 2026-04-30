@@ -8,6 +8,8 @@ useDefault = true
 [allowlist]
   description = "Safe files and patterns"
   paths = [
+    # detect-secrets baseline — stores SHA-256 hashes of detected values, not real secrets
+    '''\.secrets\.baseline$''',
     # Docs reference example patterns and commands
     '''docs/AWS_DEPLOYMENT\.md$''',
     '''AWS_SETUP\.md$''',
