@@ -1,0 +1,231 @@
+<!--
+  Suite E Studios — Links Widget
+  ================================
+  Paste this entire block into a WordPress Custom HTML block (or Elementor HTML widget).
+  The widget fetches live links from the StPeteMusic API and renders them automatically.
+  No updates needed — content stays in sync with Linktree.
+
+  See docs/wordpress-linktree-widget.md for full installation instructions.
+-->
+
+<div id="spm-links-widget" role="region" aria-label="Suite E Studios links">
+  <p id="spm-loading" style="margin:0;font-size:0.875rem;color:#666;">Loading links…</p>
+</div>
+
+<style>
+  /* ── Base layout (mobile-first, reset-safe) ── */
+  #spm-links-widget {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  #spm-links-widget *,
+  #spm-links-widget *::before,
+  #spm-links-widget *::after {
+    box-sizing: inherit;
+  }
+
+  #spm-links-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.625rem;
+    list-style: none;
+    margin: 0 0 1rem;
+    padding: 0;
+  }
+
+  @media (min-width: 640px) {
+    #spm-links-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  /* ── Link cards — Suite E Studios brand style ── */
+  .spm-link-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 1.125rem;
+    background-color: #000000;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 2px solid #000000;
+    border-radius: 0;
+    transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+  }
+
+  .spm-link-card:hover,
+  .spm-link-card:focus-visible {
+    background-color: #FF7D2F;
+    border-color: #FF7D2F;
+    color: #ffffff;
+    outline: none;
+  }
+
+  .spm-link-card:focus-visible {
+    outline: 2px solid #FF7D2F;
+    outline-offset: 2px;
+  }
+
+  .spm-link-icon {
+    flex-shrink: 0;
+    margin-left: 0.625rem;
+    opacity: 0.6;
+  }
+
+  /* ── Social links row ── */
+  #spm-social-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    list-style: none;
+    margin: 0.25rem 0 0;
+    padding: 0;
+  }
+
+  .spm-social-link {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #4d4d4d;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .spm-social-link:hover {
+    color: #A43D00;
+  }
+</style>
+
+<script>
+(function () {
+  var API = 'https://qag1q0ijn5.execute-api.us-east-1.amazonaws.com/linktree';
+  var PROFILE = 'suite_e_studios';
+
+  var SOCIAL_LABELS = {
+    FACEBOOK: 'Facebook',
+    INSTAGRAM: 'Instagram',
+    YOUTUBE: 'YouTube',
+    TIKTOK: 'TikTok',
+    THREADS: 'Threads',
+    EMAIL_ADDRESS: 'Email',
+  };
+
+  function createExternalIcon() {
+    var NS = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('class', 'spm-link-icon');
+    svg.setAttribute('width', '13');
+    svg.setAttribute('height', '13');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('stroke-width', '2.5');
+    svg.setAttribute('aria-hidden', 'true');
+
+    var path = document.createElementNS(NS, 'path');
+    path.setAttribute('d', 'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6');
+
+    var polyline = document.createElementNS(NS, 'polyline');
+    polyline.setAttribute('points', '15 3 21 3 21 9');
+
+    var line = document.createElementNS(NS, 'line');
+    line.setAttribute('x1', '10');
+    line.setAttribute('y1', '14');
+    line.setAttribute('x2', '21');
+    line.setAttribute('y2', '3');
+
+    svg.appendChild(path);
+    svg.appendChild(polyline);
+    svg.appendChild(line);
+    return svg;
+  }
+
+  var container = document.getElementById('spm-links-widget');
+  var loading = document.getElementById('spm-loading');
+
+  fetch(API)
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      var profiles = Array.isArray(data) ? data : [];
+      var profile = null;
+      for (var i = 0; i < profiles.length; i++) {
+        if (profiles[i].profile === PROFILE) { profile = profiles[i]; break; }
+      }
+      if (!profile) return;
+
+      var links = (profile.links || []).slice().sort(function (a, b) {
+        return a.position - b.position;
+      });
+      var socials = profile.socialLinks || [];
+
+      if (loading) loading.remove();
+
+      // Link cards
+      if (links.length > 0) {
+        var ul = document.createElement('ul');
+        ul.id = 'spm-links-grid';
+        ul.setAttribute('role', 'list');
+
+        links.forEach(function (link) {
+          var li = document.createElement('li');
+          li.setAttribute('role', 'listitem');
+
+          var a = document.createElement('a');
+          a.href = link.url;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.className = 'spm-link-card';
+
+          var span = document.createElement('span');
+          span.textContent = link.title;
+          a.appendChild(span);
+          a.appendChild(createExternalIcon());
+
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+
+        container.appendChild(ul);
+      }
+
+      // Social links row
+      if (socials.length > 0) {
+        var socialUl = document.createElement('ul');
+        socialUl.id = 'spm-social-list';
+        socialUl.setAttribute('role', 'list');
+        socialUl.setAttribute('aria-label', 'Social media links');
+
+        socials.forEach(function (social) {
+          var li = document.createElement('li');
+          li.setAttribute('role', 'listitem');
+
+          var a = document.createElement('a');
+          a.href = social.url;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.className = 'spm-social-link';
+          a.textContent = SOCIAL_LABELS[social.type] || social.type.replace(/_/g, ' ');
+
+          li.appendChild(a);
+          socialUl.appendChild(li);
+        });
+
+        container.appendChild(socialUl);
+      }
+    })
+    .catch(function () {
+      if (loading) loading.remove();
+    });
+}());
+</script>
