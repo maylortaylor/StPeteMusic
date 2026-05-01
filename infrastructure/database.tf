@@ -13,7 +13,7 @@ resource "aws_db_subnet_group" "main" {
 
 resource "aws_security_group" "rds" {
   name        = "${var.project}-rds-sg"
-  description = "RDS PostgreSQL — EC2 + public internet (Amplify SSR, SSL required)"
+  description = "RDS PostgreSQL, allow inbound from EC2 only"
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
@@ -42,6 +42,11 @@ resource "aws_security_group" "rds" {
   }
 
   tags = { Name = "${var.project}-rds-sg", Project = var.project }
+
+  # description is immutable in AWS — ignore changes to prevent forced destroy+recreate
+  lifecycle {
+    ignore_changes = [description]
+  }
 }
 
 resource "aws_db_instance" "main" {
