@@ -50,6 +50,7 @@ jobs:
           cp n8n/nginx/listmonk.conf      deploy-pkg/listmonk.conf
           cp n8n/nginx/n8n.conf           deploy-pkg/n8n.conf
           cp -r n8n/workflows/StPeteMusic  deploy-pkg/workflows/StPeteMusic
+          cp -r database/                  deploy-pkg/database
           tar czf deploy.tar.gz -C deploy-pkg .
           echo "✓ deploy.tar.gz built ($(du -sh deploy.tar.gz | cut -f1))"
 
@@ -227,6 +228,16 @@ jobs:
               -c "CREATE DATABASE listmonk_stpetemusic;" 2>/dev/null \
               && echo "✓ listmonk_stpetemusic database created" \
               || echo "✓ listmonk_stpetemusic database already exists"
+
+            echo "── Running database migrations ──"
+            docker run --rm \
+              -v "${DEPLOY_DIR}/database:/sql" \
+              -e PGHOST="${RDS_HOST}" \
+              -e PGUSER="${POSTGRES_USER}" \
+              -e PGPASSWORD="${POSTGRES_PASSWORD}" \
+              -e PGSSLMODE=require \
+              postgres:16-alpine sh /sql/migrate.sh \
+              && echo "✓ Migrations complete" || echo "⚠ Migration step failed"
 
             echo "── Applying compose config (restarts changed containers) ──"
             cd ~/stpetemusic/n8n
