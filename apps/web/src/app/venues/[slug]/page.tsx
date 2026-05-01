@@ -66,10 +66,10 @@ export default async function VenuePage({ params }: Props) {
 
   const extraLinks: { label: string; url: string }[] = venue.extra_links ?? [];
   const hasMap = venue.lat != null && venue.lng != null;
-  const mapsUrl = hasMap
-    ? `https://www.google.com/maps/search/?api=1&query=${venue.lat},${venue.lng}`
-    : venue.address
-      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venue.address)}`
+  const mapsUrl = venue.address
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${venue.name}, ${venue.address}`)}`
+    : hasMap
+      ? `https://www.google.com/maps/search/?api=1&query=${venue.lat},${venue.lng}`
       : null;
 
   const jsonLd = {

@@ -8,7 +8,7 @@ export async function getAllVenues(): Promise<Venue[]> {
       instagram_url, instagram_username, facebook_url,
       website, lat, lng, is_active
     FROM venues
-    WHERE is_active = true AND slug IS NOT NULL
+    WHERE is_active = true AND visible_on_website = true AND slug IS NOT NULL
     ORDER BY name ASC
   `);
 }
@@ -29,7 +29,7 @@ export async function getVenueBySlug(slug: string): Promise<Venue | null> {
 
 export async function getAllVenueSlugs(): Promise<string[]> {
   const rows = await query<{ slug: string }>(`
-    SELECT slug FROM venues WHERE is_active = true AND slug IS NOT NULL
+    SELECT slug FROM venues WHERE is_active = true AND visible_on_website = true AND slug IS NOT NULL
   `);
   return rows.map(r => r.slug);
 }
