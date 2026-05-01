@@ -68,3 +68,14 @@ variable "listmonk_password" {
     error_message = "listmonk_password must not be empty. Set the LISTMONK_PASSWORD GitHub Secret."
   }
 }
+
+variable "resend_api_key" {
+  description = "Resend API key for contact form emails. Set via TF_VAR_resend_api_key in CI."
+  type        = string
+  sensitive   = true
+
+  validation {
+    condition     = length(var.resend_api_key) > 0
+    error_message = "resend_api_key must not be empty. Set the RESEND_API_KEY GitHub Secret."
+  }
+}
