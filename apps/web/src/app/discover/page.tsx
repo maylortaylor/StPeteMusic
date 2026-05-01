@@ -15,6 +15,12 @@ export const metadata: Metadata = {
       'Explore bands, DJs, solo artists, and creatives from the greater St. Petersburg, FL area. All genres, all types, no gatekeeping.',
     url: 'https://www.stpetemusic.live/discover',
   },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@StPeteMusic',
+    creator: '@StPeteMusic',
+    images: ['https://www.stpetemusic.live/images/hero/hero-1.jpg'],
+  },
 };
 
 export default async function DiscoverPage() {
