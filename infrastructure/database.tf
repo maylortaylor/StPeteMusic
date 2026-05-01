@@ -42,6 +42,11 @@ resource "aws_security_group" "rds" {
   }
 
   tags = { Name = "${var.project}-rds-sg", Project = var.project }
+
+  # description is immutable in AWS — ignore changes to prevent forced destroy+recreate
+  lifecycle {
+    ignore_changes = [description]
+  }
 }
 
 resource "aws_db_instance" "main" {
