@@ -13,7 +13,7 @@
     "detect-faces": "node scripts/detect-faces.mjs",
     "record-demo": "node scripts/record-demo.mjs",
     "record-demo:60fps": "node scripts/record-demo.mjs --60fps",
-    "record-demo:newsletter": "node scripts/record-demo.mjs --sequence=newsletter"
+    "record-demo:newsletter": "node scripts/record-demo.mjs --60fps --sequence=newsletter"
   },
   "dependencies": {
     "@stpetemusic/types": "*",
