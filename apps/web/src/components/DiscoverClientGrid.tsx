@@ -5,7 +5,7 @@ import { ArtistCard } from '@/components/ArtistCard';
 import type { Artist } from '@stpetemusic/types';
 
 const ALL_FILTER = 'All';
-const TYPE_ORDER = ['Band', 'Solo Artist', 'DJ', 'Event Producer', 'Creative', 'Other'];
+const TYPE_ORDER: Artist['type'][] = ['Band', 'Solo Artist', 'DJ', 'Event Producer', 'Creative', 'Other'];
 
 function getAvailableTypes(artists: Artist[]): string[] {
   const seen = new Set(artists.map(a => a.type).filter(Boolean));
