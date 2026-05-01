@@ -1,0 +1,2189 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]: This XML file does not appear to have any style information associated with it. The document tree is shown below.
+  - generic [ref=e4]:
+    - generic [ref=e7]:
+      - text: <urlset
+      - generic [ref=e8]: xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      - text: ">"
+    - generic [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e13]: <url>
+        - generic [ref=e14]:
+          - generic [ref=e15]:
+            - generic [ref=e16]: <loc>
+            - text: https://www.stpetemusic.live
+            - generic [ref=e17]: </loc>
+          - generic [ref=e18]:
+            - generic [ref=e19]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e20]: </lastmod>
+          - generic [ref=e21]:
+            - generic [ref=e22]: <changefreq>
+            - text: weekly
+            - generic [ref=e23]: </changefreq>
+          - generic [ref=e24]:
+            - generic [ref=e25]: <priority>
+            - text: "1"
+            - generic [ref=e26]: </priority>
+        - generic [ref=e28]: </url>
+      - generic [ref=e29]:
+        - generic [ref=e32]: <url>
+        - generic [ref=e33]:
+          - generic [ref=e34]:
+            - generic [ref=e35]: <loc>
+            - text: https://www.stpetemusic.live/events
+            - generic [ref=e36]: </loc>
+          - generic [ref=e37]:
+            - generic [ref=e38]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e39]: </lastmod>
+          - generic [ref=e40]:
+            - generic [ref=e41]: <changefreq>
+            - text: weekly
+            - generic [ref=e42]: </changefreq>
+          - generic [ref=e43]:
+            - generic [ref=e44]: <priority>
+            - text: "0.9"
+            - generic [ref=e45]: </priority>
+        - generic [ref=e47]: </url>
+      - generic [ref=e48]:
+        - generic [ref=e51]: <url>
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - generic [ref=e54]: <loc>
+            - text: https://www.stpetemusic.live/discover
+            - generic [ref=e55]: </loc>
+          - generic [ref=e56]:
+            - generic [ref=e57]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e58]: </lastmod>
+          - generic [ref=e59]:
+            - generic [ref=e60]: <changefreq>
+            - text: weekly
+            - generic [ref=e61]: </changefreq>
+          - generic [ref=e62]:
+            - generic [ref=e63]: <priority>
+            - text: "0.8"
+            - generic [ref=e64]: </priority>
+        - generic [ref=e66]: </url>
+      - generic [ref=e67]:
+        - generic [ref=e70]: <url>
+        - generic [ref=e71]:
+          - generic [ref=e72]:
+            - generic [ref=e73]: <loc>
+            - text: https://www.stpetemusic.live/venues
+            - generic [ref=e74]: </loc>
+          - generic [ref=e75]:
+            - generic [ref=e76]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e77]: </lastmod>
+          - generic [ref=e78]:
+            - generic [ref=e79]: <changefreq>
+            - text: monthly
+            - generic [ref=e80]: </changefreq>
+          - generic [ref=e81]:
+            - generic [ref=e82]: <priority>
+            - text: "0.8"
+            - generic [ref=e83]: </priority>
+        - generic [ref=e85]: </url>
+      - generic [ref=e86]:
+        - generic [ref=e89]: <url>
+        - generic [ref=e90]:
+          - generic [ref=e91]:
+            - generic [ref=e92]: <loc>
+            - text: https://www.stpetemusic.live/discover/accentrik
+            - generic [ref=e93]: </loc>
+          - generic [ref=e94]:
+            - generic [ref=e95]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e96]: </lastmod>
+          - generic [ref=e97]:
+            - generic [ref=e98]: <changefreq>
+            - text: monthly
+            - generic [ref=e99]: </changefreq>
+          - generic [ref=e100]:
+            - generic [ref=e101]: <priority>
+            - text: "0.6"
+            - generic [ref=e102]: </priority>
+        - generic [ref=e104]: </url>
+      - generic [ref=e105]:
+        - generic [ref=e108]: <url>
+        - generic [ref=e109]:
+          - generic [ref=e110]:
+            - generic [ref=e111]: <loc>
+            - text: https://www.stpetemusic.live/discover/ajeva
+            - generic [ref=e112]: </loc>
+          - generic [ref=e113]:
+            - generic [ref=e114]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e115]: </lastmod>
+          - generic [ref=e116]:
+            - generic [ref=e117]: <changefreq>
+            - text: monthly
+            - generic [ref=e118]: </changefreq>
+          - generic [ref=e119]:
+            - generic [ref=e120]: <priority>
+            - text: "0.6"
+            - generic [ref=e121]: </priority>
+        - generic [ref=e123]: </url>
+      - generic [ref=e124]:
+        - generic [ref=e127]: <url>
+        - generic [ref=e128]:
+          - generic [ref=e129]:
+            - generic [ref=e130]: <loc>
+            - text: https://www.stpetemusic.live/discover/alex-borst
+            - generic [ref=e131]: </loc>
+          - generic [ref=e132]:
+            - generic [ref=e133]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e134]: </lastmod>
+          - generic [ref=e135]:
+            - generic [ref=e136]: <changefreq>
+            - text: monthly
+            - generic [ref=e137]: </changefreq>
+          - generic [ref=e138]:
+            - generic [ref=e139]: <priority>
+            - text: "0.6"
+            - generic [ref=e140]: </priority>
+        - generic [ref=e142]: </url>
+      - generic [ref=e143]:
+        - generic [ref=e146]: <url>
+        - generic [ref=e147]:
+          - generic [ref=e148]:
+            - generic [ref=e149]: <loc>
+            - text: https://www.stpetemusic.live/discover/aliqua
+            - generic [ref=e150]: </loc>
+          - generic [ref=e151]:
+            - generic [ref=e152]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e153]: </lastmod>
+          - generic [ref=e154]:
+            - generic [ref=e155]: <changefreq>
+            - text: monthly
+            - generic [ref=e156]: </changefreq>
+          - generic [ref=e157]:
+            - generic [ref=e158]: <priority>
+            - text: "0.6"
+            - generic [ref=e159]: </priority>
+        - generic [ref=e161]: </url>
+      - generic [ref=e162]:
+        - generic [ref=e165]: <url>
+        - generic [ref=e166]:
+          - generic [ref=e167]:
+            - generic [ref=e168]: <loc>
+            - text: https://www.stpetemusic.live/discover/allen-fereti
+            - generic [ref=e169]: </loc>
+          - generic [ref=e170]:
+            - generic [ref=e171]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e172]: </lastmod>
+          - generic [ref=e173]:
+            - generic [ref=e174]: <changefreq>
+            - text: monthly
+            - generic [ref=e175]: </changefreq>
+          - generic [ref=e176]:
+            - generic [ref=e177]: <priority>
+            - text: "0.6"
+            - generic [ref=e178]: </priority>
+        - generic [ref=e180]: </url>
+      - generic [ref=e181]:
+        - generic [ref=e184]: <url>
+        - generic [ref=e185]:
+          - generic [ref=e186]:
+            - generic [ref=e187]: <loc>
+            - text: https://www.stpetemusic.live/discover/animal-prince
+            - generic [ref=e188]: </loc>
+          - generic [ref=e189]:
+            - generic [ref=e190]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e191]: </lastmod>
+          - generic [ref=e192]:
+            - generic [ref=e193]: <changefreq>
+            - text: monthly
+            - generic [ref=e194]: </changefreq>
+          - generic [ref=e195]:
+            - generic [ref=e196]: <priority>
+            - text: "0.6"
+            - generic [ref=e197]: </priority>
+        - generic [ref=e199]: </url>
+      - generic [ref=e200]:
+        - generic [ref=e203]: <url>
+        - generic [ref=e204]:
+          - generic [ref=e205]:
+            - generic [ref=e206]: <loc>
+            - text: https://www.stpetemusic.live/discover/antelope-phish-tribute
+            - generic [ref=e207]: </loc>
+          - generic [ref=e208]:
+            - generic [ref=e209]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e210]: </lastmod>
+          - generic [ref=e211]:
+            - generic [ref=e212]: <changefreq>
+            - text: monthly
+            - generic [ref=e213]: </changefreq>
+          - generic [ref=e214]:
+            - generic [ref=e215]: <priority>
+            - text: "0.6"
+            - generic [ref=e216]: </priority>
+        - generic [ref=e218]: </url>
+      - generic [ref=e219]:
+        - generic [ref=e222]: <url>
+        - generic [ref=e223]:
+          - generic [ref=e224]:
+            - generic [ref=e225]: <loc>
+            - text: https://www.stpetemusic.live/discover/ava-iri
+            - generic [ref=e226]: </loc>
+          - generic [ref=e227]:
+            - generic [ref=e228]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e229]: </lastmod>
+          - generic [ref=e230]:
+            - generic [ref=e231]: <changefreq>
+            - text: monthly
+            - generic [ref=e232]: </changefreq>
+          - generic [ref=e233]:
+            - generic [ref=e234]: <priority>
+            - text: "0.6"
+            - generic [ref=e235]: </priority>
+        - generic [ref=e237]: </url>
+      - generic [ref=e238]:
+        - generic [ref=e241]: <url>
+        - generic [ref=e242]:
+          - generic [ref=e243]:
+            - generic [ref=e244]: <loc>
+            - text: https://www.stpetemusic.live/discover/beach-terror
+            - generic [ref=e245]: </loc>
+          - generic [ref=e246]:
+            - generic [ref=e247]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e248]: </lastmod>
+          - generic [ref=e249]:
+            - generic [ref=e250]: <changefreq>
+            - text: monthly
+            - generic [ref=e251]: </changefreq>
+          - generic [ref=e252]:
+            - generic [ref=e253]: <priority>
+            - text: "0.6"
+            - generic [ref=e254]: </priority>
+        - generic [ref=e256]: </url>
+      - generic [ref=e257]:
+        - generic [ref=e260]: <url>
+        - generic [ref=e261]:
+          - generic [ref=e262]:
+            - generic [ref=e263]: <loc>
+            - text: https://www.stpetemusic.live/discover/billy-m-beck
+            - generic [ref=e264]: </loc>
+          - generic [ref=e265]:
+            - generic [ref=e266]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e267]: </lastmod>
+          - generic [ref=e268]:
+            - generic [ref=e269]: <changefreq>
+            - text: monthly
+            - generic [ref=e270]: </changefreq>
+          - generic [ref=e271]:
+            - generic [ref=e272]: <priority>
+            - text: "0.6"
+            - generic [ref=e273]: </priority>
+        - generic [ref=e275]: </url>
+      - generic [ref=e276]:
+        - generic [ref=e279]: <url>
+        - generic [ref=e280]:
+          - generic [ref=e281]:
+            - generic [ref=e282]: <loc>
+            - text: https://www.stpetemusic.live/discover/brian-busto
+            - generic [ref=e283]: </loc>
+          - generic [ref=e284]:
+            - generic [ref=e285]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e286]: </lastmod>
+          - generic [ref=e287]:
+            - generic [ref=e288]: <changefreq>
+            - text: monthly
+            - generic [ref=e289]: </changefreq>
+          - generic [ref=e290]:
+            - generic [ref=e291]: <priority>
+            - text: "0.6"
+            - generic [ref=e292]: </priority>
+        - generic [ref=e294]: </url>
+      - generic [ref=e295]:
+        - generic [ref=e298]: <url>
+        - generic [ref=e299]:
+          - generic [ref=e300]:
+            - generic [ref=e301]: <loc>
+            - text: https://www.stpetemusic.live/discover/brother-bear
+            - generic [ref=e302]: </loc>
+          - generic [ref=e303]:
+            - generic [ref=e304]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e305]: </lastmod>
+          - generic [ref=e306]:
+            - generic [ref=e307]: <changefreq>
+            - text: monthly
+            - generic [ref=e308]: </changefreq>
+          - generic [ref=e309]:
+            - generic [ref=e310]: <priority>
+            - text: "0.6"
+            - generic [ref=e311]: </priority>
+        - generic [ref=e313]: </url>
+      - generic [ref=e314]:
+        - generic [ref=e317]: <url>
+        - generic [ref=e318]:
+          - generic [ref=e319]:
+            - generic [ref=e320]: <loc>
+            - text: https://www.stpetemusic.live/discover/callaghan-keane
+            - generic [ref=e321]: </loc>
+          - generic [ref=e322]:
+            - generic [ref=e323]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e324]: </lastmod>
+          - generic [ref=e325]:
+            - generic [ref=e326]: <changefreq>
+            - text: monthly
+            - generic [ref=e327]: </changefreq>
+          - generic [ref=e328]:
+            - generic [ref=e329]: <priority>
+            - text: "0.6"
+            - generic [ref=e330]: </priority>
+        - generic [ref=e332]: </url>
+      - generic [ref=e333]:
+        - generic [ref=e336]: <url>
+        - generic [ref=e337]:
+          - generic [ref=e338]:
+            - generic [ref=e339]: <loc>
+            - text: https://www.stpetemusic.live/discover/clockworkxband
+            - generic [ref=e340]: </loc>
+          - generic [ref=e341]:
+            - generic [ref=e342]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e343]: </lastmod>
+          - generic [ref=e344]:
+            - generic [ref=e345]: <changefreq>
+            - text: monthly
+            - generic [ref=e346]: </changefreq>
+          - generic [ref=e347]:
+            - generic [ref=e348]: <priority>
+            - text: "0.6"
+            - generic [ref=e349]: </priority>
+        - generic [ref=e351]: </url>
+      - generic [ref=e352]:
+        - generic [ref=e355]: <url>
+        - generic [ref=e356]:
+          - generic [ref=e357]:
+            - generic [ref=e358]: <loc>
+            - text: https://www.stpetemusic.live/discover/corporate-guest
+            - generic [ref=e359]: </loc>
+          - generic [ref=e360]:
+            - generic [ref=e361]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e362]: </lastmod>
+          - generic [ref=e363]:
+            - generic [ref=e364]: <changefreq>
+            - text: monthly
+            - generic [ref=e365]: </changefreq>
+          - generic [ref=e366]:
+            - generic [ref=e367]: <priority>
+            - text: "0.6"
+            - generic [ref=e368]: </priority>
+        - generic [ref=e370]: </url>
+      - generic [ref=e371]:
+        - generic [ref=e374]: <url>
+        - generic [ref=e375]:
+          - generic [ref=e376]:
+            - generic [ref=e377]: <loc>
+            - text: https://www.stpetemusic.live/discover/dandy-lush
+            - generic [ref=e378]: </loc>
+          - generic [ref=e379]:
+            - generic [ref=e380]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e381]: </lastmod>
+          - generic [ref=e382]:
+            - generic [ref=e383]: <changefreq>
+            - text: monthly
+            - generic [ref=e384]: </changefreq>
+          - generic [ref=e385]:
+            - generic [ref=e386]: <priority>
+            - text: "0.6"
+            - generic [ref=e387]: </priority>
+        - generic [ref=e389]: </url>
+      - generic [ref=e390]:
+        - generic [ref=e393]: <url>
+        - generic [ref=e394]:
+          - generic [ref=e395]:
+            - generic [ref=e396]: <loc>
+            - text: https://www.stpetemusic.live/discover/dead-reef
+            - generic [ref=e397]: </loc>
+          - generic [ref=e398]:
+            - generic [ref=e399]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e400]: </lastmod>
+          - generic [ref=e401]:
+            - generic [ref=e402]: <changefreq>
+            - text: monthly
+            - generic [ref=e403]: </changefreq>
+          - generic [ref=e404]:
+            - generic [ref=e405]: <priority>
+            - text: "0.6"
+            - generic [ref=e406]: </priority>
+        - generic [ref=e408]: </url>
+      - generic [ref=e409]:
+        - generic [ref=e412]: <url>
+        - generic [ref=e413]:
+          - generic [ref=e414]:
+            - generic [ref=e415]: <loc>
+            - text: https://www.stpetemusic.live/discover/dean-mischief
+            - generic [ref=e416]: </loc>
+          - generic [ref=e417]:
+            - generic [ref=e418]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e419]: </lastmod>
+          - generic [ref=e420]:
+            - generic [ref=e421]: <changefreq>
+            - text: monthly
+            - generic [ref=e422]: </changefreq>
+          - generic [ref=e423]:
+            - generic [ref=e424]: <priority>
+            - text: "0.6"
+            - generic [ref=e425]: </priority>
+        - generic [ref=e427]: </url>
+      - generic [ref=e428]:
+        - generic [ref=e431]: <url>
+        - generic [ref=e432]:
+          - generic [ref=e433]:
+            - generic [ref=e434]: <loc>
+            - text: https://www.stpetemusic.live/discover/dionysus
+            - generic [ref=e435]: </loc>
+          - generic [ref=e436]:
+            - generic [ref=e437]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e438]: </lastmod>
+          - generic [ref=e439]:
+            - generic [ref=e440]: <changefreq>
+            - text: monthly
+            - generic [ref=e441]: </changefreq>
+          - generic [ref=e442]:
+            - generic [ref=e443]: <priority>
+            - text: "0.6"
+            - generic [ref=e444]: </priority>
+        - generic [ref=e446]: </url>
+      - generic [ref=e447]:
+        - generic [ref=e450]: <url>
+        - generic [ref=e451]:
+          - generic [ref=e452]:
+            - generic [ref=e453]: <loc>
+            - text: https://www.stpetemusic.live/discover/displace
+            - generic [ref=e454]: </loc>
+          - generic [ref=e455]:
+            - generic [ref=e456]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e457]: </lastmod>
+          - generic [ref=e458]:
+            - generic [ref=e459]: <changefreq>
+            - text: monthly
+            - generic [ref=e460]: </changefreq>
+          - generic [ref=e461]:
+            - generic [ref=e462]: <priority>
+            - text: "0.6"
+            - generic [ref=e463]: </priority>
+        - generic [ref=e465]: </url>
+      - generic [ref=e466]:
+        - generic [ref=e469]: <url>
+        - generic [ref=e470]:
+          - generic [ref=e471]:
+            - generic [ref=e472]: <loc>
+            - text: https://www.stpetemusic.live/discover/donzii
+            - generic [ref=e473]: </loc>
+          - generic [ref=e474]:
+            - generic [ref=e475]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e476]: </lastmod>
+          - generic [ref=e477]:
+            - generic [ref=e478]: <changefreq>
+            - text: monthly
+            - generic [ref=e479]: </changefreq>
+          - generic [ref=e480]:
+            - generic [ref=e481]: <priority>
+            - text: "0.6"
+            - generic [ref=e482]: </priority>
+        - generic [ref=e484]: </url>
+      - generic [ref=e485]:
+        - generic [ref=e488]: <url>
+        - generic [ref=e489]:
+          - generic [ref=e490]:
+            - generic [ref=e491]: <loc>
+            - text: https://www.stpetemusic.live/discover/doorman-the-dj
+            - generic [ref=e492]: </loc>
+          - generic [ref=e493]:
+            - generic [ref=e494]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e495]: </lastmod>
+          - generic [ref=e496]:
+            - generic [ref=e497]: <changefreq>
+            - text: monthly
+            - generic [ref=e498]: </changefreq>
+          - generic [ref=e499]:
+            - generic [ref=e500]: <priority>
+            - text: "0.6"
+            - generic [ref=e501]: </priority>
+        - generic [ref=e503]: </url>
+      - generic [ref=e504]:
+        - generic [ref=e507]: <url>
+        - generic [ref=e508]:
+          - generic [ref=e509]:
+            - generic [ref=e510]: <loc>
+            - text: https://www.stpetemusic.live/discover/dylan-dames
+            - generic [ref=e511]: </loc>
+          - generic [ref=e512]:
+            - generic [ref=e513]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e514]: </lastmod>
+          - generic [ref=e515]:
+            - generic [ref=e516]: <changefreq>
+            - text: monthly
+            - generic [ref=e517]: </changefreq>
+          - generic [ref=e518]:
+            - generic [ref=e519]: <priority>
+            - text: "0.6"
+            - generic [ref=e520]: </priority>
+        - generic [ref=e522]: </url>
+      - generic [ref=e523]:
+        - generic [ref=e526]: <url>
+        - generic [ref=e527]:
+          - generic [ref=e528]:
+            - generic [ref=e529]: <loc>
+            - text: https://www.stpetemusic.live/discover/earth-girl
+            - generic [ref=e530]: </loc>
+          - generic [ref=e531]:
+            - generic [ref=e532]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e533]: </lastmod>
+          - generic [ref=e534]:
+            - generic [ref=e535]: <changefreq>
+            - text: monthly
+            - generic [ref=e536]: </changefreq>
+          - generic [ref=e537]:
+            - generic [ref=e538]: <priority>
+            - text: "0.6"
+            - generic [ref=e539]: </priority>
+        - generic [ref=e541]: </url>
+      - generic [ref=e542]:
+        - generic [ref=e545]: <url>
+        - generic [ref=e546]:
+          - generic [ref=e547]:
+            - generic [ref=e548]: <loc>
+            - text: https://www.stpetemusic.live/discover/freeman-sound-mindset
+            - generic [ref=e549]: </loc>
+          - generic [ref=e550]:
+            - generic [ref=e551]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e552]: </lastmod>
+          - generic [ref=e553]:
+            - generic [ref=e554]: <changefreq>
+            - text: monthly
+            - generic [ref=e555]: </changefreq>
+          - generic [ref=e556]:
+            - generic [ref=e557]: <priority>
+            - text: "0.6"
+            - generic [ref=e558]: </priority>
+        - generic [ref=e560]: </url>
+      - generic [ref=e561]:
+        - generic [ref=e564]: <url>
+        - generic [ref=e565]:
+          - generic [ref=e566]:
+            - generic [ref=e567]: <loc>
+            - text: https://www.stpetemusic.live/discover/frog-shaman
+            - generic [ref=e568]: </loc>
+          - generic [ref=e569]:
+            - generic [ref=e570]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e571]: </lastmod>
+          - generic [ref=e572]:
+            - generic [ref=e573]: <changefreq>
+            - text: monthly
+            - generic [ref=e574]: </changefreq>
+          - generic [ref=e575]:
+            - generic [ref=e576]: <priority>
+            - text: "0.6"
+            - generic [ref=e577]: </priority>
+        - generic [ref=e579]: </url>
+      - generic [ref=e580]:
+        - generic [ref=e583]: <url>
+        - generic [ref=e584]:
+          - generic [ref=e585]:
+            - generic [ref=e586]: <loc>
+            - text: https://www.stpetemusic.live/discover/gabe-hernandez
+            - generic [ref=e587]: </loc>
+          - generic [ref=e588]:
+            - generic [ref=e589]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e590]: </lastmod>
+          - generic [ref=e591]:
+            - generic [ref=e592]: <changefreq>
+            - text: monthly
+            - generic [ref=e593]: </changefreq>
+          - generic [ref=e594]:
+            - generic [ref=e595]: <priority>
+            - text: "0.6"
+            - generic [ref=e596]: </priority>
+        - generic [ref=e598]: </url>
+      - generic [ref=e599]:
+        - generic [ref=e602]: <url>
+        - generic [ref=e603]:
+          - generic [ref=e604]:
+            - generic [ref=e605]: <loc>
+            - text: https://www.stpetemusic.live/discover/golden-hour-trees
+            - generic [ref=e606]: </loc>
+          - generic [ref=e607]:
+            - generic [ref=e608]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e609]: </lastmod>
+          - generic [ref=e610]:
+            - generic [ref=e611]: <changefreq>
+            - text: monthly
+            - generic [ref=e612]: </changefreq>
+          - generic [ref=e613]:
+            - generic [ref=e614]: <priority>
+            - text: "0.6"
+            - generic [ref=e615]: </priority>
+        - generic [ref=e617]: </url>
+      - generic [ref=e618]:
+        - generic [ref=e621]: <url>
+        - generic [ref=e622]:
+          - generic [ref=e623]:
+            - generic [ref=e624]: <loc>
+            - text: https://www.stpetemusic.live/discover/harlow-gold
+            - generic [ref=e625]: </loc>
+          - generic [ref=e626]:
+            - generic [ref=e627]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e628]: </lastmod>
+          - generic [ref=e629]:
+            - generic [ref=e630]: <changefreq>
+            - text: monthly
+            - generic [ref=e631]: </changefreq>
+          - generic [ref=e632]:
+            - generic [ref=e633]: <priority>
+            - text: "0.6"
+            - generic [ref=e634]: </priority>
+        - generic [ref=e636]: </url>
+      - generic [ref=e637]:
+        - generic [ref=e640]: <url>
+        - generic [ref=e641]:
+          - generic [ref=e642]:
+            - generic [ref=e643]: <loc>
+            - text: https://www.stpetemusic.live/discover/holy-river
+            - generic [ref=e644]: </loc>
+          - generic [ref=e645]:
+            - generic [ref=e646]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e647]: </lastmod>
+          - generic [ref=e648]:
+            - generic [ref=e649]: <changefreq>
+            - text: monthly
+            - generic [ref=e650]: </changefreq>
+          - generic [ref=e651]:
+            - generic [ref=e652]: <priority>
+            - text: "0.6"
+            - generic [ref=e653]: </priority>
+        - generic [ref=e655]: </url>
+      - generic [ref=e656]:
+        - generic [ref=e659]: <url>
+        - generic [ref=e660]:
+          - generic [ref=e661]:
+            - generic [ref=e662]: <loc>
+            - text: https://www.stpetemusic.live/discover/house-of-i
+            - generic [ref=e663]: </loc>
+          - generic [ref=e664]:
+            - generic [ref=e665]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e666]: </lastmod>
+          - generic [ref=e667]:
+            - generic [ref=e668]: <changefreq>
+            - text: monthly
+            - generic [ref=e669]: </changefreq>
+          - generic [ref=e670]:
+            - generic [ref=e671]: <priority>
+            - text: "0.6"
+            - generic [ref=e672]: </priority>
+        - generic [ref=e674]: </url>
+      - generic [ref=e675]:
+        - generic [ref=e678]: <url>
+        - generic [ref=e679]:
+          - generic [ref=e680]:
+            - generic [ref=e681]: <loc>
+            - text: https://www.stpetemusic.live/discover/humankinda
+            - generic [ref=e682]: </loc>
+          - generic [ref=e683]:
+            - generic [ref=e684]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e685]: </lastmod>
+          - generic [ref=e686]:
+            - generic [ref=e687]: <changefreq>
+            - text: monthly
+            - generic [ref=e688]: </changefreq>
+          - generic [ref=e689]:
+            - generic [ref=e690]: <priority>
+            - text: "0.6"
+            - generic [ref=e691]: </priority>
+        - generic [ref=e693]: </url>
+      - generic [ref=e694]:
+        - generic [ref=e697]: <url>
+        - generic [ref=e698]:
+          - generic [ref=e699]:
+            - generic [ref=e700]: <loc>
+            - text: https://www.stpetemusic.live/discover/in-case-u-didnt-joe
+            - generic [ref=e701]: </loc>
+          - generic [ref=e702]:
+            - generic [ref=e703]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e704]: </lastmod>
+          - generic [ref=e705]:
+            - generic [ref=e706]: <changefreq>
+            - text: monthly
+            - generic [ref=e707]: </changefreq>
+          - generic [ref=e708]:
+            - generic [ref=e709]: <priority>
+            - text: "0.6"
+            - generic [ref=e710]: </priority>
+        - generic [ref=e712]: </url>
+      - generic [ref=e713]:
+        - generic [ref=e716]: <url>
+        - generic [ref=e717]:
+          - generic [ref=e718]:
+            - generic [ref=e719]: <loc>
+            - text: https://www.stpetemusic.live/discover/infinite-third
+            - generic [ref=e720]: </loc>
+          - generic [ref=e721]:
+            - generic [ref=e722]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e723]: </lastmod>
+          - generic [ref=e724]:
+            - generic [ref=e725]: <changefreq>
+            - text: monthly
+            - generic [ref=e726]: </changefreq>
+          - generic [ref=e727]:
+            - generic [ref=e728]: <priority>
+            - text: "0.6"
+            - generic [ref=e729]: </priority>
+        - generic [ref=e731]: </url>
+      - generic [ref=e732]:
+        - generic [ref=e735]: <url>
+        - generic [ref=e736]:
+          - generic [ref=e737]:
+            - generic [ref=e738]: <loc>
+            - text: https://www.stpetemusic.live/discover/jimpster
+            - generic [ref=e739]: </loc>
+          - generic [ref=e740]:
+            - generic [ref=e741]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e742]: </lastmod>
+          - generic [ref=e743]:
+            - generic [ref=e744]: <changefreq>
+            - text: monthly
+            - generic [ref=e745]: </changefreq>
+          - generic [ref=e746]:
+            - generic [ref=e747]: <priority>
+            - text: "0.6"
+            - generic [ref=e748]: </priority>
+        - generic [ref=e750]: </url>
+      - generic [ref=e751]:
+        - generic [ref=e754]: <url>
+        - generic [ref=e755]:
+          - generic [ref=e756]:
+            - generic [ref=e757]: <loc>
+            - text: https://www.stpetemusic.live/discover/johee-mason
+            - generic [ref=e758]: </loc>
+          - generic [ref=e759]:
+            - generic [ref=e760]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e761]: </lastmod>
+          - generic [ref=e762]:
+            - generic [ref=e763]: <changefreq>
+            - text: monthly
+            - generic [ref=e764]: </changefreq>
+          - generic [ref=e765]:
+            - generic [ref=e766]: <priority>
+            - text: "0.6"
+            - generic [ref=e767]: </priority>
+        - generic [ref=e769]: </url>
+      - generic [ref=e770]:
+        - generic [ref=e773]: <url>
+        - generic [ref=e774]:
+          - generic [ref=e775]:
+            - generic [ref=e776]: <loc>
+            - text: https://www.stpetemusic.live/discover/jon-berg
+            - generic [ref=e777]: </loc>
+          - generic [ref=e778]:
+            - generic [ref=e779]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e780]: </lastmod>
+          - generic [ref=e781]:
+            - generic [ref=e782]: <changefreq>
+            - text: monthly
+            - generic [ref=e783]: </changefreq>
+          - generic [ref=e784]:
+            - generic [ref=e785]: <priority>
+            - text: "0.6"
+            - generic [ref=e786]: </priority>
+        - generic [ref=e788]: </url>
+      - generic [ref=e789]:
+        - generic [ref=e792]: <url>
+        - generic [ref=e793]:
+          - generic [ref=e794]:
+            - generic [ref=e795]: <loc>
+            - text: https://www.stpetemusic.live/discover/joy-wagon
+            - generic [ref=e796]: </loc>
+          - generic [ref=e797]:
+            - generic [ref=e798]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e799]: </lastmod>
+          - generic [ref=e800]:
+            - generic [ref=e801]: <changefreq>
+            - text: monthly
+            - generic [ref=e802]: </changefreq>
+          - generic [ref=e803]:
+            - generic [ref=e804]: <priority>
+            - text: "0.6"
+            - generic [ref=e805]: </priority>
+        - generic [ref=e807]: </url>
+      - generic [ref=e808]:
+        - generic [ref=e811]: <url>
+        - generic [ref=e812]:
+          - generic [ref=e813]:
+            - generic [ref=e814]: <loc>
+            - text: https://www.stpetemusic.live/discover/j-rose-loops
+            - generic [ref=e815]: </loc>
+          - generic [ref=e816]:
+            - generic [ref=e817]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e818]: </lastmod>
+          - generic [ref=e819]:
+            - generic [ref=e820]: <changefreq>
+            - text: monthly
+            - generic [ref=e821]: </changefreq>
+          - generic [ref=e822]:
+            - generic [ref=e823]: <priority>
+            - text: "0.6"
+            - generic [ref=e824]: </priority>
+        - generic [ref=e826]: </url>
+      - generic [ref=e827]:
+        - generic [ref=e830]: <url>
+        - generic [ref=e831]:
+          - generic [ref=e832]:
+            - generic [ref=e833]: <loc>
+            - text: https://www.stpetemusic.live/discover/jt-brown-and-co
+            - generic [ref=e834]: </loc>
+          - generic [ref=e835]:
+            - generic [ref=e836]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e837]: </lastmod>
+          - generic [ref=e838]:
+            - generic [ref=e839]: <changefreq>
+            - text: monthly
+            - generic [ref=e840]: </changefreq>
+          - generic [ref=e841]:
+            - generic [ref=e842]: <priority>
+            - text: "0.6"
+            - generic [ref=e843]: </priority>
+        - generic [ref=e845]: </url>
+      - generic [ref=e846]:
+        - generic [ref=e849]: <url>
+        - generic [ref=e850]:
+          - generic [ref=e851]:
+            - generic [ref=e852]: <loc>
+            - text: https://www.stpetemusic.live/discover/katara
+            - generic [ref=e853]: </loc>
+          - generic [ref=e854]:
+            - generic [ref=e855]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e856]: </lastmod>
+          - generic [ref=e857]:
+            - generic [ref=e858]: <changefreq>
+            - text: monthly
+            - generic [ref=e859]: </changefreq>
+          - generic [ref=e860]:
+            - generic [ref=e861]: <priority>
+            - text: "0.6"
+            - generic [ref=e862]: </priority>
+        - generic [ref=e864]: </url>
+      - generic [ref=e865]:
+        - generic [ref=e868]: <url>
+        - generic [ref=e869]:
+          - generic [ref=e870]:
+            - generic [ref=e871]: <loc>
+            - text: https://www.stpetemusic.live/discover/kelsey-sharp
+            - generic [ref=e872]: </loc>
+          - generic [ref=e873]:
+            - generic [ref=e874]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e875]: </lastmod>
+          - generic [ref=e876]:
+            - generic [ref=e877]: <changefreq>
+            - text: monthly
+            - generic [ref=e878]: </changefreq>
+          - generic [ref=e879]:
+            - generic [ref=e880]: <priority>
+            - text: "0.6"
+            - generic [ref=e881]: </priority>
+        - generic [ref=e883]: </url>
+      - generic [ref=e884]:
+        - generic [ref=e887]: <url>
+        - generic [ref=e888]:
+          - generic [ref=e889]:
+            - generic [ref=e890]: <loc>
+            - text: https://www.stpetemusic.live/discover/khoury-affinity
+            - generic [ref=e891]: </loc>
+          - generic [ref=e892]:
+            - generic [ref=e893]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e894]: </lastmod>
+          - generic [ref=e895]:
+            - generic [ref=e896]: <changefreq>
+            - text: monthly
+            - generic [ref=e897]: </changefreq>
+          - generic [ref=e898]:
+            - generic [ref=e899]: <priority>
+            - text: "0.6"
+            - generic [ref=e900]: </priority>
+        - generic [ref=e902]: </url>
+      - generic [ref=e903]:
+        - generic [ref=e906]: <url>
+        - generic [ref=e907]:
+          - generic [ref=e908]:
+            - generic [ref=e909]: <loc>
+            - text: https://www.stpetemusic.live/discover/kollect-inc
+            - generic [ref=e910]: </loc>
+          - generic [ref=e911]:
+            - generic [ref=e912]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e913]: </lastmod>
+          - generic [ref=e914]:
+            - generic [ref=e915]: <changefreq>
+            - text: monthly
+            - generic [ref=e916]: </changefreq>
+          - generic [ref=e917]:
+            - generic [ref=e918]: <priority>
+            - text: "0.6"
+            - generic [ref=e919]: </priority>
+        - generic [ref=e921]: </url>
+      - generic [ref=e922]:
+        - generic [ref=e925]: <url>
+        - generic [ref=e926]:
+          - generic [ref=e927]:
+            - generic [ref=e928]: <loc>
+            - text: https://www.stpetemusic.live/discover/legacy-music
+            - generic [ref=e929]: </loc>
+          - generic [ref=e930]:
+            - generic [ref=e931]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e932]: </lastmod>
+          - generic [ref=e933]:
+            - generic [ref=e934]: <changefreq>
+            - text: monthly
+            - generic [ref=e935]: </changefreq>
+          - generic [ref=e936]:
+            - generic [ref=e937]: <priority>
+            - text: "0.6"
+            - generic [ref=e938]: </priority>
+        - generic [ref=e940]: </url>
+      - generic [ref=e941]:
+        - generic [ref=e944]: <url>
+        - generic [ref=e945]:
+          - generic [ref=e946]:
+            - generic [ref=e947]: <loc>
+            - text: https://www.stpetemusic.live/discover/legacy-orchestra-collective
+            - generic [ref=e948]: </loc>
+          - generic [ref=e949]:
+            - generic [ref=e950]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e951]: </lastmod>
+          - generic [ref=e952]:
+            - generic [ref=e953]: <changefreq>
+            - text: monthly
+            - generic [ref=e954]: </changefreq>
+          - generic [ref=e955]:
+            - generic [ref=e956]: <priority>
+            - text: "0.6"
+            - generic [ref=e957]: </priority>
+        - generic [ref=e959]: </url>
+      - generic [ref=e960]:
+        - generic [ref=e963]: <url>
+        - generic [ref=e964]:
+          - generic [ref=e965]:
+            - generic [ref=e966]: <loc>
+            - text: https://www.stpetemusic.live/discover/lesa-silvermore
+            - generic [ref=e967]: </loc>
+          - generic [ref=e968]:
+            - generic [ref=e969]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e970]: </lastmod>
+          - generic [ref=e971]:
+            - generic [ref=e972]: <changefreq>
+            - text: monthly
+            - generic [ref=e973]: </changefreq>
+          - generic [ref=e974]:
+            - generic [ref=e975]: <priority>
+            - text: "0.6"
+            - generic [ref=e976]: </priority>
+        - generic [ref=e978]: </url>
+      - generic [ref=e979]:
+        - generic [ref=e982]: <url>
+        - generic [ref=e983]:
+          - generic [ref=e984]:
+            - generic [ref=e985]: <loc>
+            - text: https://www.stpetemusic.live/discover/liam-bauman
+            - generic [ref=e986]: </loc>
+          - generic [ref=e987]:
+            - generic [ref=e988]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e989]: </lastmod>
+          - generic [ref=e990]:
+            - generic [ref=e991]: <changefreq>
+            - text: monthly
+            - generic [ref=e992]: </changefreq>
+          - generic [ref=e993]:
+            - generic [ref=e994]: <priority>
+            - text: "0.6"
+            - generic [ref=e995]: </priority>
+        - generic [ref=e997]: </url>
+      - generic [ref=e998]:
+        - generic [ref=e1001]: <url>
+        - generic [ref=e1002]:
+          - generic [ref=e1003]:
+            - generic [ref=e1004]: <loc>
+            - text: https://www.stpetemusic.live/discover/light-the-wire
+            - generic [ref=e1005]: </loc>
+          - generic [ref=e1006]:
+            - generic [ref=e1007]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1008]: </lastmod>
+          - generic [ref=e1009]:
+            - generic [ref=e1010]: <changefreq>
+            - text: monthly
+            - generic [ref=e1011]: </changefreq>
+          - generic [ref=e1012]:
+            - generic [ref=e1013]: <priority>
+            - text: "0.6"
+            - generic [ref=e1014]: </priority>
+        - generic [ref=e1016]: </url>
+      - generic [ref=e1017]:
+        - generic [ref=e1020]: <url>
+        - generic [ref=e1021]:
+          - generic [ref=e1022]:
+            - generic [ref=e1023]: <loc>
+            - text: https://www.stpetemusic.live/discover/liquid-pennies
+            - generic [ref=e1024]: </loc>
+          - generic [ref=e1025]:
+            - generic [ref=e1026]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1027]: </lastmod>
+          - generic [ref=e1028]:
+            - generic [ref=e1029]: <changefreq>
+            - text: monthly
+            - generic [ref=e1030]: </changefreq>
+          - generic [ref=e1031]:
+            - generic [ref=e1032]: <priority>
+            - text: "0.6"
+            - generic [ref=e1033]: </priority>
+        - generic [ref=e1035]: </url>
+      - generic [ref=e1036]:
+        - generic [ref=e1039]: <url>
+        - generic [ref=e1040]:
+          - generic [ref=e1041]:
+            - generic [ref=e1042]: <loc>
+            - text: https://www.stpetemusic.live/discover/little-giver-band
+            - generic [ref=e1043]: </loc>
+          - generic [ref=e1044]:
+            - generic [ref=e1045]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1046]: </lastmod>
+          - generic [ref=e1047]:
+            - generic [ref=e1048]: <changefreq>
+            - text: monthly
+            - generic [ref=e1049]: </changefreq>
+          - generic [ref=e1050]:
+            - generic [ref=e1051]: <priority>
+            - text: "0.6"
+            - generic [ref=e1052]: </priority>
+        - generic [ref=e1054]: </url>
+      - generic [ref=e1055]:
+        - generic [ref=e1058]: <url>
+        - generic [ref=e1059]:
+          - generic [ref=e1060]:
+            - generic [ref=e1061]: <loc>
+            - text: https://www.stpetemusic.live/discover/lynn-hawkins
+            - generic [ref=e1062]: </loc>
+          - generic [ref=e1063]:
+            - generic [ref=e1064]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1065]: </lastmod>
+          - generic [ref=e1066]:
+            - generic [ref=e1067]: <changefreq>
+            - text: monthly
+            - generic [ref=e1068]: </changefreq>
+          - generic [ref=e1069]:
+            - generic [ref=e1070]: <priority>
+            - text: "0.6"
+            - generic [ref=e1071]: </priority>
+        - generic [ref=e1073]: </url>
+      - generic [ref=e1074]:
+        - generic [ref=e1077]: <url>
+        - generic [ref=e1078]:
+          - generic [ref=e1079]:
+            - generic [ref=e1080]: <loc>
+            - text: https://www.stpetemusic.live/discover/mel-with-a-period
+            - generic [ref=e1081]: </loc>
+          - generic [ref=e1082]:
+            - generic [ref=e1083]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1084]: </lastmod>
+          - generic [ref=e1085]:
+            - generic [ref=e1086]: <changefreq>
+            - text: monthly
+            - generic [ref=e1087]: </changefreq>
+          - generic [ref=e1088]:
+            - generic [ref=e1089]: <priority>
+            - text: "0.6"
+            - generic [ref=e1090]: </priority>
+        - generic [ref=e1092]: </url>
+      - generic [ref=e1093]:
+        - generic [ref=e1096]: <url>
+        - generic [ref=e1097]:
+          - generic [ref=e1098]:
+            - generic [ref=e1099]: <loc>
+            - text: https://www.stpetemusic.live/discover/michael-may-james
+            - generic [ref=e1100]: </loc>
+          - generic [ref=e1101]:
+            - generic [ref=e1102]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1103]: </lastmod>
+          - generic [ref=e1104]:
+            - generic [ref=e1105]: <changefreq>
+            - text: monthly
+            - generic [ref=e1106]: </changefreq>
+          - generic [ref=e1107]:
+            - generic [ref=e1108]: <priority>
+            - text: "0.6"
+            - generic [ref=e1109]: </priority>
+        - generic [ref=e1111]: </url>
+      - generic [ref=e1112]:
+        - generic [ref=e1115]: <url>
+        - generic [ref=e1116]:
+          - generic [ref=e1117]:
+            - generic [ref=e1118]: <loc>
+            - text: https://www.stpetemusic.live/discover/mike-blenda
+            - generic [ref=e1119]: </loc>
+          - generic [ref=e1120]:
+            - generic [ref=e1121]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1122]: </lastmod>
+          - generic [ref=e1123]:
+            - generic [ref=e1124]: <changefreq>
+            - text: monthly
+            - generic [ref=e1125]: </changefreq>
+          - generic [ref=e1126]:
+            - generic [ref=e1127]: <priority>
+            - text: "0.6"
+            - generic [ref=e1128]: </priority>
+        - generic [ref=e1130]: </url>
+      - generic [ref=e1131]:
+        - generic [ref=e1134]: <url>
+        - generic [ref=e1135]:
+          - generic [ref=e1136]:
+            - generic [ref=e1137]: <loc>
+            - text: https://www.stpetemusic.live/discover/minim
+            - generic [ref=e1138]: </loc>
+          - generic [ref=e1139]:
+            - generic [ref=e1140]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1141]: </lastmod>
+          - generic [ref=e1142]:
+            - generic [ref=e1143]: <changefreq>
+            - text: monthly
+            - generic [ref=e1144]: </changefreq>
+          - generic [ref=e1145]:
+            - generic [ref=e1146]: <priority>
+            - text: "0.6"
+            - generic [ref=e1147]: </priority>
+        - generic [ref=e1149]: </url>
+      - generic [ref=e1150]:
+        - generic [ref=e1153]: <url>
+        - generic [ref=e1154]:
+          - generic [ref=e1155]:
+            - generic [ref=e1156]: <loc>
+            - text: https://www.stpetemusic.live/discover/moonshow
+            - generic [ref=e1157]: </loc>
+          - generic [ref=e1158]:
+            - generic [ref=e1159]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1160]: </lastmod>
+          - generic [ref=e1161]:
+            - generic [ref=e1162]: <changefreq>
+            - text: monthly
+            - generic [ref=e1163]: </changefreq>
+          - generic [ref=e1164]:
+            - generic [ref=e1165]: <priority>
+            - text: "0.6"
+            - generic [ref=e1166]: </priority>
+        - generic [ref=e1168]: </url>
+      - generic [ref=e1169]:
+        - generic [ref=e1172]: <url>
+        - generic [ref=e1173]:
+          - generic [ref=e1174]:
+            - generic [ref=e1175]: <loc>
+            - text: https://www.stpetemusic.live/discover/mouth-council
+            - generic [ref=e1176]: </loc>
+          - generic [ref=e1177]:
+            - generic [ref=e1178]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1179]: </lastmod>
+          - generic [ref=e1180]:
+            - generic [ref=e1181]: <changefreq>
+            - text: monthly
+            - generic [ref=e1182]: </changefreq>
+          - generic [ref=e1183]:
+            - generic [ref=e1184]: <priority>
+            - text: "0.6"
+            - generic [ref=e1185]: </priority>
+        - generic [ref=e1187]: </url>
+      - generic [ref=e1188]:
+        - generic [ref=e1191]: <url>
+        - generic [ref=e1192]:
+          - generic [ref=e1193]:
+            - generic [ref=e1194]: <loc>
+            - text: https://www.stpetemusic.live/discover/movie-props
+            - generic [ref=e1195]: </loc>
+          - generic [ref=e1196]:
+            - generic [ref=e1197]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1198]: </lastmod>
+          - generic [ref=e1199]:
+            - generic [ref=e1200]: <changefreq>
+            - text: monthly
+            - generic [ref=e1201]: </changefreq>
+          - generic [ref=e1202]:
+            - generic [ref=e1203]: <priority>
+            - text: "0.6"
+            - generic [ref=e1204]: </priority>
+        - generic [ref=e1206]: </url>
+      - generic [ref=e1207]:
+        - generic [ref=e1210]: <url>
+        - generic [ref=e1211]:
+          - generic [ref=e1212]:
+            - generic [ref=e1213]: <loc>
+            - text: https://www.stpetemusic.live/discover/mr-whiskers-and-the-nine-lives
+            - generic [ref=e1214]: </loc>
+          - generic [ref=e1215]:
+            - generic [ref=e1216]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1217]: </lastmod>
+          - generic [ref=e1218]:
+            - generic [ref=e1219]: <changefreq>
+            - text: monthly
+            - generic [ref=e1220]: </changefreq>
+          - generic [ref=e1221]:
+            - generic [ref=e1222]: <priority>
+            - text: "0.6"
+            - generic [ref=e1223]: </priority>
+        - generic [ref=e1225]: </url>
+      - generic [ref=e1226]:
+        - generic [ref=e1229]: <url>
+        - generic [ref=e1230]:
+          - generic [ref=e1231]:
+            - generic [ref=e1232]: <loc>
+            - text: https://www.stpetemusic.live/discover/nico-the-alchemist
+            - generic [ref=e1233]: </loc>
+          - generic [ref=e1234]:
+            - generic [ref=e1235]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1236]: </lastmod>
+          - generic [ref=e1237]:
+            - generic [ref=e1238]: <changefreq>
+            - text: monthly
+            - generic [ref=e1239]: </changefreq>
+          - generic [ref=e1240]:
+            - generic [ref=e1241]: <priority>
+            - text: "0.6"
+            - generic [ref=e1242]: </priority>
+        - generic [ref=e1244]: </url>
+      - generic [ref=e1245]:
+        - generic [ref=e1248]: <url>
+        - generic [ref=e1249]:
+          - generic [ref=e1250]:
+            - generic [ref=e1251]: <loc>
+            - text: https://www.stpetemusic.live/discover/north-star
+            - generic [ref=e1252]: </loc>
+          - generic [ref=e1253]:
+            - generic [ref=e1254]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1255]: </lastmod>
+          - generic [ref=e1256]:
+            - generic [ref=e1257]: <changefreq>
+            - text: monthly
+            - generic [ref=e1258]: </changefreq>
+          - generic [ref=e1259]:
+            - generic [ref=e1260]: <priority>
+            - text: "0.6"
+            - generic [ref=e1261]: </priority>
+        - generic [ref=e1263]: </url>
+      - generic [ref=e1264]:
+        - generic [ref=e1267]: <url>
+        - generic [ref=e1268]:
+          - generic [ref=e1269]:
+            - generic [ref=e1270]: <loc>
+            - text: https://www.stpetemusic.live/discover/not-julia-powell
+            - generic [ref=e1271]: </loc>
+          - generic [ref=e1272]:
+            - generic [ref=e1273]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1274]: </lastmod>
+          - generic [ref=e1275]:
+            - generic [ref=e1276]: <changefreq>
+            - text: monthly
+            - generic [ref=e1277]: </changefreq>
+          - generic [ref=e1278]:
+            - generic [ref=e1279]: <priority>
+            - text: "0.6"
+            - generic [ref=e1280]: </priority>
+        - generic [ref=e1282]: </url>
+      - generic [ref=e1283]:
+        - generic [ref=e1286]: <url>
+        - generic [ref=e1287]:
+          - generic [ref=e1288]:
+            - generic [ref=e1289]: <loc>
+            - text: https://www.stpetemusic.live/discover/only1two
+            - generic [ref=e1290]: </loc>
+          - generic [ref=e1291]:
+            - generic [ref=e1292]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1293]: </lastmod>
+          - generic [ref=e1294]:
+            - generic [ref=e1295]: <changefreq>
+            - text: monthly
+            - generic [ref=e1296]: </changefreq>
+          - generic [ref=e1297]:
+            - generic [ref=e1298]: <priority>
+            - text: "0.6"
+            - generic [ref=e1299]: </priority>
+        - generic [ref=e1301]: </url>
+      - generic [ref=e1302]:
+        - generic [ref=e1305]: <url>
+        - generic [ref=e1306]:
+          - generic [ref=e1307]:
+            - generic [ref=e1308]: <loc>
+            - text: https://www.stpetemusic.live/discover/physical-plant
+            - generic [ref=e1309]: </loc>
+          - generic [ref=e1310]:
+            - generic [ref=e1311]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1312]: </lastmod>
+          - generic [ref=e1313]:
+            - generic [ref=e1314]: <changefreq>
+            - text: monthly
+            - generic [ref=e1315]: </changefreq>
+          - generic [ref=e1316]:
+            - generic [ref=e1317]: <priority>
+            - text: "0.6"
+            - generic [ref=e1318]: </priority>
+        - generic [ref=e1320]: </url>
+      - generic [ref=e1321]:
+        - generic [ref=e1324]: <url>
+        - generic [ref=e1325]:
+          - generic [ref=e1326]:
+            - generic [ref=e1327]: <loc>
+            - text: https://www.stpetemusic.live/discover/prophessor-j-events
+            - generic [ref=e1328]: </loc>
+          - generic [ref=e1329]:
+            - generic [ref=e1330]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1331]: </lastmod>
+          - generic [ref=e1332]:
+            - generic [ref=e1333]: <changefreq>
+            - text: monthly
+            - generic [ref=e1334]: </changefreq>
+          - generic [ref=e1335]:
+            - generic [ref=e1336]: <priority>
+            - text: "0.6"
+            - generic [ref=e1337]: </priority>
+        - generic [ref=e1339]: </url>
+      - generic [ref=e1340]:
+        - generic [ref=e1343]: <url>
+        - generic [ref=e1344]:
+          - generic [ref=e1345]:
+            - generic [ref=e1346]: <loc>
+            - text: https://www.stpetemusic.live/discover/public-speaking
+            - generic [ref=e1347]: </loc>
+          - generic [ref=e1348]:
+            - generic [ref=e1349]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1350]: </lastmod>
+          - generic [ref=e1351]:
+            - generic [ref=e1352]: <changefreq>
+            - text: monthly
+            - generic [ref=e1353]: </changefreq>
+          - generic [ref=e1354]:
+            - generic [ref=e1355]: <priority>
+            - text: "0.6"
+            - generic [ref=e1356]: </priority>
+        - generic [ref=e1358]: </url>
+      - generic [ref=e1359]:
+        - generic [ref=e1362]: <url>
+        - generic [ref=e1363]:
+          - generic [ref=e1364]:
+            - generic [ref=e1365]: <loc>
+            - text: https://www.stpetemusic.live/discover/rat-galactic
+            - generic [ref=e1366]: </loc>
+          - generic [ref=e1367]:
+            - generic [ref=e1368]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1369]: </lastmod>
+          - generic [ref=e1370]:
+            - generic [ref=e1371]: <changefreq>
+            - text: monthly
+            - generic [ref=e1372]: </changefreq>
+          - generic [ref=e1373]:
+            - generic [ref=e1374]: <priority>
+            - text: "0.6"
+            - generic [ref=e1375]: </priority>
+        - generic [ref=e1377]: </url>
+      - generic [ref=e1378]:
+        - generic [ref=e1381]: <url>
+        - generic [ref=e1382]:
+          - generic [ref=e1383]:
+            - generic [ref=e1384]: <loc>
+            - text: https://www.stpetemusic.live/discover/razor-and-the-boogie-men
+            - generic [ref=e1385]: </loc>
+          - generic [ref=e1386]:
+            - generic [ref=e1387]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1388]: </lastmod>
+          - generic [ref=e1389]:
+            - generic [ref=e1390]: <changefreq>
+            - text: monthly
+            - generic [ref=e1391]: </changefreq>
+          - generic [ref=e1392]:
+            - generic [ref=e1393]: <priority>
+            - text: "0.6"
+            - generic [ref=e1394]: </priority>
+        - generic [ref=e1396]: </url>
+      - generic [ref=e1397]:
+        - generic [ref=e1400]: <url>
+        - generic [ref=e1401]:
+          - generic [ref=e1402]:
+            - generic [ref=e1403]: <loc>
+            - text: https://www.stpetemusic.live/discover/red-feather
+            - generic [ref=e1404]: </loc>
+          - generic [ref=e1405]:
+            - generic [ref=e1406]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1407]: </lastmod>
+          - generic [ref=e1408]:
+            - generic [ref=e1409]: <changefreq>
+            - text: monthly
+            - generic [ref=e1410]: </changefreq>
+          - generic [ref=e1411]:
+            - generic [ref=e1412]: <priority>
+            - text: "0.6"
+            - generic [ref=e1413]: </priority>
+        - generic [ref=e1415]: </url>
+      - generic [ref=e1416]:
+        - generic [ref=e1419]: <url>
+        - generic [ref=e1420]:
+          - generic [ref=e1421]:
+            - generic [ref=e1422]: <loc>
+            - text: https://www.stpetemusic.live/discover/roger-thomas
+            - generic [ref=e1423]: </loc>
+          - generic [ref=e1424]:
+            - generic [ref=e1425]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1426]: </lastmod>
+          - generic [ref=e1427]:
+            - generic [ref=e1428]: <changefreq>
+            - text: monthly
+            - generic [ref=e1429]: </changefreq>
+          - generic [ref=e1430]:
+            - generic [ref=e1431]: <priority>
+            - text: "0.6"
+            - generic [ref=e1432]: </priority>
+        - generic [ref=e1434]: </url>
+      - generic [ref=e1435]:
+        - generic [ref=e1438]: <url>
+        - generic [ref=e1439]:
+          - generic [ref=e1440]:
+            - generic [ref=e1441]: <loc>
+            - text: https://www.stpetemusic.live/discover/sauce-pocket-funk
+            - generic [ref=e1442]: </loc>
+          - generic [ref=e1443]:
+            - generic [ref=e1444]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1445]: </lastmod>
+          - generic [ref=e1446]:
+            - generic [ref=e1447]: <changefreq>
+            - text: monthly
+            - generic [ref=e1448]: </changefreq>
+          - generic [ref=e1449]:
+            - generic [ref=e1450]: <priority>
+            - text: "0.6"
+            - generic [ref=e1451]: </priority>
+        - generic [ref=e1453]: </url>
+      - generic [ref=e1454]:
+        - generic [ref=e1457]: <url>
+        - generic [ref=e1458]:
+          - generic [ref=e1459]:
+            - generic [ref=e1460]: <loc>
+            - text: https://www.stpetemusic.live/discover/savannah-lee
+            - generic [ref=e1461]: </loc>
+          - generic [ref=e1462]:
+            - generic [ref=e1463]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1464]: </lastmod>
+          - generic [ref=e1465]:
+            - generic [ref=e1466]: <changefreq>
+            - text: monthly
+            - generic [ref=e1467]: </changefreq>
+          - generic [ref=e1468]:
+            - generic [ref=e1469]: <priority>
+            - text: "0.6"
+            - generic [ref=e1470]: </priority>
+        - generic [ref=e1472]: </url>
+      - generic [ref=e1473]:
+        - generic [ref=e1476]: <url>
+        - generic [ref=e1477]:
+          - generic [ref=e1478]:
+            - generic [ref=e1479]: <loc>
+            - text: https://www.stpetemusic.live/discover/sedque
+            - generic [ref=e1480]: </loc>
+          - generic [ref=e1481]:
+            - generic [ref=e1482]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1483]: </lastmod>
+          - generic [ref=e1484]:
+            - generic [ref=e1485]: <changefreq>
+            - text: monthly
+            - generic [ref=e1486]: </changefreq>
+          - generic [ref=e1487]:
+            - generic [ref=e1488]: <priority>
+            - text: "0.6"
+            - generic [ref=e1489]: </priority>
+        - generic [ref=e1491]: </url>
+      - generic [ref=e1492]:
+        - generic [ref=e1495]: <url>
+        - generic [ref=e1496]:
+          - generic [ref=e1497]:
+            - generic [ref=e1498]: <loc>
+            - text: https://www.stpetemusic.live/discover/seems
+            - generic [ref=e1499]: </loc>
+          - generic [ref=e1500]:
+            - generic [ref=e1501]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1502]: </lastmod>
+          - generic [ref=e1503]:
+            - generic [ref=e1504]: <changefreq>
+            - text: monthly
+            - generic [ref=e1505]: </changefreq>
+          - generic [ref=e1506]:
+            - generic [ref=e1507]: <priority>
+            - text: "0.6"
+            - generic [ref=e1508]: </priority>
+        - generic [ref=e1510]: </url>
+      - generic [ref=e1511]:
+        - generic [ref=e1514]: <url>
+        - generic [ref=e1515]:
+          - generic [ref=e1516]:
+            - generic [ref=e1517]: <loc>
+            - text: https://www.stpetemusic.live/discover/shua-harrell
+            - generic [ref=e1518]: </loc>
+          - generic [ref=e1519]:
+            - generic [ref=e1520]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1521]: </lastmod>
+          - generic [ref=e1522]:
+            - generic [ref=e1523]: <changefreq>
+            - text: monthly
+            - generic [ref=e1524]: </changefreq>
+          - generic [ref=e1525]:
+            - generic [ref=e1526]: <priority>
+            - text: "0.6"
+            - generic [ref=e1527]: </priority>
+        - generic [ref=e1529]: </url>
+      - generic [ref=e1530]:
+        - generic [ref=e1533]: <url>
+        - generic [ref=e1534]:
+          - generic [ref=e1535]:
+            - generic [ref=e1536]: <loc>
+            - text: https://www.stpetemusic.live/discover/slamchops
+            - generic [ref=e1537]: </loc>
+          - generic [ref=e1538]:
+            - generic [ref=e1539]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1540]: </lastmod>
+          - generic [ref=e1541]:
+            - generic [ref=e1542]: <changefreq>
+            - text: monthly
+            - generic [ref=e1543]: </changefreq>
+          - generic [ref=e1544]:
+            - generic [ref=e1545]: <priority>
+            - text: "0.6"
+            - generic [ref=e1546]: </priority>
+        - generic [ref=e1548]: </url>
+      - generic [ref=e1549]:
+        - generic [ref=e1552]: <url>
+        - generic [ref=e1553]:
+          - generic [ref=e1554]:
+            - generic [ref=e1555]: <loc>
+            - text: https://www.stpetemusic.live/discover/slam-duncan
+            - generic [ref=e1556]: </loc>
+          - generic [ref=e1557]:
+            - generic [ref=e1558]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1559]: </lastmod>
+          - generic [ref=e1560]:
+            - generic [ref=e1561]: <changefreq>
+            - text: monthly
+            - generic [ref=e1562]: </changefreq>
+          - generic [ref=e1563]:
+            - generic [ref=e1564]: <priority>
+            - text: "0.6"
+            - generic [ref=e1565]: </priority>
+        - generic [ref=e1567]: </url>
+      - generic [ref=e1568]:
+        - generic [ref=e1571]: <url>
+        - generic [ref=e1572]:
+          - generic [ref=e1573]:
+            - generic [ref=e1574]: <loc>
+            - text: https://www.stpetemusic.live/discover/spanish-bombs
+            - generic [ref=e1575]: </loc>
+          - generic [ref=e1576]:
+            - generic [ref=e1577]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1578]: </lastmod>
+          - generic [ref=e1579]:
+            - generic [ref=e1580]: <changefreq>
+            - text: monthly
+            - generic [ref=e1581]: </changefreq>
+          - generic [ref=e1582]:
+            - generic [ref=e1583]: <priority>
+            - text: "0.6"
+            - generic [ref=e1584]: </priority>
+        - generic [ref=e1586]: </url>
+      - generic [ref=e1587]:
+        - generic [ref=e1590]: <url>
+        - generic [ref=e1591]:
+          - generic [ref=e1592]:
+            - generic [ref=e1593]: <loc>
+            - text: https://www.stpetemusic.live/discover/stripes
+            - generic [ref=e1594]: </loc>
+          - generic [ref=e1595]:
+            - generic [ref=e1596]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1597]: </lastmod>
+          - generic [ref=e1598]:
+            - generic [ref=e1599]: <changefreq>
+            - text: monthly
+            - generic [ref=e1600]: </changefreq>
+          - generic [ref=e1601]:
+            - generic [ref=e1602]: <priority>
+            - text: "0.6"
+            - generic [ref=e1603]: </priority>
+        - generic [ref=e1605]: </url>
+      - generic [ref=e1606]:
+        - generic [ref=e1609]: <url>
+        - generic [ref=e1610]:
+          - generic [ref=e1611]:
+            - generic [ref=e1612]: <loc>
+            - text: https://www.stpetemusic.live/discover/tamayo
+            - generic [ref=e1613]: </loc>
+          - generic [ref=e1614]:
+            - generic [ref=e1615]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1616]: </lastmod>
+          - generic [ref=e1617]:
+            - generic [ref=e1618]: <changefreq>
+            - text: monthly
+            - generic [ref=e1619]: </changefreq>
+          - generic [ref=e1620]:
+            - generic [ref=e1621]: <priority>
+            - text: "0.6"
+            - generic [ref=e1622]: </priority>
+        - generic [ref=e1624]: </url>
+      - generic [ref=e1625]:
+        - generic [ref=e1628]: <url>
+        - generic [ref=e1629]:
+          - generic [ref=e1630]:
+            - generic [ref=e1631]: <loc>
+            - text: https://www.stpetemusic.live/discover/the-george-band
+            - generic [ref=e1632]: </loc>
+          - generic [ref=e1633]:
+            - generic [ref=e1634]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1635]: </lastmod>
+          - generic [ref=e1636]:
+            - generic [ref=e1637]: <changefreq>
+            - text: monthly
+            - generic [ref=e1638]: </changefreq>
+          - generic [ref=e1639]:
+            - generic [ref=e1640]: <priority>
+            - text: "0.6"
+            - generic [ref=e1641]: </priority>
+        - generic [ref=e1643]: </url>
+      - generic [ref=e1644]:
+        - generic [ref=e1647]: <url>
+        - generic [ref=e1648]:
+          - generic [ref=e1649]:
+            - generic [ref=e1650]: <loc>
+            - text: https://www.stpetemusic.live/discover/then-theres-me
+            - generic [ref=e1651]: </loc>
+          - generic [ref=e1652]:
+            - generic [ref=e1653]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1654]: </lastmod>
+          - generic [ref=e1655]:
+            - generic [ref=e1656]: <changefreq>
+            - text: monthly
+            - generic [ref=e1657]: </changefreq>
+          - generic [ref=e1658]:
+            - generic [ref=e1659]: <priority>
+            - text: "0.6"
+            - generic [ref=e1660]: </priority>
+        - generic [ref=e1662]: </url>
+      - generic [ref=e1663]:
+        - generic [ref=e1666]: <url>
+        - generic [ref=e1667]:
+          - generic [ref=e1668]:
+            - generic [ref=e1669]: <loc>
+            - text: https://www.stpetemusic.live/discover/the-pilot-waves
+            - generic [ref=e1670]: </loc>
+          - generic [ref=e1671]:
+            - generic [ref=e1672]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1673]: </lastmod>
+          - generic [ref=e1674]:
+            - generic [ref=e1675]: <changefreq>
+            - text: monthly
+            - generic [ref=e1676]: </changefreq>
+          - generic [ref=e1677]:
+            - generic [ref=e1678]: <priority>
+            - text: "0.6"
+            - generic [ref=e1679]: </priority>
+        - generic [ref=e1681]: </url>
+      - generic [ref=e1682]:
+        - generic [ref=e1685]: <url>
+        - generic [ref=e1686]:
+          - generic [ref=e1687]:
+            - generic [ref=e1688]: <loc>
+            - text: https://www.stpetemusic.live/discover/the-pleasantries
+            - generic [ref=e1689]: </loc>
+          - generic [ref=e1690]:
+            - generic [ref=e1691]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1692]: </lastmod>
+          - generic [ref=e1693]:
+            - generic [ref=e1694]: <changefreq>
+            - text: monthly
+            - generic [ref=e1695]: </changefreq>
+          - generic [ref=e1696]:
+            - generic [ref=e1697]: <priority>
+            - text: "0.6"
+            - generic [ref=e1698]: </priority>
+        - generic [ref=e1700]: </url>
+      - generic [ref=e1701]:
+        - generic [ref=e1704]: <url>
+        - generic [ref=e1705]:
+          - generic [ref=e1706]:
+            - generic [ref=e1707]: <loc>
+            - text: https://www.stpetemusic.live/discover/the-real-gore-wizard
+            - generic [ref=e1708]: </loc>
+          - generic [ref=e1709]:
+            - generic [ref=e1710]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1711]: </lastmod>
+          - generic [ref=e1712]:
+            - generic [ref=e1713]: <changefreq>
+            - text: monthly
+            - generic [ref=e1714]: </changefreq>
+          - generic [ref=e1715]:
+            - generic [ref=e1716]: <priority>
+            - text: "0.6"
+            - generic [ref=e1717]: </priority>
+        - generic [ref=e1719]: </url>
+      - generic [ref=e1720]:
+        - generic [ref=e1723]: <url>
+        - generic [ref=e1724]:
+          - generic [ref=e1725]:
+            - generic [ref=e1726]: <loc>
+            - text: https://www.stpetemusic.live/discover/the-tilt
+            - generic [ref=e1727]: </loc>
+          - generic [ref=e1728]:
+            - generic [ref=e1729]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1730]: </lastmod>
+          - generic [ref=e1731]:
+            - generic [ref=e1732]: <changefreq>
+            - text: monthly
+            - generic [ref=e1733]: </changefreq>
+          - generic [ref=e1734]:
+            - generic [ref=e1735]: <priority>
+            - text: "0.6"
+            - generic [ref=e1736]: </priority>
+        - generic [ref=e1738]: </url>
+      - generic [ref=e1739]:
+        - generic [ref=e1742]: <url>
+        - generic [ref=e1743]:
+          - generic [ref=e1744]:
+            - generic [ref=e1745]: <loc>
+            - text: https://www.stpetemusic.live/discover/the-venus-band
+            - generic [ref=e1746]: </loc>
+          - generic [ref=e1747]:
+            - generic [ref=e1748]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1749]: </lastmod>
+          - generic [ref=e1750]:
+            - generic [ref=e1751]: <changefreq>
+            - text: monthly
+            - generic [ref=e1752]: </changefreq>
+          - generic [ref=e1753]:
+            - generic [ref=e1754]: <priority>
+            - text: "0.6"
+            - generic [ref=e1755]: </priority>
+        - generic [ref=e1757]: </url>
+      - generic [ref=e1758]:
+        - generic [ref=e1761]: <url>
+        - generic [ref=e1762]:
+          - generic [ref=e1763]:
+            - generic [ref=e1764]: <loc>
+            - text: https://www.stpetemusic.live/discover/the-wandering-hours
+            - generic [ref=e1765]: </loc>
+          - generic [ref=e1766]:
+            - generic [ref=e1767]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1768]: </lastmod>
+          - generic [ref=e1769]:
+            - generic [ref=e1770]: <changefreq>
+            - text: monthly
+            - generic [ref=e1771]: </changefreq>
+          - generic [ref=e1772]:
+            - generic [ref=e1773]: <priority>
+            - text: "0.6"
+            - generic [ref=e1774]: </priority>
+        - generic [ref=e1776]: </url>
+      - generic [ref=e1777]:
+        - generic [ref=e1780]: <url>
+        - generic [ref=e1781]:
+          - generic [ref=e1782]:
+            - generic [ref=e1783]: <loc>
+            - text: https://www.stpetemusic.live/discover/tizzi
+            - generic [ref=e1784]: </loc>
+          - generic [ref=e1785]:
+            - generic [ref=e1786]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1787]: </lastmod>
+          - generic [ref=e1788]:
+            - generic [ref=e1789]: <changefreq>
+            - text: monthly
+            - generic [ref=e1790]: </changefreq>
+          - generic [ref=e1791]:
+            - generic [ref=e1792]: <priority>
+            - text: "0.6"
+            - generic [ref=e1793]: </priority>
+        - generic [ref=e1795]: </url>
+      - generic [ref=e1796]:
+        - generic [ref=e1799]: <url>
+        - generic [ref=e1800]:
+          - generic [ref=e1801]:
+            - generic [ref=e1802]: <loc>
+            - text: https://www.stpetemusic.live/discover/tropico-blvd
+            - generic [ref=e1803]: </loc>
+          - generic [ref=e1804]:
+            - generic [ref=e1805]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1806]: </lastmod>
+          - generic [ref=e1807]:
+            - generic [ref=e1808]: <changefreq>
+            - text: monthly
+            - generic [ref=e1809]: </changefreq>
+          - generic [ref=e1810]:
+            - generic [ref=e1811]: <priority>
+            - text: "0.6"
+            - generic [ref=e1812]: </priority>
+        - generic [ref=e1814]: </url>
+      - generic [ref=e1815]:
+        - generic [ref=e1818]: <url>
+        - generic [ref=e1819]:
+          - generic [ref=e1820]:
+            - generic [ref=e1821]: <loc>
+            - text: https://www.stpetemusic.live/discover/viorica
+            - generic [ref=e1822]: </loc>
+          - generic [ref=e1823]:
+            - generic [ref=e1824]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1825]: </lastmod>
+          - generic [ref=e1826]:
+            - generic [ref=e1827]: <changefreq>
+            - text: monthly
+            - generic [ref=e1828]: </changefreq>
+          - generic [ref=e1829]:
+            - generic [ref=e1830]: <priority>
+            - text: "0.6"
+            - generic [ref=e1831]: </priority>
+        - generic [ref=e1833]: </url>
+      - generic [ref=e1834]:
+        - generic [ref=e1837]: <url>
+        - generic [ref=e1838]:
+          - generic [ref=e1839]:
+            - generic [ref=e1840]: <loc>
+            - text: https://www.stpetemusic.live/discover/warren-buchholz
+            - generic [ref=e1841]: </loc>
+          - generic [ref=e1842]:
+            - generic [ref=e1843]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1844]: </lastmod>
+          - generic [ref=e1845]:
+            - generic [ref=e1846]: <changefreq>
+            - text: monthly
+            - generic [ref=e1847]: </changefreq>
+          - generic [ref=e1848]:
+            - generic [ref=e1849]: <priority>
+            - text: "0.6"
+            - generic [ref=e1850]: </priority>
+        - generic [ref=e1852]: </url>
+      - generic [ref=e1853]:
+        - generic [ref=e1856]: <url>
+        - generic [ref=e1857]:
+          - generic [ref=e1858]:
+            - generic [ref=e1859]: <loc>
+            - text: https://www.stpetemusic.live/discover/willie-jones
+            - generic [ref=e1860]: </loc>
+          - generic [ref=e1861]:
+            - generic [ref=e1862]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1863]: </lastmod>
+          - generic [ref=e1864]:
+            - generic [ref=e1865]: <changefreq>
+            - text: monthly
+            - generic [ref=e1866]: </changefreq>
+          - generic [ref=e1867]:
+            - generic [ref=e1868]: <priority>
+            - text: "0.6"
+            - generic [ref=e1869]: </priority>
+        - generic [ref=e1871]: </url>
+      - generic [ref=e1872]:
+        - generic [ref=e1875]: <url>
+        - generic [ref=e1876]:
+          - generic [ref=e1877]:
+            - generic [ref=e1878]: <loc>
+            - text: https://www.stpetemusic.live/discover/wyatt-norton
+            - generic [ref=e1879]: </loc>
+          - generic [ref=e1880]:
+            - generic [ref=e1881]: <lastmod>
+            - text: 2026-05-01T15:59:31.267Z
+            - generic [ref=e1882]: </lastmod>
+          - generic [ref=e1883]:
+            - generic [ref=e1884]: <changefreq>
+            - text: monthly
+            - generic [ref=e1885]: </changefreq>
+          - generic [ref=e1886]:
+            - generic [ref=e1887]: <priority>
+            - text: "0.6"
+            - generic [ref=e1888]: </priority>
+        - generic [ref=e1890]: </url>
+      - generic [ref=e1891]:
+        - generic [ref=e1894]: <url>
+        - generic [ref=e1895]:
+          - generic [ref=e1896]:
+            - generic [ref=e1897]: <loc>
+            - text: https://www.stpetemusic.live/venues/3-daughters-brewing
+            - generic [ref=e1898]: </loc>
+          - generic [ref=e1899]:
+            - generic [ref=e1900]: <lastmod>
+            - text: 2026-05-01T15:59:31.268Z
+            - generic [ref=e1901]: </lastmod>
+          - generic [ref=e1902]:
+            - generic [ref=e1903]: <changefreq>
+            - text: monthly
+            - generic [ref=e1904]: </changefreq>
+          - generic [ref=e1905]:
+            - generic [ref=e1906]: <priority>
+            - text: "0.6"
+            - generic [ref=e1907]: </priority>
+        - generic [ref=e1909]: </url>
+      - generic [ref=e1910]:
+        - generic [ref=e1913]: <url>
+        - generic [ref=e1914]:
+          - generic [ref=e1915]:
+            - generic [ref=e1916]: <loc>
+            - text: https://www.stpetemusic.live/venues/bayboro-brewing
+            - generic [ref=e1917]: </loc>
+          - generic [ref=e1918]:
+            - generic [ref=e1919]: <lastmod>
+            - text: 2026-05-01T15:59:31.268Z
+            - generic [ref=e1920]: </lastmod>
+          - generic [ref=e1921]:
+            - generic [ref=e1922]: <changefreq>
+            - text: monthly
+            - generic [ref=e1923]: </changefreq>
+          - generic [ref=e1924]:
+            - generic [ref=e1925]: <priority>
+            - text: "0.6"
+            - generic [ref=e1926]: </priority>
+        - generic [ref=e1928]: </url>
+      - generic [ref=e1929]:
+        - generic [ref=e1932]: <url>
+        - generic [ref=e1933]:
+          - generic [ref=e1934]:
+            - generic [ref=e1935]: <loc>
+            - text: https://www.stpetemusic.live/venues/cage-brewing
+            - generic [ref=e1936]: </loc>
+          - generic [ref=e1937]:
+            - generic [ref=e1938]: <lastmod>
+            - text: 2026-05-01T15:59:31.268Z
+            - generic [ref=e1939]: </lastmod>
+          - generic [ref=e1940]:
+            - generic [ref=e1941]: <changefreq>
+            - text: monthly
+            - generic [ref=e1942]: </changefreq>
+          - generic [ref=e1943]:
+            - generic [ref=e1944]: <priority>
+            - text: "0.6"
+            - generic [ref=e1945]: </priority>
+        - generic [ref=e1947]: </url>
+      - generic [ref=e1948]:
+        - generic [ref=e1951]: <url>
+        - generic [ref=e1952]:
+          - generic [ref=e1953]:
+            - generic [ref=e1954]: <loc>
+            - text: https://www.stpetemusic.live/venues/jannus-live
+            - generic [ref=e1955]: </loc>
+          - generic [ref=e1956]:
+            - generic [ref=e1957]: <lastmod>
+            - text: 2026-05-01T15:59:31.268Z
+            - generic [ref=e1958]: </lastmod>
+          - generic [ref=e1959]:
+            - generic [ref=e1960]: <changefreq>
+            - text: monthly
+            - generic [ref=e1961]: </changefreq>
+          - generic [ref=e1962]:
+            - generic [ref=e1963]: <priority>
+            - text: "0.6"
+            - generic [ref=e1964]: </priority>
+        - generic [ref=e1966]: </url>
+      - generic [ref=e1967]:
+        - generic [ref=e1970]: <url>
+        - generic [ref=e1971]:
+          - generic [ref=e1972]:
+            - generic [ref=e1973]: <loc>
+            - text: https://www.stpetemusic.live/venues/mandarin-hide
+            - generic [ref=e1974]: </loc>
+          - generic [ref=e1975]:
+            - generic [ref=e1976]: <lastmod>
+            - text: 2026-05-01T15:59:31.268Z
+            - generic [ref=e1977]: </lastmod>
+          - generic [ref=e1978]:
+            - generic [ref=e1979]: <changefreq>
+            - text: monthly
+            - generic [ref=e1980]: </changefreq>
+          - generic [ref=e1981]:
+            - generic [ref=e1982]: <priority>
+            - text: "0.6"
+            - generic [ref=e1983]: </priority>
+        - generic [ref=e1985]: </url>
+      - generic [ref=e1986]:
+        - generic [ref=e1989]: <url>
+        - generic [ref=e1990]:
+          - generic [ref=e1991]:
+            - generic [ref=e1992]: <loc>
+            - text: https://www.stpetemusic.live/venues/rubys-elixir
+            - generic [ref=e1993]: </loc>
+          - generic [ref=e1994]:
+            - generic [ref=e1995]: <lastmod>
+            - text: 2026-05-01T15:59:31.268Z
+            - generic [ref=e1996]: </lastmod>
+          - generic [ref=e1997]:
+            - generic [ref=e1998]: <changefreq>
+            - text: monthly
+            - generic [ref=e1999]: </changefreq>
+          - generic [ref=e2000]:
+            - generic [ref=e2001]: <priority>
+            - text: "0.6"
+            - generic [ref=e2002]: </priority>
+        - generic [ref=e2004]: </url>
+      - generic [ref=e2005]:
+        - generic [ref=e2008]: <url>
+        - generic [ref=e2009]:
+          - generic [ref=e2010]:
+            - generic [ref=e2011]: <loc>
+            - text: https://www.stpetemusic.live/venues/st-pete-brewing-co
+            - generic [ref=e2012]: </loc>
+          - generic [ref=e2013]:
+            - generic [ref=e2014]: <lastmod>
+            - text: 2026-05-01T15:59:31.268Z
+            - generic [ref=e2015]: </lastmod>
+          - generic [ref=e2016]:
+            - generic [ref=e2017]: <changefreq>
+            - text: monthly
+            - generic [ref=e2018]: </changefreq>
+          - generic [ref=e2019]:
+            - generic [ref=e2020]: <priority>
+            - text: "0.6"
+            - generic [ref=e2021]: </priority>
+        - generic [ref=e2023]: </url>
+      - generic [ref=e2024]:
+        - generic [ref=e2027]: <url>
+        - generic [ref=e2028]:
+          - generic [ref=e2029]:
+            - generic [ref=e2030]: <loc>
+            - text: https://www.stpetemusic.live/venues/the-bends
+            - generic [ref=e2031]: </loc>
+          - generic [ref=e2032]:
+            - generic [ref=e2033]: <lastmod>
+            - text: 2026-05-01T15:59:31.268Z
+            - generic [ref=e2034]: </lastmod>
+          - generic [ref=e2035]:
+            - generic [ref=e2036]: <changefreq>
+            - text: monthly
+            - generic [ref=e2037]: </changefreq>
+          - generic [ref=e2038]:
+            - generic [ref=e2039]: <priority>
+            - text: "0.6"
+            - generic [ref=e2040]: </priority>
+        - generic [ref=e2042]: </url>
+      - generic [ref=e2043]:
+        - generic [ref=e2046]: <url>
+        - generic [ref=e2047]:
+          - generic [ref=e2048]:
+            - generic [ref=e2049]: <loc>
+            - text: https://www.stpetemusic.live/venues/the-blueberry-patch
+            - generic [ref=e2050]: </loc>
+          - generic [ref=e2051]:
+            - generic [ref=e2052]: <lastmod>
+            - text: 2026-05-01T15:59:31.268Z
+            - generic [ref=e2053]: </lastmod>
+          - generic [ref=e2054]:
+            - generic [ref=e2055]: <changefreq>
+            - text: monthly
+            - generic [ref=e2056]: </changefreq>
+          - generic [ref=e2057]:
+            - generic [ref=e2058]: <priority>
+            - text: "0.6"
+            - generic [ref=e2059]: </priority>
+        - generic [ref=e2061]: </url>
+      - generic [ref=e2062]:
+        - generic [ref=e2065]: <url>
+        - generic [ref=e2066]:
+          - generic [ref=e2067]:
+            - generic [ref=e2068]: <loc>
+            - text: https://www.stpetemusic.live/venues/the-nest
+            - generic [ref=e2069]: </loc>
+          - generic [ref=e2070]:
+            - generic [ref=e2071]: <lastmod>
+            - text: 2026-05-01T15:59:31.268Z
+            - generic [ref=e2072]: </lastmod>
+          - generic [ref=e2073]:
+            - generic [ref=e2074]: <changefreq>
+            - text: monthly
+            - generic [ref=e2075]: </changefreq>
+          - generic [ref=e2076]:
+            - generic [ref=e2077]: <priority>
+            - text: "0.6"
+            - generic [ref=e2078]: </priority>
+        - generic [ref=e2080]: </url>
+    - generic [ref=e2082]: </urlset>

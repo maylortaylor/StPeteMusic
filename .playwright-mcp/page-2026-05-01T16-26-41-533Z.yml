@@ -1,0 +1,642 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "StPeteMusic" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "StPeteMusic" [ref=e5]
+      - generic [ref=e6]:
+        - link "Events" [ref=e7] [cursor=pointer]:
+          - /url: /events
+        - link "Discover" [ref=e8] [cursor=pointer]:
+          - /url: /discover
+        - link "Venues" [ref=e9] [cursor=pointer]:
+          - /url: /venues
+        - link "YouTube" [ref=e10] [cursor=pointer]:
+          - /url: https://youtube.com/@StPeteMusic
+  - main [ref=e11]:
+    - generic [ref=e12]:
+      - generic [ref=e13]:
+        - paragraph [ref=e14]: Community
+        - heading "Discover" [level=1] [ref=e15]
+      - paragraph [ref=e17]: Bands, DJs, solo artists, and creatives from the greater St. Petersburg, FL area. All genres, no gatekeeping.
+      - link "Browse Venues →" [ref=e19] [cursor=pointer]:
+        - /url: /venues
+      - searchbox "Search artists..." [ref=e21]
+      - generic [ref=e22]:
+        - button "All" [ref=e23]
+        - button "Band" [ref=e24]
+        - button "Solo Artist" [ref=e25]
+        - button "DJ" [ref=e26]
+        - button "Event Producer" [ref=e27]
+      - paragraph [ref=e28]: 95 artists
+      - generic [ref=e29]:
+        - link "DJ Accentrik @accentrik" [ref=e30] [cursor=pointer]:
+          - /url: /discover/accentrik
+          - generic [ref=e31]:
+            - paragraph [ref=e32]: DJ
+            - heading "Accentrik" [level=3] [ref=e33]
+            - paragraph [ref=e34]: "@accentrik"
+        - link "Band Ajeva @ajevamusic" [ref=e35] [cursor=pointer]:
+          - /url: /discover/ajeva
+          - generic [ref=e36]:
+            - paragraph [ref=e37]: Band
+            - heading "Ajeva" [level=3] [ref=e38]
+            - paragraph [ref=e39]: "@ajevamusic"
+        - link "Solo Artist Alex Borst @_alexborst" [ref=e40] [cursor=pointer]:
+          - /url: /discover/alex-borst
+          - generic [ref=e41]:
+            - paragraph [ref=e42]: Solo Artist
+            - heading "Alex Borst" [level=3] [ref=e43]
+            - paragraph [ref=e44]: "@_alexborst"
+        - link "Band Aliqua @_aliqua" [ref=e45] [cursor=pointer]:
+          - /url: /discover/aliqua
+          - generic [ref=e46]:
+            - paragraph [ref=e47]: Band
+            - heading "Aliqua" [level=3] [ref=e48]
+            - paragraph [ref=e49]: "@_aliqua"
+        - link "Solo Artist Allen Fereti @allenfereti06" [ref=e50] [cursor=pointer]:
+          - /url: /discover/allen-fereti
+          - generic [ref=e51]:
+            - paragraph [ref=e52]: Solo Artist
+            - heading "Allen Fereti" [level=3] [ref=e53]
+            - paragraph [ref=e54]: "@allenfereti06"
+        - link "Band Animal Prince @animalprince_" [ref=e55] [cursor=pointer]:
+          - /url: /discover/animal-prince
+          - generic [ref=e56]:
+            - paragraph [ref=e57]: Band
+            - heading "Animal Prince" [level=3] [ref=e58]
+            - paragraph [ref=e59]: "@animalprince_"
+        - link "Band Antelope (Phish Tribute) @antelopephishtribute" [ref=e60] [cursor=pointer]:
+          - /url: /discover/antelope-phish-tribute
+          - generic [ref=e61]:
+            - paragraph [ref=e62]: Band
+            - heading "Antelope (Phish Tribute)" [level=3] [ref=e63]
+            - paragraph [ref=e64]: "@antelopephishtribute"
+        - link "Solo Artist Ava Iri @ava.iri Soul R&B Hip-hop" [ref=e65] [cursor=pointer]:
+          - /url: /discover/ava-iri
+          - generic [ref=e66]:
+            - paragraph [ref=e67]: Solo Artist
+            - heading "Ava Iri" [level=3] [ref=e68]
+            - paragraph [ref=e69]: "@ava.iri"
+            - generic [ref=e70]:
+              - generic [ref=e71]: Soul
+              - generic [ref=e72]: R&B
+              - generic [ref=e73]: Hip-hop
+        - link "Band Beach Terror @beach_terror" [ref=e74] [cursor=pointer]:
+          - /url: /discover/beach-terror
+          - generic [ref=e75]:
+            - paragraph [ref=e76]: Band
+            - heading "Beach Terror" [level=3] [ref=e77]
+            - paragraph [ref=e78]: "@beach_terror"
+        - link "Solo Artist Billy M. Beck @billymbeck" [ref=e79] [cursor=pointer]:
+          - /url: /discover/billy-m-beck
+          - generic [ref=e80]:
+            - paragraph [ref=e81]: Solo Artist
+            - heading "Billy M. Beck" [level=3] [ref=e82]
+            - paragraph [ref=e83]: "@billymbeck"
+        - link "DJ Brian Busto @djbrianbusto" [ref=e84] [cursor=pointer]:
+          - /url: /discover/brian-busto
+          - generic [ref=e85]:
+            - paragraph [ref=e86]: DJ
+            - heading "Brian Busto" [level=3] [ref=e87]
+            - paragraph [ref=e88]: "@djbrianbusto"
+        - link "DJ Brother Bear @brotherbear.boi" [ref=e89] [cursor=pointer]:
+          - /url: /discover/brother-bear
+          - generic [ref=e90]:
+            - paragraph [ref=e91]: DJ
+            - heading "Brother Bear" [level=3] [ref=e92]
+            - paragraph [ref=e93]: "@brotherbear.boi"
+        - link "DJ Callaghan Keane @callaghan.keane" [ref=e94] [cursor=pointer]:
+          - /url: /discover/callaghan-keane
+          - generic [ref=e95]:
+            - paragraph [ref=e96]: DJ
+            - heading "Callaghan Keane" [level=3] [ref=e97]
+            - paragraph [ref=e98]: "@callaghan.keane"
+        - link "Band Chriss (Clockworkxband) @chriss.3___" [ref=e99] [cursor=pointer]:
+          - /url: /discover/clockworkxband
+          - generic [ref=e100]:
+            - paragraph [ref=e101]: Band
+            - heading "Chriss (Clockworkxband)" [level=3] [ref=e102]
+            - paragraph [ref=e103]: "@chriss.3___"
+        - link "Solo Artist Corporate Guest @corporateguest" [ref=e104] [cursor=pointer]:
+          - /url: /discover/corporate-guest
+          - generic [ref=e105]:
+            - paragraph [ref=e106]: Solo Artist
+            - heading "Corporate Guest" [level=3] [ref=e107]
+            - paragraph [ref=e108]: "@corporateguest"
+        - link "Band Dandy Lush @dandylushmusic" [ref=e109] [cursor=pointer]:
+          - /url: /discover/dandy-lush
+          - generic [ref=e110]:
+            - paragraph [ref=e111]: Band
+            - heading "Dandy Lush" [level=3] [ref=e112]
+            - paragraph [ref=e113]: "@dandylushmusic"
+        - link "Band Dead Reef @deadreef.fl Sludge Metal Metal Doom" [ref=e114] [cursor=pointer]:
+          - /url: /discover/dead-reef
+          - generic [ref=e115]:
+            - paragraph [ref=e116]: Band
+            - heading "Dead Reef" [level=3] [ref=e117]
+            - paragraph [ref=e118]: "@deadreef.fl"
+            - generic [ref=e119]:
+              - generic [ref=e120]: Sludge Metal
+              - generic [ref=e121]: Metal
+              - generic [ref=e122]: Doom
+        - link "Solo Artist Dean Mischief @deanmischiefmusic" [ref=e123] [cursor=pointer]:
+          - /url: /discover/dean-mischief
+          - generic [ref=e124]:
+            - paragraph [ref=e125]: Solo Artist
+            - heading "Dean Mischief" [level=3] [ref=e126]
+            - paragraph [ref=e127]: "@deanmischiefmusic"
+        - link "Band Dionysus @dionysus.band" [ref=e128] [cursor=pointer]:
+          - /url: /discover/dionysus
+          - generic [ref=e129]:
+            - paragraph [ref=e130]: Band
+            - heading "Dionysus" [level=3] [ref=e131]
+            - paragraph [ref=e132]: "@dionysus.band"
+        - link "Band Displace @displacemusic" [ref=e133] [cursor=pointer]:
+          - /url: /discover/displace
+          - generic [ref=e134]:
+            - paragraph [ref=e135]: Band
+            - heading "Displace" [level=3] [ref=e136]
+            - paragraph [ref=e137]: "@displacemusic"
+        - link "Band Donzii @_donzii" [ref=e138] [cursor=pointer]:
+          - /url: /discover/donzii
+          - generic [ref=e139]:
+            - paragraph [ref=e140]: Band
+            - heading "Donzii" [level=3] [ref=e141]
+            - paragraph [ref=e142]: "@_donzii"
+        - link "DJ Doorman the DJ @doormanthedj" [ref=e143] [cursor=pointer]:
+          - /url: /discover/doorman-the-dj
+          - generic [ref=e144]:
+            - paragraph [ref=e145]: DJ
+            - heading "Doorman the DJ" [level=3] [ref=e146]
+            - paragraph [ref=e147]: "@doormanthedj"
+        - link "Band Dylan Dames @DylanDames" [ref=e148] [cursor=pointer]:
+          - /url: /discover/dylan-dames
+          - generic [ref=e149]:
+            - paragraph [ref=e150]: Band
+            - heading "Dylan Dames" [level=3] [ref=e151]
+            - paragraph [ref=e152]: "@DylanDames"
+        - link "Band Earth Girl @earthgirl Indie Alternative" [ref=e153] [cursor=pointer]:
+          - /url: /discover/earth-girl
+          - generic [ref=e154]:
+            - paragraph [ref=e155]: Band
+            - heading "Earth Girl" [level=3] [ref=e156]
+            - paragraph [ref=e157]: "@earthgirl"
+            - generic [ref=e158]:
+              - generic [ref=e159]: Indie
+              - generic [ref=e160]: Alternative
+        - link "Band Freeman Sound Mindset @freemansoundmindset" [ref=e161] [cursor=pointer]:
+          - /url: /discover/freeman-sound-mindset
+          - generic [ref=e162]:
+            - paragraph [ref=e163]: Band
+            - heading "Freeman Sound Mindset" [level=3] [ref=e164]
+            - paragraph [ref=e165]: "@freemansoundmindset"
+        - link "Band Frog Shaman @frogshamanband" [ref=e166] [cursor=pointer]:
+          - /url: /discover/frog-shaman
+          - generic [ref=e167]:
+            - paragraph [ref=e168]: Band
+            - heading "Frog Shaman" [level=3] [ref=e169]
+            - paragraph [ref=e170]: "@frogshamanband"
+        - link "Band Gabe Hernandez @gabehernandezmusic" [ref=e171] [cursor=pointer]:
+          - /url: /discover/gabe-hernandez
+          - generic [ref=e172]:
+            - paragraph [ref=e173]: Band
+            - heading "Gabe Hernandez" [level=3] [ref=e174]
+            - paragraph [ref=e175]: "@gabehernandezmusic"
+        - link "Band Golden Hour Trees @goldenhourtrees" [ref=e176] [cursor=pointer]:
+          - /url: /discover/golden-hour-trees
+          - generic [ref=e177]:
+            - paragraph [ref=e178]: Band
+            - heading "Golden Hour Trees" [level=3] [ref=e179]
+            - paragraph [ref=e180]: "@goldenhourtrees"
+        - link "Band Harlow Gold @o.g.harlowgold" [ref=e181] [cursor=pointer]:
+          - /url: /discover/harlow-gold
+          - generic [ref=e182]:
+            - paragraph [ref=e183]: Band
+            - heading "Harlow Gold" [level=3] [ref=e184]
+            - paragraph [ref=e185]: "@o.g.harlowgold"
+        - link "Band Holy River @holyrivermusic" [ref=e186] [cursor=pointer]:
+          - /url: /discover/holy-river
+          - generic [ref=e187]:
+            - paragraph [ref=e188]: Band
+            - heading "Holy River" [level=3] [ref=e189]
+            - paragraph [ref=e190]: "@holyrivermusic"
+        - link "Band House of I @HouseOfI" [ref=e191] [cursor=pointer]:
+          - /url: /discover/house-of-i
+          - generic [ref=e192]:
+            - paragraph [ref=e193]: Band
+            - heading "House of I" [level=3] [ref=e194]
+            - paragraph [ref=e195]: "@HouseOfI"
+        - link "Band Humankinda @humankindaband" [ref=e196] [cursor=pointer]:
+          - /url: /discover/humankinda
+          - generic [ref=e197]:
+            - paragraph [ref=e198]: Band
+            - heading "Humankinda" [level=3] [ref=e199]
+            - paragraph [ref=e200]: "@humankindaband"
+        - link "Band In Case U Didn't Joe @incaseu.didntjoe" [ref=e201] [cursor=pointer]:
+          - /url: /discover/in-case-u-didnt-joe
+          - generic [ref=e202]:
+            - paragraph [ref=e203]: Band
+            - heading "In Case U Didn't Joe" [level=3] [ref=e204]
+            - paragraph [ref=e205]: "@incaseu.didntjoe"
+        - link "Solo Artist Infinite Third @infinitethird" [ref=e206] [cursor=pointer]:
+          - /url: /discover/infinite-third
+          - generic [ref=e207]:
+            - paragraph [ref=e208]: Solo Artist
+            - heading "Infinite Third" [level=3] [ref=e209]
+            - paragraph [ref=e210]: "@infinitethird"
+        - link "Solo Artist Jimpster @jimpster_gram" [ref=e211] [cursor=pointer]:
+          - /url: /discover/jimpster
+          - generic [ref=e212]:
+            - paragraph [ref=e213]: Solo Artist
+            - heading "Jimpster" [level=3] [ref=e214]
+            - paragraph [ref=e215]: "@jimpster_gram"
+        - link "Solo Artist JoheeMason @Joheemason" [ref=e216] [cursor=pointer]:
+          - /url: /discover/johee-mason
+          - generic [ref=e217]:
+            - paragraph [ref=e218]: Solo Artist
+            - heading "JoheeMason" [level=3] [ref=e219]
+            - paragraph [ref=e220]: "@Joheemason"
+        - link "Solo Artist Jon Berg @xjonberg" [ref=e221] [cursor=pointer]:
+          - /url: /discover/jon-berg
+          - generic [ref=e222]:
+            - paragraph [ref=e223]: Solo Artist
+            - heading "Jon Berg" [level=3] [ref=e224]
+            - paragraph [ref=e225]: "@xjonberg"
+        - link "Band Joy Wagon @joywagonband" [ref=e226] [cursor=pointer]:
+          - /url: /discover/joy-wagon
+          - generic [ref=e227]:
+            - paragraph [ref=e228]: Band
+            - heading "Joy Wagon" [level=3] [ref=e229]
+            - paragraph [ref=e230]: "@joywagonband"
+        - link "Solo Artist J Rose Loops @jroseloops" [ref=e231] [cursor=pointer]:
+          - /url: /discover/j-rose-loops
+          - generic [ref=e232]:
+            - paragraph [ref=e233]: Solo Artist
+            - heading "J Rose Loops" [level=3] [ref=e234]
+            - paragraph [ref=e235]: "@jroseloops"
+        - link "Band JT Brown & Co @jtbrownandco" [ref=e236] [cursor=pointer]:
+          - /url: /discover/jt-brown-and-co
+          - generic [ref=e237]:
+            - paragraph [ref=e238]: Band
+            - heading "JT Brown & Co" [level=3] [ref=e239]
+            - paragraph [ref=e240]: "@jtbrownandco"
+        - link "Band Katara @wearekatara" [ref=e241] [cursor=pointer]:
+          - /url: /discover/katara
+          - generic [ref=e242]:
+            - paragraph [ref=e243]: Band
+            - heading "Katara" [level=3] [ref=e244]
+            - paragraph [ref=e245]: "@wearekatara"
+        - link "Solo Artist Kelsey Sharp @kelseysharpmusic" [ref=e246] [cursor=pointer]:
+          - /url: /discover/kelsey-sharp
+          - generic [ref=e247]:
+            - paragraph [ref=e248]: Solo Artist
+            - heading "Kelsey Sharp" [level=3] [ref=e249]
+            - paragraph [ref=e250]: "@kelseysharpmusic"
+        - link "DJ Khoury Affinity @khoury_affinity" [ref=e251] [cursor=pointer]:
+          - /url: /discover/khoury-affinity
+          - generic [ref=e252]:
+            - paragraph [ref=e253]: DJ
+            - heading "Khoury Affinity" [level=3] [ref=e254]
+            - paragraph [ref=e255]: "@khoury_affinity"
+        - link "Band Kollect Inc @kollectinc" [ref=e256] [cursor=pointer]:
+          - /url: /discover/kollect-inc
+          - generic [ref=e257]:
+            - paragraph [ref=e258]: Band
+            - heading "Kollect Inc" [level=3] [ref=e259]
+            - paragraph [ref=e260]: "@kollectinc"
+        - link "Band Legacy Music @legacymusic859" [ref=e261] [cursor=pointer]:
+          - /url: /discover/legacy-music
+          - generic [ref=e262]:
+            - paragraph [ref=e263]: Band
+            - heading "Legacy Music" [level=3] [ref=e264]
+            - paragraph [ref=e265]: "@legacymusic859"
+        - link "Band Legacy Orchestra Collective @legacyorchestracollective" [ref=e266] [cursor=pointer]:
+          - /url: /discover/legacy-orchestra-collective
+          - generic [ref=e267]:
+            - paragraph [ref=e268]: Band
+            - heading "Legacy Orchestra Collective" [level=3] [ref=e269]
+            - paragraph [ref=e270]: "@legacyorchestracollective"
+        - link "Band Lesa Silvermore @lesasilvermoremusic" [ref=e271] [cursor=pointer]:
+          - /url: /discover/lesa-silvermore
+          - generic [ref=e272]:
+            - paragraph [ref=e273]: Band
+            - heading "Lesa Silvermore" [level=3] [ref=e274]
+            - paragraph [ref=e275]: "@lesasilvermoremusic"
+        - link "Solo Artist Liam Bauman @liam_bauman" [ref=e276] [cursor=pointer]:
+          - /url: /discover/liam-bauman
+          - generic [ref=e277]:
+            - paragraph [ref=e278]: Solo Artist
+            - heading "Liam Bauman" [level=3] [ref=e279]
+            - paragraph [ref=e280]: "@liam_bauman"
+        - link "Band Light the Wire @light.the.wire" [ref=e281] [cursor=pointer]:
+          - /url: /discover/light-the-wire
+          - generic [ref=e282]:
+            - paragraph [ref=e283]: Band
+            - heading "Light the Wire" [level=3] [ref=e284]
+            - paragraph [ref=e285]: "@light.the.wire"
+        - link "Band Liquid Pennies @liquidpenniesband" [ref=e286] [cursor=pointer]:
+          - /url: /discover/liquid-pennies
+          - generic [ref=e287]:
+            - paragraph [ref=e288]: Band
+            - heading "Liquid Pennies" [level=3] [ref=e289]
+            - paragraph [ref=e290]: "@liquidpenniesband"
+        - link "Band Little Giver Band @littlegiverband" [ref=e291] [cursor=pointer]:
+          - /url: /discover/little-giver-band
+          - generic [ref=e292]:
+            - paragraph [ref=e293]: Band
+            - heading "Little Giver Band" [level=3] [ref=e294]
+            - paragraph [ref=e295]: "@littlegiverband"
+        - link "Solo Artist Lynn Hawkins @lynnhawkins_" [ref=e296] [cursor=pointer]:
+          - /url: /discover/lynn-hawkins
+          - generic [ref=e297]:
+            - paragraph [ref=e298]: Solo Artist
+            - heading "Lynn Hawkins" [level=3] [ref=e299]
+            - paragraph [ref=e300]: "@lynnhawkins_"
+        - link "Solo Artist Mel With A Period @melwithaperiod" [ref=e301] [cursor=pointer]:
+          - /url: /discover/mel-with-a-period
+          - generic [ref=e302]:
+            - paragraph [ref=e303]: Solo Artist
+            - heading "Mel With A Period" [level=3] [ref=e304]
+            - paragraph [ref=e305]: "@melwithaperiod"
+        - link "Solo Artist Michael May James @michaelmayjames" [ref=e306] [cursor=pointer]:
+          - /url: /discover/michael-may-james
+          - generic [ref=e307]:
+            - paragraph [ref=e308]: Solo Artist
+            - heading "Michael May James" [level=3] [ref=e309]
+            - paragraph [ref=e310]: "@michaelmayjames"
+        - link "Solo Artist Mike Blenda @mikeblenda" [ref=e311] [cursor=pointer]:
+          - /url: /discover/mike-blenda
+          - generic [ref=e312]:
+            - paragraph [ref=e313]: Solo Artist
+            - heading "Mike Blenda" [level=3] [ref=e314]
+            - paragraph [ref=e315]: "@mikeblenda"
+        - link "Band Minim @minim_music" [ref=e316] [cursor=pointer]:
+          - /url: /discover/minim
+          - generic [ref=e317]:
+            - paragraph [ref=e318]: Band
+            - heading "Minim" [level=3] [ref=e319]
+            - paragraph [ref=e320]: "@minim_music"
+        - link "Band MoonShow @moonshowband" [ref=e321] [cursor=pointer]:
+          - /url: /discover/moonshow
+          - generic [ref=e322]:
+            - paragraph [ref=e323]: Band
+            - heading "MoonShow" [level=3] [ref=e324]
+            - paragraph [ref=e325]: "@moonshowband"
+        - link "Solo Artist Mouth Council @mouthcouncil" [ref=e326] [cursor=pointer]:
+          - /url: /discover/mouth-council
+          - generic [ref=e327]:
+            - paragraph [ref=e328]: Solo Artist
+            - heading "Mouth Council" [level=3] [ref=e329]
+            - paragraph [ref=e330]: "@mouthcouncil"
+        - link "Band Movie Props @moviepropsband" [ref=e331] [cursor=pointer]:
+          - /url: /discover/movie-props
+          - generic [ref=e332]:
+            - paragraph [ref=e333]: Band
+            - heading "Movie Props" [level=3] [ref=e334]
+            - paragraph [ref=e335]: "@moviepropsband"
+        - link "Band Mr. Whiskers and the Nine Lives @mr.whiskers_and_the_nine_lives" [ref=e336] [cursor=pointer]:
+          - /url: /discover/mr-whiskers-and-the-nine-lives
+          - generic [ref=e337]:
+            - paragraph [ref=e338]: Band
+            - heading "Mr. Whiskers and the Nine Lives" [level=3] [ref=e339]
+            - paragraph [ref=e340]: "@mr.whiskers_and_the_nine_lives"
+        - link "DJ Nico the Alchemist @nicosalchemy" [ref=e341] [cursor=pointer]:
+          - /url: /discover/nico-the-alchemist
+          - generic [ref=e342]:
+            - paragraph [ref=e343]: DJ
+            - heading "Nico the Alchemist" [level=3] [ref=e344]
+            - paragraph [ref=e345]: "@nicosalchemy"
+        - link "Band North Star @northstarstpete" [ref=e346] [cursor=pointer]:
+          - /url: /discover/north-star
+          - generic [ref=e347]:
+            - paragraph [ref=e348]: Band
+            - heading "North Star" [level=3] [ref=e349]
+            - paragraph [ref=e350]: "@northstarstpete"
+        - link "Solo Artist Not Julia Powell @not_julia_powell" [ref=e351] [cursor=pointer]:
+          - /url: /discover/not-julia-powell
+          - generic [ref=e352]:
+            - paragraph [ref=e353]: Solo Artist
+            - heading "Not Julia Powell" [level=3] [ref=e354]
+            - paragraph [ref=e355]: "@not_julia_powell"
+        - link "Solo Artist Only1Two @only1two" [ref=e356] [cursor=pointer]:
+          - /url: /discover/only1two
+          - generic [ref=e357]:
+            - paragraph [ref=e358]: Solo Artist
+            - heading "Only1Two" [level=3] [ref=e359]
+            - paragraph [ref=e360]: "@only1two"
+        - link "Band Physical Plant @physical_plant" [ref=e361] [cursor=pointer]:
+          - /url: /discover/physical-plant
+          - generic [ref=e362]:
+            - paragraph [ref=e363]: Band
+            - heading "Physical Plant" [level=3] [ref=e364]
+            - paragraph [ref=e365]: "@physical_plant"
+        - link "Event Producer Prophessor J Events" [ref=e366] [cursor=pointer]:
+          - /url: /discover/prophessor-j-events
+          - generic [ref=e367]:
+            - paragraph [ref=e368]: Event Producer
+            - heading "Prophessor J Events" [level=3] [ref=e369]
+        - link "Solo Artist Public Speaking @public__speaking" [ref=e370] [cursor=pointer]:
+          - /url: /discover/public-speaking
+          - generic [ref=e371]:
+            - paragraph [ref=e372]: Solo Artist
+            - heading "Public Speaking" [level=3] [ref=e373]
+            - paragraph [ref=e374]: "@public__speaking"
+        - link "Solo Artist Rat Galactic @rat_galactic" [ref=e375] [cursor=pointer]:
+          - /url: /discover/rat-galactic
+          - generic [ref=e376]:
+            - paragraph [ref=e377]: Solo Artist
+            - heading "Rat Galactic" [level=3] [ref=e378]
+            - paragraph [ref=e379]: "@rat_galactic"
+        - link "Band Razor and the Boogie Men @razorandtheboogiemen" [ref=e380] [cursor=pointer]:
+          - /url: /discover/razor-and-the-boogie-men
+          - generic [ref=e381]:
+            - paragraph [ref=e382]: Band
+            - heading "Razor and the Boogie Men" [level=3] [ref=e383]
+            - paragraph [ref=e384]: "@razorandtheboogiemen"
+        - link "Solo Artist Red Feather @redfeathermusic" [ref=e385] [cursor=pointer]:
+          - /url: /discover/red-feather
+          - generic [ref=e386]:
+            - paragraph [ref=e387]: Solo Artist
+            - heading "Red Feather" [level=3] [ref=e388]
+            - paragraph [ref=e389]: "@redfeathermusic"
+        - link "Solo Artist Roger Thomas @rogerthomasmusic" [ref=e390] [cursor=pointer]:
+          - /url: /discover/roger-thomas
+          - generic [ref=e391]:
+            - paragraph [ref=e392]: Solo Artist
+            - heading "Roger Thomas" [level=3] [ref=e393]
+            - paragraph [ref=e394]: "@rogerthomasmusic"
+        - link "Band Sauce Pocket Funk @saucepocketfunk" [ref=e395] [cursor=pointer]:
+          - /url: /discover/sauce-pocket-funk
+          - generic [ref=e396]:
+            - paragraph [ref=e397]: Band
+            - heading "Sauce Pocket Funk" [level=3] [ref=e398]
+            - paragraph [ref=e399]: "@saucepocketfunk"
+        - link "Solo Artist Savannah Lee @savannahlee475" [ref=e400] [cursor=pointer]:
+          - /url: /discover/savannah-lee
+          - generic [ref=e401]:
+            - paragraph [ref=e402]: Solo Artist
+            - heading "Savannah Lee" [level=3] [ref=e403]
+            - paragraph [ref=e404]: "@savannahlee475"
+        - link "Band Sedque @sedque.music" [ref=e405] [cursor=pointer]:
+          - /url: /discover/sedque
+          - generic [ref=e406]:
+            - paragraph [ref=e407]: Band
+            - heading "Sedque" [level=3] [ref=e408]
+            - paragraph [ref=e409]: "@sedque.music"
+        - link "Band Seems @seemsband" [ref=e410] [cursor=pointer]:
+          - /url: /discover/seems
+          - generic [ref=e411]:
+            - paragraph [ref=e412]: Band
+            - heading "Seems" [level=3] [ref=e413]
+            - paragraph [ref=e414]: "@seemsband"
+        - link "Solo Artist Shua Harrell @shuaharrell" [ref=e415] [cursor=pointer]:
+          - /url: /discover/shua-harrell
+          - generic [ref=e416]:
+            - paragraph [ref=e417]: Solo Artist
+            - heading "Shua Harrell" [level=3] [ref=e418]
+            - paragraph [ref=e419]: "@shuaharrell"
+        - link "Solo Artist SlamChops @slamchopss" [ref=e420] [cursor=pointer]:
+          - /url: /discover/slamchops
+          - generic [ref=e421]:
+            - paragraph [ref=e422]: Solo Artist
+            - heading "SlamChops" [level=3] [ref=e423]
+            - paragraph [ref=e424]: "@slamchopss"
+        - link "Solo Artist Slam Duncan @slamduncan710" [ref=e425] [cursor=pointer]:
+          - /url: /discover/slam-duncan
+          - generic [ref=e426]:
+            - paragraph [ref=e427]: Solo Artist
+            - heading "Slam Duncan" [level=3] [ref=e428]
+            - paragraph [ref=e429]: "@slamduncan710"
+        - link "Band Spanish Bombs @SpanishBombsFL" [ref=e430] [cursor=pointer]:
+          - /url: /discover/spanish-bombs
+          - generic [ref=e431]:
+            - paragraph [ref=e432]: Band
+            - heading "Spanish Bombs" [level=3] [ref=e433]
+            - paragraph [ref=e434]: "@SpanishBombsFL"
+        - link "Band Stripes @stripes520" [ref=e435] [cursor=pointer]:
+          - /url: /discover/stripes
+          - generic [ref=e436]:
+            - paragraph [ref=e437]: Band
+            - heading "Stripes" [level=3] [ref=e438]
+            - paragraph [ref=e439]: "@stripes520"
+        - link "Band Tamayo @tamayo_band" [ref=e440] [cursor=pointer]:
+          - /url: /discover/tamayo
+          - generic [ref=e441]:
+            - paragraph [ref=e442]: Band
+            - heading "Tamayo" [level=3] [ref=e443]
+            - paragraph [ref=e444]: "@tamayo_band"
+        - link "Band The George Band @thegeorgebandd" [ref=e445] [cursor=pointer]:
+          - /url: /discover/the-george-band
+          - generic [ref=e446]:
+            - paragraph [ref=e447]: Band
+            - heading "The George Band" [level=3] [ref=e448]
+            - paragraph [ref=e449]: "@thegeorgebandd"
+        - link "Band Then There's Me @ThenTheresMeOfficial" [ref=e450] [cursor=pointer]:
+          - /url: /discover/then-theres-me
+          - generic [ref=e451]:
+            - paragraph [ref=e452]: Band
+            - heading "Then There's Me" [level=3] [ref=e453]
+            - paragraph [ref=e454]: "@ThenTheresMeOfficial"
+        - link "Band The Pilot Waves @the_pilotwaves" [ref=e455] [cursor=pointer]:
+          - /url: /discover/the-pilot-waves
+          - generic [ref=e456]:
+            - paragraph [ref=e457]: Band
+            - heading "The Pilot Waves" [level=3] [ref=e458]
+            - paragraph [ref=e459]: "@the_pilotwaves"
+        - link "Band The Pleasantries @Thepleasantriesband" [ref=e460] [cursor=pointer]:
+          - /url: /discover/the-pleasantries
+          - generic [ref=e461]:
+            - paragraph [ref=e462]: Band
+            - heading "The Pleasantries" [level=3] [ref=e463]
+            - paragraph [ref=e464]: "@Thepleasantriesband"
+        - link "Band The Real Gore Wizard @therealgorewizard" [ref=e465] [cursor=pointer]:
+          - /url: /discover/the-real-gore-wizard
+          - generic [ref=e466]:
+            - paragraph [ref=e467]: Band
+            - heading "The Real Gore Wizard" [level=3] [ref=e468]
+            - paragraph [ref=e469]: "@therealgorewizard"
+        - link "Band The Tilt Orchestra @TheTiltOrchestra" [ref=e470] [cursor=pointer]:
+          - /url: /discover/the-tilt
+          - generic [ref=e471]:
+            - paragraph [ref=e472]: Band
+            - heading "The Tilt Orchestra" [level=3] [ref=e473]
+            - paragraph [ref=e474]: "@TheTiltOrchestra"
+        - link "Band The Venus Band @thevenus_band" [ref=e475] [cursor=pointer]:
+          - /url: /discover/the-venus-band
+          - generic [ref=e476]:
+            - paragraph [ref=e477]: Band
+            - heading "The Venus Band" [level=3] [ref=e478]
+            - paragraph [ref=e479]: "@thevenus_band"
+        - link "Band The Wandering Hours @TheWanderingHours" [ref=e480] [cursor=pointer]:
+          - /url: /discover/the-wandering-hours
+          - generic [ref=e481]:
+            - paragraph [ref=e482]: Band
+            - heading "The Wandering Hours" [level=3] [ref=e483]
+            - paragraph [ref=e484]: "@TheWanderingHours"
+        - link "Solo Artist Tizzi @inatizzi" [ref=e485] [cursor=pointer]:
+          - /url: /discover/tizzi
+          - generic [ref=e486]:
+            - paragraph [ref=e487]: Solo Artist
+            - heading "Tizzi" [level=3] [ref=e488]
+            - paragraph [ref=e489]: "@inatizzi"
+        - link "Band Tropico Blvd @tropicoblvd" [ref=e490] [cursor=pointer]:
+          - /url: /discover/tropico-blvd
+          - generic [ref=e491]:
+            - paragraph [ref=e492]: Band
+            - heading "Tropico Blvd" [level=3] [ref=e493]
+            - paragraph [ref=e494]: "@tropicoblvd"
+        - link "Band Viorica @Viorica.Band" [ref=e495] [cursor=pointer]:
+          - /url: /discover/viorica
+          - generic [ref=e496]:
+            - paragraph [ref=e497]: Band
+            - heading "Viorica" [level=3] [ref=e498]
+            - paragraph [ref=e499]: "@Viorica.Band"
+        - link "Solo Artist Warren Buchholz @warrenbuchholz" [ref=e500] [cursor=pointer]:
+          - /url: /discover/warren-buchholz
+          - generic [ref=e501]:
+            - paragraph [ref=e502]: Solo Artist
+            - heading "Warren Buchholz" [level=3] [ref=e503]
+            - paragraph [ref=e504]: "@warrenbuchholz"
+        - link "Solo Artist Willie Jones @williejones_cocktailhour" [ref=e505] [cursor=pointer]:
+          - /url: /discover/willie-jones
+          - generic [ref=e506]:
+            - paragraph [ref=e507]: Solo Artist
+            - heading "Willie Jones" [level=3] [ref=e508]
+            - paragraph [ref=e509]: "@williejones_cocktailhour"
+        - link "Solo Artist Wyatt Norton @wyatt_norton" [ref=e510] [cursor=pointer]:
+          - /url: /discover/wyatt-norton
+          - generic [ref=e511]:
+            - paragraph [ref=e512]: Solo Artist
+            - heading "Wyatt Norton" [level=3] [ref=e513]
+            - paragraph [ref=e514]: "@wyatt_norton"
+  - contentinfo [ref=e515]:
+    - generic [ref=e516]:
+      - generic [ref=e517]:
+        - img "StPeteMusic" [ref=e519]
+        - generic [ref=e520]:
+          - paragraph [ref=e521]: St. Petersburg, FL
+          - paragraph [ref=e522]: Community Driven Music
+        - generic [ref=e523]:
+          - generic [ref=e524]:
+            - paragraph [ref=e525]: Follow
+            - generic [ref=e526]:
+              - link "Instagram" [ref=e527] [cursor=pointer]:
+                - /url: https://www.instagram.com/StPeteMusic
+              - link "YouTube" [ref=e528] [cursor=pointer]:
+                - /url: https://youtube.com/@StPeteMusic
+              - link "Facebook" [ref=e529] [cursor=pointer]:
+                - /url: https://www.facebook.com/stpeteflmusic/
+          - generic [ref=e530]:
+            - paragraph [ref=e531]: Friends
+            - generic [ref=e532]:
+              - link "Suite E Studios" [ref=e533] [cursor=pointer]:
+                - /url: https://www.suiteestudios.com
+              - link "Bayboro Brewing" [ref=e534] [cursor=pointer]:
+                - /url: https://www.bayborobrewing.com/
+              - link "Cage Brewing" [ref=e535] [cursor=pointer]:
+                - /url: https://cagebrewing.com/
+      - generic [ref=e536]:
+        - paragraph [ref=e537]: © 2026 StPeteMusic / Suite E Studios
+        - paragraph [ref=e538]: Live Music · Local Artists · Real Community
+  - alert [ref=e539]

@@ -1,0 +1,54 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "StPeteMusic" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "StPeteMusic" [ref=e5]
+      - generic [ref=e6]:
+        - link "Events" [ref=e7] [cursor=pointer]:
+          - /url: /events
+        - link "Discover" [ref=e8] [cursor=pointer]:
+          - /url: /discover
+        - link "Venues" [ref=e9] [cursor=pointer]:
+          - /url: /venues
+        - link "YouTube" [ref=e10] [cursor=pointer]:
+          - /url: https://youtube.com/@StPeteMusic
+  - main [ref=e11]:
+    - generic [ref=e12]:
+      - generic [ref=e13]:
+        - paragraph [ref=e14]: Community
+        - heading "Discover" [level=1] [ref=e15]
+      - paragraph [ref=e17]: Bands, DJs, solo artists, and creatives from the greater St. Petersburg, FL area. All genres, no gatekeeping.
+      - link "Browse Venues →" [ref=e19] [cursor=pointer]:
+        - /url: /venues
+      - paragraph [ref=e21]: Artist directory coming soon. All genres, all types, no gatekeeping.
+  - contentinfo [ref=e22]:
+    - generic [ref=e23]:
+      - generic [ref=e24]:
+        - img "StPeteMusic" [ref=e26]
+        - generic [ref=e27]:
+          - paragraph [ref=e28]: St. Petersburg, FL
+          - paragraph [ref=e29]: Community Driven Music
+        - generic [ref=e30]:
+          - generic [ref=e31]:
+            - paragraph [ref=e32]: Follow
+            - generic [ref=e33]:
+              - link "Instagram" [ref=e34] [cursor=pointer]:
+                - /url: https://www.instagram.com/StPeteMusic
+              - link "YouTube" [ref=e35] [cursor=pointer]:
+                - /url: https://youtube.com/@StPeteMusic
+              - link "Facebook" [ref=e36] [cursor=pointer]:
+                - /url: https://www.facebook.com/stpeteflmusic/
+          - generic [ref=e37]:
+            - paragraph [ref=e38]: Friends
+            - generic [ref=e39]:
+              - link "Suite E Studios" [ref=e40] [cursor=pointer]:
+                - /url: https://www.suiteestudios.com
+              - link "Bayboro Brewing" [ref=e41] [cursor=pointer]:
+                - /url: https://www.bayborobrewing.com/
+              - link "Cage Brewing" [ref=e42] [cursor=pointer]:
+                - /url: https://cagebrewing.com/
+      - generic [ref=e43]:
+        - paragraph [ref=e44]: © 2026 StPeteMusic / Suite E Studios
+        - paragraph [ref=e45]: Live Music · Local Artists · Real Community
+  - alert [ref=e46]
