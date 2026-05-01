@@ -28,10 +28,11 @@ const ROOT = path.join(__dirname, '..');
 
 const BASE_URL = process.env.DEMO_URL ?? 'http://localhost:3000';
 const OUTPUT_DIR = path.join(ROOT, 'demo-recordings');
-const TIMESTAMP = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-const OUTPUT_FILE = path.join(OUTPUT_DIR, `demo-${TIMESTAMP}.mp4`);
-const FPS = process.argv.includes('--60fps') ? 60 : 30;
 const SEQUENCE = process.argv.find((a) => a.startsWith('--sequence='))?.split('=')[1] ?? 'full';
+const TIMESTAMP = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+const SEQUENCE_SUFFIX = SEQUENCE !== 'full' ? `-${SEQUENCE}` : '';
+const OUTPUT_FILE = path.join(OUTPUT_DIR, `demo${SEQUENCE_SUFFIX}-${TIMESTAMP}.mp4`);
+const FPS = process.argv.includes('--60fps') ? 60 : 30;
 
 // Exact 9:16 viewport: 405×720 (405/720 = 9/16 = 0.5625).
 // Width stays under the 768px Tailwind breakpoint so mobile layout applies.
@@ -334,6 +335,13 @@ async function main() {
   });
 
   const page = await context.newPage();
+
+  // Hide Next.js dev indicator ("N" badge at bottom-left)
+  await page.addInitScript(() => {
+    const s = document.createElement('style');
+    s.textContent = 'nextjs-portal { display: none !important; }';
+    document.head.appendChild(s);
+  });
 
   const sequences = {
     full: runDemoSequence,
