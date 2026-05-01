@@ -93,6 +93,7 @@
 | Component | Phase |
 |---|---|
 | Import newsletter n8n workflows + set up Google Sheets + Listmonk credentials | Phase 1.5 |
+| Merge `fix/listmonk-startup-order` branch | Phase 1.5 |
 | S3 media bucket for images/video | Phase 2 |
 | Payload CMS (`apps/cms/`) | Phase 2 |
 | Real event/artist data from CMS | Phase 2 |

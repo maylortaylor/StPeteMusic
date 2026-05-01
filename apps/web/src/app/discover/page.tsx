@@ -40,8 +40,7 @@ export default async function DiscoverPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <Nav />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />      <Nav />
       <main className="min-h-screen bg-surface">
         <div className="max-w-7xl mx-auto px-6 py-20">
 
