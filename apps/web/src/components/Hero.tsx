@@ -111,12 +111,10 @@ export function Hero() {
             transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.65 }}
           >
             <a
-              href="https://final-friday.eventbrite.com/"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#newsletter"
               className="text-white font-inter font-bold text-base uppercase tracking-widest px-10 py-4 bg-black hover:opacity-85 transition-opacity"
             >
-              See Events
+              Tune In
             </a>
             <a
               href="https://youtube.com/@StPeteMusic"
@@ -127,7 +125,7 @@ export function Hero() {
               Watch on YouTube
             </a>
             <a
-              href="https://final-friday.eventbrite.com/"
+              href="https://www.eventbrite.com/o/suite-e-studios-109188388681"
               target="_blank"
               rel="noopener noreferrer"
               className="text-white font-inter font-bold text-base uppercase tracking-widest px-10 py-4 bg-brand-orange hover:opacity-85 transition-opacity"

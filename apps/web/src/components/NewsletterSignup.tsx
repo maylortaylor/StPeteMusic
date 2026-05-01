@@ -61,7 +61,7 @@ export function NewsletterSignup({ variant = 'section' }: NewsletterSignupProps)
   }
 
   return (
-    <section className="relative px-6 py-40 overflow-hidden bg-black">
+    <section id="newsletter" className="relative px-6 py-40 overflow-hidden bg-black">
       <div className="relative z-10 max-w-3xl mx-auto text-center">
         <AnimateIn as="p" className="font-inter font-medium text-sm tracking-[0.5em] uppercase mb-6" style={{ color: '#FF8C00' }}>
           Stay in the loop
