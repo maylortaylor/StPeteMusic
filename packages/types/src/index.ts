@@ -2,7 +2,7 @@ export interface Artist {
   id: string;
   name: string;
   slug: string;
-  type: 'Band' | 'Solo Artist' | 'DJ' | 'SR. PRODUCER' | 'Creative' | 'Other';
+  type: 'Band' | 'Solo Artist' | 'DJ' | 'Event Producer' | 'Creative' | 'Other';
   description?: string;
   email?: string;
   hero_photo_url?: string;
