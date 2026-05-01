@@ -8,17 +8,16 @@ describe('Footer', () => {
     expect(screen.getByAltText('StPeteMusic')).toBeInTheDocument();
   });
 
-  it('renders all link column headings', () => {
+  it('renders the Follow and Friends column headings', () => {
     render(<Footer />);
-    expect(screen.getByText('Shows')).toBeInTheDocument();
     expect(screen.getByText('Follow')).toBeInTheDocument();
-    expect(screen.getByText('More')).toBeInTheDocument();
+    expect(screen.getByText('Friends')).toBeInTheDocument();
   });
 
-  it('renders the Final Friday link with correct href', () => {
+  it('renders the Suite E Studios link with correct href', () => {
     render(<Footer />);
-    const link = screen.getByText('Final Friday').closest('a');
-    expect(link).toHaveAttribute('href', 'https://final-friday.eventbrite.com/');
+    const link = screen.getByText('Suite E Studios').closest('a');
+    expect(link).toHaveAttribute('href', 'https://www.suiteestudios.com');
   });
 
   it('renders the Instagram link', () => {
@@ -36,5 +35,10 @@ describe('Footer', () => {
   it('renders the St. Pete location text', () => {
     render(<Footer />);
     expect(screen.getByText('St. Petersburg, FL')).toBeInTheDocument();
+  });
+
+  it('renders the community tagline', () => {
+    render(<Footer />);
+    expect(screen.getByText('Community Driven Music')).toBeInTheDocument();
   });
 });

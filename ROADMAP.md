@@ -1,7 +1,7 @@
 # StPeteMusic — Project Roadmap
 
-> **Status:** Phase 1.5 nearly complete — newsletter live + tracked, SEO pass done, n8n workflows pending
-> **Last Updated:** April 30, 2026
+> **Status:** Phase 1.5 nearly complete — all branches merged, newsletter verified, n8n workflow wiring is the only remaining item
+> **Last Updated:** May 1, 2026
 > **Author:** Matt Taylor (@maylortaylor)
 > **Stack:** Next.js 16 · Listmonk · Payload CMS · PostgreSQL (RDS) · AWS (OpenTofu IaC) · n8n · AWS Amplify
 
@@ -93,7 +93,6 @@
 | Component | Phase |
 |---|---|
 | Import newsletter n8n workflows + set up Google Sheets + Listmonk credentials | Phase 1.5 |
-| Merge `fix/listmonk-startup-order` branch | Phase 1.5 |
 | S3 media bucket for images/video | Phase 2 |
 | Payload CMS (`apps/cms/`) | Phase 2 |
 | Real event/artist data from CMS | Phase 2 |
@@ -230,7 +229,7 @@ Merge this branch to prevent a race condition on fresh EC2 deploys. Not urgent (
 - [x] Test newsletter send end-to-end (Resend SMTP configured + campaign verified in inbox)
 - [x] Newsletter analytics: open tracking pixel, click tracking, UTM params on template links
 - [ ] Import newsletter n8n workflows + wire Google Sheets + Listmonk credentials
-- [ ] Merge `fix/listmonk-startup-order` branch
+- [x] Merge `fix/listmonk-startup-order` branch
 
 ---
 

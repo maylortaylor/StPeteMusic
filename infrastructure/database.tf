@@ -13,7 +13,7 @@ resource "aws_db_subnet_group" "main" {
 
 resource "aws_security_group" "rds" {
   name        = "${var.project}-rds-sg"
-  description = "RDS PostgreSQL, allow inbound from EC2 only"
+  description = "RDS PostgreSQL — EC2 + public internet (Amplify SSR, SSL required)"
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
@@ -22,6 +22,16 @@ resource "aws_security_group" "rds" {
     protocol        = "tcp"
     security_groups = [aws_security_group.n8n.id]
     description     = "PostgreSQL from EC2"
+  }
+
+  # Amplify WEB_COMPUTE has no fixed egress IPs — must allow internet access.
+  # Mitigated by: strong password, SSL required (sslmode=require in DATABASE_URL).
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "PostgreSQL from internet (Amplify SSR + local dev)"
   }
 
   egress {
@@ -49,7 +59,7 @@ resource "aws_db_instance" "main" {
   skip_final_snapshot    = false
   deletion_protection    = true
   multi_az               = false
-  publicly_accessible    = false
+  publicly_accessible    = true   # required for Amplify SSR → RDS connectivity
   backup_retention_period = 7
 
   tags = { Name = "${var.project}-postgres", Project = var.project }

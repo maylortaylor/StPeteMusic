@@ -19,9 +19,10 @@ interface Event {
   label: string;
   title: string;
   body: string;
-  date: string;
+  date?: string;
   venue: string;
-  ticketUrl?: string;
+  ctaUrl?: string;
+  ctaLabel?: string;
   presenter?: { name: string; links: { label: string; href: string }[] };
   photoSrc: string;
   photoPosition?: string;
@@ -32,25 +33,24 @@ const EVENTS: Event[] = [
   {
     label: 'Monthly · Last Friday',
     title: 'Final Friday.',
-    body: 'Three bands. One night. Suite E Studios. The signature St. Pete music event — live, loud, and local every last Friday of the month.',
-    date: 'April 25, 2026',
-    venue: 'Suite E Studios · Doors 7pm',
-    ticketUrl: 'https://final-friday.eventbrite.com/',
+    body: 'Three bands. One night. Suite E Studios. Years of St. Pete music history — live, loud, and local. Every show captured on film. Watch the moments that define this scene.',
+    venue: 'Suite E Studios · Last Friday Monthly',
+    ctaUrl: 'https://www.youtube.com/watch?v=bU_FdDKosbk&list=PL5gTeopOibQREpXSSqHwVaZTWv1EdUuki',
+    ctaLabel: 'Watch History in the Making',
     photoSrc: '/images/events/final-friday/hero.jpg',
     photoPosition: '65% bottom',
     logoSrc: '/images/brand/ff-logo-magenta.png',
   },
   {
-    label: 'Monthly · 4th Wednesday · Prophessor J Events',
+    label: 'Monthly · 4th Wednesday',
     title: 'Final Wednesday.',
-    body: 'Community jam night & listening lounge — live instruments, local artists, and great vibes. $5 entry includes a raffle for free studio time. Guitar, drums, bass, piano, mics, and full recording gear provided.',
-    date: 'April 23, 2026',
+    body: 'A community jam session hosted by Prophessor J Events — live instruments, local artists, and real vibes every final Wednesday. $5 to enter. Guitar, drums, bass, piano, mics, and full recording gear provided.',
     venue: 'Suite E Studios · 615 27th St S, St. Pete · 7–10pm',
     presenter: {
       name: 'Prophessor J Events',
       links: [
-        { label: 'FB Community', href: 'https://www.facebook.com/groups/803946243670033' },
         { label: 'FB Page', href: 'https://www.facebook.com/profile.php?id=100090049310435' },
+        { label: 'FB Community', href: 'https://www.facebook.com/groups/803946243670033' },
       ],
     },
     photoSrc: '/images/vibes/strip-10.jpg',
@@ -100,16 +100,16 @@ function EventRow({ event, index, onOpenPhoto }: { event: Event; index: number; 
         <p className="font-inter text-text-secondary text-xl leading-relaxed mb-8 max-w-md">
           {event.body}
         </p>
-        <p className="font-inter text-text-muted text-base mb-1">{event.date}</p>
+        {event.date && <p className="font-inter text-text-muted text-base mb-1">{event.date}</p>}
         <p className="font-inter text-text-muted text-base mb-8">{event.venue}</p>
-        {event.ticketUrl ? (
+        {event.ctaUrl ? (
           <a
-            href={event.ticketUrl}
+            href={event.ctaUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="self-start text-white font-inter font-bold text-sm uppercase tracking-widest px-8 py-3 hover:opacity-85 transition-opacity bg-black"
           >
-            Get Tickets
+            {event.ctaLabel ?? 'Get Tickets'}
           </a>
         ) : (
           <span className="font-inter font-medium text-text-muted text-base uppercase tracking-widest">$5 at the door · No reservation needed</span>
@@ -117,17 +117,17 @@ function EventRow({ event, index, onOpenPhoto }: { event: Event; index: number; 
 
         {event.presenter && (
           <div className="mt-6 pt-6 border-t border-border">
-            <p className="font-inter font-medium text-xs tracking-[0.3em] uppercase mb-2 text-text-muted">
+            <p className="font-inter font-bold text-base tracking-[0.2em] uppercase mb-4 text-black">
               Presented by {event.presenter.name}
             </p>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-3">
               {event.presenter.links.map(link => (
                 <a
                   key={link.label}
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-inter text-sm text-text-muted hover:text-text-secondary transition-colors"
+                  className="font-inter font-bold text-sm uppercase tracking-widest px-5 py-2 border border-black text-black hover:bg-black hover:text-white transition-all"
                 >
                   {link.label} →
                 </a>

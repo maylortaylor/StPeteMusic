@@ -4,14 +4,6 @@ import Image from "next/image";
 
 const COLUMNS = [
   {
-    heading: "Shows",
-    links: [
-      { label: "Final Friday", href: "https://final-friday.eventbrite.com/" },
-      { label: "Instant Noodles", href: null },
-      { label: "Art Walk", href: null },
-    ],
-  },
-  {
     heading: "Follow",
     links: [
       { label: "Instagram", href: "https://www.instagram.com/StPeteMusic" },
@@ -20,11 +12,11 @@ const COLUMNS = [
     ],
   },
   {
-    heading: "More",
+    heading: "Friends",
     links: [
-      { label: "Suite E Studios", href: "https://linktr.ee/suite_e_studios" },
-      { label: "All Links", href: "https://linktr.ee/stpetemusic" },
-      { label: "Contact", href: "mailto:TheBurgMusic@gmail.com" },
+      { label: "Suite E Studios", href: "https://www.suiteestudios.com" },
+      { label: "Bayboro Brewing", href: "https://www.bayborobrewing.com/" },
+      { label: "Cage Brewing", href: "https://cagebrewing.com/" },
     ],
   },
 ];
@@ -50,7 +42,7 @@ export function Footer() {
               St. Petersburg, FL
             </p>
             <p className="font-inter text-base mt-0.5 text-black/60">
-              Warehouse Arts District
+              Community Driven Music
             </p>
           </div>
 
@@ -98,7 +90,7 @@ export function Footer() {
             © {new Date().getFullYear()} StPeteMusic / Suite E Studios
           </p>
           <p className="font-inter font-medium text-sm tracking-[0.2em] uppercase text-black/50">
-            Warehouse Arts District · St. Pete FL
+            Live Music · Local Artists · Real Community
           </p>
         </div>
       </div>
