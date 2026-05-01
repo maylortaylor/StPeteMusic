@@ -52,7 +52,9 @@ export function YouTubeGrid() {
                 className="font-inter font-black uppercase leading-none text-black"
                 style={{ fontSize: 'clamp(3rem, 8vw, 7rem)' }}
               >
-                Live at Suite E
+                Live at{' '}
+                <br className="sm:hidden" />
+                Suite E
               </h2>
               <span className="section-underline" />
             </AnimateIn>
@@ -62,7 +64,7 @@ export function YouTubeGrid() {
               href="https://youtube.com/@StPeteMusic"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-inter font-medium text-text-muted hover:text-text-secondary text-base tracking-[0.3em] uppercase transition-colors shrink-0"
+              className="font-inter font-bold text-sm uppercase tracking-widest px-8 py-3 bg-black text-white hover:opacity-85 transition-opacity shrink-0"
             >
               All Videos →
             </a>
