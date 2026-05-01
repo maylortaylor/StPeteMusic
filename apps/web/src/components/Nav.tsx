@@ -25,6 +25,7 @@ export function Nav() {
         <div className="hidden md:flex items-center gap-10">
           <Link href="/events"   className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Events</Link>
           <Link href="/discover" className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Discover</Link>
+          <Link href="/venues"   className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Venues</Link>
           <a href="https://youtube.com/@StPeteMusic" target="_blank" rel="noopener noreferrer"
             className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">YouTube</a>
         </div>
@@ -56,6 +57,7 @@ export function Nav() {
         <div className="md:hidden bg-gradient-orange border-t border-black/10 px-6 py-4 flex flex-col gap-4">
           <Link href="/events"   onClick={() => setMenuOpen(false)} className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Events</Link>
           <Link href="/discover" onClick={() => setMenuOpen(false)} className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Discover</Link>
+          <Link href="/venues"   onClick={() => setMenuOpen(false)} className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Venues</Link>
           <a href="https://youtube.com/@StPeteMusic" target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)}
             className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">YouTube</a>
         </div>
