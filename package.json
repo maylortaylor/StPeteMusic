@@ -20,7 +20,8 @@
     "dev:stop": "docker-compose -f docker-compose.dev.yml down",
     "build": "npm run build --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "reinstall": "rm -rf node_modules apps/*/node_modules packages/*/node_modules apps/web/.next && npm install"
   },
   "devDependencies": {
     "react": "^19.2.5",
@@ -35,6 +36,7 @@
     "@rollup/rollup-linux-x64-gnu": "4.60.1",
     "@tailwindcss/oxide-linux-x64-gnu": "4.2.4",
     "@unrs/resolver-binding-linux-x64-gnu": "1.11.1",
+    "lightningcss-darwin-arm64": "^1.32.0",
     "lightningcss-linux-x64-gnu": "1.32.0"
   }
 }
