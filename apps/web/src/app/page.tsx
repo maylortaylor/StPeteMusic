@@ -6,6 +6,7 @@ import { StatsSection } from '@/components/StatsSection';
 import { YouTubeGrid } from '@/components/YouTubeGrid';
 import { NewsletterSignup } from '@/components/NewsletterSignup';
 import { LinkTreeSection } from '@/components/LinkTreeSection';
+import { ContactSection } from '@/components/ContactSection';
 import { Footer } from '@/components/Footer';
 import { PhotoStrip, EventsTeaser, VibesSection } from '@/components/ClientSections';
 
@@ -63,6 +64,8 @@ export default function HomePage() {
         <YouTubeGrid />
 
         <NewsletterSignup variant="section" />
+
+        <ContactSection />
 
         <LinkTreeSection />
       </main>

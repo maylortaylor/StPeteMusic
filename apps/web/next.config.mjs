@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  devIndicators: false,
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'img.youtube.com' },
@@ -16,6 +17,7 @@ const nextConfig = {
     LISTMONK_LIST_ID: process.env.LISTMONK_LIST_ID ?? '1',
     LISTMONK_USERNAME: process.env.LISTMONK_USERNAME ?? 'admin',
     LISTMONK_PASSWORD: process.env.LISTMONK_PASSWORD ?? '',
+    RESEND_API_KEY: process.env.RESEND_API_KEY ?? '',
   },
 };
 

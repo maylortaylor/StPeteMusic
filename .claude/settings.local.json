@@ -27,7 +27,30 @@
       "Bash(GH_CONFIG_DIR=/workspace/.gh-config gh auth:*)",
       "Bash(npm test:*)",
       "Bash(xargs ls:*)",
-      "Bash(npm why:*)"
+      "Bash(npm why:*)",
+      "Bash(git branch:*)",
+      "Bash(python3:*)",
+      "Bash(ls:*)",
+      "Bash(AWS_PROFILE=personal aws ssm get-parameter:*)",
+      "Bash(unset AWS_WEB_IDENTITY_TOKEN_FILE)",
+      "Bash(AWS_PROFILE=personal aws ssm describe-parameters --region us-east-1 --query \"Parameters[].Name\" --output text)",
+      "Bash(AWS_PROFILE=personal aws rds describe-db-instances --db-instance-identifier stpetemusic-postgres --query 'DBInstances[0].MasterUsername' --output text --region us-east-1)",
+      "Bash(AWS_PROFILE=personal aws rds describe-db-instances --db-instance-identifier stpetemusic-postgres --query 'DBInstances[0].{Status:DBInstanceStatus,PubliclyAccessible:PubliclyAccessible}' --output json --region us-east-1)",
+      "Bash(aws rds:*)",
+      "Bash(aws amplify:*)",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "Bash(git reset:*)",
+      "WebFetch(domain:www.stpetemusic.live)",
+      "mcp__plugin_playwright_playwright__browser_evaluate",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(pkill -f \"next dev\")",
+      "mcp__plugin_playwright_playwright__browser_tabs",
+      "mcp__plugin_playwright_playwright__browser_snapshot",
+      "mcp__plugin_playwright_playwright__browser_fill_form",
+      "mcp__plugin_playwright_playwright__browser_click",
+      "mcp__plugin_playwright_playwright__browser_wait_for",
+      "WebFetch(domain:github.com)"
     ]
   }
 }
