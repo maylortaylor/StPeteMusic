@@ -33,3 +33,4 @@ apply_if_new "010_backfill_existing.sql"               "/sql/migrations/010_back
 apply_if_new "011_seed_venues.sql"                     "/sql/migrations/011_seed_venues.sql"
 apply_if_new "012_seed_persons.sql"                    "/sql/migrations/012_seed_persons.sql"
 apply_if_new "013_seed_organizations.sql"              "/sql/migrations/013_seed_organizations.sql"
+apply_if_new "014_update_venues.sql"                   "/sql/migrations/014_update_venues.sql"
