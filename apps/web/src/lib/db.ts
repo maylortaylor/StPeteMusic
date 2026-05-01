@@ -16,7 +16,7 @@ function getPool(): Pool {
     }
     pool = new Pool({
       connectionString,
-      ssl: connectionString.includes('sslmode=require') ? { rejectUnauthorized: false } : false,
+      ssl: !/localhost|127\.0\.0\.1/.test(connectionString) ? { rejectUnauthorized: false } : false,
       max: 5,
       idleTimeoutMillis: 30_000,
       connectionTimeoutMillis: 5_000,
