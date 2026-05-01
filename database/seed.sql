@@ -74,9 +74,6 @@ VALUES
   ('Allen Fereti', '@allenfereti06', 'Solo Artist',
     'https://www.instagram.com/allenfereti06', NULL, NULL, NULL, 'Email in CSV has typo: allenfereti066gmail.com'),
 
-  ('Kieth Penu', '@kwell_creates', 'SR. PRODUCER',
-    NULL, 'https://www.facebook.com/keith.penu', NULL, NULL, NULL),
-
   ('Physical Plant', '@physical_plant', 'Band',
     NULL, 'https://www.facebook.com/physicalplants', 'https://www.physicalplantmusic.com/', 'https://linktr.ee/physicalplant', NULL),
 
@@ -95,10 +92,7 @@ VALUES
   ('Brian Busto', '@djbrianbusto', 'DJ',
     'https://www.instagram.com/djbrianbusto/', 'https://www.facebook.com/brian.busto.1', 'https://linktr.ee/djbrianbusto', NULL, 'Also: @serioussoul813'),
 
-  ('Bryan Edward', '@bryanedwardcreative', 'Creative',
-    'https://www.instagram.com/bryanedwardcreative/', 'https://www.facebook.com/bryanedwardalpha', NULL, NULL, NULL),
-
-  ('Prophessor J Events', NULL, 'SR. PRODUCER',
+  ('Prophessor J Events', NULL, 'Event Producer',
     NULL, 'https://www.facebook.com/groups/803946243670033', NULL, NULL, NULL),
 
   ('Chriss (Clockworkxband)', '@chriss.3___', 'Band',
@@ -160,12 +154,10 @@ VALUES
   ('Liam',     'Walsh',      ARRAY['artist', 'musician'],                        'Contact for SlamChops'),
   ('Wyatt',    'Norton',     ARRAY['artist', 'musician'],                        'Contact for Wyatt Norton solo and Beach Terror'),
   ('Allen',    'Fereti',     ARRAY['artist', 'musician'],                        'Solo artist @allenfereti06'),
-  ('Kieth',    'Penu',       ARRAY['producer'],                                  'SR. PRODUCER @kwell_creates'),
   ('Leah',     NULL,         ARRAY['artist', 'musician'],                        'Contact for Little Giver Band @leahivelise'),
   ('Liam',     'Bauman',     ARRAY['artist', 'musician'],                        'Solo artist, publicity via Sweetheart PR'),
   ('Callaghan', 'Keane',     ARRAY['artist', 'dj'],                              'DJ @callaghan.keane'),
   ('Brian',    'Busto',      ARRAY['artist', 'dj'],                              'DJ @djbrianbusto'),
-  ('Bryan',    'Edward',     ARRAY['creative', 'videographer', 'photographer'],  'Creative @bryanedwardcreative'),
   ('Jarryd',   'Thompson',   ARRAY['producer', 'event producer'],                'Prophessor J Events'),
   ('Tyson',    NULL,         ARRAY['artist', 'musician'],                        'Contact for Seems band'),
   ('Joheem',   NULL,         ARRAY['artist', 'musician'],                        'Solo artist @joheemason'),
