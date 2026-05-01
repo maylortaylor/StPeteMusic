@@ -64,7 +64,8 @@ resource "aws_db_instance" "main" {
   skip_final_snapshot    = false
   deletion_protection    = true
   multi_az               = false
-  publicly_accessible    = true   # required for Amplify SSR → RDS connectivity
+  publicly_accessible    = true   # required for Amplify SSR + local dev → RDS connectivity
+  apply_immediately      = true   # apply modifications immediately, not at next maintenance window
   backup_retention_period = 7
 
   tags = { Name = "${var.project}-postgres", Project = var.project }
