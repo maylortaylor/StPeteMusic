@@ -3,7 +3,12 @@
 # Branches: main (production) + develop (staging)
 # Build spec: amplify.yml at repo root
 
-# Read Listmonk credentials from SSM so Amplify env vars stay in sync with EC2
+# Read secrets from SSM so Amplify env vars stay in sync
+data "aws_ssm_parameter" "resend_api_key" {
+  name            = aws_ssm_parameter.resend_api_key.name
+  with_decryption = true
+}
+
 data "aws_ssm_parameter" "listmonk_username" {
   name            = aws_ssm_parameter.listmonk_username.name
   with_decryption = true
@@ -28,6 +33,7 @@ resource "aws_amplify_app" "web" {
   environment_variables = {
     AMPLIFY_MONOREPO_APP_ROOT = "apps/web"  # tells Amplify where to find package.json for framework detection
     NEXT_PUBLIC_SITE_URL      = "https://www.stpetemusic.live"
+    RESEND_API_KEY            = data.aws_ssm_parameter.resend_api_key.value
     LISTMONK_API_URL          = "https://listmonk.stpetemusic.live"
     LISTMONK_LIST_ID          = "3"
     LISTMONK_USERNAME         = data.aws_ssm_parameter.listmonk_username.value
