@@ -2,21 +2,63 @@ export interface Artist {
   id: string;
   name: string;
   slug: string;
-  genre?: string;
-  instagram?: string;
-  bio?: string;
-  imageUrl?: string;
-  type: 'band' | 'dj' | 'solo_artist' | 'visual_artist';
+  type: 'Band' | 'Solo Artist' | 'DJ' | 'SR. PRODUCER' | 'Creative' | 'Other';
+  description?: string;
+  email?: string;
+  hero_photo_url?: string;
+  genres: string[];
+  tags: string[];
+  username?: string;
+  instagram_handle?: string;
+  instagram_url?: string;
+  facebook_url?: string;
+  youtube_url?: string;
+  bandcamp_url?: string;
+  spotify_url?: string;
+  soundcloud_url?: string;
+  linktree_url?: string;
+  website?: string;
+  extra_links: { label: string; url: string }[];
+  is_active: boolean;
+}
+
+export interface ArtistShow {
+  id: string;
+  artist_id: string;
+  title: string;
+  youtube_url?: string;
+  show_date?: string;
+  venue_name?: string;
 }
 
 export interface Venue {
   id: string;
   name: string;
   slug: string;
-  address: string;
-  neighborhood?: string;
+  description?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  capacity?: number;
+  tags: string[];
+  instagram_url?: string;
+  instagram_username?: string;
+  facebook_url?: string;
+  facebook_username?: string;
   website?: string;
-  instagram?: string;
+  hero_photo_url?: string;
+  lat?: number;
+  lng?: number;
+  extra_links: { label: string; url: string }[];
+  is_active: boolean;
+}
+
+export interface Collaborator {
+  id: string;
+  first_name: string;
+  last_name?: string;
+  skills: string[];
+  notes?: string;
 }
 
 export interface Event {
