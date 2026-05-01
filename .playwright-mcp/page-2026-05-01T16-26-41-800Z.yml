@@ -1,0 +1,111 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "StPeteMusic" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "StPeteMusic" [ref=e5]
+      - generic [ref=e6]:
+        - link "Events" [ref=e7] [cursor=pointer]:
+          - /url: /events
+        - link "Discover" [ref=e8] [cursor=pointer]:
+          - /url: /discover
+        - link "Venues" [ref=e9] [cursor=pointer]:
+          - /url: /venues
+        - link "YouTube" [ref=e10] [cursor=pointer]:
+          - /url: https://youtube.com/@StPeteMusic
+  - main [ref=e11]:
+    - generic [ref=e12]:
+      - generic [ref=e13]:
+        - paragraph [ref=e14]: St. Pete, FL
+        - heading "Venues" [level=1] [ref=e15]
+      - paragraph [ref=e17]: The stages that make the St. Pete music scene. From warehouse studios to neighborhood breweries.
+      - generic [ref=e18]:
+        - link "3 Daughters Brewing" [ref=e19] [cursor=pointer]:
+          - /url: /venues/3-daughters-brewing
+          - heading "3 Daughters Brewing" [level=3] [ref=e21]
+        - link "Bayboro Brewing 2390 5th Ave S, St. Petersburg, FL 33712 brewery venue st-pete" [ref=e22] [cursor=pointer]:
+          - /url: /venues/bayboro-brewing
+          - generic [ref=e23]:
+            - heading "Bayboro Brewing" [level=3] [ref=e24]
+            - paragraph [ref=e25]: 2390 5th Ave S, St. Petersburg, FL 33712
+            - generic [ref=e26]:
+              - generic [ref=e27]: brewery
+              - generic [ref=e28]: venue
+              - generic [ref=e29]: st-pete
+        - link "Cage Brewing 1514 2nd Ave N, St. Petersburg, FL 33713 brewery venue st-pete" [ref=e30] [cursor=pointer]:
+          - /url: /venues/cage-brewing
+          - generic [ref=e31]:
+            - heading "Cage Brewing" [level=3] [ref=e32]
+            - paragraph [ref=e33]: 1514 2nd Ave N, St. Petersburg, FL 33713
+            - generic [ref=e34]:
+              - generic [ref=e35]: brewery
+              - generic [ref=e36]: venue
+              - generic [ref=e37]: st-pete
+        - link "Jannus Live" [ref=e38] [cursor=pointer]:
+          - /url: /venues/jannus-live
+          - heading "Jannus Live" [level=3] [ref=e40]
+        - link "Mandarin Hide" [ref=e41] [cursor=pointer]:
+          - /url: /venues/mandarin-hide
+          - heading "Mandarin Hide" [level=3] [ref=e43]
+        - link "Ruby's Elixir St. Petersburg, FL bar venue st-pete" [ref=e44] [cursor=pointer]:
+          - /url: /venues/rubys-elixir
+          - generic [ref=e45]:
+            - heading "Ruby's Elixir" [level=3] [ref=e46]
+            - paragraph [ref=e47]: St. Petersburg, FL
+            - generic [ref=e48]:
+              - generic [ref=e49]: bar
+              - generic [ref=e50]: venue
+              - generic [ref=e51]: st-pete
+        - link "St. Pete Brewing Co" [ref=e52] [cursor=pointer]:
+          - /url: /venues/st-pete-brewing-co
+          - heading "St. Pete Brewing Co" [level=3] [ref=e54]
+        - link "The Bends" [ref=e55] [cursor=pointer]:
+          - /url: /venues/the-bends
+          - heading "The Bends" [level=3] [ref=e57]
+        - link "The Blueberry Patch St. Petersburg, FL venue st-pete" [ref=e58] [cursor=pointer]:
+          - /url: /venues/the-blueberry-patch
+          - generic [ref=e59]:
+            - heading "The Blueberry Patch" [level=3] [ref=e60]
+            - paragraph [ref=e61]: St. Petersburg, FL
+            - generic [ref=e62]:
+              - generic [ref=e63]: venue
+              - generic [ref=e64]: st-pete
+        - link "The Nest at St Pete Brewing 544 1st Ave N, St. Petersburg, FL 33701 brewery venue st-pete" [ref=e65] [cursor=pointer]:
+          - /url: /venues/the-nest
+          - generic [ref=e66]:
+            - heading "The Nest at St Pete Brewing" [level=3] [ref=e67]
+            - paragraph [ref=e68]: 544 1st Ave N, St. Petersburg, FL 33701
+            - generic [ref=e69]:
+              - generic [ref=e70]: brewery
+              - generic [ref=e71]: venue
+              - generic [ref=e72]: st-pete
+  - contentinfo [ref=e73]:
+    - generic [ref=e74]:
+      - generic [ref=e75]:
+        - img "StPeteMusic" [ref=e77]
+        - generic [ref=e78]:
+          - paragraph [ref=e79]: St. Petersburg, FL
+          - paragraph [ref=e80]: Community Driven Music
+        - generic [ref=e81]:
+          - generic [ref=e82]:
+            - paragraph [ref=e83]: Follow
+            - generic [ref=e84]:
+              - link "Instagram" [ref=e85] [cursor=pointer]:
+                - /url: https://www.instagram.com/StPeteMusic
+              - link "YouTube" [ref=e86] [cursor=pointer]:
+                - /url: https://youtube.com/@StPeteMusic
+              - link "Facebook" [ref=e87] [cursor=pointer]:
+                - /url: https://www.facebook.com/stpeteflmusic/
+          - generic [ref=e88]:
+            - paragraph [ref=e89]: Friends
+            - generic [ref=e90]:
+              - link "Suite E Studios" [ref=e91] [cursor=pointer]:
+                - /url: https://www.suiteestudios.com
+              - link "Bayboro Brewing" [ref=e92] [cursor=pointer]:
+                - /url: https://www.bayborobrewing.com/
+              - link "Cage Brewing" [ref=e93] [cursor=pointer]:
+                - /url: https://cagebrewing.com/
+      - generic [ref=e94]:
+        - paragraph [ref=e95]: © 2026 StPeteMusic / Suite E Studios
+        - paragraph [ref=e96]: Live Music · Local Artists · Real Community
+  - alert [ref=e97]

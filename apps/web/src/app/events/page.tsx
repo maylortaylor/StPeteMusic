@@ -12,7 +12,37 @@ export const metadata: Metadata = {
       'Upcoming live music, community jams, and art walks in St. Petersburg, FL — including Final Friday and Instant Noodles at Suite E Studios.',
     url: 'https://www.stpetemusic.live/events',
   },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@StPeteMusic',
+    creator: '@StPeteMusic',
+    images: ['https://www.stpetemusic.live/images/hero/hero-1.jpg'],
+  },
 };
+
+// Calculate next Final Friday (last Friday of current or next month)
+function nextFinalFriday(): string {
+  const now = new Date();
+  let date = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  while (date.getDay() !== 5) date.setDate(date.getDate() - 1);
+  if (date <= now) {
+    date = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+    while (date.getDay() !== 5) date.setDate(date.getDate() - 1);
+  }
+  return date.toISOString().split('T')[0] + 'T19:00:00-04:00';
+}
+
+// Calculate next Instant Noodles (last Wednesday of current or next month)
+function nextInstantNoodles(): string {
+  const now = new Date();
+  let date = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  while (date.getDay() !== 3) date.setDate(date.getDate() - 1);
+  if (date <= now) {
+    date = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+    while (date.getDay() !== 3) date.setDate(date.getDate() - 1);
+  }
+  return date.toISOString().split('T')[0] + 'T18:00:00-04:00';
+}
 
 const eventsJsonLd = {
   '@context': 'https://schema.org',
@@ -25,7 +55,7 @@ const eventsJsonLd = {
       name: 'Final Friday',
       description:
         'Live music showcase — doors at 7pm, three bands performing 8pm–midnight. Last Friday of every month at Suite E Studios.',
-      startDate: '2026-05-29T19:00:00-04:00',
+      startDate: nextFinalFriday(),
       location: {
         '@type': 'Place',
         name: 'Suite E Studios',
@@ -51,7 +81,7 @@ const eventsJsonLd = {
       name: 'Instant Noodles',
       description:
         'Community jam session — building the band from the ground up. Doors at 6pm, jam 7–10pm. Last Wednesday of every month at Suite E Studios.',
-      startDate: '2026-05-27T18:00:00-04:00',
+      startDate: nextInstantNoodles(),
       location: {
         '@type': 'Place',
         name: 'Suite E Studios',

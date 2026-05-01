@@ -2,10 +2,11 @@ export interface Artist {
   id: string;
   name: string;
   slug: string;
-  type: 'Band' | 'Solo Artist' | 'DJ' | 'SR. PRODUCER' | 'Creative' | 'Other';
+  type: 'Band' | 'Solo Artist' | 'DJ' | 'Event Producer' | 'Creative' | 'Other';
   description?: string;
   email?: string;
   hero_photo_url?: string;
+  home_base?: string;
   genres: string[];
   tags: string[];
   username?: string;
@@ -19,7 +20,10 @@ export interface Artist {
   linktree_url?: string;
   website?: string;
   extra_links: { label: string; url: string }[];
+  extra_data: Record<string, unknown>;
+  notes?: string;
   is_active: boolean;
+  visible_on_website: boolean;
 }
 
 export interface ArtistShow {
@@ -37,6 +41,9 @@ export interface Venue {
   slug: string;
   description?: string;
   address?: string;
+  neighborhood?: string;
+  av_setup?: string;
+  partnership_level?: string;
   phone?: string;
   email?: string;
   capacity?: number;
@@ -50,15 +57,46 @@ export interface Venue {
   lat?: number;
   lng?: number;
   extra_links: { label: string; url: string }[];
+  extra_data: Record<string, unknown>;
+  notes?: string;
   is_active: boolean;
+  visible_on_website: boolean;
 }
 
 export interface Collaborator {
   id: string;
   first_name: string;
   last_name?: string;
+  role?: string;
+  company?: string;
+  instagram_handle?: string;
+  instagram_url?: string;
   skills: string[];
+  tags: string[];
+  extra_links: { label: string; url: string }[];
+  extra_data: Record<string, unknown>;
   notes?: string;
+  visible_on_website: boolean;
+}
+
+export interface Organization {
+  id: string;
+  name: string;
+  slug?: string;
+  type?: string;
+  description?: string;
+  instagram_handle?: string;
+  instagram_url?: string;
+  facebook_url?: string;
+  website?: string;
+  tags: string[];
+  extra_links: { label: string; url: string }[];
+  extra_data: Record<string, unknown>;
+  notes?: string;
+  is_active: boolean;
+  visible_on_website: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Event {

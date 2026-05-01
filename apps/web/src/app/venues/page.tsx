@@ -13,6 +13,12 @@ export const metadata: Metadata = {
     description: 'Live music venues in St. Petersburg, FL.',
     url: 'https://www.stpetemusic.live/venues',
   },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@StPeteMusic',
+    creator: '@StPeteMusic',
+    images: ['https://www.stpetemusic.live/images/hero/hero-1.jpg'],
+  },
 };
 
 export default async function VenuesPage() {

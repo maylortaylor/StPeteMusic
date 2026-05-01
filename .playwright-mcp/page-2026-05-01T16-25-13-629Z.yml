@@ -1,0 +1,286 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "StPeteMusic" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "StPeteMusic" [ref=e5]
+      - generic [ref=e6]:
+        - link "Events" [ref=e7] [cursor=pointer]:
+          - /url: /events
+        - link "Discover" [ref=e8] [cursor=pointer]:
+          - /url: /discover
+        - link "Venues" [ref=e9] [cursor=pointer]:
+          - /url: /venues
+        - link "YouTube" [ref=e10] [cursor=pointer]:
+          - /url: https://youtube.com/@StPeteMusic
+  - main [ref=e11]:
+    - generic [ref=e16]:
+      - heading "St. Pete Music — Live Music in St. Petersburg, FL" [level=1] [ref=e17]
+      - paragraph [ref=e18]: St. Petersburg, FL - Community Driven Music
+      - img "St Pete Music" [ref=e20]
+      - paragraph [ref=e21]: Live Music / Local Artists / Real Community
+      - generic [ref=e22]:
+        - link "See Events" [ref=e23] [cursor=pointer]:
+          - /url: https://final-friday.eventbrite.com/
+        - link "Watch on YouTube" [ref=e24] [cursor=pointer]:
+          - /url: https://youtube.com/@StPeteMusic
+        - link "Get Tickets" [ref=e25] [cursor=pointer]:
+          - /url: https://final-friday.eventbrite.com/
+    - generic [ref=e29]:
+      - generic [ref=e30]:
+        - paragraph [ref=e31]: 100+
+        - paragraph [ref=e32]: Shows captured in St. Pete
+      - generic [ref=e33]:
+        - paragraph [ref=e34]: 50+
+        - paragraph [ref=e35]: Local artists documented
+      - generic [ref=e36]:
+        - paragraph [ref=e37]: 10+
+        - paragraph [ref=e38]: Years in the community
+    - generic [ref=e39]:
+      - generic [ref=e40]:
+        - paragraph [ref=e42]: The Scene
+        - generic [ref=e44]:
+          - button "Scroll left" [ref=e45]: ←
+          - button "Scroll right" [ref=e46]: →
+      - generic [ref=e48]:
+        - generic [ref=e49]:
+          - img "Light the Wire" [ref=e50]
+          - paragraph [ref=e53]: Light the Wire
+        - generic [ref=e54]:
+          - img "Katara" [ref=e55]
+          - paragraph [ref=e58]: Katara
+        - generic [ref=e59]:
+          - img "Mouth Council" [ref=e60]
+          - paragraph [ref=e63]: Mouth Council
+        - generic [ref=e64]:
+          - img "Dionysus" [ref=e65]
+          - paragraph [ref=e68]: Dionysus
+        - generic [ref=e69]:
+          - img "Minim" [ref=e70]
+          - paragraph [ref=e73]: Minim
+        - generic [ref=e74]:
+          - img "Kneedz" [ref=e75]
+          - paragraph [ref=e78]: Kneedz
+        - generic [ref=e79]:
+          - img "Suite E" [ref=e80]
+          - paragraph [ref=e83]: Suite E
+        - generic [ref=e84]:
+          - img "Community" [ref=e85]
+          - paragraph [ref=e88]: Community
+        - generic [ref=e89]:
+          - img "Orchestra" [ref=e90]
+          - paragraph [ref=e93]: Orchestra
+        - generic [ref=e94]:
+          - img "Viorica" [ref=e95]
+          - paragraph [ref=e98]: Viorica
+    - generic [ref=e100]:
+      - generic [ref=e101]:
+        - paragraph [ref=e102]: Upcoming
+        - heading "Shows & Events" [level=2] [ref=e104]
+      - generic [ref=e106]:
+        - generic [ref=e107]:
+          - generic [ref=e108]:
+            - paragraph [ref=e109]: Monthly · Last Friday
+            - heading "Final Friday." [level=3] [ref=e110]
+            - paragraph [ref=e112]: Three bands. One night. Suite E Studios. Years of St. Pete music history — live, loud, and local. Every show captured on film. Watch the moments that define this scene.
+            - paragraph [ref=e113]: Suite E Studios · Last Friday Monthly
+            - link "Watch History in the Making" [ref=e114] [cursor=pointer]:
+              - /url: https://www.youtube.com/watch?v=bU_FdDKosbk&list=PL5gTeopOibQREpXSSqHwVaZTWv1EdUuki
+          - generic [ref=e115]:
+            - generic [ref=e116]:
+              - img "Final Friday."
+            - generic:
+              - img "Final Friday."
+        - generic [ref=e117]:
+          - generic [ref=e118]:
+            - paragraph [ref=e119]: Monthly · 4th Wednesday
+            - heading "Final Wednesday." [level=3] [ref=e120]
+            - paragraph [ref=e122]: A community jam session hosted by Prophessor J Events — live instruments, local artists, and real vibes every final Wednesday. $5 to enter. Guitar, drums, bass, piano, mics, and full recording gear provided.
+            - paragraph [ref=e123]: Suite E Studios · 615 27th St S, St. Pete · 7–10pm
+            - generic [ref=e124]: $5 at the door · No reservation needed
+            - generic [ref=e125]:
+              - paragraph [ref=e126]: Presented by Prophessor J Events
+              - generic [ref=e127]:
+                - link "FB Page →" [ref=e128] [cursor=pointer]:
+                  - /url: https://www.facebook.com/profile.php?id=100090049310435
+                - link "FB Community →" [ref=e129] [cursor=pointer]:
+                  - /url: https://www.facebook.com/groups/803946243670033
+          - generic [ref=e131]:
+            - img "Final Wednesday."
+      - link "View Full Calendar →" [ref=e133] [cursor=pointer]:
+        - /url: /events
+    - generic [ref=e135]:
+      - generic [ref=e136]:
+        - generic [ref=e137]:
+          - paragraph [ref=e138]: The Vibe
+          - heading "Real Shows. Real People." [level=2] [ref=e140]:
+            - text: Real Shows.
+            - text: Real People.
+        - link "@StPeteMusic on Instagram →" [ref=e143] [cursor=pointer]:
+          - /url: https://www.instagram.com/StPeteMusic
+      - generic [ref=e144]:
+        - generic [ref=e145]:
+          - img "Final Friday" [ref=e146]
+          - paragraph [ref=e150]: Final Friday
+        - generic [ref=e151]:
+          - img "The Crowd" [ref=e152]
+          - paragraph [ref=e156]: The Crowd
+        - generic [ref=e157]:
+          - img "On Stage" [ref=e158]
+          - paragraph [ref=e162]: On Stage
+        - generic [ref=e163]:
+          - img "Suite E Studios · Warehouse Arts District" [ref=e164]
+          - paragraph [ref=e168]: Suite E Studios · Warehouse Arts District
+    - generic [ref=e170]:
+      - generic [ref=e171]:
+        - generic [ref=e172]:
+          - paragraph [ref=e173]: Latest from the scene
+          - heading "Live at Suite E" [level=2] [ref=e175]
+        - link "All Videos →" [ref=e178] [cursor=pointer]:
+          - /url: https://youtube.com/@StPeteMusic
+      - iframe [ref=e180]:
+        - generic [active] [ref=f1e1]:
+          - generic "YouTube Video Player" [ref=f1e3]
+          - generic [ref=f1e5]:
+            - generic:
+              - generic:
+                - button "Play video" [ref=f1e10] [cursor=pointer]
+                - button "Hide player controls" [ref=f1e12] [cursor=pointer]
+                - generic [ref=f1e14]:
+                  - generic [ref=f1e19]:
+                    - generic [ref=f1e20]:
+                      - 'link "Prophessor J Events Community Jam Sessions\\ at Suite E Studios // 03.25.2026 #StPeteMusic #StPeteFL" [ref=f1e21] [cursor=pointer]':
+                        - /url: https://www.youtube.com/watch?v=bU_FdDKosbk
+                      - link "StPete Music" [ref=f1e22] [cursor=pointer]:
+                        - /url: /channel/UC6AxekRpodWOw--CQEOKh2g
+                        - generic [ref=f1e23]: StPete Music
+                    - generic [ref=f1e24]:
+                      - button [ref=f1e25] [cursor=pointer]
+                      - generic [ref=f1e27]:
+                        - generic: StPete Music
+                        - generic: 359 subscribers
+                  - generic [ref=f1e28]:
+                    - button "Share" [ref=f1e31] [cursor=pointer]:
+                      - generic [ref=f1e35]:
+                        - img
+                    - link "Watch on YouTube" [ref=f1e42] [cursor=pointer]:
+                      - /url: https://www.youtube.com/watch?v=bU_FdDKosbk
+                      - generic [ref=f1e45]:
+                        - text: Watch on
+                        - img [ref=f1e47]:
+                          - generic [ref=f1e49]:
+                            - img
+      - generic [ref=e181]:
+        - link "Feb 7, 2026 Movie Props Suite E Studios Watch →" [ref=e182] [cursor=pointer]:
+          - /url: https://www.youtube.com/live/T_bzHYN_PE4?si=gntKfGPM1Y3Js4n8&t=1323
+          - generic [ref=e183]:
+            - paragraph [ref=e184]: Feb 7, 2026
+            - paragraph [ref=e185]: Movie Props
+            - paragraph [ref=e186]: Suite E Studios
+            - paragraph [ref=e187]: Watch →
+        - link "Feb 7, 2026 Viorica Suite E Studios Watch →" [ref=e188] [cursor=pointer]:
+          - /url: https://www.youtube.com/live/T_bzHYN_PE4?si=PsMFMgo3uTvxvO_8&t=7372
+          - generic [ref=e189]:
+            - paragraph [ref=e190]: Feb 7, 2026
+            - paragraph [ref=e191]: Viorica
+            - paragraph [ref=e192]: Suite E Studios
+            - paragraph [ref=e193]: Watch →
+        - link "Feb 7, 2026 Aliqua Suite E Studios Watch →" [ref=e194] [cursor=pointer]:
+          - /url: https://www.youtube.com/live/T_bzHYN_PE4?si=MK_PmsUF7eJtSrdj&t=3839
+          - generic [ref=e195]:
+            - paragraph [ref=e196]: Feb 7, 2026
+            - paragraph [ref=e197]: Aliqua
+            - paragraph [ref=e198]: Suite E Studios
+            - paragraph [ref=e199]: Watch →
+        - link "Jan 30, 2026 Physical Plant Suite E Studios Watch →" [ref=e200] [cursor=pointer]:
+          - /url: https://youtu.be/TelVx8eCEBk?si=od7jCVzwYS6nJYVj
+          - generic [ref=e201]:
+            - paragraph [ref=e202]: Jan 30, 2026
+            - paragraph [ref=e203]: Physical Plant
+            - paragraph [ref=e204]: Suite E Studios
+            - paragraph [ref=e205]: Watch →
+    - generic [ref=e207]:
+      - paragraph [ref=e208]: Stay in the loop
+      - heading "Don't Miss a Show." [level=2] [ref=e210]:
+        - text: Don't Miss
+        - text: a Show.
+      - paragraph [ref=e212]: Monthly roundup of what's happening in St Pete's music scene, emerging artists in the area, and what you should be excited for.
+      - generic [ref=e214]:
+        - textbox "your@email.com" [ref=e215]
+        - button "Subscribe" [ref=e216]
+      - paragraph [ref=e217]: No spam. Unsubscribe anytime.
+    - generic [ref=e218]:
+      - heading "Find Us Everywhere" [level=2] [ref=e219]:
+        - link "Find Us Everywhere" [ref=e220] [cursor=pointer]:
+          - /url: https://linktr.ee/stpetemusic
+      - list [ref=e222]:
+        - listitem [ref=e223]:
+          - link "FINAL FRIDAY at Suite E Studios" [ref=e224] [cursor=pointer]:
+            - /url: https://final-friday.eventbrite.com/
+            - text: FINAL FRIDAY at Suite E Studios
+            - img [ref=e225]
+        - listitem [ref=e229]:
+          - link "Suite E Studios" [ref=e230] [cursor=pointer]:
+            - /url: https://linktr.ee/suite_e_studios
+            - text: Suite E Studios
+            - img [ref=e231]
+        - listitem [ref=e235]:
+          - link "St Pete Music's Eventbrite" [ref=e236] [cursor=pointer]:
+            - /url: https://www.eventbrite.com/o/st-pete-music-105663485881
+            - text: St Pete Music's Eventbrite
+            - img [ref=e237]
+        - listitem [ref=e241]:
+          - link "🎵 YouTube | St Pete Music 🎵" [ref=e242] [cursor=pointer]:
+            - /url: https://youtube.com/@StPeteMusic?sub_confirmation=1
+            - text: 🎵 YouTube | St Pete Music 🎵
+            - img [ref=e243]
+        - listitem [ref=e247]:
+          - link "🎶🎶Instagram | St Pete 🎶🎶" [ref=e248] [cursor=pointer]:
+            - /url: https://www.instagram.com/StPeteMusic
+            - text: 🎶🎶Instagram | St Pete 🎶🎶
+            - img [ref=e249]
+        - listitem [ref=e253]:
+          - link "🎵🎶Facebook | St Pete Music🎶🎵" [ref=e254] [cursor=pointer]:
+            - /url: https://www.facebook.com/stpeteflmusic/
+            - text: 🎵🎶Facebook | St Pete Music🎶🎵
+            - img [ref=e255]
+      - list "Social media links" [ref=e259]:
+        - listitem [ref=e260]:
+          - link "FACEBOOK" [ref=e261] [cursor=pointer]:
+            - /url: https://www.facebook.com/stpeteflmusic
+        - listitem [ref=e262]:
+          - link "INSTAGRAM" [ref=e263] [cursor=pointer]:
+            - /url: https://instagram.com/StPeteMusic
+        - listitem [ref=e264]:
+          - link "YOUTUBE" [ref=e265] [cursor=pointer]:
+            - /url: https://youtube.com/@stpetemusic
+  - contentinfo [ref=e266]:
+    - generic [ref=e267]:
+      - generic [ref=e268]:
+        - img "StPeteMusic" [ref=e270]
+        - generic [ref=e271]:
+          - paragraph [ref=e272]: St. Petersburg, FL
+          - paragraph [ref=e273]: Community Driven Music
+        - generic [ref=e274]:
+          - generic [ref=e275]:
+            - paragraph [ref=e276]: Follow
+            - generic [ref=e277]:
+              - link "Instagram" [ref=e278] [cursor=pointer]:
+                - /url: https://www.instagram.com/StPeteMusic
+              - link "YouTube" [ref=e279] [cursor=pointer]:
+                - /url: https://youtube.com/@StPeteMusic
+              - link "Facebook" [ref=e280] [cursor=pointer]:
+                - /url: https://www.facebook.com/stpeteflmusic/
+          - generic [ref=e281]:
+            - paragraph [ref=e282]: Friends
+            - generic [ref=e283]:
+              - link "Suite E Studios" [ref=e284] [cursor=pointer]:
+                - /url: https://www.suiteestudios.com
+              - link "Bayboro Brewing" [ref=e285] [cursor=pointer]:
+                - /url: https://www.bayborobrewing.com/
+              - link "Cage Brewing" [ref=e286] [cursor=pointer]:
+                - /url: https://cagebrewing.com/
+      - generic [ref=e287]:
+        - paragraph [ref=e288]: © 2026 StPeteMusic / Suite E Studios
+        - paragraph [ref=e289]: Live Music · Local Artists · Real Community
+  - alert [ref=e290]

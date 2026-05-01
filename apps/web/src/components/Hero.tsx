@@ -68,6 +68,8 @@ export function Hero() {
           className="relative z-10 max-w-6xl mx-auto flex flex-col items-center gap-8"
           style={{ y: contentY, opacity: contentOpacity }}
         >
+          <h1 className="sr-only">St. Pete Music — Live Music in St. Petersburg, FL</h1>
+
           <motion.p
             className="font-inter font-medium text-sm tracking-[0.5em] uppercase text-white/90 mt-40"
             initial={{ opacity: 0, y: 30 }}
