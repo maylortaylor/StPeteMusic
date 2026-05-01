@@ -53,6 +53,12 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@StPeteMusic',
+    creator: '@StPeteMusic',
+    images: ['https://www.stpetemusic.live/images/hero/hero-1.jpg'],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

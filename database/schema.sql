@@ -52,8 +52,8 @@ CREATE TABLE IF NOT EXISTS artists (
   id               UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name             TEXT NOT NULL,
   username         TEXT,                       -- @handle used across platforms
-  type             TEXT NOT NULL               -- Band | Solo Artist | DJ | SR. PRODUCER | Creative | Other
-                   CHECK (type IN ('Band', 'Solo Artist', 'DJ', 'SR. PRODUCER', 'Creative', 'Other')),
+  type             TEXT NOT NULL               -- Band | Solo Artist | DJ | Event Producer | Creative | Other
+                   CHECK (type IN ('Band', 'Solo Artist', 'DJ', 'Event Producer', 'Creative', 'Other')),
   email            BYTEA,
   instagram_handle TEXT,
   instagram_url    TEXT,

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Nav } from '@/components/Nav';
 import { Footer } from '@/components/Footer';
-import { ArtistCard } from '@/components/ArtistCard';
+import { DiscoverClientGrid } from '@/components/DiscoverClientGrid';
 import { getAllArtists } from '@/lib/queries/artists';
 
 export const metadata: Metadata = {
@@ -14,6 +14,12 @@ export const metadata: Metadata = {
     description:
       'Explore bands, DJs, solo artists, and creatives from the greater St. Petersburg, FL area. All genres, all types, no gatekeeping.',
     url: 'https://www.stpetemusic.live/discover',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@StPeteMusic',
+    creator: '@StPeteMusic',
+    images: ['https://www.stpetemusic.live/images/hero/hero-1.jpg'],
   },
 };
 
@@ -70,27 +76,7 @@ export default async function DiscoverPage() {
             </Link>
           </div>
 
-          {/* Artist grid */}
-          {artists.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {artists.map(artist => (
-                <ArtistCard
-                  key={artist.id}
-                  name={artist.name}
-                  slug={artist.slug}
-                  type={artist.type}
-                  instagram_handle={artist.instagram_handle ?? undefined}
-                  genres={artist.genres ?? []}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="border border-border bg-white p-12 text-center">
-              <p className="font-inter text-text-muted text-base">
-                Artist directory coming soon. All genres, all types, no gatekeeping.
-              </p>
-            </div>
-          )}
+          <DiscoverClientGrid artists={artists} />
         </div>
       </main>
       <Footer />
