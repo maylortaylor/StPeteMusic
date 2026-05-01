@@ -33,7 +33,7 @@ resource "aws_amplify_app" "web" {
     LISTMONK_USERNAME         = data.aws_ssm_parameter.listmonk_username.value
     LISTMONK_PASSWORD         = data.aws_ssm_parameter.listmonk_password.value
     # Constructed from existing POSTGRES_USER / POSTGRES_PASSWORD GitHub Secrets.
-    # sslmode=require enforced — RDS is publicly accessible but password + SSL protected.
+    # SSL handled by db.ts (rejectUnauthorized:false for non-localhost connections).
     DATABASE_URL              = "postgresql://${var.db_username}:${var.db_password}@${aws_db_instance.main.address}:5432/n8n"
   }
 
