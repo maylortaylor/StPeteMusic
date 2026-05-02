@@ -9,116 +9,84 @@ Add visitor tracking, click maps, traffic source attribution, and a foundation f
 |---|---|---|
 | **Google Tag Manager (GTM)** | Single script container — manage all tags from a web UI, no future code deploys | Free |
 | **Google Analytics 4 (GA4)** | Page views, sessions, traffic sources, user journeys | Free |
-| **Microsoft Clarity** | Heatmaps, session recordings, click maps | Free |
 
-**Why GTM as the container:** GA4, Clarity, and future ad pixels (Google Ads, Facebook) are all added _inside_ GTM from its web dashboard — no more layout.tsx changes once GTM is wired in. GTM also natively supports Microsoft Clarity as a Community Template tag.
+**Why GTM as the container:** GA4 and future ad pixels (Google Ads, Facebook) are all added _inside_ GTM from its web dashboard — no more layout.tsx changes once GTM is wired in.
 
 ---
 
-## Step 1 — Account Setup (Do this first)
+## Step 1 — Account Setup ✅ COMPLETE
 
-### Google Tag Manager
-1. Go to https://tagmanager.google.com → **Create Account**
-2. Account Name: `StPeteMusic` · Container Name: `stpetemusic.live` · Target platform: **Web**
-3. Copy your **GTM ID** (format: `GTM-XXXXXXX`)
+### Google Tag Manager ✅
+- Account: `StPeteMusic` · Container: `stpetemusic.live`
+- GTM ID: `GTM-WW7MSP3L`
 
-### Google Analytics 4
-1. Go to https://analytics.google.com → **Admin → Create Property**
-2. Property name: `StPeteMusic` · Timezone: `US/Eastern` · Currency: `USD`
-3. Data stream → Web → URL: `https://www.stpetemusic.live`
-4. Copy your **Measurement ID** (format: `G-XXXXXXXXXX`)
-5. In GTM: Tags → New → **Google Analytics: GA4 Configuration** → paste Measurement ID → Trigger: **All Pages** → Save → Publish
+### Google Analytics 4 ✅
+- Measurement ID: `G-RZJP9NFXX4`
+- **TODO (GTM dashboard):** Tags → New → **Google Analytics: GA4 Configuration** → paste `G-RZJP9NFXX4` → Trigger: **All Pages** → Save → Publish
 
 ### Microsoft Clarity
-1. Go to https://clarity.microsoft.com → **Add new project**
-2. Name: `StPeteMusic` · Website: `https://www.stpetemusic.live`
-3. Copy your **Project ID** (6-char alphanumeric like `abc123`)
-4. In GTM: Tags → New → **Community Templates** → search "Microsoft Clarity" → install → paste Project ID → Trigger: **All Pages** → Save → Publish
-
-At this point GTM handles both GA4 and Clarity — **no second script tag needed in your code**.
+- Skipped — not needed.
 
 ---
 
-## Step 2 — Code Changes
+## Step 2 — Code Changes ✅ COMPLETE
 
-### Install the package
+### Installed
 ```bash
 cd apps/web
 npm install @next/third-parties
 ```
 
-### Modify `apps/web/src/app/layout.tsx`
+### `apps/web/src/app/layout.tsx` ✅
+- Added `<GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID} />` inside `<html>`, before `<body>`
+- Renders both the `<head>` script and `<body>` noscript iframe automatically
 
-Add two imports and one component — that's it:
+### `apps/web/src/types/global.d.ts` ✅
+- Added `window.dataLayer` type declaration
 
-```tsx
-import { GoogleTagManager } from '@next/third-parties/google';
-
-// Inside RootLayout, inside <html>:
-export default function RootLayout({ children }) {
-  return (
-    <html lang="en" className={inter.variable}>
-      {process.env.NEXT_PUBLIC_GTM_ID && (
-        <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID} />
-      )}
-      <body ...>
-        {children}
-      </body>
-    </html>
-  );
-}
-```
-
-`GoogleTagManager` from `@next/third-parties` automatically renders both the `<script>` tag in `<head>` and the `<noscript>` iframe fallback in `<body>`.
-
-### Environment variable
-
-Add to `apps/web/.env.local`:
-```
-NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX
-```
-
-### Add to Amplify (critical — build-time, not runtime)
-
-`NEXT_PUBLIC_*` variables are **inlined at build time** by Next.js. They must be present when Amplify runs the build, not just at runtime.
-
-In Amplify Console → App → Environment variables:
-- Add `NEXT_PUBLIC_GTM_ID` = `GTM-XXXXXXX`
-- Set it for the **main** and **develop** branches (or all branches)
-- **Trigger a new build** after adding — existing builds won't pick it up
-
-Also add `NEXT_PUBLIC_GTM_ID` to GitHub Secrets if it's referenced in a CI build workflow.
+### Environment variable ✅
+- `NEXT_PUBLIC_GTM_ID=GTM-WW7MSP3L` added to Amplify Console (main + develop branches)
+- **Trigger a new build** in Amplify if not already done — `NEXT_PUBLIC_*` vars are inlined at build time
 
 ---
 
 ## Step 3 — GTM Tag Configuration
 
-All of this is done in the GTM web dashboard — no code changes:
+All done in the GTM web dashboard — no code changes required.
 
 ### Required tags
-1. **GA4 Configuration** — fires All Pages (set up in Step 1)
-2. **Clarity** — fires All Pages (set up in Step 1)
-3. **GA4 Event: Newsletter Signup** — trigger on custom event `newsletter_signup`
 
-### For future Google Ads (when ready)
-4. **Google Ads Conversion Linker** — fires All Pages — required for cross-domain attribution
-5. **Google Ads Conversion Tracking** — fires on specific conversion events
+#### 1. GA4 Configuration — fires All Pages ✅ COMPLETE
+1. GTM Dashboard → Tags → New
+2. Tag Type: **Google Analytics: GA4 Configuration**
+3. Measurement ID: `G-RZJP9NFXX4`
+4. Trigger: **All Pages**
+5. Save → Publish
 
-### Custom event from the newsletter form
+#### 2. GA4 Event: Newsletter Signup ✅ (code side done — GTM side pending)
+The component already pushes `{ event: 'newsletter_signup' }` to `window.dataLayer` on successful subscribe.
 
-Push to dataLayer in the subscribe form's success handler (in the component that calls `/api/newsletter/subscribe`):
+**Wire it up in GTM:**
 
-```ts
-// After successful subscribe API call:
-window.dataLayer?.push({ event: 'newsletter_signup' });
-```
+**Step A — Create the Trigger:**
+1. GTM Dashboard → Triggers → New
+2. Name: `newsletter_signup`
+3. Trigger type: **Custom Event**
+4. Event name: `newsletter_signup`
+5. Save
 
-Add a TypeScript declaration in `apps/web/src/types/global.d.ts` (or a new file) to avoid type errors:
-```ts
-interface Window {
-  dataLayer: Record<string, unknown>[];
-}
-```
+**Step B — Create the Tag:**
+1. GTM Dashboard → Tags → New
+2. Name: `GA4 Event - Newsletter Signup`
+3. Tag type: **Google Analytics: GA4 Event**
+4. **Configuration Tag:** select `GA4 Configuration - All Pages` (the tag from step 1 above — do NOT enter a Measurement ID here, it is inherited from that tag)
+5. Event name: `newsletter_signup`
+6. Trigger: `newsletter_signup` (the trigger from Step A)
+7. Save → **Publish**
+
+#### 3. Future: Google Ads (when ready)
+- **Google Ads Conversion Linker** — All Pages (required for cross-domain attribution)
+- **Google Ads Conversion Tracking** — fires on specific conversion events
 
 ---
 
@@ -127,8 +95,8 @@ interface Window {
 1. Install [Google Tag Assistant](https://tagassistant.google.com) Chrome extension
 2. Visit https://www.stpetemusic.live → Tag Assistant should confirm GTM is firing
 3. GA4 → **Realtime** report → visit the site in another tab — your session should appear within seconds
-4. Clarity → wait ~24 hours → heatmaps and session recordings will appear
-5. DevTools Network tab → filter by `googletagmanager.com` and `clarity.ms` to confirm requests fire
+4. To test the newsletter event: submit the newsletter form, then check GA4 Realtime → Events for `newsletter_signup`
+5. DevTools Network tab → filter by `googletagmanager.com` to confirm requests fire
 
 ---
 
@@ -147,8 +115,8 @@ No additional code changes to the app needed.
 
 | File | Change |
 |---|---|
-| `apps/web/package.json` | Add `@next/third-parties` dependency |
-| `apps/web/src/app/layout.tsx` | Add `<GoogleTagManager>` component |
-| `apps/web/.env.local` | Add `NEXT_PUBLIC_GTM_ID` |
-| `apps/web/src/types/global.d.ts` | Add `window.dataLayer` type (optional but clean) |
-| Amplify Console | Add `NEXT_PUBLIC_GTM_ID` env var + trigger rebuild |
+| `apps/web/package.json` | Added `@next/third-parties` |
+| `apps/web/src/app/layout.tsx` | Added `<GoogleTagManager>` component |
+| `apps/web/src/components/NewsletterSignup.tsx` | Added `window.dataLayer.push` on successful subscribe |
+| `apps/web/src/types/global.d.ts` | Added `window.dataLayer` type |
+| Amplify Console | Added `NEXT_PUBLIC_GTM_ID=GTM-WW7MSP3L` env var |
