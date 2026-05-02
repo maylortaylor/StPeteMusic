@@ -2,7 +2,7 @@
 
 **Purpose:** Centralized hub for all @StPeteMusic brand tools, automation, and infrastructure. Houses n8n workflows, documentation, and supporting tools for managing social media, events, and community engagement in St. Petersburg, FL.
 
-**Live n8n instance:** https://n8n-stpetemusic.duckdns.org
+**Live n8n instance:** https://n8n.stpetemusic.live
 
 ---
 
@@ -50,9 +50,26 @@
 ├── data/                            # Data archives (gitignored)
 │
 └── docs/                            # Project documentation
-    ├── AWS_DEPLOYMENT.md            # Step-by-step AWS deployment guide
-    ├── OBSIDIAN_DATAVIEW_QUERIES.md
-    └── YOUTUBE_SHORTS_*.md
+    ├── plans/                       # Project planning & roadmaps
+    │   ├── ROADMAP.md               # Master roadmap (authoritative)
+    │   ├── ANALYTICS_PLAN.md         # Google Analytics GA4 + GTM setup
+    │   └── SEO_ACTION_PLAN.md        # Local SEO & content strategy
+    ├── infrastructure/              # AWS deployment & configuration
+    │   ├── EC2_SETUP.md             # Step-by-step EC2 setup
+    │   ├── DNS_CLOUDFLARE.md        # Domain setup & SSL cert
+    │   └── SERVER_OPERATIONS.md     # Production commands & troubleshooting
+    ├── workflows/                   # n8n workflow documentation
+    │   ├── YOUTUBE_SHORTS_README.md
+    │   ├── YOUTUBE_SHORTS_SETUP.md
+    │   ├── YOUTUBE_SHORTS_QUICK_REFERENCE.md
+    │   ├── YOUTUBE_SHORTS_USAGE_GUIDE.md
+    │   └── OBSIDIAN_DATAVIEW_QUERIES.md
+    ├── incidents/                   # Historical incident reports
+    │   ├── EC2_OOM_2026-04-28.md
+    │   └── LISTMONK_CREDS_2026-04-30.md
+    └── integrations/                # Third-party integrations
+        ├── WORDPRESS_LINKTREE.md
+        └── BRAND_GUIDE.md
 ```
 
 ---
@@ -63,14 +80,14 @@ All AWS resources are managed with **Terraform** — see `infrastructure/`. **Ne
 
 | Resource | Value |
 |---|---|
-| n8n URL | https://n8n-stpetemusic.duckdns.org |
-| Server | AWS EC2 t3.micro, `us-east-1`, IP `54.235.171.182` |
+| n8n URL | https://n8n.stpetemusic.live |
+| Server | AWS EC2 t3.small, `us-east-1`, IP `54.235.171.182` |
 | SSH Key | `~/.ssh/stpetemusic-n8n.pem` |
-| DNS | DuckDNS (migrating to Cloudflare `stpetemusic.com` in Phase 1) |
-| SSL | Let's Encrypt (auto-renews) |
+| DNS | Cloudflare for `stpetemusic.live` |
+| SSL | AWS ACM (auto-managed by Amplify) |
 | Database | PostgreSQL 16 (Docker on EC2) |
 
-> Quick reference: `AWS_SETUP.md` | Step-by-step from scratch: `docs/AWS_DEPLOYMENT.md`
+> Quick reference: `docs/infrastructure/SERVER_OPERATIONS.md` | Step-by-step setup: `docs/infrastructure/EC2_SETUP.md`
 
 ### AWS Console — Quick Links
 
@@ -166,7 +183,7 @@ docker-compose down
 
 ```bash
 # SSH into server
-ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n-stpetemusic.duckdns.org
+ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n.stpetemusic.live
 
 # View n8n logs
 docker logs -f n8n
@@ -180,7 +197,7 @@ cd ~/stpetemusic/n8n
 docker-compose -f docker-compose.prod.yaml --env-file ../.env up -d
 ```
 
-See `AWS_SETUP.md` for full production reference.
+See `docs/infrastructure/SERVER_OPERATIONS.md` for full production reference.
 
 ---
 
@@ -216,7 +233,7 @@ See `AWS_SETUP.md` for full production reference.
 When setting up OAuth credentials (YouTube, Instagram, Facebook) in n8n or Google/Meta Developer portals, use this callback URL:
 
 ```
-https://n8n-stpetemusic.duckdns.org/rest/oauth2-credential/callback
+https://n8n.stpetemusic.live/rest/oauth2-credential/callback
 ```
 
 ---
