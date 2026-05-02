@@ -33,6 +33,7 @@ export function EventsPageClient({ months }: EventsPageClientProps) {
     if (window.innerWidth < 768) setViewMode('list');
   }, []);
 
+
   const currentMonth = months[activeMonthIdx];
 
   const filteredEvents = currentMonth.events.filter(event => {
