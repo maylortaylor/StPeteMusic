@@ -101,21 +101,15 @@ export interface Organization {
 
 export interface Event {
   id: string;
+  google_event_id: string;
   title: string;
-  eventDate: string;
-  doorsTime?: string;
-  venueId: string;
-  venue?: Venue;
-  performers: Array<{
-    artistId: string;
-    artist?: Artist;
-    headline: boolean;
-  }>;
-  ticketUrl?: string;
-  coverCharge?: number;
-  description?: string;
-  imageUrl?: string;
-  eventType: 'Final Friday' | 'Instant Noodles' | 'Second Saturday' | 'Other';
+  description: string | null;
+  start_time: string;
+  end_time: string | null;
+  location: string | null;
+  tag: string | null;
+  ticket_url: string | null;
+  performers: Artist[];
 }
 
 export interface Post {

@@ -8,11 +8,11 @@ import { getAllArtists } from '@/lib/queries/artists';
 export const metadata: Metadata = {
   title: 'Discover St. Pete Artists',
   description:
-    'Explore bands, DJs, solo artists, and creatives from the greater St. Petersburg, FL area. All genres, all types, no gatekeeping.',
+    'Explore bands, DJs, solo artists, and creatives from the greater St. Petersburg, FL area. All genres, all types, our growing community.',
   openGraph: {
     title: 'St. Pete Music | Discover St. Pete Artists',
     description:
-      'Explore bands, DJs, solo artists, and creatives from the greater St. Petersburg, FL area. All genres, all types, no gatekeeping.',
+      'Explore bands, DJs, solo artists, and creatives from the greater St. Petersburg, FL area. All genres, all types, our growing community.',
     url: 'https://www.stpetemusic.live/discover',
   },
   twitter: {
