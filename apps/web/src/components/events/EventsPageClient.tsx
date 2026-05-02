@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Event } from '@stpetemusic/types';
 import type { EventTagSlug } from '@/lib/eventTags';
 import { isEventTagSlug } from '@/lib/eventTags';
@@ -28,6 +28,10 @@ export function EventsPageClient({ months }: EventsPageClientProps) {
   const [activeTag, setActiveTag] = useState<EventTagSlug | 'ALL'>('ALL');
   const [viewMode, setViewMode] = useState<ViewMode>('calendar');
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+
+  useEffect(() => {
+    if (window.innerWidth < 768) setViewMode('list');
+  }, []);
 
   const currentMonth = months[activeMonthIdx];
 
