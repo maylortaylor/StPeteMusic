@@ -1,0 +1,83 @@
+{
+  "name": "gcal-to-db-sync",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 96
+            }
+          ]
+        }
+      },
+      "id": "cron-trigger",
+      "name": "Every 96 Hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "resource": "event",
+        "operation": "getAll",
+        "calendarId": "suite.e.stpete@gmail.com",
+        "returnAll": true,
+        "options": {
+          "timeMin": "={{ $now.startOf('month').toISO() }}",
+          "timeMax": "={{ $now.plus(2, 'months').endOf('month').toISO() }}",
+          "singleEvents": true,
+          "orderBy": "startTime"
+        }
+      },
+      "id": "gcal-list",
+      "name": "Get Calendar Events",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [200, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse each Google Calendar event and build the upsert SQL inline.\n// Embedding values directly avoids n8n queryReplacement quirks.\n\nfunction esc(v) {\n  // Escape a value for safe inclusion in a SQL string literal.\n  if (v === null || v === undefined) return 'NULL';\n  return \"'\" + String(v).replace(/'/g, \"''\") + \"'\";\n}\n\nfunction stripHtml(html) {\n  if (!html) return null;\n  return html\n    .replace(/<br\\s*\\/?>/gi, '\\n')\n    .replace(/<\\/li>/gi, '\\n')\n    .replace(/<\\/p>/gi, '\\n')\n    .replace(/<[^>]+>/g, '')\n    .replace(/&amp;/g, '&')\n    .replace(/&lt;/g, '<')\n    .replace(/&gt;/g, '>')\n    .replace(/&quot;/g, '\"')\n    .replace(/&#39;/g, \"'\")\n    .replace(/&nbsp;/g, ' ')\n    .replace(/\\n{3,}/g, '\\n\\n')\n    .trim() || null;\n}\n\nconst items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  const ev = item.json;\n\n  // Skip all-day events (no dateTime) and untitled events\n  if (!ev.start?.dateTime) continue;\n  const title = (ev.summary || '').trim();\n  if (!title) continue;\n\n  const description = stripHtml(ev.description);\n  const titleLower = title.toLowerCase();\n  // Use raw description for tag/ticket parsing before HTML is stripped from those lines\n  const rawDesc = (ev.description || '');\n\n  // Auto-detect tag from title\n  let tag = null;\n  if (titleLower.includes('final friday')) {\n    tag = 'final-friday';\n  } else if (titleLower.includes('open house') || titleLower.includes('ohc')) {\n    tag = 'ohc';\n  } else if (titleLower.includes('instant noodles') || titleLower.includes('community jam')) {\n    tag = 'community-jam';\n  } else if (titleLower.includes('art walk') || titleLower.includes('second saturday') || titleLower.includes('2nd saturday')) {\n    tag = 'art-walk';\n  } else if (titleLower.includes('workshop') || titleLower.includes('class')) {\n    tag = 'workshop-class';\n  } else {\n    const tagsMatch = rawDesc.match(/^tags:\\s*(.+)$/im);\n    if (tagsMatch) tag = tagsMatch[1].trim().split(',')[0].trim();\n  }\n\n  // Parse tickets: url from raw description\n  let ticketUrl = null;\n  const ticketsMatch = rawDesc.match(/^tickets:\\s*(https?:\\/\\/\\S+)$/im);\n  if (ticketsMatch) ticketUrl = ticketsMatch[1].trim();\n\n  const googleEventId = ev.id;\n  const startTime = ev.start.dateTime;\n  const endTime = ev.end?.dateTime || null;\n  const location = ev.location || null;\n  const desc = description;\n\n  const sql = `\nINSERT INTO events (\n  google_event_id, title, description, start_time, end_time,\n  location, tag, ticket_url, is_active, synced_at\n) VALUES (\n  ${esc(googleEventId)}, ${esc(title)}, ${esc(desc)},\n  ${esc(startTime)}::TIMESTAMPTZ, ${esc(endTime) === 'NULL' ? 'NULL' : esc(endTime) + '::TIMESTAMPTZ'},\n  ${esc(location)}, ${esc(tag)}, ${esc(ticketUrl)}, true, NOW()\n)\nON CONFLICT (google_event_id) DO UPDATE SET\n  title       = EXCLUDED.title,\n  description = EXCLUDED.description,\n  start_time  = EXCLUDED.start_time,\n  end_time    = EXCLUDED.end_time,\n  location    = EXCLUDED.location,\n  tag         = EXCLUDED.tag,\n  ticket_url  = EXCLUDED.ticket_url,\n  is_active   = true,\n  synced_at   = NOW()\nRETURNING id, google_event_id, title\n`.trim();\n\n  results.push({ json: { sql, title, tag } });\n}\n\nreturn results;\n"
+      },
+      "id": "parse-events",
+      "name": "Parse Events",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [400, 0]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $json.sql }}",
+        "options": {}
+      },
+      "id": "upsert-event",
+      "name": "Upsert Event",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [600, 0]
+    }
+  ],
+  "connections": {
+    "Every 96 Hours": {
+      "main": [[{ "node": "Get Calendar Events", "type": "main", "index": 0 }]]
+    },
+    "Get Calendar Events": {
+      "main": [[{ "node": "Parse Events", "type": "main", "index": 0 }]]
+    },
+    "Parse Events": {
+      "main": [[{ "node": "Upsert Event", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    { "name": "StPeteMusic" }
+  ],
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

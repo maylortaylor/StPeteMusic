@@ -9,7 +9,7 @@ How the custom domain is wired: **Cloudflare DNS → AWS Amplify → ACM SSL cer
 ```
 Browser
   → stpetemusic.live (Cloudflare DNS)
-    → d3vawaunbp8pn9.cloudfront.net (Amplify CloudFront)
+    → d35nc2e8nr92q9.cloudfront.net (Amplify CloudFront)
       → AWS Amplify app (stpetemusic-web)
         → Next.js SSR on WEB_COMPUTE
 ```
@@ -24,7 +24,7 @@ Browser
 - **Production URL (default):** `https://main.d1fjwgk99cbqor.amplifyapp.com`
 - **Staging URL (default):** `https://develop.d1fjwgk99cbqor.amplifyapp.com`
 - **Custom domain:** `stpetemusic.live`
-- **CloudFront target:** `d3vawaunbp8pn9.cloudfront.net`
+- **CloudFront target:** `d35nc2e8nr92q9.cloudfront.net`
 - **SSL:** Amplify managed certificate (via ACM)
 
 ### IAM role required for custom domain
@@ -49,8 +49,8 @@ All records for `stpetemusic.live`. Managed at **dash.cloudflare.com**.
 
 | Type | Name | Value | Proxy |
 |------|------|-------|-------|
-| CNAME | `www` | `d3vawaunbp8pn9.cloudfront.net` | DNS only (grey) |
-| CNAME | `@` | `d3vawaunbp8pn9.cloudfront.net` | DNS only (grey) |
+| CNAME | `www` | `d35nc2e8nr92q9.cloudfront.net` | DNS only (grey) |
+| CNAME | `@` | `d35nc2e8nr92q9.cloudfront.net` | DNS only (grey) |
 | CNAME | `_ddf1b33c5eab2d60eddc95848a12d240` | `_bf19e363018afabe1b2e49737993dac9.jkddzztszm.acm-validations.aws` | DNS only (grey — always) |
 
 > The `_ddf1b33c...` record is the ACM SSL verification record. It must stay **forever** (Amplify uses it to renew the cert automatically). Never delete it.
@@ -112,5 +112,5 @@ Leave the `_ddf1b33c...` verification record as DNS only forever.
 → Cloudflare CNAME flattening should handle apex automatically. Verify the `@` record exists.
 
 **CloudFront target changed**
-→ If you ever delete and recreate the Amplify app, the CloudFront URL (`d3vawaunbp8pn9...`) will change.
+→ If you ever delete and recreate the Amplify app, the CloudFront URL (`d35nc2e8nr92q9...`) will change.
 → Update all CNAME values in Cloudflare to the new target shown in Amplify's DNS records table.
