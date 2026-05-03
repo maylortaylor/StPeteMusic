@@ -2,6 +2,7 @@
 
 import type { Event } from '@stpetemusic/types';
 import { EVENT_TAGS, isEventTagSlug } from '@/lib/eventTags';
+import { VENUES, isVenueSlug } from '@/lib/venues';
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -74,21 +75,19 @@ export function CalendarGrid({ year, month, events, onEventClick }: CalendarGrid
                   </span>
                   <div className="flex flex-col gap-0.5">
                     {dayEvents.map(event => {
+                      const venueConfig =
+                        event.venue && isVenueSlug(event.venue) ? VENUES[event.venue] : null;
                       const tagConfig =
-                        event.tag && isEventTagSlug(event.tag)
-                          ? EVENT_TAGS[event.tag]
-                          : null;
+                        event.tag && isEventTagSlug(event.tag) ? EVENT_TAGS[event.tag] : null;
+                      // Venue color takes priority; fall back to tag color
+                      const bgColor = venueConfig?.color ?? tagConfig?.hex ?? '#6B7280';
                       return (
                         <button
                           key={event.id}
                           onClick={() => onEventClick(event)}
                           className="w-full text-left font-inter text-[10px] sm:text-xs font-medium px-1.5 py-0.5 rounded truncate leading-tight hover:opacity-80 transition-opacity"
-                          style={
-                            tagConfig
-                              ? { backgroundColor: tagConfig.hex, color: tagConfig.textColor }
-                              : { backgroundColor: '#6B7280', color: 'white' }
-                          }
-                          title={event.title}
+                          style={{ backgroundColor: bgColor, color: 'white' }}
+                          title={`${venueConfig ? venueConfig.name + ' · ' : ''}${event.title}`}
                         >
                           {event.title}
                         </button>

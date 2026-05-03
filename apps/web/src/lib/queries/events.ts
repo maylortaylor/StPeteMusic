@@ -12,6 +12,7 @@ interface EventRow {
   location: string | null;
   tag: string | null;
   ticket_url: string | null;
+  venue: string | null;
   performers: string; // JSON string from DB
 }
 
@@ -41,6 +42,7 @@ async function _getEventsForMonths(specs: MonthSpec[]): Promise<Event[]> {
       e.location,
       e.tag,
       e.ticket_url,
+      e.venue,
       COALESCE(
         json_agg(
           json_build_object(

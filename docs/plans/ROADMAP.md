@@ -93,6 +93,7 @@
 | Component | Phase |
 |---|---|
 | Import newsletter n8n workflows + set up Google Sheets + Listmonk credentials | Phase 1.5 |
+| **Consolidate Google Cloud projects** — YouTube OAuth + Google Calendar n8n credential currently live in separate GCP projects under `theburgmusic@gmail.com`. Merge into one project, enable both APIs (YouTube Data API v3 + Google Calendar API), update `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` GitHub Secrets, and re-authorize n8n credentials | Tech Debt |
 | S3 media bucket for images/video | Phase 2 |
 | Payload CMS (`apps/cms/`) | Phase 2 |
 | Real event/artist data from CMS | Phase 2 |
@@ -299,6 +300,7 @@ Also: uncomment `aws_s3_bucket.listmonk_media` in `infrastructure/backup.tf` to 
 | **Database** | RDS PostgreSQL db.t4g.micro | Moved off EC2 Docker for durability + managed backups; free tier eligible Y1 |
 | **Linktree API** | Lambda + DynamoDB + API Gateway | ~$0/mo, serverless, no EC2 RAM impact, hourly scrape |
 | **Design system** | DESIGN.md | Plain-text brand system AI reads for consistent UI generation |
+| **Google Cloud** | Multiple projects (fragmented) | YouTube OAuth uses one GCP project; Google Calendar n8n credential uses a second. Consolidate into one project — see *Not Yet Started* below |
 
 ---
 

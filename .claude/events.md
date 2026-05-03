@@ -1,6 +1,6 @@
 ---
 topic: events
-triggers: event, final friday, instant noodles, content, post, caption, hashtag, promotion
+triggers: event, final friday, instant noodles, content, post, caption, hashtag, promotion, art walk, second saturday, jam, band, schedule
 updated: 2026-04-30
 ---
 

@@ -109,6 +109,7 @@ export interface Event {
   location: string | null;
   tag: string | null;
   ticket_url: string | null;
+  venue: string | null;
   performers: Artist[];
 }
 

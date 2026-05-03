@@ -1,6 +1,6 @@
 ---
 topic: infrastructure
-triggers: aws, amplify, dns, cloudflare, tofu, terraform, ec2, tailscale, hosting, deploy
+triggers: aws, amplify, dns, cloudflare, tofu, terraform, ec2, tailscale, hosting, deploy, branch, git, listmonk, newsletter, ssl, ci, cd
 updated: 2026-04-30
 ---
 

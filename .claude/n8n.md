@@ -1,6 +1,6 @@
 ---
 topic: n8n
-triggers: n8n, workflow, automation, obsidian, youtube, instagram, facebook, social post, posting
+triggers: n8n, workflow, automation, obsidian, youtube, instagram, facebook, social post, posting, google drive, drive, video, reel, publish
 updated: 2026-04-30
 ---
 

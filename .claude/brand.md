@@ -1,6 +1,6 @@
 ---
 topic: brand
-triggers: brand, team, @stpetemusic, suite e, tangent, social, links, owners, google account
+triggers: brand, team, @stpetemusic, suite e, tangent, social, links, owners, google account, ig, fb, instagram, facebook, youtube, eventbrite
 updated: 2026-04-30
 ---
 
