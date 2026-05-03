@@ -2,6 +2,7 @@
 
 import type { Event } from '@stpetemusic/types';
 import { EVENT_TAGS, isEventTagSlug } from '@/lib/eventTags';
+import { VENUES, isVenueSlug } from '@/lib/venues';
 
 function formatDateHeader(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', {
@@ -66,6 +67,8 @@ export function ListView({ events, onEventClick }: ListViewProps) {
             {group.events.map(event => {
               const tagConfig =
                 event.tag && isEventTagSlug(event.tag) ? EVENT_TAGS[event.tag] : null;
+              const venueConfig =
+                event.venue && isVenueSlug(event.venue) ? VENUES[event.venue] : null;
               return (
                 <button
                   key={event.id}
@@ -73,21 +76,31 @@ export function ListView({ events, onEventClick }: ListViewProps) {
                   className="w-full text-left bg-white border border-border hover:border-black transition-colors duration-150 p-5 group"
                 >
                   <div className="flex items-start gap-3">
-                    {/* Color bar */}
+                    {/* Color bar — venue color takes priority */}
                     <div
                       className="w-1 self-stretch rounded-full flex-shrink-0 mt-0.5"
-                      style={{ backgroundColor: tagConfig?.hex ?? '#6B7280' }}
+                      style={{ backgroundColor: venueConfig?.color ?? tagConfig?.hex ?? '#6B7280' }}
                     />
                     <div className="flex-1 min-w-0">
-                      {/* Tag label */}
-                      {tagConfig && (
-                        <p
-                          className="font-inter text-xs uppercase tracking-widest font-medium mb-1"
-                          style={{ color: tagConfig.hex }}
-                        >
-                          {tagConfig.label}
-                        </p>
-                      )}
+                      {/* Venue + tag label row */}
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        {venueConfig && (
+                          <span
+                            className="font-inter text-[10px] uppercase tracking-widest font-semibold px-2 py-0.5 rounded-full"
+                            style={{ backgroundColor: venueConfig.color + '1a', color: venueConfig.color }}
+                          >
+                            {venueConfig.name}
+                          </span>
+                        )}
+                        {tagConfig && (
+                          <p
+                            className="font-inter text-xs uppercase tracking-widest font-medium"
+                            style={{ color: tagConfig.hex }}
+                          >
+                            {tagConfig.label}
+                          </p>
+                        )}
+                      </div>
                       {/* Title */}
                       <h4 className="font-inter font-black text-base uppercase text-black group-hover:opacity-70 transition-opacity mb-1 truncate">
                         {event.title}

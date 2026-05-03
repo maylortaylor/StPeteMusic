@@ -11,7 +11,11 @@ interface TagFilterChipsProps {
 
 export function TagFilterChips({ activeTag, onChange, availableTags }: TagFilterChipsProps) {
   return (
-    <div className="flex flex-wrap gap-2 mb-6">
+    <div className="mb-6">
+      <p className="font-inter text-[10px] uppercase tracking-[0.2em] text-text-muted mb-2">
+        Event type
+      </p>
+    <div className="flex flex-wrap gap-2">
       {/* ALL chip */}
       <button
         onClick={() => onChange('ALL')}
@@ -48,6 +52,7 @@ export function TagFilterChips({ activeTag, onChange, availableTags }: TagFilter
           );
         },
       )}
+    </div>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Event } from '@stpetemusic/types';
 import { EVENT_TAGS, isEventTagSlug } from '@/lib/eventTags';
+import { VENUES, isVenueSlug } from '@/lib/venues';
 
 interface EventModalProps {
   event: Event | null;
@@ -51,6 +52,7 @@ export function EventModal({ event, onClose }: EventModalProps) {
   }, [event]);
 
   const tag = event?.tag && isEventTagSlug(event.tag) ? EVENT_TAGS[event.tag] : null;
+  const venue = event?.venue && isVenueSlug(event.venue) ? VENUES[event.venue] : null;
 
   return (
     <AnimatePresence>
@@ -88,15 +90,25 @@ export function EventModal({ event, onClose }: EventModalProps) {
             </div>
 
             <div className="p-6 pt-4">
-              {/* Tag chip */}
-              {tag && (
-                <span
-                  className="inline-block font-inter text-xs uppercase tracking-widest px-3 py-1 rounded-full mb-4"
-                  style={{ backgroundColor: tag.hex, color: tag.textColor }}
-                >
-                  {tag.label}
-                </span>
-              )}
+              {/* Venue + tag chips row */}
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                {venue && (
+                  <span
+                    className="inline-block font-inter text-xs uppercase tracking-widest px-3 py-1 rounded-full font-semibold"
+                    style={{ backgroundColor: venue.color, color: 'white' }}
+                  >
+                    {venue.name}
+                  </span>
+                )}
+                {tag && (
+                  <span
+                    className="inline-block font-inter text-xs uppercase tracking-widest px-3 py-1 rounded-full"
+                    style={{ backgroundColor: tag.hex, color: tag.textColor }}
+                  >
+                    {tag.label}
+                  </span>
+                )}
+              </div>
 
               {/* Title */}
               <h2 className="font-inter font-black text-2xl uppercase text-black leading-tight mb-4">
