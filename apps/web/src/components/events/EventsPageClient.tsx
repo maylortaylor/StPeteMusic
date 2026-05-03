@@ -4,7 +4,10 @@ import { useState, useEffect } from 'react';
 import type { Event } from '@stpetemusic/types';
 import type { EventTagSlug } from '@/lib/eventTags';
 import { isEventTagSlug } from '@/lib/eventTags';
+import type { VenueSlug } from '@/lib/venues';
+import { isVenueSlug } from '@/lib/venues';
 import { MonthTabs } from './MonthTabs';
+import { VenueFilterRow } from './VenueFilterRow';
 import { TagFilterChips } from './TagFilterChips';
 import { CalendarGrid } from './CalendarGrid';
 import { ListView } from './ListView';
@@ -25,6 +28,7 @@ interface EventsPageClientProps {
 
 export function EventsPageClient({ months }: EventsPageClientProps) {
   const [activeMonthIdx, setActiveMonthIdx] = useState(0);
+  const [activeVenue, setActiveVenue] = useState<VenueSlug | 'ALL'>('ALL');
   const [activeTag, setActiveTag] = useState<EventTagSlug | 'ALL'>('ALL');
   const [viewMode, setViewMode] = useState<ViewMode>('calendar');
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -33,17 +37,28 @@ export function EventsPageClient({ months }: EventsPageClientProps) {
     if (window.innerWidth < 768) setViewMode('list');
   }, []);
 
-
   const currentMonth = months[activeMonthIdx];
 
   const filteredEvents = currentMonth.events.filter(event => {
-    if (activeTag === 'ALL') return true;
-    return event.tag === activeTag;
+    const venueMatch = activeVenue === 'ALL' || event.venue === activeVenue;
+    const tagMatch = activeTag === 'ALL' || event.tag === activeTag;
+    return venueMatch && tagMatch;
   });
 
-  // Only show tags that have at least one event in this month
-  const availableTags = new Set(
+  // Only show venues that have at least one event in this month
+  const availableVenues = new Set(
     currentMonth.events
+      .map(e => e.venue)
+      .filter((v): v is string => v !== null && isVenueSlug(v)),
+  );
+
+  // Only show tags that have at least one event in this month (respecting active venue filter)
+  const eventsForTagCounting = activeVenue === 'ALL'
+    ? currentMonth.events
+    : currentMonth.events.filter(e => e.venue === activeVenue);
+
+  const availableTags = new Set(
+    eventsForTagCounting
       .map(e => e.tag)
       .filter((t): t is string => t !== null && isEventTagSlug(t)),
   );
@@ -56,8 +71,19 @@ export function EventsPageClient({ months }: EventsPageClientProps) {
         active={activeMonthIdx}
         onChange={idx => {
           setActiveMonthIdx(idx);
+          setActiveVenue('ALL');
           setActiveTag('ALL');
         }}
+      />
+
+      {/* Venue filter row */}
+      <VenueFilterRow
+        active={activeVenue}
+        onChange={slug => {
+          setActiveVenue(slug);
+          setActiveTag('ALL');
+        }}
+        availableVenues={availableVenues}
       />
 
       {/* Tag filter chips */}

@@ -50,7 +50,20 @@
       "mcp__plugin_playwright_playwright__browser_fill_form",
       "mcp__plugin_playwright_playwright__browser_click",
       "mcp__plugin_playwright_playwright__browser_wait_for",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(npx tsc:*)",
+      "WebSearch",
+      "Bash(docker run:*)",
+      "Read(//root/**)",
+      "Read(//root/Desktop/**)",
+      "Read(//workspace/**)",
+      "Bash(PGPASSWORD=* psql:*)",
+      "Bash(GH_TOKEN=$\\(git config --get credential.helper 2>/dev/null || echo \"\"\\) git push origin develop)",
+      "Bash(apt list:*)",
+      "Bash(apt-get install:*)",
+      "Bash(apt-get update:*)",
+      "Bash(ffprobe -v quiet -show_streams -select_streams v:0 -show_format /workspace/StPeteMusic/apps/web/public/videos/hero.mp4)",
+      "Bash(gh api:*)"
     ]
   }
 }

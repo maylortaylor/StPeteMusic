@@ -1,6 +1,6 @@
 ---
 topic: secrets
-triggers: secret, token, env, github secret, rotate, credential, password, api key, ig_access_token
+triggers: secret, token, env, github secret, rotate, credential, password, api key, ig_access_token, env var, listmonk, environment variable
 updated: 2026-04-30
 ---
 
