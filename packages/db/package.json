@@ -1,0 +1,35 @@
+{
+  "name": "@stpetemusic/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "default": "./dist/schema.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "db:introspect": "drizzle-kit introspect:pg",
+    "db:generate": "drizzle-kit generate:pg",
+    "db:push": "drizzle-kit push:pg"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.31.2",
+    "pg": "^8.20.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "@types/pg": "^8.20.0",
+    "drizzle-kit": "^0.20.17",
+    "typescript": "^6"
+  }
+}
