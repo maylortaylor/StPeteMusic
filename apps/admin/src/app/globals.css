@@ -1,5 +1,34 @@
 @import 'tailwindcss';
-@config "../../tailwind.config.ts";
+
+/* Tailwind v4: dark mode via .dark class */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Tailwind v4: map CSS variables to utility classes */
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --font-sans: var(--font-sans, ui-sans-serif), system-ui, sans-serif;
+}
 
 @layer base {
   :root {
@@ -11,16 +40,16 @@
     --popover-foreground: 0 0% 3.6%;
     --muted: 0 0% 96.1%;
     --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 9.0%;
+    --accent: 0 0% 9%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
-    --primary: 0 0% 9.0%;
+    --primary: 0 0% 9%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9.0%;
+    --secondary-foreground: 0 0% 9%;
     --ring: 0 0% 3.6%;
     --radius: 0.5rem;
   }
@@ -35,20 +64,18 @@
     --muted: 0 0% 14.9%;
     --muted-foreground: 0 0% 63.9%;
     --accent: 0 0% 98.2%;
-    --accent-foreground: 0 0% 9.0%;
+    --accent-foreground: 0 0% 9%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98.2%;
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
     --primary: 0 0% 98.2%;
-    --primary-foreground: 0 0% 9.0%;
+    --primary-foreground: 0 0% 9%;
     --secondary: 0 0% 14.9%;
     --secondary-foreground: 0 0% 98.2%;
     --ring: 0 0% 83.1%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
