@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { AnimateIn } from './AnimateIn';
+import { pushEvent } from '@/lib/analytics';
 
 export function ContactSection() {
   const [name, setName] = useState('');
@@ -31,6 +32,7 @@ export function ContactSection() {
       });
 
       if (res.ok) {
+        pushEvent('contact_form_submit');
         setStatus('success');
         setName('');
         setEmail('');

@@ -3,6 +3,7 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { AnimateIn } from './AnimateIn';
+import { pushEvent } from '@/lib/analytics';
 
 const ARTISTS = [
   { artist: 'Movie Props',    date: 'Feb 7, 2026',  accent: '#B57048', youtubeUrl: 'https://www.youtube.com/live/T_bzHYN_PE4?si=gntKfGPM1Y3Js4n8&t=1323' },
@@ -64,6 +65,7 @@ export function YouTubeGrid() {
               href="https://youtube.com/@StPeteMusic"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => pushEvent('outbound_link_click', { link_url: 'https://youtube.com/@StPeteMusic', link_text: 'All Videos' })}
               className="font-inter font-bold text-sm uppercase tracking-widest px-8 py-3 bg-black text-white hover:opacity-85 transition-opacity shrink-0"
             >
               All Videos →
@@ -80,6 +82,10 @@ export function YouTubeGrid() {
               href={v.youtubeUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                pushEvent('video_engage', { video_title: v.artist, video_url: v.youtubeUrl });
+                pushEvent('outbound_link_click', { link_url: v.youtubeUrl, link_text: v.artist });
+              }}
               className="block"
             >
               <AnimateIn

@@ -1,22 +1,23 @@
-/** @format */
+'use client';
 
-import Image from "next/image";
+import Image from 'next/image';
+import { pushEvent } from '@/lib/analytics';
 
 const COLUMNS = [
   {
-    heading: "Follow",
+    heading: 'Follow',
     links: [
-      { label: "Instagram", href: "https://www.instagram.com/StPeteMusic" },
-      { label: "YouTube", href: "https://youtube.com/@StPeteMusic" },
-      { label: "Facebook", href: "https://www.facebook.com/stpeteflmusic/" },
+      { label: 'Instagram', href: 'https://www.instagram.com/StPeteMusic' },
+      { label: 'YouTube', href: 'https://youtube.com/@StPeteMusic' },
+      { label: 'Facebook', href: 'https://www.facebook.com/stpeteflmusic/' },
     ],
   },
   {
-    heading: "Friends",
+    heading: 'Friends',
     links: [
-      { label: "Suite E Studios", href: "https://www.suiteestudios.com" },
-      { label: "Bayboro Brewing", href: "https://www.bayborobrewing.com/" },
-      { label: "Cage Brewing", href: "https://cagebrewing.com/" },
+      { label: 'Suite E Studios', href: 'https://www.suiteestudios.com' },
+      { label: 'Bayboro Brewing', href: 'https://www.bayborobrewing.com/' },
+      { label: 'Cage Brewing', href: 'https://cagebrewing.com/' },
     ],
   },
 ];
@@ -33,7 +34,6 @@ export function Footer() {
               width={250}
               height={250}
               className="object-contain  mb-4"
-              // style={{ height: 200, width: 'auto' }}
             />
           </div>
 
@@ -58,13 +58,13 @@ export function Footer() {
                       <a
                         key={link.label}
                         href={link.href}
-                        target={
-                          link.href.startsWith("http") ? "_blank" : undefined
-                        }
-                        rel={
-                          link.href.startsWith("http")
-                            ? "noopener noreferrer"
-                            : undefined
+                        target={link.href.startsWith('http') ? '_blank' : undefined}
+                        rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        onClick={() =>
+                          pushEvent('outbound_link_click', {
+                            link_url: link.href,
+                            link_text: link.label,
+                          })
                         }
                         className="font-inter text-lg text-black/70 hover:text-black transition-colors"
                       >

@@ -7,6 +7,7 @@ import Zoom from 'yet-another-react-lightbox/plugins/zoom';
 import { LightboxImage } from './LightboxImage';
 import { AnimateIn } from './AnimateIn';
 import focalPoints from '@/config/focal-points.json';
+import { pushEvent } from '@/lib/analytics';
 
 function getFocalPosition(src: string): string {
   const fp = focalPoints[src as keyof typeof focalPoints];
@@ -138,6 +139,7 @@ export function VibesSection() {
               href="https://www.instagram.com/StPeteMusic"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => pushEvent('outbound_link_click', { link_url: 'https://www.instagram.com/StPeteMusic', link_text: '@StPeteMusic on Instagram' })}
               className="font-inter font-medium text-base tracking-[0.35em] uppercase transition-opacity hover:opacity-70 shrink-0"
               style={{ color: '#FF8C00' }}
             >

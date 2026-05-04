@@ -3,6 +3,7 @@
 import type { Event } from '@stpetemusic/types';
 import { EVENT_TAGS, isEventTagSlug } from '@/lib/eventTags';
 import { VENUES, isVenueSlug } from '@/lib/venues';
+import { pushEvent } from '@/lib/analytics';
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -84,7 +85,13 @@ export function CalendarGrid({ year, month, events, onEventClick }: CalendarGrid
                       return (
                         <button
                           key={event.id}
-                          onClick={() => onEventClick(event)}
+                          onClick={() => {
+                            pushEvent('event_click', {
+                              event_title: event.title,
+                              event_venue: event.venue ?? '',
+                            });
+                            onEventClick(event);
+                          }}
                           className="w-full text-left font-inter text-[10px] sm:text-xs font-medium px-1.5 py-0.5 rounded truncate leading-tight hover:opacity-80 transition-opacity"
                           style={{ backgroundColor: bgColor, color: 'white' }}
                           title={`${venueConfig ? venueConfig.name + ' · ' : ''}${event.title}`}

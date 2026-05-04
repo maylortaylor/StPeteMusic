@@ -7,11 +7,11 @@ import { getEventsForMonths } from '@/lib/queries/events';
 export const metadata: Metadata = {
   title: 'Shows & Events',
   description:
-    'Upcoming live music, community jams, and art walks in St. Petersburg, FL — including Final Friday and Instant Noodles at Suite E Studios.',
+    'Upcoming live music, community jams, and musical happenings in St. Petersburg, FL.',
   openGraph: {
     title: 'St. Pete Music | Shows & Events',
     description:
-      'Upcoming live music, community jams, and art walks in St. Petersburg, FL — including Final Friday and Instant Noodles at Suite E Studios.',
+      'Upcoming live music, community jams, and musical happenings in St. Petersburg, FL.',
     url: 'https://www.stpetemusic.live/events',
   },
   twitter: {

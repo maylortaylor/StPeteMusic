@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { pushEvent } from '@/lib/analytics';
 
 export function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -26,8 +27,13 @@ export function Nav() {
           <Link href="/events"   className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Events</Link>
           <Link href="/discover" className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Discover</Link>
           <Link href="/venues"   className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Venues</Link>
-          <a href="https://youtube.com/@StPeteMusic" target="_blank" rel="noopener noreferrer"
-            className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">YouTube</a>
+          <a
+            href="https://youtube.com/@StPeteMusic"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => pushEvent('outbound_link_click', { link_url: 'https://youtube.com/@StPeteMusic', link_text: 'YouTube' })}
+            className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity"
+          >YouTube</a>
         </div>
 
         {/* Mobile hamburger button */}
@@ -58,8 +64,16 @@ export function Nav() {
           <Link href="/events"   onClick={() => setMenuOpen(false)} className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Events</Link>
           <Link href="/discover" onClick={() => setMenuOpen(false)} className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Discover</Link>
           <Link href="/venues"   onClick={() => setMenuOpen(false)} className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Venues</Link>
-          <a href="https://youtube.com/@StPeteMusic" target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)}
-            className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">YouTube</a>
+          <a
+            href="https://youtube.com/@StPeteMusic"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => {
+              setMenuOpen(false);
+              pushEvent('outbound_link_click', { link_url: 'https://youtube.com/@StPeteMusic', link_text: 'YouTube' });
+            }}
+            className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity"
+          >YouTube</a>
         </div>
       )}
     </nav>

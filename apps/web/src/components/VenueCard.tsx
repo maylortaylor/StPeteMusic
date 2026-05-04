@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { pushEvent } from '@/lib/analytics';
 
 interface VenueCardProps {
   name: string;
@@ -10,7 +13,11 @@ interface VenueCardProps {
 
 export function VenueCard({ name, slug, address, tags }: VenueCardProps) {
   return (
-    <Link href={`/venues/${slug}`} className="block group">
+    <Link
+      href={`/venues/${slug}`}
+      className="block group"
+      onClick={() => pushEvent('venue_click', { venue_name: name })}
+    >
       <div className="bg-white border border-border hover:border-black transition-colors duration-200 p-6 h-full flex flex-col">
         <h3 className="font-inter font-black text-xl uppercase leading-tight text-black mb-2 group-hover:opacity-70 transition-opacity">
           {name}
