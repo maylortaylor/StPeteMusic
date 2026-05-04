@@ -43,6 +43,21 @@ output "amplify_staging_url" {
   value       = "https://develop.${aws_amplify_app.web.default_domain}"
 }
 
+output "amplify_admin_app_id" {
+  description = "Admin Amplify app ID"
+  value       = aws_amplify_app.admin.id
+}
+
+output "amplify_admin_default_domain" {
+  description = "Admin Amplify default domain (before custom domain is connected)"
+  value       = aws_amplify_app.admin.default_domain
+}
+
+output "amplify_admin_production_url" {
+  description = "Admin production URL on Amplify (main branch)"
+  value       = "https://main.${aws_amplify_app.admin.default_domain}"
+}
+
 output "linktree_api_url" {
   description = "Base URL for the Linktree API — use this in WordPress and Next.js fetch calls"
   value       = aws_apigatewayv2_api.linktree.api_endpoint
