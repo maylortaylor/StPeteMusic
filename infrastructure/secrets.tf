@@ -26,3 +26,17 @@ resource "aws_ssm_parameter" "resend_api_key" {
   value = var.resend_api_key
   tags  = { Project = var.project }
 }
+
+resource "aws_ssm_parameter" "clerk_secret_key" {
+  name  = "/${var.project}/clerk/secret_key"
+  type  = "SecureString"
+  value = var.clerk_secret_key
+  tags  = { Project = var.project }
+}
+
+resource "aws_ssm_parameter" "clerk_publishable_key" {
+  name  = "/${var.project}/clerk/publishable_key"
+  type  = "SecureString"
+  value = var.clerk_publishable_key
+  tags  = { Project = var.project }
+}

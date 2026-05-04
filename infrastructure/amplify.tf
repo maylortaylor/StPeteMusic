@@ -4,6 +4,16 @@
 # Build spec: amplify.yml at repo root
 
 # Read secrets from SSM so Amplify env vars stay in sync
+data "aws_ssm_parameter" "clerk_secret_key" {
+  name            = aws_ssm_parameter.clerk_secret_key.name
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "clerk_publishable_key" {
+  name            = aws_ssm_parameter.clerk_publishable_key.name
+  with_decryption = true
+}
+
 data "aws_ssm_parameter" "resend_api_key" {
   name            = aws_ssm_parameter.resend_api_key.name
   with_decryption = true
@@ -92,6 +102,78 @@ resource "aws_amplify_branch" "develop" {
   }
 }
 
+# ── Admin app ────────────────────────────────────────────────────────────────
+
+resource "aws_amplify_app" "admin" {
+  name         = "${var.project}-admin"
+  repository   = "https://github.com/maylortaylor/StPeteMusic"
+  access_token = var.github_token != "" ? var.github_token : null
+  platform     = "WEB_COMPUTE"
+
+  environment_variables = {
+    AMPLIFY_MONOREPO_APP_ROOT           = "apps/admin"
+    NEXT_PUBLIC_SITE_URL                = "https://admin.stpetemusic.live"
+    DATABASE_URL                        = "postgresql://${var.db_username}:${var.db_password}@${aws_db_instance.main.address}:5432/stpetemusic"
+    CLERK_SECRET_KEY                    = data.aws_ssm_parameter.clerk_secret_key.value
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY   = data.aws_ssm_parameter.clerk_publishable_key.value
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL       = "/sign-in"
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL = "/dashboard"
+  }
+
+  enable_auto_branch_creation = false
+  enable_branch_auto_deletion = true
+
+  tags = {
+    Name    = "${var.project}-admin"
+    Project = var.project
+  }
+
+  lifecycle {
+    ignore_changes = [access_token]
+  }
+}
+
+resource "aws_amplify_branch" "admin_main" {
+  app_id      = aws_amplify_app.admin.id
+  branch_name = "main"
+  framework   = "Next.js - SSR"
+  stage       = "PRODUCTION"
+
+  enable_auto_build           = true
+  enable_pull_request_preview = false
+
+  tags = {
+    Name    = "${var.project}-admin-main"
+    Project = var.project
+  }
+}
+
+resource "aws_amplify_branch" "admin_develop" {
+  app_id      = aws_amplify_app.admin.id
+  branch_name = "develop"
+  framework   = "Next.js - SSR"
+  stage       = "DEVELOPMENT"
+
+  enable_auto_build           = true
+  enable_pull_request_preview = true
+
+  tags = {
+    Name    = "${var.project}-admin-develop"
+    Project = var.project
+  }
+}
+
+# Custom domain — uncomment after admin.stpetemusic.live DNS is set in Cloudflare
+# resource "aws_amplify_domain_association" "admin" {
+#   app_id      = aws_amplify_app.admin.id
+#   domain_name = "stpetemusic.live"
+#   sub_domain {
+#     branch_name = aws_amplify_branch.admin_main.branch_name
+#     prefix      = "admin"
+#   }
+# }
+
+# ── Web app custom domain ────────────────────────────────────────────────────
 # Custom domain — uncomment after stpetemusic.live nameservers point to Cloudflare
 # and after the Amplify app is created (run terraform apply without this block first,
 # then add it and re-apply once you have the Amplify CNAME value for Cloudflare DNS).

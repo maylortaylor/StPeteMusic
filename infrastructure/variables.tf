@@ -79,3 +79,25 @@ variable "resend_api_key" {
     error_message = "resend_api_key must not be empty. Set the RESEND_API_KEY GitHub Secret."
   }
 }
+
+variable "clerk_secret_key" {
+  description = "Clerk secret key for admin app. Set via TF_VAR_clerk_secret_key in CI."
+  type        = string
+  sensitive   = true
+
+  validation {
+    condition     = length(var.clerk_secret_key) > 0
+    error_message = "clerk_secret_key must not be empty. Set the CLERK_SECRET_KEY GitHub Secret."
+  }
+}
+
+variable "clerk_publishable_key" {
+  description = "Clerk publishable key for admin app. Set via TF_VAR_clerk_publishable_key in CI."
+  type        = string
+  sensitive   = true
+
+  validation {
+    condition     = length(var.clerk_publishable_key) > 0
+    error_message = "clerk_publishable_key must not be empty. Set the NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY GitHub Secret."
+  }
+}

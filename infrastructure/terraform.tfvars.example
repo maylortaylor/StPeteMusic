@@ -4,3 +4,17 @@
 aws_region   = "us-east-1"
 project      = "stpetemusic"
 ssh_key_name = "stpetemusic-n8n"
+
+# Secrets are passed as TF_VAR_* environment variables, not in this file.
+# Before running tofu locally, export:
+#
+#   export TF_VAR_db_username="stpetemusic"
+#   export TF_VAR_db_password="..."          # POSTGRES_PASSWORD GitHub Secret
+#   export TF_VAR_listmonk_username="..."    # LISTMONK_USERNAME GitHub Secret
+#   export TF_VAR_listmonk_password="..."    # LISTMONK_PASSWORD GitHub Secret
+#   export TF_VAR_resend_api_key="..."       # RESEND_API_KEY GitHub Secret
+#
+# Clerk — admin app auth (witty-koala-2 / StPeteMusic Clerk instance)
+# Values are in apps/admin/.env.local:
+#   export TF_VAR_clerk_secret_key="sk_test_..."      # CLERK_SECRET_KEY GitHub Secret
+#   export TF_VAR_clerk_publishable_key="pk_test_..." # NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY GitHub Secret
