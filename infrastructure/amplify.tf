@@ -163,15 +163,15 @@ resource "aws_amplify_branch" "admin_develop" {
   }
 }
 
-# Custom domain — uncomment after admin.stpetemusic.live DNS is set in Cloudflare
-# resource "aws_amplify_domain_association" "admin" {
-#   app_id      = aws_amplify_app.admin.id
-#   domain_name = "stpetemusic.live"
-#   sub_domain {
-#     branch_name = aws_amplify_branch.admin_main.branch_name
-#     prefix      = "admin"
-#   }
-# }
+resource "aws_amplify_domain_association" "admin" {
+  app_id      = aws_amplify_app.admin.id
+  domain_name = "stpetemusic.live"
+
+  sub_domain {
+    branch_name = aws_amplify_branch.admin_main.branch_name
+    prefix      = "admin"
+  }
+}
 
 # ── Web app custom domain ────────────────────────────────────────────────────
 # Custom domain — uncomment after stpetemusic.live nameservers point to Cloudflare
