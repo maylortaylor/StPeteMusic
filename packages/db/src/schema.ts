@@ -8,8 +8,14 @@ import {
   integer,
   numeric,
   jsonb,
-  bytea,
+  customType,
 } from 'drizzle-orm/pg-core';
+
+const bytea = customType<{ data: Buffer; notNull: false; default: false }>({
+  dataType() {
+    return 'bytea';
+  },
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SENSITIVE COLUMNS — NEVER SELECT OR EDIT IN ADMIN
