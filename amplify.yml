@@ -28,7 +28,9 @@ applications:
         preBuild:
           commands:
             - node --version
-            - npm ci
+            # Install from the monorepo root so all workspace deps (drizzle-orm, pg, etc.)
+            # land in root node_modules and are resolvable by apps/admin
+            - cd $CODEBUILD_SRC_DIR && npm ci
         build:
           commands:
             - npm run build
@@ -38,6 +40,6 @@ applications:
           - '**/*'
       cache:
         paths:
-          - node_modules/**/*
+          - $CODEBUILD_SRC_DIR/node_modules/**/*
           - .next/cache/**/*
     appRoot: apps/admin
