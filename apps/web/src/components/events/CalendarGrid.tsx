@@ -89,6 +89,7 @@ export function CalendarGrid({ year, month, events, onEventClick }: CalendarGrid
                             pushEvent('event_click', {
                               event_title: event.title,
                               event_venue: event.venue ?? '',
+                              event_date: event.start_time,
                             });
                             onEventClick(event);
                           }}
