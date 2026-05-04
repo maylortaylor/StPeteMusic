@@ -133,9 +133,15 @@ export function ListView({ events, onEventClick }: ListViewProps) {
                         rel="noopener noreferrer"
                         onClick={e => {
                           e.stopPropagation();
+                          pushEvent('ticket_link_click', {
+                            event_title: event.title,
+                            event_venue: event.venue ?? '',
+                            link_url: event.ticket_url,
+                          });
                           pushEvent('outbound_link_click', {
                             link_url: event.ticket_url,
                             link_text: 'Tickets',
+                            link_category: 'ticket',
                           });
                         }}
                         className="flex-shrink-0 font-inter font-bold text-xs uppercase tracking-wide text-white px-3 py-2 rounded hover:opacity-90 transition-opacity self-center"

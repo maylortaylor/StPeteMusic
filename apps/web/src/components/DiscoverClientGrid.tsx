@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { ArtistCard } from '@/components/ArtistCard';
 import type { Artist } from '@stpetemusic/types';
+import { pushEvent } from '@/lib/analytics';
 
 const ALL_FILTER = 'All';
 const TYPE_ORDER: Artist['type'][] = ['Band', 'Solo Artist', 'DJ', 'Event Producer', 'Creative', 'Other'];
@@ -15,6 +16,7 @@ function getAvailableTypes(artists: Artist[]): string[] {
 export function DiscoverClientGrid({ artists }: { artists: Artist[] }) {
   const [active, setActive] = useState<string>(ALL_FILTER);
   const [query, setQuery] = useState('');
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const types = getAvailableTypes(artists);
 
   const q = query.trim().toLowerCase();
@@ -36,8 +38,15 @@ export function DiscoverClientGrid({ artists }: { artists: Artist[] }) {
           placeholder="Search artists..."
           value={query}
           onChange={e => {
-            setQuery(e.target.value);
-            if (e.target.value) setActive(ALL_FILTER);
+            const value = e.target.value;
+            setQuery(value);
+            if (value) setActive(ALL_FILTER);
+            if (searchTimer.current) clearTimeout(searchTimer.current);
+            if (value.length > 1) {
+              searchTimer.current = setTimeout(() => {
+                pushEvent('discover_search', { search_query: value });
+              }, 600);
+            }
           }}
           className="w-full sm:w-80 font-inter text-sm px-4 py-2.5 border border-border bg-white text-black placeholder:text-text-muted focus:outline-none focus:border-black transition-colors"
         />
@@ -48,7 +57,10 @@ export function DiscoverClientGrid({ artists }: { artists: Artist[] }) {
         {[ALL_FILTER, ...types].map(t => (
           <button
             key={t}
-            onClick={() => setActive(t)}
+            onClick={() => {
+              setActive(t);
+              pushEvent('discover_filter', { filter_type: 'artist_type', filter_value: t });
+            }}
             className={`font-inter text-xs uppercase tracking-[0.3em] px-4 py-2 border transition-colors duration-150 ${
               active === t
                 ? 'bg-black text-white border-black'
