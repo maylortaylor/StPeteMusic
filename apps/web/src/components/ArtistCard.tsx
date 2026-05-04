@@ -16,7 +16,7 @@ export function ArtistCard({ name, slug, type, instagram_handle, genres }: Artis
     <Link
       href={`/discover/${slug}`}
       className="block group"
-      onClick={() => pushEvent('artist_click', { artist_name: name })}
+      onClick={() => pushEvent('artist_click', { artist_name: name, artist_genre: genres[0] ?? '' })}
     >
       <div className="bg-white border border-border hover:border-black transition-colors duration-200 p-6 h-full flex flex-col">
         <p className="font-inter font-medium text-xs uppercase tracking-[0.3em] mb-2" style={{ color: '#B57048' }}>

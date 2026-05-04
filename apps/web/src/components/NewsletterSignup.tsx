@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { AnimateIn } from './AnimateIn';
+import { pushEvent } from '@/lib/analytics';
 
 interface NewsletterSignupProps {
   variant?: 'inline' | 'section';
@@ -23,7 +24,7 @@ export function NewsletterSignup({ variant = 'section' }: NewsletterSignupProps)
         body: JSON.stringify({ email }),
       });
       if (res.ok) {
-        window.dataLayer?.push({ event: 'newsletter_signup' });
+        pushEvent('newsletter_signup');
         setStatus('success');
         setMessage("You're in. Monthly St. Pete music roundup incoming.");
         setEmail('');

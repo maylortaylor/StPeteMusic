@@ -64,7 +64,9 @@
       "Bash(apt-get update:*)",
       "Bash(ffprobe -v quiet -show_streams -select_streams v:0 -show_format /workspace/StPeteMusic/apps/web/public/videos/hero.mp4)",
       "Bash(gh api:*)",
-      "Bash(find /Users/matt.taylor/Documents/_dev/maylortaylor/StPeteMusic -type f \\\\\\( -name \"*.ts\" -o -name \"*.js\" -o -name \"*.json\" \\\\\\) -exec grep -l \"venue.*tag\\\\|VENUE.*TAG\" {} \\\\;)"
+      "Bash(find /Users/matt.taylor/Documents/_dev/maylortaylor/StPeteMusic -type f \\\\\\( -name \"*.ts\" -o -name \"*.js\" -o -name \"*.json\" \\\\\\) -exec grep -l \"venue.*tag\\\\|VENUE.*TAG\" {} \\\\;)",
+      "Bash(npm run:*)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   }
 }

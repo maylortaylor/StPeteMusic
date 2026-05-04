@@ -1,0 +1,80 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import {
+  LayoutDashboard,
+  Users,
+  MapPin,
+  Users2,
+  Building2,
+  Zap,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+const navItems = [
+  {
+    label: 'Dashboard',
+    href: '/dashboard',
+    icon: LayoutDashboard,
+  },
+  {
+    label: 'Artists',
+    href: '/dashboard/artists',
+    icon: Users,
+  },
+  {
+    label: 'Venues',
+    href: '/dashboard/venues',
+    icon: MapPin,
+  },
+  {
+    label: 'Persons',
+    href: '/dashboard/persons',
+    icon: Users2,
+  },
+  {
+    label: 'Organizations',
+    href: '/dashboard/organizations',
+    icon: Building2,
+  },
+  {
+    label: 'Templates',
+    href: '/dashboard/templates',
+    icon: Zap,
+  },
+];
+
+export function Sidebar() {
+  const pathname = usePathname();
+
+  return (
+    <nav className="flex flex-col gap-2 border-r border-gray-200 bg-white px-4 py-6">
+      <div className="mb-4 px-2">
+        <h1 className="text-lg font-bold text-gray-900">StPeteMusic</h1>
+        <p className="text-sm text-gray-600">Admin Dashboard</p>
+      </div>
+
+      {navItems.map((item) => {
+        const Icon = item.icon;
+        const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={cn(
+              'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+              isActive
+                ? 'bg-gray-100 text-gray-900'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+            )}
+          >
+            <Icon className="h-5 w-5" />
+            <span>{item.label}</span>
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}

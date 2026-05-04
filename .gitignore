@@ -26,6 +26,12 @@ node_modules/
 **/sa-key.json
 *.pem
 *.key
+# Service account key files (GCP downloads)
+apps/*-analytics-*.json
+apps/*-service-account-*.json
+
+# GTM container exports (temp files)
+apps/GTM-*.json
 
 # gh CLI config (GH_CONFIG_DIR — stores OAuth token, must not be committed)
 /workspace/.gh-config/

@@ -17,6 +17,7 @@
     "optimize-video": "node scripts/optimize-video.mjs",
     "ga4:export": "node scripts/ga4-export.mjs",
     "gtm:backup": "node scripts/gtm-backup.mjs",
+    "gtm:apply": "node scripts/gtm-apply.mjs",
     "ga4:conversions": "node scripts/ga4-conversions.mjs"
   },
   "dependencies": {

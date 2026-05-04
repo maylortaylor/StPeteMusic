@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import type { Event } from '@stpetemusic/types';
+import { pushEvent } from '@/lib/analytics';
 import type { EventTagSlug } from '@/lib/eventTags';
 import { isEventTagSlug } from '@/lib/eventTags';
 import type { VenueSlug } from '@/lib/venues';
@@ -82,6 +83,8 @@ export function EventsPageClient({ months }: EventsPageClientProps) {
         onChange={slug => {
           setActiveVenue(slug);
           setActiveTag('ALL');
+          const count = currentMonth.events.filter(e => slug === 'ALL' || e.venue === slug).length;
+          pushEvent('events_filter', { filter_type: 'venue', filter_value: slug, results_count: count });
         }}
         availableVenues={availableVenues}
       />
@@ -89,7 +92,13 @@ export function EventsPageClient({ months }: EventsPageClientProps) {
       {/* Tag filter chips */}
       <TagFilterChips
         activeTag={activeTag}
-        onChange={setActiveTag}
+        onChange={tag => {
+          setActiveTag(tag);
+          const count = currentMonth.events.filter(e =>
+            (activeVenue === 'ALL' || e.venue === activeVenue) && (tag === 'ALL' || e.tag === tag),
+          ).length;
+          pushEvent('events_filter', { filter_type: 'tag', filter_value: tag, results_count: count });
+        }}
         availableTags={availableTags}
       />
 
@@ -98,7 +107,10 @@ export function EventsPageClient({ months }: EventsPageClientProps) {
         {(['calendar', 'list'] as ViewMode[]).map(mode => (
           <button
             key={mode}
-            onClick={() => setViewMode(mode)}
+            onClick={() => {
+              setViewMode(mode);
+              pushEvent('events_view_toggle', { view_mode: mode });
+            }}
             className={`font-inter text-xs uppercase tracking-[0.25em] px-4 py-2 border transition-colors duration-150 ${
               viewMode === mode
                 ? 'bg-black text-white border-black'
