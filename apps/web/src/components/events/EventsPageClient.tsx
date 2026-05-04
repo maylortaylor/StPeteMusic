@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import type { Event } from '@stpetemusic/types';
-import { pushEvent } from '@/lib/analytics';
+import { pushEvent, pushPageView } from '@/lib/analytics';
 import type { EventTagSlug } from '@/lib/eventTags';
 import { isEventTagSlug } from '@/lib/eventTags';
 import type { VenueSlug } from '@/lib/venues';
@@ -27,6 +27,15 @@ interface EventsPageClientProps {
   months: MonthData[];
 }
 
+function toEventSlug(event: Event): string {
+  const titleSlug = event.title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+  const date = event.start_time.slice(0, 10);
+  return `${titleSlug}-${date}`;
+}
+
 export function EventsPageClient({ months }: EventsPageClientProps) {
   const [activeMonthIdx, setActiveMonthIdx] = useState(0);
   const [activeVenue, setActiveVenue] = useState<VenueSlug | 'ALL'>('ALL');
@@ -37,6 +46,16 @@ export function EventsPageClient({ months }: EventsPageClientProps) {
   useEffect(() => {
     if (window.innerWidth < 768) setViewMode('list');
   }, []);
+
+  useEffect(() => {
+    if (selectedEvent) {
+      const path = `/events/${toEventSlug(selectedEvent)}`;
+      window.history.pushState({}, '', path);
+      pushPageView(path, selectedEvent.title);
+    } else {
+      window.history.replaceState({}, '', '/events');
+    }
+  }, [selectedEvent]);
 
   const currentMonth = months[activeMonthIdx];
 

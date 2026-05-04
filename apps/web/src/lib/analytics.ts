@@ -3,3 +3,12 @@
 export function pushEvent(event: string, params?: Record<string, unknown>): void {
   window.dataLayer?.push({ event, ...params });
 }
+
+export function pushPageView(path: string, title?: string): void {
+  window.dataLayer?.push({
+    event: 'page_view',
+    page_location: `${window.location.origin}${path}`,
+    page_title: title ? `${title} | St. Pete Music` : document.title,
+    page_path: path,
+  });
+}
