@@ -29,8 +29,9 @@ applications:
           commands:
             - node --version
             # Install from the monorepo root so all workspace deps (drizzle-orm, pg, etc.)
-            # land in root node_modules and are resolvable by apps/admin
-            - cd $CODEBUILD_SRC_DIR && npm ci
+            # land in root node_modules and are resolvable by apps/admin.
+            # appRoot sets CWD to apps/admin, so ../.. is the repo root.
+            - cd ../.. && npm ci
         build:
           commands:
             - npm run build
@@ -40,6 +41,6 @@ applications:
           - '**/*'
       cache:
         paths:
-          - $CODEBUILD_SRC_DIR/node_modules/**/*
+          - ../../node_modules/**/*
           - .next/cache/**/*
     appRoot: apps/admin
