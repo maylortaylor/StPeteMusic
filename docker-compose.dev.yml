@@ -10,7 +10,7 @@ services:
     container_name: stpetemusic-db-dev
     environment:
       POSTGRES_USER: stpetemusic
-      POSTGRES_PASSWORD: devpassword
+      POSTGRES_PASSWORD: wZd7v0s0luVSnDMg57BT1tcV
       POSTGRES_DB: stpetemusic_dev
     ports:
       - '5433:5432'  # 5433 on host to avoid conflicts with other postgres instances

@@ -66,7 +66,15 @@
       "Bash(gh api:*)",
       "Bash(find /Users/matt.taylor/Documents/_dev/maylortaylor/StPeteMusic -type f \\\\\\( -name \"*.ts\" -o -name \"*.js\" -o -name \"*.json\" \\\\\\) -exec grep -l \"venue.*tag\\\\|VENUE.*TAG\" {} \\\\;)",
       "Bash(npm run:*)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(gcloud version:*)",
+      "Bash(npm --version)",
+      "Bash(curl --version)",
+      "Bash(docker compose:*)",
+      "Bash(echo \"Exit: $?\")",
+      "WebFetch(domain:clerk.com)",
+      "Bash(git show:*)",
+      "Bash(git -C /Users/matt.taylor/Documents/_dev/maylortaylor/StPeteMusic status apps/admin/src/)"
     ]
   }
 }
