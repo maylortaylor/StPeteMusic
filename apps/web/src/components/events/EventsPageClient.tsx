@@ -33,7 +33,9 @@ function toEventSlug(event: Event): string {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
   const date = event.start_time.slice(0, 10);
-  return `${titleSlug}-${date}`;
+  return event.venue
+    ? `${titleSlug}-${date}-${event.venue}`
+    : `${titleSlug}-${date}`;
 }
 
 export function EventsPageClient({ months }: EventsPageClientProps) {
