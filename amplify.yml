@@ -23,3 +23,21 @@ applications:
           - node_modules/**/*
           - .next/cache/**/*
     appRoot: apps/web
+  - frontend:
+      phases:
+        preBuild:
+          commands:
+            - node --version
+            - npm ci
+        build:
+          commands:
+            - npm run build
+      artifacts:
+        baseDirectory: .next
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
+          - .next/cache/**/*
+    appRoot: apps/admin
