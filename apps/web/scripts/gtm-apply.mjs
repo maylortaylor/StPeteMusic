@@ -51,6 +51,7 @@ const auth = new google.auth.GoogleAuth({
   ...(credentials ? { credentials } : {}),
   scopes: [
     'https://www.googleapis.com/auth/tagmanager.edit.containers',
+    'https://www.googleapis.com/auth/tagmanager.edit.containerversions',
     'https://www.googleapis.com/auth/tagmanager.publish',
   ],
 });
@@ -112,14 +113,31 @@ function buildGA4EventTag(name, triggerId, eventName, paramNames) {
 
 // ---- Main ----
 
+async function resolveWorkspace() {
+  const containerParent = `accounts/${accountId}/containers/${containerId}`;
+
+  // List existing workspaces and return the first non-default one that exists,
+  // or create a fresh one. We skip workspace 1 because it may be in a "submitted"
+  // (locked) state from a previous manual GTM session.
+  const ts = new Date().toISOString().slice(0, 16).replace('T', '-').replace(':', '');
+  const newWs = await gtm.accounts.containers.workspaces.create({
+    parent: containerParent,
+    requestBody: { name: `gtm-apply-${ts}`, description: 'Created by gtm-apply.mjs' },
+  });
+  console.log(`  ✅ Created workspace: ${newWs.data.workspaceId} (${newWs.data.name})`);
+  return `${containerParent}/workspaces/${newWs.data.workspaceId}`;
+}
+
 async function apply() {
-  console.log(`\n🔍 Reading live GTM workspace: ${parent}`);
+  console.log(`\n🔍 Resolving GTM workspace...`);
+  const resolvedParent = await resolveWorkspace();
+  console.log(`   Using: ${resolvedParent}`);
 
   // 1. Fetch existing state
   const [existingVarsRes, existingTrigsRes, existingTagsRes] = await Promise.all([
-    gtm.accounts.containers.workspaces.variables.list({ parent }),
-    gtm.accounts.containers.workspaces.triggers.list({ parent }),
-    gtm.accounts.containers.workspaces.tags.list({ parent }),
+    gtm.accounts.containers.workspaces.variables.list({ parent: resolvedParent }),
+    gtm.accounts.containers.workspaces.triggers.list({ parent: resolvedParent }),
+    gtm.accounts.containers.workspaces.tags.list({ parent: resolvedParent }),
   ]);
 
   const existingVarNames = new Set(
@@ -142,7 +160,7 @@ async function apply() {
       continue;
     }
     await gtm.accounts.containers.workspaces.variables.create({
-      parent,
+      parent: resolvedParent,
       requestBody: buildDLVariable(name, dlKey),
     });
     console.log(`  ➕ ${name} (created)`);
@@ -160,7 +178,7 @@ async function apply() {
       continue;
     }
     const res = await gtm.accounts.containers.workspaces.triggers.create({
-      parent,
+      parent: resolvedParent,
       requestBody: buildCustomEventTrigger(name, eventName),
     });
     triggerIdByName[name] = res.data.triggerId;
@@ -181,7 +199,7 @@ async function apply() {
       continue;
     }
     await gtm.accounts.containers.workspaces.tags.create({
-      parent,
+      parent: resolvedParent,
       requestBody: buildGA4EventTag(name, triggerId, eventName, params),
     });
     console.log(`  ➕ ${name} (created)`);
@@ -192,7 +210,7 @@ async function apply() {
   if (changes > 0) {
     console.log('\n🚀 Creating new version...');
     const versionRes = await gtm.accounts.containers.workspaces.create_version({
-      path: parent,
+      path: resolvedParent,
       requestBody: {
         name: `gtm-apply — ${new Date().toISOString().slice(0, 10)}`,
         notes: `Applied via gtm-apply.mjs IaC (${changes} changes): event_click, ticket_link_click, outbound_link_click, cta_click, newsletter_signup, contact_form_submit, video_engage, artist_click, venue_click, events_filter, events_view_toggle, discover_search, discover_filter, artist_social_click, venue_social_click`,
@@ -208,22 +226,22 @@ async function apply() {
     console.log('\n⏭️  No GTM changes — skipping publish.');
   }
 
-  // 6. GA4 conversion events (driven entirely by gtm-config.json)
-  console.log('\n📊 GA4 Conversions:');
+  // 6. GA4 key events (formerly "conversions") — driven entirely by gtm-config.json
+  console.log('\n📊 GA4 Key Events:');
   const ga4Property = `properties/${propertyId}`;
-  const [existing] = await ga4Admin.listConversionEvents({ parent: ga4Property });
-  const existingConversionNames = new Set(existing.map(e => e.eventName));
+  const [existing] = await ga4Admin.listKeyEvents({ parent: ga4Property });
+  const existingKeyEventNames = new Set(existing.map(e => e.eventName));
 
   for (const eventName of gtmConfig.conversions) {
-    if (existingConversionNames.has(eventName)) {
-      console.log(`  ✅ ${eventName} (already conversion)`);
+    if (existingKeyEventNames.has(eventName)) {
+      console.log(`  ✅ ${eventName} (already key event)`);
       continue;
     }
-    await ga4Admin.createConversionEvent({
+    await ga4Admin.createKeyEvent({
       parent: ga4Property,
-      conversionEvent: { eventName },
+      keyEvent: { eventName },
     });
-    console.log(`  ➕ ${eventName} (marked as conversion)`);
+    console.log(`  ➕ ${eventName} (marked as key event)`);
   }
 
   console.log('\n✅ Done — GTM published, GA4 conversions updated.\n');

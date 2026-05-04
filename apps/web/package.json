@@ -18,6 +18,7 @@
     "ga4:export": "node scripts/ga4-export.mjs",
     "gtm:backup": "node scripts/gtm-backup.mjs",
     "gtm:apply": "node scripts/gtm-apply.mjs",
+    "gtm:validate": "node scripts/gtm-validate.mjs",
     "ga4:conversions": "node scripts/ga4-conversions.mjs"
   },
   "dependencies": {

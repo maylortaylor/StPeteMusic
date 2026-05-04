@@ -50,10 +50,10 @@ const credentials = loadSACredentials();
 const adminClient = new AnalyticsAdminServiceClient(credentials ? { credentials } : {});
 const property = `properties/${propertyId}`;
 
-// ── Fetch existing conversion events ─────────────────────────────────────────
-console.log(`Fetching existing conversion events for property ${propertyId}…`);
-const [existingConversions] = await adminClient.listConversionEvents({ parent: property });
-const alreadyMarked = new Set(existingConversions.map(e => e.eventName));
+// ── Fetch existing key events (formerly "conversions") ───────────────────────
+console.log(`Fetching existing key events for property ${propertyId}…`);
+const [existingKeyEvents] = await adminClient.listKeyEvents({ parent: property });
+const alreadyMarked = new Set(existingKeyEvents.map(e => e.eventName));
 
 // ── Mark new ones ─────────────────────────────────────────────────────────────
 let created = 0;
@@ -61,14 +61,14 @@ let skipped = 0;
 
 for (const eventName of CONVERSION_EVENTS) {
   if (alreadyMarked.has(eventName)) {
-    console.log(`  ↳ skip  ${eventName} (already a conversion)`);
+    console.log(`  ↳ skip  ${eventName} (already a key event)`);
     skipped++;
     continue;
   }
 
-  await adminClient.createConversionEvent({
+  await adminClient.createKeyEvent({
     parent: property,
-    conversionEvent: { eventName },
+    keyEvent: { eventName },
   });
 
   console.log(`  ✓ marked ${eventName}`);
