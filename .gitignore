@@ -23,6 +23,7 @@ node_modules/
 # Credentials and secrets
 **/credentials.json
 **/token.json
+**/sa-key.json
 *.pem
 *.key
 
