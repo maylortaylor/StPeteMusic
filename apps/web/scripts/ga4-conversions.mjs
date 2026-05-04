@@ -31,9 +31,11 @@ config({ path: join(__dirname, '..', '..', '..', '.env') });
 // Primary goal: event_click (user showed intent toward an event)
 // Secondary: contact + newsletter as lead-gen conversions
 const CONVERSION_EVENTS = [
-  'event_click',
-  'newsletter_signup',
-  'contact_form_submit',
+  'ticket_link_click',    // highest intent — user clicked a ticket purchase link
+  'cta_click',            // hero Get Tickets / tune_in CTA
+  'event_click',          // user showed interest in a specific event
+  'newsletter_signup',    // lead gen
+  'contact_form_submit',  // lead gen / booking inquiry
 ];
 
 // ── Validate env ─────────────────────────────────────────────────────────────

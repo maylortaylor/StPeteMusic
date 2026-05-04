@@ -1,0 +1,378 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { z } from 'zod';
+import { toast } from 'sonner';
+
+const artistSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  type: z.enum(['Band', 'Solo Artist', 'DJ', 'Event Producer', 'Creative', 'Other']),
+  slug: z.string().optional(),
+  username: z.string().optional(),
+  description: z.string().optional(),
+  instagram_handle: z.string().optional(),
+  instagram_url: z.string().url().optional().or(z.literal('')),
+  facebook_url: z.string().url().optional().or(z.literal('')),
+  youtube_url: z.string().url().optional().or(z.literal('')),
+  website: z.string().url().optional().or(z.literal('')),
+  linktree_url: z.string().url().optional().or(z.literal('')),
+  home_base: z.string().optional(),
+  hero_photo_url: z.string().url().optional().or(z.literal('')),
+  genres: z.string().optional(),
+  tags: z.string().optional(),
+  notes: z.string().optional(),
+  is_active: z.boolean().default(true),
+  visible_on_website: z.boolean().default(false),
+});
+
+type ArtistFormData = z.infer<typeof artistSchema>;
+
+interface ArtistFormProps {
+  artistId?: string;
+}
+
+export function ArtistForm({ artistId }: ArtistFormProps) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(!!artistId);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState<ArtistFormData>({
+    name: '',
+    type: 'Band',
+    is_active: true,
+    visible_on_website: false,
+  });
+
+  useEffect(() => {
+    if (artistId) {
+      async function fetchArtist() {
+        try {
+          const response = await fetch(`/api/artists/${artistId}`);
+          if (!response.ok) throw new Error('Failed to fetch artist');
+          const data = await response.json();
+          setFormData({
+            ...data,
+            genres: Array.isArray(data.genres) ? data.genres.join(', ') : '',
+            tags: Array.isArray(data.tags) ? data.tags.join(', ') : '',
+          });
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'An error occurred');
+        } finally {
+          setLoading(false);
+        }
+      }
+      fetchArtist();
+    }
+  }, [artistId]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSubmitting(true);
+
+    try {
+      const validation = artistSchema.safeParse(formData);
+      if (!validation.success) {
+        setError(validation.error.errors[0].message);
+        return;
+      }
+
+      const payload = {
+        ...validation.data,
+        genres: validation.data.genres
+          ? validation.data.genres.split(',').map(g => g.trim()).filter(Boolean)
+          : [],
+        tags: validation.data.tags
+          ? validation.data.tags.split(',').map(t => t.trim()).filter(Boolean)
+          : [],
+        slug: validation.data.slug || validation.data.name.toLowerCase().replace(/\s+/g, '-'),
+      };
+
+      const url = artistId ? `/api/artists/${artistId}` : '/api/artists';
+      const method = artistId ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save artist');
+      }
+
+      toast.success(artistId ? 'Artist updated' : 'Artist created');
+      router.push('/dashboard/artists');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'An error occurred';
+      setError(message);
+      toast.error(message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="flex items-center justify-center py-12">Loading...</div>;
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6 rounded-lg border border-gray-200 bg-white p-8">
+      {error && (
+        <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <div>
+          <label className="block text-sm font-medium text-gray-900">
+            Name *
+          </label>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+            placeholder="Artist name"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-900">
+            Type *
+          </label>
+          <select
+            name="type"
+            value={formData.type}
+            onChange={handleChange}
+            className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+          >
+            <option value="Band">Band</option>
+            <option value="Solo Artist">Solo Artist</option>
+            <option value="DJ">DJ</option>
+            <option value="Event Producer">Event Producer</option>
+            <option value="Creative">Creative</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-900">
+            Username
+          </label>
+          <input
+            type="text"
+            name="username"
+            value={formData.username || ''}
+            onChange={handleChange}
+            className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+            placeholder="@username"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-900">
+            Home Base
+          </label>
+          <input
+            type="text"
+            name="home_base"
+            value={formData.home_base || ''}
+            onChange={handleChange}
+            className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+            placeholder="St. Pete, FL"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-900">
+          Description
+        </label>
+        <textarea
+          name="description"
+          value={formData.description || ''}
+          onChange={handleChange}
+          rows={4}
+          className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+          placeholder="Tell us about this artist..."
+        />
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <div>
+          <label className="block text-sm font-medium text-gray-900">
+            Genres (comma-separated)
+          </label>
+          <input
+            type="text"
+            name="genres"
+            value={formData.genres || ''}
+            onChange={handleChange}
+            className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+            placeholder="Hip-Hop, Electronic, Rock"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-900">
+            Tags (comma-separated)
+          </label>
+          <input
+            type="text"
+            name="tags"
+            value={formData.tags || ''}
+            onChange={handleChange}
+            className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+            placeholder="Local, Featured, Rising"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-4 border-t border-gray-200 pt-6">
+        <h3 className="font-medium text-gray-900">Social Media & Links</h3>
+        <div className="grid gap-6 md:grid-cols-2">
+          <div>
+            <label className="block text-sm font-medium text-gray-900">
+              Instagram Handle
+            </label>
+            <input
+              type="text"
+              name="instagram_handle"
+              value={formData.instagram_handle || ''}
+              onChange={handleChange}
+              className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+              placeholder="@handle"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-900">
+              Instagram URL
+            </label>
+            <input
+              type="url"
+              name="instagram_url"
+              value={formData.instagram_url || ''}
+              onChange={handleChange}
+              className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+              placeholder="https://instagram.com/..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-900">
+              Facebook URL
+            </label>
+            <input
+              type="url"
+              name="facebook_url"
+              value={formData.facebook_url || ''}
+              onChange={handleChange}
+              className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+              placeholder="https://facebook.com/..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-900">
+              YouTube URL
+            </label>
+            <input
+              type="url"
+              name="youtube_url"
+              value={formData.youtube_url || ''}
+              onChange={handleChange}
+              className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+              placeholder="https://youtube.com/..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-900">
+              Website
+            </label>
+            <input
+              type="url"
+              name="website"
+              value={formData.website || ''}
+              onChange={handleChange}
+              className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+              placeholder="https://..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-900">
+              Linktree URL
+            </label>
+            <input
+              type="url"
+              name="linktree_url"
+              value={formData.linktree_url || ''}
+              onChange={handleChange}
+              className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+              placeholder="https://linktree.com/..."
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-4 border-t border-gray-200 pt-6">
+        <h3 className="font-medium text-gray-900">Visibility & Status</h3>
+        <div className="space-y-3">
+          <label className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              name="is_active"
+              checked={formData.is_active}
+              onChange={handleChange}
+              className="h-4 w-4 rounded border-gray-300"
+            />
+            <span className="text-sm font-medium text-gray-900">Active</span>
+          </label>
+          <label className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              name="visible_on_website"
+              checked={formData.visible_on_website}
+              onChange={handleChange}
+              className="h-4 w-4 rounded border-gray-300"
+            />
+            <span className="text-sm font-medium text-gray-900">Visible on Website</span>
+          </label>
+        </div>
+      </div>
+
+      <div className="flex gap-4 border-t border-gray-200 pt-6">
+        <button
+          type="submit"
+          disabled={submitting}
+          className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+        >
+          {submitting ? 'Saving...' : artistId ? 'Update Artist' : 'Create Artist'}
+        </button>
+        <button
+          type="button"
+          onClick={() => router.push('/dashboard/artists')}
+          className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+}

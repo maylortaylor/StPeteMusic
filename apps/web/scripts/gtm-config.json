@@ -1,0 +1,145 @@
+{
+  "_comment": "StPeteMusic GTM desired state — edit this file, then run npm run gtm:apply to provision",
+  "measurementId": "G-RZJP9NFXX4",
+
+  "variables": [
+    { "name": "DL - event_title",   "dlKey": "event_title" },
+    { "name": "DL - event_venue",   "dlKey": "event_venue" },
+    { "name": "DL - event_date",    "dlKey": "event_date" },
+    { "name": "DL - link_url",      "dlKey": "link_url" },
+    { "name": "DL - link_text",     "dlKey": "link_text" },
+    { "name": "DL - link_category", "dlKey": "link_category" },
+    { "name": "DL - cta_label",     "dlKey": "cta_label" },
+    { "name": "DL - cta_location",  "dlKey": "cta_location" },
+    { "name": "DL - artist_name",   "dlKey": "artist_name" },
+    { "name": "DL - artist_genre",  "dlKey": "artist_genre" },
+    { "name": "DL - venue_name",    "dlKey": "venue_name" },
+    { "name": "DL - video_title",   "dlKey": "video_title" },
+    { "name": "DL - video_url",     "dlKey": "video_url" },
+    { "name": "DL - filter_type",   "dlKey": "filter_type" },
+    { "name": "DL - filter_value",  "dlKey": "filter_value" },
+    { "name": "DL - results_count", "dlKey": "results_count" },
+    { "name": "DL - view_mode",     "dlKey": "view_mode" },
+    { "name": "DL - search_query",  "dlKey": "search_query" },
+    { "name": "DL - link_label",    "dlKey": "link_label" }
+  ],
+
+  "triggers": [
+    { "name": "SPM-event_click",         "eventName": "event_click" },
+    { "name": "SPM-ticket_link_click",   "eventName": "ticket_link_click" },
+    { "name": "SPM-outbound_link_click", "eventName": "outbound_link_click" },
+    { "name": "SPM-cta_click",           "eventName": "cta_click" },
+    { "name": "SPM-contact_form_submit", "eventName": "contact_form_submit" },
+    { "name": "SPM-newsletter_signup",   "eventName": "newsletter_signup" },
+    { "name": "SPM-video_engage",        "eventName": "video_engage" },
+    { "name": "SPM-artist_click",        "eventName": "artist_click" },
+    { "name": "SPM-venue_click",         "eventName": "venue_click" },
+    { "name": "SPM-events_filter",       "eventName": "events_filter" },
+    { "name": "SPM-events_view_toggle",  "eventName": "events_view_toggle" },
+    { "name": "SPM-discover_search",     "eventName": "discover_search" },
+    { "name": "SPM-discover_filter",     "eventName": "discover_filter" },
+    { "name": "SPM-artist_social_click", "eventName": "artist_social_click" },
+    { "name": "SPM-venue_social_click",  "eventName": "venue_social_click" }
+  ],
+
+  "tags": [
+    {
+      "name": "SPM-GA4-event_click",
+      "trigger": "SPM-event_click",
+      "eventName": "event_click",
+      "params": ["event_title", "event_venue", "event_date"]
+    },
+    {
+      "name": "SPM-GA4-ticket_link_click",
+      "trigger": "SPM-ticket_link_click",
+      "eventName": "ticket_link_click",
+      "params": ["event_title", "event_venue", "link_url"]
+    },
+    {
+      "name": "SPM-GA4-outbound_link_click",
+      "trigger": "SPM-outbound_link_click",
+      "eventName": "outbound_link_click",
+      "params": ["link_url", "link_text", "link_category"]
+    },
+    {
+      "name": "SPM-GA4-cta_click",
+      "trigger": "SPM-cta_click",
+      "eventName": "cta_click",
+      "params": ["cta_label", "cta_location"]
+    },
+    {
+      "name": "SPM-GA4-contact_form_submit",
+      "trigger": "SPM-contact_form_submit",
+      "eventName": "contact_form_submit",
+      "params": []
+    },
+    {
+      "name": "SPM-GA4-newsletter_signup",
+      "trigger": "SPM-newsletter_signup",
+      "eventName": "newsletter_signup",
+      "params": []
+    },
+    {
+      "name": "SPM-GA4-video_engage",
+      "trigger": "SPM-video_engage",
+      "eventName": "video_engage",
+      "params": ["video_title", "video_url"]
+    },
+    {
+      "name": "SPM-GA4-artist_click",
+      "trigger": "SPM-artist_click",
+      "eventName": "artist_click",
+      "params": ["artist_name", "artist_genre"]
+    },
+    {
+      "name": "SPM-GA4-venue_click",
+      "trigger": "SPM-venue_click",
+      "eventName": "venue_click",
+      "params": ["venue_name"]
+    },
+    {
+      "name": "SPM-GA4-events_filter",
+      "trigger": "SPM-events_filter",
+      "eventName": "events_filter",
+      "params": ["filter_type", "filter_value", "results_count"]
+    },
+    {
+      "name": "SPM-GA4-events_view_toggle",
+      "trigger": "SPM-events_view_toggle",
+      "eventName": "events_view_toggle",
+      "params": ["view_mode"]
+    },
+    {
+      "name": "SPM-GA4-discover_search",
+      "trigger": "SPM-discover_search",
+      "eventName": "discover_search",
+      "params": ["search_query"]
+    },
+    {
+      "name": "SPM-GA4-discover_filter",
+      "trigger": "SPM-discover_filter",
+      "eventName": "discover_filter",
+      "params": ["filter_type", "filter_value"]
+    },
+    {
+      "name": "SPM-GA4-artist_social_click",
+      "trigger": "SPM-artist_social_click",
+      "eventName": "artist_social_click",
+      "params": ["artist_name", "link_label", "link_url"]
+    },
+    {
+      "name": "SPM-GA4-venue_social_click",
+      "trigger": "SPM-venue_social_click",
+      "eventName": "venue_social_click",
+      "params": ["venue_name", "link_label", "link_url"]
+    }
+  ],
+
+  "conversions": [
+    "ticket_link_click",
+    "cta_click",
+    "event_click",
+    "newsletter_signup",
+    "contact_form_submit"
+  ]
+}
