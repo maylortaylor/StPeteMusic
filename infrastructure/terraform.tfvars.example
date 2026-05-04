@@ -18,3 +18,20 @@ ssh_key_name = "stpetemusic-n8n"
 # Values are in apps/admin/.env.local:
 #   export TF_VAR_clerk_secret_key="sk_test_..."      # CLERK_SECRET_KEY GitHub Secret
 #   export TF_VAR_clerk_publishable_key="pk_test_..." # NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY GitHub Secret
+#
+# Cloudflare DNS — required for cloudflare.tf to manage stpetemusic.live DNS records
+#   1. Create API token: dash.cloudflare.com → My Profile → API Tokens → Create Token → "Edit zone DNS" template
+#      Scope the token to Zone: stpetemusic.live only.
+#   2. Get Zone ID: dash.cloudflare.com → stpetemusic.live → right sidebar → Zone ID
+#   3. Add GitHub Secrets: CLOUDFLARE_API_TOKEN and CLOUDFLARE_ZONE_ID
+#
+#   export TF_VAR_cloudflare_api_token="..."   # CLOUDFLARE_API_TOKEN GitHub Secret
+#   export TF_VAR_cloudflare_zone_id="..."     # CLOUDFLARE_ZONE_ID GitHub Secret
+#
+# On first apply with Cloudflare, import existing records before they get overwritten:
+#   # Get record IDs: curl -H "Authorization: Bearer $CF_TOKEN" \
+#   #   "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records" | jq '.result[] | {name,id}'
+#   tofu import 'cloudflare_record.www[0]'          <zone_id>/<www_record_id>
+#   tofu import 'cloudflare_record.apex[0]'         <zone_id>/<apex_record_id>
+#   tofu import 'cloudflare_record.admin[0]'        <zone_id>/<admin_record_id>
+#   tofu import 'cloudflare_record.acm_validation[0]' <zone_id>/<acm_record_id>

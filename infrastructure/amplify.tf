@@ -165,8 +165,9 @@ resource "aws_amplify_branch" "admin_develop" {
 }
 
 resource "aws_amplify_domain_association" "admin" {
-  app_id      = aws_amplify_app.admin.id
-  domain_name = "stpetemusic.live"
+  app_id                 = aws_amplify_app.admin.id
+  domain_name            = "stpetemusic.live"
+  wait_for_verification  = false  # DNS managed via cloudflare.tf; Amplify validates async
 
   sub_domain {
     branch_name = aws_amplify_branch.admin_main.branch_name
@@ -177,8 +178,9 @@ resource "aws_amplify_domain_association" "admin" {
 # ── Web app custom domain ────────────────────────────────────────────────────
 
 resource "aws_amplify_domain_association" "web" {
-  app_id      = aws_amplify_app.web.id
-  domain_name = "stpetemusic.live"
+  app_id                 = aws_amplify_app.web.id
+  domain_name            = "stpetemusic.live"
+  wait_for_verification  = false  # DNS managed via cloudflare.tf; Amplify validates async
 
   sub_domain {
     branch_name = aws_amplify_branch.main.branch_name

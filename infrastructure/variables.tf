@@ -101,3 +101,16 @@ variable "clerk_publishable_key" {
     error_message = "clerk_publishable_key must not be empty. Set the NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY GitHub Secret."
   }
 }
+
+variable "cloudflare_api_token" {
+  description = "Cloudflare API token with Zone:DNS:Edit permission for stpetemusic.live. Create at dash.cloudflare.com → My Profile → API Tokens → Create Token → Edit zone DNS template. Set via TF_VAR_cloudflare_api_token in CI."
+  type        = string
+  sensitive   = true
+  default     = ""  # empty default allows tofu validate/plan to pass without Cloudflare creds
+}
+
+variable "cloudflare_zone_id" {
+  description = "Cloudflare Zone ID for stpetemusic.live. Found in Cloudflare dashboard → stpetemusic.live → right sidebar → Zone ID. Set via TF_VAR_cloudflare_zone_id in CI."
+  type        = string
+  default     = ""  # empty default allows tofu validate/plan to pass without Cloudflare creds
+}
