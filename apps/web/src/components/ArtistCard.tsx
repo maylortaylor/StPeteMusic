@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { pushEvent } from '@/lib/analytics';
 
 interface ArtistCardProps {
   name: string;
@@ -10,7 +13,11 @@ interface ArtistCardProps {
 
 export function ArtistCard({ name, slug, type, instagram_handle, genres }: ArtistCardProps) {
   return (
-    <Link href={`/discover/${slug}`} className="block group">
+    <Link
+      href={`/discover/${slug}`}
+      className="block group"
+      onClick={() => pushEvent('artist_click', { artist_name: name })}
+    >
       <div className="bg-white border border-border hover:border-black transition-colors duration-200 p-6 h-full flex flex-col">
         <p className="font-inter font-medium text-xs uppercase tracking-[0.3em] mb-2" style={{ color: '#B57048' }}>
           {type}

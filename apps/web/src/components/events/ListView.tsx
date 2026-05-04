@@ -3,6 +3,7 @@
 import type { Event } from '@stpetemusic/types';
 import { EVENT_TAGS, isEventTagSlug } from '@/lib/eventTags';
 import { VENUES, isVenueSlug } from '@/lib/venues';
+import { pushEvent } from '@/lib/analytics';
 
 function formatDateHeader(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', {
@@ -72,7 +73,13 @@ export function ListView({ events, onEventClick }: ListViewProps) {
               return (
                 <button
                   key={event.id}
-                  onClick={() => onEventClick(event)}
+                  onClick={() => {
+                    pushEvent('event_click', {
+                      event_title: event.title,
+                      event_venue: event.venue ?? '',
+                    });
+                    onEventClick(event);
+                  }}
                   className="w-full text-left bg-white border border-border hover:border-black transition-colors duration-150 p-5 group"
                 >
                   <div className="flex items-start gap-3">
@@ -123,7 +130,13 @@ export function ListView({ events, onEventClick }: ListViewProps) {
                         href={event.ticket_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={e => e.stopPropagation()}
+                        onClick={e => {
+                          e.stopPropagation();
+                          pushEvent('outbound_link_click', {
+                            link_url: event.ticket_url,
+                            link_text: 'Tickets',
+                          });
+                        }}
                         className="flex-shrink-0 font-inter font-bold text-xs uppercase tracking-wide text-white px-3 py-2 rounded hover:opacity-90 transition-opacity self-center"
                         style={{ backgroundColor: '#FF8C00' }}
                       >

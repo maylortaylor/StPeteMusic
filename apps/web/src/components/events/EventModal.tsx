@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Event } from '@stpetemusic/types';
+import { pushEvent } from '@/lib/analytics';
 import { EVENT_TAGS, isEventTagSlug } from '@/lib/eventTags';
 import { VENUES, isVenueSlug } from '@/lib/venues';
 
@@ -173,6 +174,12 @@ export function EventModal({ event, onClose }: EventModalProps) {
                   href={event.ticket_url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() =>
+                    pushEvent('outbound_link_click', {
+                      link_url: event.ticket_url,
+                      link_text: 'Get Tickets',
+                    })
+                  }
                   className="block w-full text-center font-inter font-bold text-sm uppercase tracking-widest text-white py-4 rounded-lg hover:opacity-90 transition-opacity"
                   style={{ backgroundColor: '#FF8C00' }}
                 >

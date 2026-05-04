@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import Image from 'next/image';
 import { motion, useTransform, useSpring } from 'framer-motion';
 import { useScrollPinned } from './AnimateIn';
+import { pushEvent } from '@/lib/analytics';
 
 export function Hero() {
   const outerRef = useRef<HTMLElement>(null);
@@ -112,6 +113,7 @@ export function Hero() {
           >
             <a
               href="#newsletter"
+              onClick={() => pushEvent('cta_click', { cta_label: 'tune_in', cta_location: 'hero' })}
               className="text-white font-inter font-bold text-base uppercase tracking-widest px-10 py-4 bg-black hover:opacity-85 transition-opacity"
             >
               Tune In
@@ -120,6 +122,10 @@ export function Hero() {
               href="https://youtube.com/@StPeteMusic"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                pushEvent('cta_click', { cta_label: 'watch_youtube', cta_location: 'hero' });
+                pushEvent('outbound_link_click', { link_url: 'https://youtube.com/@StPeteMusic', link_text: 'Watch on YouTube' });
+              }}
               className="text-white font-inter font-bold text-base uppercase tracking-widest px-10 py-4 border border-white hover:bg-white/10 transition-all"
             >
               Watch on YouTube
@@ -128,6 +134,10 @@ export function Hero() {
               href="https://www.eventbrite.com/o/suite-e-studios-109188388681"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                pushEvent('cta_click', { cta_label: 'get_tickets', cta_location: 'hero' });
+                pushEvent('outbound_link_click', { link_url: 'https://www.eventbrite.com/o/suite-e-studios-109188388681', link_text: 'Get Tickets' });
+              }}
               className="text-white font-inter font-bold text-base uppercase tracking-widest px-10 py-4 bg-brand-orange hover:opacity-85 transition-opacity"
             >
               Get Tickets
