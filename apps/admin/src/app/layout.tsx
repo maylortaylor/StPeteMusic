@@ -13,17 +13,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <head>
-          <style>
-            {`:root {
-              color-scheme: light;
-            }`}
-          </style>
-        </head>
-        <body className="antialiased">{children}</body>
-      </html>
-    </ClerkProvider>
+    <html lang="en">
+      <head>
+        <style>
+          {`:root {
+            color-scheme: light;
+          }`}
+        </style>
+      </head>
+      <body className="antialiased">
+        <ClerkProvider>{children}</ClerkProvider>
+      </body>
+    </html>
   );
 }
