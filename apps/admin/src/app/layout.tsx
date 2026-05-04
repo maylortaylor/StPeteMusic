@@ -1,5 +1,5 @@
-import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
+import { Providers } from './providers';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -14,15 +14,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <style>
-          {`:root {
-            color-scheme: light;
-          }`}
-        </style>
-      </head>
       <body className="antialiased">
-        <ClerkProvider>{children}</ClerkProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
