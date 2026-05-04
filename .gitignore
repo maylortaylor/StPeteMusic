@@ -39,4 +39,13 @@ apps/GTM-*.json
 # Large data files that can be regenerated
 data/archive/
 data/secrets/
+data/*.csv
 n8n/local-files/
+
+# Build outputs
+apps/**/.next/
+apps/data/
+
+# Claude Code session files
+.claude/settings.local.json
+.playwright-mcp/
