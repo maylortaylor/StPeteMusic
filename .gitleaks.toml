@@ -20,3 +20,8 @@ useDefault = true
     '''YOUR_[A-Z_]+''',
     '''<YOUR_[A-Z_]+>''',
   ]
+  # Bypass already-committed findings that cannot be removed from history.
+  # Real values have been replaced with placeholders in current files.
+  commits = [
+    "a4e83b10cb099cc35210520d99dd5aba1628d614",
+  ]
