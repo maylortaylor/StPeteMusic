@@ -43,6 +43,7 @@ resource "aws_amplify_app" "web" {
   environment_variables = {
     AMPLIFY_MONOREPO_APP_ROOT = "apps/web"  # tells Amplify where to find package.json for framework detection
     NEXT_PUBLIC_SITE_URL      = "https://www.stpetemusic.live"
+    NEXT_PUBLIC_GTM_ID        = "GTM-WW7MSP3L"
     RESEND_API_KEY            = data.aws_ssm_parameter.resend_api_key.value
     LISTMONK_API_URL          = "https://listmonk.stpetemusic.live"
     LISTMONK_LIST_ID          = "3"
@@ -164,8 +165,9 @@ resource "aws_amplify_branch" "admin_develop" {
 }
 
 resource "aws_amplify_domain_association" "admin" {
-  app_id      = aws_amplify_app.admin.id
-  domain_name = "stpetemusic.live"
+  app_id                 = aws_amplify_app.admin.id
+  domain_name            = "stpetemusic.live"
+  wait_for_verification  = false  # DNS managed via cloudflare.tf; Amplify validates async
 
   sub_domain {
     branch_name = aws_amplify_branch.admin_main.branch_name
@@ -174,21 +176,19 @@ resource "aws_amplify_domain_association" "admin" {
 }
 
 # ── Web app custom domain ────────────────────────────────────────────────────
-# Custom domain — uncomment after stpetemusic.live nameservers point to Cloudflare
-# and after the Amplify app is created (run terraform apply without this block first,
-# then add it and re-apply once you have the Amplify CNAME value for Cloudflare DNS).
-#
-# resource "aws_amplify_domain_association" "web" {
-#   app_id      = aws_amplify_app.web.id
-#   domain_name = "stpetemusic.live"
-#
-#   sub_domain {
-#     branch_name = aws_amplify_branch.main.branch_name
-#     prefix      = "www"
-#   }
-#
-#   sub_domain {
-#     branch_name = aws_amplify_branch.main.branch_name
-#     prefix      = ""
-#   }
-# }
+
+resource "aws_amplify_domain_association" "web" {
+  app_id                 = aws_amplify_app.web.id
+  domain_name            = "stpetemusic.live"
+  wait_for_verification  = false  # DNS managed via cloudflare.tf; Amplify validates async
+
+  sub_domain {
+    branch_name = aws_amplify_branch.main.branch_name
+    prefix      = "www"
+  }
+
+  sub_domain {
+    branch_name = aws_amplify_branch.main.branch_name
+    prefix      = ""
+  }
+}

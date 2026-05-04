@@ -58,6 +58,16 @@ output "amplify_admin_production_url" {
   value       = "https://main.${aws_amplify_app.admin.default_domain}"
 }
 
+output "web_domain_dns_records" {
+  description = "DNS records Amplify expects for www.stpetemusic.live and apex. Verify these match your Cloudflare CNAME values."
+  value       = aws_amplify_domain_association.web.sub_domain
+}
+
+output "admin_domain_dns_records" {
+  description = "DNS records Amplify expects for admin.stpetemusic.live. Verify CNAME matches Cloudflare record."
+  value       = aws_amplify_domain_association.admin.sub_domain
+}
+
 output "linktree_api_url" {
   description = "Base URL for the Linktree API — use this in WordPress and Next.js fetch calls"
   value       = aws_apigatewayv2_api.linktree.api_endpoint
