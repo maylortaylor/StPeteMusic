@@ -10,6 +10,10 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = "~> 4.0"
     }
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 6.0"
+    }
   }
 
   backend "s3" {
@@ -30,4 +34,12 @@ provider "aws" {
 
 provider "cloudflare" {
   api_token = var.cloudflare_api_token
+}
+
+# Google Cloud provider — auth via GOOGLE_APPLICATION_CREDENTIALS env var
+# or gcloud application-default login (for local development).
+# Set TF_VAR_google_project_id and TF_VAR_google_org_id in CI.
+provider "google" {
+  project = var.google_project_id
+  region  = "us-east1"
 }

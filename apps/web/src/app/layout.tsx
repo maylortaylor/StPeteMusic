@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { GoogleTagManager } from '@next/third-parties/google';
+import { CookieBanner } from '@/components/CookieBanner';
 import './globals.css';
 
 const inter = Inter({
@@ -70,6 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       )}
       <body className="bg-background text-text-primary font-inter antialiased">
         {children}
+        <CookieBanner />
       </body>
     </html>
   );

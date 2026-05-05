@@ -114,3 +114,17 @@ variable "cloudflare_zone_id" {
   type        = string
   default     = ""  # empty default allows tofu validate/plan to pass without Cloudflare creds
 }
+
+# ── Google Cloud ──────────────────────────────────────────────────────────────
+
+variable "google_project_id" {
+  description = "GCP project ID for the main StPeteMusic project. Set via TF_VAR_google_project_id in CI."
+  type        = string
+  default     = ""  # empty default allows tofu validate/plan to pass without GCP creds
+}
+
+variable "google_org_id" {
+  description = "GCP organization ID for theburgmusic-org. Get via: gcloud organizations list. Set via TF_VAR_google_org_id in CI."
+  type        = string
+  default     = ""  # empty default allows tofu validate/plan to pass without GCP creds
+}

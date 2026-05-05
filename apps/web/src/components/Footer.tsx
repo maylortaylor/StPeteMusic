@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { pushEvent } from '@/lib/analytics';
 
 const COLUMNS = [
@@ -85,10 +86,16 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-black/20 pt-8 flex flex-col sm:flex-row justify-between gap-4">
+        <div className="border-t border-black/20 pt-8 flex flex-col sm:flex-row justify-between gap-4 items-center">
           <p className="font-inter text-base text-black/60">
             © {new Date().getFullYear()} StPeteMusic / Suite E Studios
           </p>
+          <Link
+            href="/privacy"
+            className="font-inter text-sm text-black/50 hover:text-black/80 transition-colors"
+          >
+            Privacy Policy
+          </Link>
           <p className="font-inter font-medium text-sm tracking-[0.2em] uppercase text-black/50">
             Live Music · Local Artists · Real Community
           </p>

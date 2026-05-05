@@ -35,3 +35,23 @@ ssh_key_name = "stpetemusic-n8n"
 #   tofu import 'cloudflare_record.apex[0]'         <zone_id>/<apex_record_id>
 #   tofu import 'cloudflare_record.admin[0]'        <zone_id>/<admin_record_id>
 #   tofu import 'cloudflare_record.acm_validation[0]' <zone_id>/<acm_record_id>
+#
+# ── Google Cloud ──────────────────────────────────────────────────────────────
+#
+# Auth: set GOOGLE_APPLICATION_CREDENTIALS to a service account JSON key path,
+#       or run: gcloud auth application-default login
+#
+# Get org ID: gcloud organizations list
+#   → note the numeric ID for theburgmusic-org
+#
+#   export TF_VAR_google_project_id="project-bb73c742-70e6-4419-a66"  # main StPeteMusic project
+#   export TF_VAR_google_org_id="<numeric_org_id>"                     # theburgmusic-org
+#
+# On first apply, import existing projects before Terraform manages them:
+#   tofu import 'google_project.stpetemusic[0]'  project-bb73c742-70e6-4419-a66
+#   tofu import 'google_project.analytics[0]'    stpetemusic-analytics
+#
+# Add to CI (GitHub Secrets):
+#   TF_VAR_GOOGLE_PROJECT_ID
+#   TF_VAR_GOOGLE_ORG_ID
+#   GOOGLE_APPLICATION_CREDENTIALS (or inline JSON)
