@@ -1,3 +1,21 @@
+// Content Security Policy
+// next/font/google self-hosts fonts → font-src 'self' is sufficient
+// GTM requires unsafe-inline (injects inline scripts into the page)
+// Google Maps API loaded via @vis.gl/react-google-maps
+const csp = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://maps.googleapis.com",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://www.googletagmanager.com https://www.google-analytics.com https://i.ytimg.com https://img.youtube.com https://maps.googleapis.com https://maps.gstatic.com",
+  "font-src 'self'",
+  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://region1.analytics.google.com https://www.googletagmanager.com",
+  "frame-src https://www.youtube.com https://www.youtube-nocookie.com",
+  "frame-ancestors 'self'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "object-src 'none'",
+].join('; ');
+
 const securityHeaders = [
   { key: 'X-Frame-Options',           value: 'SAMEORIGIN' },
   { key: 'X-Content-Type-Options',    value: 'nosniff' },
@@ -5,6 +23,7 @@ const securityHeaders = [
   { key: 'X-DNS-Prefetch-Control',    value: 'on' },
   { key: 'Permissions-Policy',        value: 'camera=(), microphone=(), geolocation=()' },
   { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+  { key: 'Content-Security-Policy',   value: csp },
 ];
 
 /** @type {import('next').NextConfig} */

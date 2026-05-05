@@ -42,6 +42,7 @@ export function Hero() {
             muted
             loop
             playsInline
+            poster="/images/hero/hero-1.webp"
             className="absolute inset-0 w-full h-full object-cover"
           >
             <source src="/videos/hero.mp4" type="video/mp4" />
@@ -49,6 +50,7 @@ export function Hero() {
               src="/images/hero/hero-1.jpg"
               alt="Live music at Suite E Studios"
               fill
+              sizes="100vw"
               className="object-cover object-center"
               priority
             />
@@ -90,6 +92,7 @@ export function Hero() {
               alt="St Pete Music"
               width={500}
               height={500}
+              sizes="(max-width: 768px) 75vw, 500px"
               className="object-contain"
               style={{ maxWidth: 'min(500px, 75vw)', height: 'auto', marginTop: '-75px', marginBottom: '-75px' }}
               priority
