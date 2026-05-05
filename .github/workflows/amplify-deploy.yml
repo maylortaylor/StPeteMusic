@@ -1,0 +1,102 @@
+name: Deploy to Amplify
+
+# Explicitly triggers Amplify builds for web and admin apps on push to main.
+# This is the reliable path — Amplify's webhook-based auto-build depends on
+# a stored GitHub token that can silently go stale. This workflow uses the
+# AWS CLI directly, so builds always fire regardless of webhook state.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+      - 'amplify.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  WEB_APP_ID: d1fjwgk99cbqor
+  ADMIN_APP_ID: d2n0tn0yijqxny
+  AWS_REGION: us-east-1
+
+jobs:
+  deploy:
+    name: Trigger Amplify builds
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37  # v6.1.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Start web app build
+        id: web_job
+        run: |
+          JOB_ID=$(aws amplify start-job \
+            --app-id "$WEB_APP_ID" \
+            --branch-name main \
+            --job-type RELEASE \
+            --query 'jobSummary.jobId' \
+            --output text)
+          echo "job_id=$JOB_ID" >> "$GITHUB_OUTPUT"
+          echo "Started web build: job $JOB_ID"
+
+      - name: Start admin app build
+        id: admin_job
+        run: |
+          JOB_ID=$(aws amplify start-job \
+            --app-id "$ADMIN_APP_ID" \
+            --branch-name main \
+            --job-type RELEASE \
+            --query 'jobSummary.jobId' \
+            --output text)
+          echo "job_id=$JOB_ID" >> "$GITHUB_OUTPUT"
+          echo "Started admin build: job $JOB_ID"
+
+      - name: Wait for web build
+        env:
+          WEB_JOB_ID: ${{ steps.web_job.outputs.job_id }}
+        run: |
+          echo "Waiting for web build $WEB_JOB_ID..."
+          for i in $(seq 1 40); do
+            STATUS=$(aws amplify get-job \
+              --app-id "$WEB_APP_ID" \
+              --branch-name main \
+              --job-id "$WEB_JOB_ID" \
+              --query 'job.summary.status' \
+              --output text)
+            echo "  [${i}/40] status: $STATUS"
+            case "$STATUS" in
+              SUCCEED) echo "✓ Web build succeeded"; exit 0 ;;
+              FAILED|CANCELLED) echo "✗ Web build $STATUS"; exit 1 ;;
+            esac
+            sleep 30
+          done
+          echo "✗ Web build timed out after 20 min"; exit 1
+
+      - name: Wait for admin build
+        env:
+          ADMIN_JOB_ID: ${{ steps.admin_job.outputs.job_id }}
+        run: |
+          echo "Waiting for admin build $ADMIN_JOB_ID..."
+          for i in $(seq 1 40); do
+            STATUS=$(aws amplify get-job \
+              --app-id "$ADMIN_APP_ID" \
+              --branch-name main \
+              --job-id "$ADMIN_JOB_ID" \
+              --query 'job.summary.status' \
+              --output text)
+            echo "  [${i}/40] status: $STATUS"
+            case "$STATUS" in
+              SUCCEED) echo "✓ Admin build succeeded"; exit 0 ;;
+              FAILED|CANCELLED) echo "✗ Admin build $STATUS"; exit 1 ;;
+            esac
+            sleep 30
+          done
+          echo "✗ Admin build timed out after 20 min"; exit 1
