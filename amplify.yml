@@ -31,7 +31,7 @@ applications:
             # Install from the monorepo root so all workspace deps (drizzle-orm, pg, etc.)
             # land in root node_modules and are resolvable by apps/admin.
             # appRoot sets CWD to apps/admin, so ../.. is the repo root.
-            - cd ../.. && npm ci
+            - cd ../.. && npm ci && npm run build --workspace=@stpetemusic/db
         build:
           commands:
             - npm run build

@@ -45,6 +45,7 @@ n8n/local-files/
 # Build outputs
 apps/**/.next/
 apps/data/
+packages/db/dist/
 
 # Claude Code session files
 .claude/settings.local.json
