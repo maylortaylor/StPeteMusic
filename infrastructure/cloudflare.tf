@@ -24,7 +24,7 @@ resource "cloudflare_record" "www" {
   zone_id = var.cloudflare_zone_id
   name    = "www"
   type    = "CNAME"
-  value   = try(one([for s in aws_amplify_domain_association.web.sub_domain : s.dns_record if s.prefix == "www"]), "")
+  content = try(one([for s in aws_amplify_domain_association.web.sub_domain : s.dns_record if s.prefix == "www"]), "")
   proxied = false
   ttl     = 1  # 1 = auto (required when proxied = false)
 }
@@ -38,7 +38,7 @@ resource "cloudflare_record" "apex" {
   zone_id = var.cloudflare_zone_id
   name    = "@"
   type    = "CNAME"
-  value   = try(one([for s in aws_amplify_domain_association.web.sub_domain : s.dns_record if s.prefix == ""]), "")
+  content = try(one([for s in aws_amplify_domain_association.web.sub_domain : s.dns_record if s.prefix == ""]), "")
   proxied = false
   ttl     = 1
 }
@@ -51,7 +51,7 @@ resource "cloudflare_record" "admin" {
   zone_id = var.cloudflare_zone_id
   name    = "admin"
   type    = "CNAME"
-  value   = try(one([for s in aws_amplify_domain_association.admin.sub_domain : s.dns_record if s.prefix == "admin"]), "")
+  content = try(one([for s in aws_amplify_domain_association.admin.sub_domain : s.dns_record if s.prefix == "admin"]), "")
   proxied = false
   ttl     = 1
 }
@@ -69,7 +69,8 @@ resource "cloudflare_record" "acm_validation" {
   zone_id = var.cloudflare_zone_id
   name    = "_ddf1b33c5eab2d60eddc95848a12d240"
   type    = "CNAME"
-  value   = "_bf19e363018afabe1b2e49737993dac9.jkddzztszm.acm-validations.aws"
+  content = "_bf19e363018afabe1b2e49737993dac9.jkddzztszm.acm-validations.aws"
   proxied = false
   ttl     = 1
 }
+
