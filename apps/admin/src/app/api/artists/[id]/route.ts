@@ -1,6 +1,5 @@
 import { auth } from '@clerk/nextjs/server';
-import { getDb, artists } from '@stpetemusic/db';
-import { eq } from 'drizzle-orm';
+import { getDb, artists, eq } from '@stpetemusic/db';
 
 export async function GET(
   request: Request,
