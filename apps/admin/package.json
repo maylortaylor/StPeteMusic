@@ -12,7 +12,6 @@
   "dependencies": {
     "@clerk/nextjs": "^6.5.0",
     "@stpetemusic/db": "*",
-    "drizzle-orm": "^0.31.2",
     "@stpetemusic/types": "*",
     "@tanstack/react-form": "^1.0.0",
     "@tanstack/react-table": "^8.20.0",

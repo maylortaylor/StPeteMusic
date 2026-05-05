@@ -38,26 +38,52 @@ jobs:
       - name: Start web app build
         id: web_job
         run: |
-          JOB_ID=$(aws amplify start-job \
+          # If a build is already running (e.g. triggered by Amplify webhook on the same push),
+          # reuse that job rather than failing.
+          START_OUT=$(aws amplify start-job \
             --app-id "$WEB_APP_ID" \
             --branch-name main \
             --job-type RELEASE \
             --query 'jobSummary.jobId' \
-            --output text)
+            --output text 2>&1) || true
+          if echo "$START_OUT" | grep -q "LimitExceededException"; then
+            echo "Build already running — finding existing job..."
+            JOB_ID=$(aws amplify list-jobs \
+              --app-id "$WEB_APP_ID" \
+              --branch-name main \
+              --max-results 1 \
+              --query 'jobSummaries[0].jobId' \
+              --output text)
+            echo "Using existing web job $JOB_ID"
+          else
+            JOB_ID="$START_OUT"
+            echo "Started web build: job $JOB_ID"
+          fi
           echo "job_id=$JOB_ID" >> "$GITHUB_OUTPUT"
-          echo "Started web build: job $JOB_ID"
 
       - name: Start admin app build
         id: admin_job
         run: |
-          JOB_ID=$(aws amplify start-job \
+          START_OUT=$(aws amplify start-job \
             --app-id "$ADMIN_APP_ID" \
             --branch-name main \
             --job-type RELEASE \
             --query 'jobSummary.jobId' \
-            --output text)
+            --output text 2>&1) || true
+          if echo "$START_OUT" | grep -q "LimitExceededException"; then
+            echo "Build already running — finding existing job..."
+            JOB_ID=$(aws amplify list-jobs \
+              --app-id "$ADMIN_APP_ID" \
+              --branch-name main \
+              --max-results 1 \
+              --query 'jobSummaries[0].jobId' \
+              --output text)
+            echo "Using existing admin job $JOB_ID"
+          else
+            JOB_ID="$START_OUT"
+            echo "Started admin build: job $JOB_ID"
+          fi
           echo "job_id=$JOB_ID" >> "$GITHUB_OUTPUT"
-          echo "Started admin build: job $JOB_ID"
 
       - name: Wait for web build
         env:
