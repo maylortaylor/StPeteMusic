@@ -50,3 +50,4 @@ packages/db/dist/
 # Claude Code session files
 .claude/settings.local.json
 .playwright-mcp/
+lighthouse-*.json

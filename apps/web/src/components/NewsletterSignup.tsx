@@ -109,7 +109,7 @@ export function NewsletterSignup({ variant = 'section' }: NewsletterSignupProps)
         </AnimateIn>
 
         {status === 'error' && <p className="text-red-400 text-base mt-4">{message}</p>}
-        <AnimateIn delay={0.4} as="p" className="font-inter text-white/40 text-base mt-6">
+        <AnimateIn delay={0.4} as="p" className="font-inter text-white/50 text-base mt-6">
           No spam. Unsubscribe anytime.
         </AnimateIn>
       </div>

@@ -175,7 +175,7 @@ export function ContactSection() {
                 {status === 'loading' ? 'Sending...' : 'Send Message'}
               </button>
 
-              <p className="font-inter text-white/40 text-xs text-center mt-4">
+              <p className="font-inter text-white/60 text-xs text-center mt-4">
                 * Required fields. We&apos;ll respond as soon as we can.
               </p>
             </form>

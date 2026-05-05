@@ -42,7 +42,7 @@ export function Footer() {
             <p className="font-inter text-base text-black/70">
               St. Petersburg, FL
             </p>
-            <p className="font-inter text-base mt-0.5 text-black/60">
+            <p className="font-inter text-base mt-0.5 text-black/70">
               Community Driven Music
             </p>
           </div>
@@ -74,7 +74,7 @@ export function Footer() {
                     ) : (
                       <span
                         key={link.label}
-                        className="font-inter text-lg text-black/60"
+                        className="font-inter text-lg text-black/70"
                       >
                         {link.label}
                       </span>
@@ -87,16 +87,16 @@ export function Footer() {
         </div>
 
         <div className="border-t border-black/20 pt-8 flex flex-col sm:flex-row justify-between gap-4 items-center">
-          <p className="font-inter text-base text-black/60">
+          <p className="font-inter text-base text-black/70">
             © {new Date().getFullYear()} StPeteMusic / Suite E Studios
           </p>
           <Link
             href="/privacy"
-            className="font-inter text-sm text-black/50 hover:text-black/80 transition-colors"
+            className="font-inter text-sm text-black/70 hover:text-black transition-colors"
           >
             Privacy Policy
           </Link>
-          <p className="font-inter font-medium text-sm tracking-[0.2em] uppercase text-black/50">
+          <p className="font-inter font-medium text-sm tracking-[0.2em] uppercase text-black/70">
             Live Music · Local Artists · Real Community
           </p>
         </div>
