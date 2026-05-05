@@ -8,6 +8,7 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  id-token: write  # required for Workload Identity Federation
 
 jobs:
   tofu-plan:
@@ -33,6 +34,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/1082906683227/locations/global/workloadIdentityPools/github-actions/providers/github
+          service_account: spm-ci-planner@stpetemusic-analytics.iam.gserviceaccount.com
+
       - name: OpenTofu Init
         id: init
         run: tofu init -backend-config="profile="
@@ -56,6 +63,8 @@ jobs:
           TF_VAR_clerk_publishable_key: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
           TF_VAR_cloudflare_api_token:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
           TF_VAR_cloudflare_zone_id:    ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          TF_VAR_google_project_id:     project-bb73c742-70e6-4419-a66
+          TF_VAR_google_org_id:         "982527051911"
 
       - name: Post Plan to PR
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3  # v9.0.0
