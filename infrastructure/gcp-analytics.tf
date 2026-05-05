@@ -22,6 +22,16 @@ resource "google_project" "analytics" {
   org_id     = var.google_org_id
 }
 
+# Cloud Resource Manager API — required by the Google Terraform provider to read project state
+resource "google_project_service" "resource_manager" {
+  count = local.enable_gcp ? 1 : 0
+
+  project                    = google_project.analytics[0].project_id
+  service                    = "cloudresourcemanager.googleapis.com"
+  disable_on_destroy         = false
+  disable_dependent_services = false
+}
+
 # GA4 Data API — read analytics reports
 resource "google_project_service" "ga4_data" {
   count = local.enable_gcp ? 1 : 0
