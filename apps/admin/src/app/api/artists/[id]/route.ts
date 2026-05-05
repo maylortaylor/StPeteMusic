@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { userId } = await auth();
@@ -12,11 +12,12 @@ export async function GET(
       return new Response('Unauthorized', { status: 401 });
     }
 
+    const { id } = await params;
     const db = getDb();
     const result = await db
       .select()
       .from(artists)
-      .where(eq(artists.id, params.id));
+      .where(eq(artists.id, id));
 
     if (result.length === 0) {
       return Response.json({ error: 'Artist not found' }, { status: 404 });
@@ -34,7 +35,7 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { userId } = await auth();
@@ -42,6 +43,7 @@ export async function PUT(
       return new Response('Unauthorized', { status: 401 });
     }
 
+    const { id } = await params;
     const data = await request.json();
     const db = getDb();
 
@@ -66,7 +68,7 @@ export async function PUT(
         is_active: data.is_active,
         visible_on_website: data.visible_on_website,
       })
-      .where(eq(artists.id, params.id))
+      .where(eq(artists.id, id))
       .returning();
 
     if (result.length === 0) {
@@ -85,7 +87,7 @@ export async function PUT(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { userId } = await auth();
@@ -93,6 +95,7 @@ export async function PATCH(
       return new Response('Unauthorized', { status: 401 });
     }
 
+    const { id } = await params;
     const data = await request.json();
     const db = getDb();
 
@@ -103,7 +106,7 @@ export async function PATCH(
     const result = await db
       .update(artists)
       .set(updateData)
-      .where(eq(artists.id, params.id))
+      .where(eq(artists.id, id))
       .returning();
 
     if (result.length === 0) {
