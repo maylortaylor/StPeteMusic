@@ -73,3 +73,4 @@ resource "cloudflare_record" "acm_validation" {
   proxied = false
   ttl     = 1
 }
+
