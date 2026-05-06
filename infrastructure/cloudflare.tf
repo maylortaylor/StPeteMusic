@@ -66,11 +66,12 @@ resource "cloudflare_record" "admin" {
 resource "cloudflare_record" "acm_validation" {
   count = local.enable_cloudflare ? 1 : 0
 
-  zone_id = var.cloudflare_zone_id
-  name    = "_ddf1b33c5eab2d60eddc95848a12d240"
-  type    = "CNAME"
-  content = "_bf19e363018afabe1b2e49737993dac9.jkddzztszm.acm-validations.aws"
-  proxied = false
-  ttl     = 1
+  zone_id         = var.cloudflare_zone_id
+  name            = "_ddf1b33c5eab2d60eddc95848a12d240"
+  type            = "CNAME"
+  content         = "_bf19e363018afabe1b2e49737993dac9.jkddzztszm.acm-validations.aws"
+  proxied         = false
+  ttl             = 1
+  allow_overwrite = true  # static hardcoded value — safe to overwrite; record may pre-exist state
 }
 

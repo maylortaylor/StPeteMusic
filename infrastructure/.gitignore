@@ -9,6 +9,7 @@ tfplan
 # Variable overrides (contain secrets)
 terraform.tfvars
 *.auto.tfvars
+import-vars.tfvars
 
 # Crash logs
 crash.log

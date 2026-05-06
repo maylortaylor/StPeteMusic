@@ -46,6 +46,7 @@ n8n/local-files/
 apps/**/.next/
 apps/data/
 packages/db/dist/
+apps/**/tsconfig.tsbuildinfo
 
 # Claude Code session files
 .claude/settings.local.json
