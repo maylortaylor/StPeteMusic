@@ -84,6 +84,14 @@ export function ArtistForm({ artistId }: ArtistFormProps) {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
+    if (name === 'name') {
+      setFormData(prev => ({
+        ...prev,
+        name: value,
+        slug: value.toLowerCase().replace(/\s+/g, '-'),
+      }));
+      return;
+    }
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,

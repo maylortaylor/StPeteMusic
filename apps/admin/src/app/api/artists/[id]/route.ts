@@ -1,6 +1,24 @@
 import { auth } from '@clerk/nextjs/server';
 import { getDb, artists, eq } from '@stpetemusic/db';
 
+async function triggerRevalidation(slug: string, oldSlug?: string) {
+  const webAppUrl = process.env.WEB_APP_URL;
+  const secret = process.env.REVALIDATION_SECRET;
+  if (!webAppUrl || !secret) return;
+  try {
+    await fetch(`${webAppUrl}/api/revalidate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${secret}`,
+      },
+      body: JSON.stringify({ slug, oldSlug }),
+    });
+  } catch (err) {
+    console.error('Revalidation request failed:', err);
+  }
+}
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -46,6 +64,9 @@ export async function PUT(
     const data = await request.json();
     const db = getDb();
 
+    const current = await db.select({ slug: artists.slug }).from(artists).where(eq(artists.id, id));
+    const oldSlug = current[0]?.slug ?? undefined;
+
     const result = await db
       .update(artists)
       .set({
@@ -73,6 +94,8 @@ export async function PUT(
     if (result.length === 0) {
       return Response.json({ error: 'Artist not found' }, { status: 404 });
     }
+
+    await triggerRevalidation(result[0].slug, oldSlug);
 
     return Response.json(result[0]);
   } catch (error) {
@@ -111,6 +134,8 @@ export async function PATCH(
     if (result.length === 0) {
       return Response.json({ error: 'Artist not found' }, { status: 404 });
     }
+
+    await triggerRevalidation(result[0].slug);
 
     return Response.json(result[0]);
   } catch (error) {
