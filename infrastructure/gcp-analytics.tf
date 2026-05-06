@@ -62,6 +62,16 @@ resource "google_project_service" "iam_api" {
   disable_dependent_services = false
 }
 
+# Google Sheets API — weekly analytics report writes to Drive spreadsheet
+resource "google_project_service" "sheets_api" {
+  count = local.enable_gcp ? 1 : 0
+
+  project                    = google_project.analytics[0].project_id
+  service                    = "sheets.googleapis.com"
+  disable_on_destroy         = false
+  disable_dependent_services = false
+}
+
 # Tag Manager API — backup/apply/validate GTM container config
 resource "google_project_service" "tag_manager" {
   count = local.enable_gcp ? 1 : 0

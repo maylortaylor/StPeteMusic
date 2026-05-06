@@ -21,6 +21,7 @@
     "gtm:validate": "node scripts/gtm-validate.mjs",
     "ga4:conversions": "node scripts/ga4-conversions.mjs",
     "ga4:setup": "node scripts/ga4-setup.mjs",
+    "ga4:weekly-report": "node scripts/ga4-weekly-report.mjs",
     "images:optimize": "node scripts/optimize-images.mjs"
   },
   "dependencies": {

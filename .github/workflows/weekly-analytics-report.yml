@@ -1,0 +1,44 @@
+name: Weekly Analytics Report
+
+on:
+  schedule:
+    - cron: '0 14 * * 1'  # Monday 9am ET (14:00 UTC)
+  workflow_dispatch:       # manual trigger for testing
+
+permissions:
+  contents: read
+  id-token: write  # required for GCP Workload Identity Federation
+
+jobs:
+  report:
+    name: Generate & Send Report
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: apps/web
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/1082906683227/locations/global/workloadIdentityPools/github-actions/providers/github
+          service_account: spm-ci-planner@stpetemusic-analytics.iam.gserviceaccount.com
+
+      - name: Run weekly analytics report
+        run: node scripts/ga4-weekly-report.mjs
+        working-directory: apps/web
+        env:
+          GA4_PROPERTY_ID:         ${{ secrets.GA4_PROPERTY_ID }}
+          RESEND_API_KEY:          ${{ secrets.RESEND_API_KEY }}
+          WEEKLY_REPORT_SHEETS_ID: ${{ secrets.WEEKLY_REPORT_SHEETS_ID }}
