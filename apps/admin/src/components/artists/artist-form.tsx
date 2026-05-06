@@ -51,8 +51,24 @@ export function ArtistForm({ artistId }: ArtistFormProps) {
           const response = await fetch(`/api/artists/${artistId}`);
           if (!response.ok) throw new Error('Failed to fetch artist');
           const data = await response.json();
+          const nullToEmpty = (v: unknown) => (v === null ? '' : v);
           setFormData({
-            ...data,
+            name: data.name ?? '',
+            type: data.type ?? 'Band',
+            slug: nullToEmpty(data.slug) as string,
+            username: nullToEmpty(data.username) as string,
+            description: nullToEmpty(data.description) as string,
+            instagram_handle: nullToEmpty(data.instagram_handle) as string,
+            instagram_url: nullToEmpty(data.instagram_url) as string,
+            facebook_url: nullToEmpty(data.facebook_url) as string,
+            youtube_url: nullToEmpty(data.youtube_url) as string,
+            website: nullToEmpty(data.website) as string,
+            linktree_url: nullToEmpty(data.linktree_url) as string,
+            home_base: nullToEmpty(data.home_base) as string,
+            hero_photo_url: nullToEmpty(data.hero_photo_url) as string,
+            notes: nullToEmpty(data.notes) as string,
+            is_active: data.is_active ?? true,
+            visible_on_website: data.visible_on_website ?? false,
             genres: Array.isArray(data.genres) ? data.genres.join(', ') : '',
             tags: Array.isArray(data.tags) ? data.tags.join(', ') : '',
           });
