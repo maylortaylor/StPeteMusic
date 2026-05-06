@@ -17,6 +17,7 @@ updated: 2026-05-06
 
 **Listmonk credential sync**: Amplify's `LISTMONK_USERNAME`/`LISTMONK_PASSWORD` must match SSM values at `/stpetemusic/listmonk/username` and `/stpetemusic/listmonk/password`. Drift → 403 → 500 errors.
 **Diagnose**: `https://www.stpetemusic.live/api/newsletter/health`
+**CloudFront cache headers**: Amplify overrides `next.config.mjs` Cache-Control for public assets (`max-age=5`). Fix via Amplify Custom Headers YAML or CloudFront behaviors — see [`docs/infrastructure/CLOUDFRONT_CACHE_POLICY.md`](../docs/infrastructure/CLOUDFRONT_CACHE_POLICY.md).
 
 ## Admin App (AWS Amplify SSR)
 | Item | Value |
