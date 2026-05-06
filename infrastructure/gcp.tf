@@ -19,6 +19,11 @@ resource "google_project" "stpetemusic" {
   name       = "StPeteMusic"
   project_id = var.google_project_id
   org_id     = var.google_org_id
+
+  lifecycle {
+    # billing_account is managed outside Terraform — don't clear it on apply
+    ignore_changes = [billing_account]
+  }
 }
 
 # Maps JavaScript API — used for venue location maps on the website

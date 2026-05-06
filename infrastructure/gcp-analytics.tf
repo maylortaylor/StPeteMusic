@@ -52,6 +52,16 @@ resource "google_project_service" "ga4_admin" {
   disable_dependent_services = false
 }
 
+# IAM API — required to create service accounts
+resource "google_project_service" "iam_api" {
+  count = local.enable_gcp ? 1 : 0
+
+  project                    = google_project.analytics[0].project_id
+  service                    = "iam.googleapis.com"
+  disable_on_destroy         = false
+  disable_dependent_services = false
+}
+
 # Tag Manager API — backup/apply/validate GTM container config
 resource "google_project_service" "tag_manager" {
   count = local.enable_gcp ? 1 : 0
@@ -73,4 +83,6 @@ resource "google_service_account" "analytics_sa" {
   account_id   = "spm-analytics-sa"
   display_name = "SPM Analytics Service Account"
   description  = "Used by ga4-export.mjs, ga4-setup.mjs, ga4-conversions.mjs, gtm-backup.mjs, gtm-apply.mjs"
+
+  depends_on = [google_project_service.iam_api]
 }
