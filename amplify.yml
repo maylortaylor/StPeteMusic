@@ -28,10 +28,10 @@ applications:
         preBuild:
           commands:
             - node --version
-            # Install from the monorepo root so all workspace deps (drizzle-orm, pg, etc.)
-            # land in root node_modules and are resolvable by apps/admin.
-            # appRoot sets CWD to apps/admin, so ../.. is the repo root.
-            - cd ../.. && npm ci && npm run build --workspace=@stpetemusic/db
+            # Use --prefix to run npm from the repo root without changing shell CWD.
+            # Keeps build phase CWD at apps/admin so 'npm run build' = 'next build'.
+            - npm --prefix ../.. ci
+            - npm --prefix ../.. run build --workspace=@stpetemusic/db
         build:
           commands:
             - npm run build
