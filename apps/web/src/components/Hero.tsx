@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { motion, useTransform, useSpring } from 'framer-motion';
 import { useScrollPinned } from './AnimateIn';
@@ -8,6 +8,7 @@ import { pushEvent } from '@/lib/analytics';
 
 export function Hero() {
   const outerRef = useRef<HTMLElement>(null);
+  const [posterVisible, setPosterVisible] = useState(true);
   const { scrollYProgress } = useScrollPinned(outerRef);
 
   // Video container scales slightly and drifts up on scroll — cinematic depth
@@ -42,19 +43,26 @@ export function Hero() {
             muted
             loop
             playsInline
-            poster="/images/hero/hero-1.webp"
+            onCanPlay={() => setPosterVisible(false)}
             className="absolute inset-0 w-full h-full object-cover"
           >
             <source src="/videos/hero.mp4" type="video/mp4" />
-            <Image
-              src="/images/hero/hero-1.jpg"
-              alt="Live music at Suite E Studios"
-              fill
-              sizes="100vw"
-              className="object-cover object-center"
-              priority
-            />
           </video>
+          {/* Poster overlay: served via _next/image so mobile gets a small optimized variant.
+              Fades out once the video can play. */}
+          <Image
+            src="/images/hero/hero-1.webp"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover object-center"
+            priority
+            style={{
+              transition: 'opacity 0.4s ease',
+              opacity: posterVisible ? 1 : 0,
+              pointerEvents: 'none',
+            }}
+          />
         </motion.div>
 
         {/* Warm orange-tinted overlay — bridges video to Suite E brand palette */}

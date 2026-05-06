@@ -47,6 +47,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'img.youtube.com' },
       { protocol: 'https', hostname: 'i.ytimg.com' },
     ],
+    minimumCacheTTL: 31536000,
   },
   // Amplify Gen 1 passes app-level env vars to the build process but does NOT
   // automatically inject server-only (non-NEXT_PUBLIC_) vars into the SSR Lambda

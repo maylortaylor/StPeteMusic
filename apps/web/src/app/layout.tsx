@@ -70,8 +70,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="theme-color" content="#FF8C00" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
-        {/* Preload hero poster so the LCP video element renders immediately */}
-        <link rel="preload" as="image" href="/images/hero/hero-1.webp" fetchPriority="high" />
       </head>
       {process.env.NEXT_PUBLIC_GTM_ID && (
         <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID} />

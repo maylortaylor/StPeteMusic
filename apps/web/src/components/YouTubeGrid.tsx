@@ -1,6 +1,7 @@
 'use client';
 
-import { useRef } from 'react';
+import { useState, useRef } from 'react';
+import Image from 'next/image';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { AnimateIn } from './AnimateIn';
 import { pushEvent } from '@/lib/analytics';
@@ -13,9 +14,12 @@ const ARTISTS = [
 ];
 
 const PLAYLIST_ID = 'PL5gTeopOibQREpXSSqHwVaZTWv1EdUuki';
+// Thumbnail from the first video in the playlist
+const PLAYLIST_THUMBNAIL_VIDEO_ID = 'T_bzHYN_PE4';
 
 function ParallaxEmbed() {
   const ref = useRef<HTMLDivElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const rawY = useTransform(scrollYProgress, [0, 0.4, 1], ['80px', '0px', '-20px']);
   const y = useSpring(rawY, { stiffness: 55, damping: 20 });
@@ -25,16 +29,41 @@ function ParallaxEmbed() {
   return (
     <motion.div
       ref={ref}
-      className="overflow-hidden aspect-video mb-6"
+      className="overflow-hidden aspect-video mb-6 relative"
       style={{ border: '1px solid #E5E5E5', y, opacity, scale }}
     >
-      <iframe
-        src={`https://www.youtube-nocookie.com/embed/videoseries?list=${PLAYLIST_ID}&autoplay=0`}
-        title="StPeteMusic — Latest Videos"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-        className="w-full h-full"
-      />
+      {isPlaying ? (
+        <iframe
+          src={`https://www.youtube-nocookie.com/embed/videoseries?list=${PLAYLIST_ID}&autoplay=1`}
+          title="StPeteMusic — Latest Videos"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="w-full h-full"
+        />
+      ) : (
+        <button
+          type="button"
+          className="w-full h-full relative group cursor-pointer border-0 p-0 bg-transparent block"
+          onClick={() => setIsPlaying(true)}
+          aria-label="Play StPeteMusic latest videos on YouTube"
+        >
+          <Image
+            src={`https://i.ytimg.com/vi/${PLAYLIST_THUMBNAIL_VIDEO_ID}/maxresdefault.jpg`}
+            alt="StPeteMusic latest videos"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 85vw, 1280px"
+            className="object-cover"
+            loading="lazy"
+          />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors">
+            <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: '#FF0000' }}>
+              <svg viewBox="0 0 24 24" fill="white" className="w-7 h-7 ml-1" aria-hidden="true">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+          </div>
+        </button>
+      )}
     </motion.div>
   );
 }
