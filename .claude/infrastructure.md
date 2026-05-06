@@ -26,18 +26,22 @@ updated: 2026-05-06
 | Staging URL | https://develop.d2n0tn0yijqxny.amplifyapp.com |
 | Hosting mode | `WEB_COMPUTE` |
 | Monorepo root | `apps/admin` |
-| CloudFront | `d3bw6dvnla71y8.cloudfront.net` |
+| CloudFront | `d2ltgwfvkan5js.cloudfront.net` |
 
 Auth via Clerk. Env vars (`CLERK_SECRET_KEY`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`) sourced from SSM at `/stpetemusic/clerk/*`.
+Database: `stpetemusic` on RDS (`stpetemusic-postgres.cmnogyowgoe1.us-east-1.rds.amazonaws.com`).
+
+**Known issue (2026-05-06)**: App builds succeed but returns 500 at runtime. Clerk middleware crashes — likely `CLERK_SECRET_KEY` not available in the Next.js 16 proxy/middleware runtime on Amplify WEB_COMPUTE. See troubleshooting below.
 
 ## DNS (Cloudflare — sole DNS provider)
 Route 53 hosted zone deleted. All records must be **DNS only (grey cloud — NOT proxied)**:
 - `www` and `@` (apex) → `d35nc2e8nr92q9.cloudfront.net`
-- `admin` → `d3bw6dvnla71y8.cloudfront.net`
+- `admin` → `d2ltgwfvkan5js.cloudfront.net`
 - ACM validation: `_ddf1b33c5eab2d60eddc95848a12d240` → `_bf19e363018afabe1b2e49737993dac9.jkddzztszm.acm-validations.aws`
 
 ⚠️ Cloudflare proxy (orange cloud) must stay OFF — Amplify ACM SSL requires direct DNS resolution.
 ⚠️ `acm_validation` record has `allow_overwrite = true` in cloudflare.tf — safe, it's static after cert issuance.
+⚠️ If domain association is deleted+recreated, a **new CloudFront distribution** is issued. You must: delete old CNAME, recreate domain association, add new CNAME, then trigger a fresh build to wire the new distribution.
 
 ## n8n Production Server (AWS EC2)
 - URL: https://n8n.stpetemusic.live
