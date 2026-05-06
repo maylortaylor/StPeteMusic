@@ -34,17 +34,6 @@ function nextFinalFriday(): string {
   return date.toISOString().split('T')[0] + 'T19:00:00-04:00';
 }
 
-function nextInstantNoodles(): string {
-  const now = new Date();
-  let date = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  while (date.getDay() !== 3) date.setDate(date.getDate() - 1);
-  if (date <= now) {
-    date = new Date(now.getFullYear(), now.getMonth() + 2, 0);
-    while (date.getDay() !== 3) date.setDate(date.getDate() - 1);
-  }
-  return date.toISOString().split('T')[0] + 'T18:00:00-04:00';
-}
-
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
@@ -119,31 +108,6 @@ export default async function EventsPage() {
           url: 'https://www.stpetemusic.live',
         },
         url: 'https://final-friday.eventbrite.com/',
-      },
-      {
-        '@type': 'MusicEvent',
-        position: 2,
-        name: 'Instant Noodles',
-        description:
-          'Community jam session — building the band from the ground up. Doors at 6pm, jam 7–10pm. Last Wednesday of every month at Suite E Studios.',
-        startDate: nextInstantNoodles(),
-        location: {
-          '@type': 'Place',
-          name: 'Suite E Studios',
-          address: {
-            '@type': 'PostalAddress',
-            streetAddress: '615 27th St S STE E',
-            addressLocality: 'St. Petersburg',
-            addressRegion: 'FL',
-            postalCode: '33712',
-            addressCountry: 'US',
-          },
-        },
-        organizer: {
-          '@type': 'Organization',
-          name: 'St. Pete Music',
-          url: 'https://www.stpetemusic.live',
-        },
       },
     ],
   };

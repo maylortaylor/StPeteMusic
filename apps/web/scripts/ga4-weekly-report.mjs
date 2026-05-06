@@ -220,7 +220,7 @@ const demoSection = demoResp?.rows?.length ? `
       <th style="${thStyle}text-align:right;">Users</th>
     </tr></thead>
     <tbody>${demoResp.rows.map((row, i) => `
-      <tr style="${i % 2 === 0 ? '' : 'background:#f9f9f9;}">
+      <tr style="${i % 2 === 0 ? '' : 'background:#f9f9f9;'}">
         <td style="${tdStyle}">${val(row, 0)}</td>
         <td style="${tdNumStyle}">${Number(val(row, 0, true)).toLocaleString()}</td>
       </tr>`).join('')}

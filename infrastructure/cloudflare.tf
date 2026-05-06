@@ -75,3 +75,15 @@ resource "cloudflare_record" "acm_validation" {
   allow_overwrite = true  # static hardcoded value — safe to overwrite; record may pre-exist state
 }
 
+# ── Google Search Console verification ────────────────────────────────────────
+resource "cloudflare_record" "google_search_console" {
+  count = local.enable_cloudflare ? 1 : 0
+
+  zone_id = var.cloudflare_zone_id
+  name    = "@"
+  type    = "TXT"
+  content = "google-site-verification=8S66qi-itvjxwf01Hou8gH7utVBQHekEASBWZ00tGos"
+  proxied = false
+  ttl     = 1
+}
+
