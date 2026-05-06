@@ -114,7 +114,7 @@ resource "aws_amplify_app" "admin" {
   environment_variables = {
     AMPLIFY_MONOREPO_APP_ROOT           = "apps/admin"
     NEXT_PUBLIC_SITE_URL                = "https://admin.stpetemusic.live"
-    DATABASE_URL                        = "postgresql://${var.db_username}:${var.db_password}@${aws_db_instance.main.address}:5432/stpetemusic"
+    DATABASE_URL                        = "postgresql://${var.db_username}:${var.db_password}@${aws_db_instance.main.address}:5432/n8n"
     CLERK_SECRET_KEY                    = data.aws_ssm_parameter.clerk_secret_key.value
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY   = data.aws_ssm_parameter.clerk_publishable_key.value
     NEXT_PUBLIC_CLERK_SIGN_IN_URL       = "/sign-in"
