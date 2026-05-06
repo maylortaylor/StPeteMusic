@@ -18,11 +18,11 @@ export const metadata: Metadata = {
 
 const orgJsonLd = {
   '@context': 'https://schema.org',
-  '@type': ['Organization', 'MusicVenue'],
+  '@type': 'Organization',
   name: 'St. Pete Music',
   url: 'https://www.stpetemusic.live',
   description:
-    'The home for live music in St. Petersburg, FL. Discover local bands, find upcoming shows, and stay connected to the Tampa Bay music scene.',
+    'A community of music lovers in St. Petersburg, FL — discovering local artists, amplifying the scene, and bringing people together through live music.',
   address: {
     '@type': 'PostalAddress',
     streetAddress: '615 27th St S STE E',
