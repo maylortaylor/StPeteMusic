@@ -28,13 +28,17 @@ applications:
         preBuild:
           commands:
             - node --version
-            # Use --prefix to run npm from the repo root without changing shell CWD.
-            # Keeps build phase CWD at apps/admin so 'npm run build' = 'next build'.
             - npm --prefix ../.. ci
             - npm --prefix ../.. run build --workspace=@stpetemusic/db
+            # Amplify WEB_COMPUTE does not inject non-NEXT_PUBLIC env vars at runtime.
+            # Write them to .env.production so Next.js loads them in the server context.
+            - |
+              echo "CLERK_SECRET_KEY=$CLERK_SECRET_KEY" >> .env.production
+              echo "DATABASE_URL=$DATABASE_URL" >> .env.production
         build:
           commands:
             - npm run build
+            - cp .env.production .next/.env.production
       artifacts:
         baseDirectory: .next
         files:
