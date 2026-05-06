@@ -21,12 +21,13 @@ locals {
 resource "cloudflare_record" "www" {
   count = local.enable_cloudflare ? 1 : 0
 
-  zone_id = var.cloudflare_zone_id
-  name    = "www"
-  type    = "CNAME"
-  content = try(one([for s in aws_amplify_domain_association.web.sub_domain : s.dns_record if s.prefix == "www"]), "")
-  proxied = false
-  ttl     = 1  # 1 = auto (required when proxied = false)
+  zone_id         = var.cloudflare_zone_id
+  name            = "www"
+  type            = "CNAME"
+  content         = try(split(" ", one([for s in aws_amplify_domain_association.web.sub_domain : s.dns_record if s.prefix == "www"]))[2], "")
+  proxied         = false
+  ttl             = 1  # 1 = auto (required when proxied = false)
+  allow_overwrite = true
 }
 
 # ── Web app: stpetemusic.live (apex) ──────────────────────────────────────────
@@ -35,12 +36,13 @@ resource "cloudflare_record" "www" {
 resource "cloudflare_record" "apex" {
   count = local.enable_cloudflare ? 1 : 0
 
-  zone_id = var.cloudflare_zone_id
-  name    = "@"
-  type    = "CNAME"
-  content = try(one([for s in aws_amplify_domain_association.web.sub_domain : s.dns_record if s.prefix == ""]), "")
-  proxied = false
-  ttl     = 1
+  zone_id         = var.cloudflare_zone_id
+  name            = "@"
+  type            = "CNAME"
+  content         = try(split(" ", one([for s in aws_amplify_domain_association.web.sub_domain : s.dns_record if s.prefix == ""]))[2], "")
+  proxied         = false
+  ttl             = 1
+  allow_overwrite = true
 }
 
 # ── Admin app: admin.stpetemusic.live ─────────────────────────────────────────
@@ -48,12 +50,13 @@ resource "cloudflare_record" "apex" {
 resource "cloudflare_record" "admin" {
   count = local.enable_cloudflare ? 1 : 0
 
-  zone_id = var.cloudflare_zone_id
-  name    = "admin"
-  type    = "CNAME"
-  content = try(one([for s in aws_amplify_domain_association.admin.sub_domain : s.dns_record if s.prefix == "admin"]), "")
-  proxied = false
-  ttl     = 1
+  zone_id         = var.cloudflare_zone_id
+  name            = "admin"
+  type            = "CNAME"
+  content         = try(split(" ", one([for s in aws_amplify_domain_association.admin.sub_domain : s.dns_record if s.prefix == "admin"]))[2], "")
+  proxied         = false
+  ttl             = 1
+  allow_overwrite = true
 }
 
 # ── ACM SSL verification ───────────────────────────────────────────────────────
