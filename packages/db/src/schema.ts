@@ -44,8 +44,8 @@ export const artists = pgTable('artists', {
   website: varchar('website', { length: 500 }),
   home_base: varchar('home_base', { length: 255 }),
   hero_photo_url: varchar('hero_photo_url', { length: 500 }),
-  genres: jsonb('genres').$type<string[]>().default([]),
-  tags: jsonb('tags').$type<string[]>().default([]),
+  genres: text('genres').array().default([]),
+  tags: text('tags').array().default([]),
   extra_links: jsonb('extra_links').$type<{ label: string; url: string }[]>().default([]),
   // ENCRYPTED — NEVER SELECT OR EDIT IN ADMIN
   venmo: bytea('venmo'),
