@@ -29,7 +29,7 @@ function ParallaxEmbed() {
       style={{ border: '1px solid #E5E5E5', y, opacity, scale }}
     >
       <iframe
-        src={`https://www.youtube.com/embed/videoseries?list=${PLAYLIST_ID}&autoplay=0`}
+        src={`https://www.youtube-nocookie.com/embed/videoseries?list=${PLAYLIST_ID}&autoplay=0`}
         title="StPeteMusic — Latest Videos"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen

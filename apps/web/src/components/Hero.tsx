@@ -42,6 +42,7 @@ export function Hero() {
             muted
             loop
             playsInline
+            preload="metadata"
             poster="/images/hero/hero-1.webp"
             className="absolute inset-0 w-full h-full object-cover"
           >
