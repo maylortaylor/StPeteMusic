@@ -23,13 +23,13 @@
     "db:push": "drizzle-kit push:pg"
   },
   "dependencies": {
-    "drizzle-orm": "^0.31.2",
+    "drizzle-orm": "^0.45.2",
     "pg": "^8.20.0"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
     "@types/pg": "^8.20.0",
-    "drizzle-kit": "^0.20.17",
+    "drizzle-kit": "^0.31.10",
     "typescript": "^6"
   }
 }

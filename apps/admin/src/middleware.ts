@@ -1,9 +1,12 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-const isProtectedRoute = createRouteMatcher(['/dashboard(.*)']);
+// Deny-by-default: protect everything except the sign-in page.
+// Never use an allow-list approach for an admin app — a new page added
+// outside the pattern would be silently public.
+const isPublicRoute = createRouteMatcher(['/sign-in(.*)']);
 
 export default clerkMiddleware(async (auth, req) => {
-  if (isProtectedRoute(req)) await auth.protect();
+  if (!isPublicRoute(req)) await auth.protect();
 });
 
 export const config = {

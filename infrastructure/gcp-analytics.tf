@@ -76,6 +76,52 @@ resource "google_project_service" "tag_manager" {
 # After apply: create + download a JSON key in GCP Console
 #   → APIs & Services → Credentials → Create credentials → Service account key
 #   → Save as apps/web/scripts/sa-key.json (gitignored)
+# Workload Identity Federation — allows GitHub Actions to impersonate the CI service account
+# without a long-lived key. The attribute_condition locks this to this specific repo (by
+# numeric ID, which is immutable even if the repo is renamed).
+#
+# First-time setup:
+#   tofu import google_iam_workload_identity_pool.github_actions \
+#     projects/stpetemusic-analytics/locations/global/workloadIdentityPools/github-actions
+#   tofu import google_iam_workload_identity_pool_provider.github \
+#     projects/stpetemusic-analytics/locations/global/workloadIdentityPools/github-actions/providers/github
+resource "google_iam_workload_identity_pool" "github_actions" {
+  count = local.enable_gcp ? 1 : 0
+
+  project                   = google_project.analytics[0].project_id
+  workload_identity_pool_id = "github-actions"
+  display_name              = "GitHub Actions"
+  description               = "WIF pool for GitHub Actions CI/CD"
+
+  depends_on = [google_project_service.iam_api]
+}
+
+resource "google_iam_workload_identity_pool_provider" "github" {
+  count = local.enable_gcp ? 1 : 0
+
+  project                            = google_project.analytics[0].project_id
+  workload_identity_pool_id          = google_iam_workload_identity_pool.github_actions[0].workload_identity_pool_id
+  workload_identity_pool_provider_id = "github"
+  display_name                       = "GitHub"
+
+  attribute_mapping = {
+    "google.subject"       = "assertion.sub"
+    "attribute.repository" = "assertion.repository"
+    "attribute.repository_id" = "assertion.repository_id"
+  }
+
+  # Restrict to this specific repo by numeric ID (immutable — safe against repo renames)
+  attribute_condition = "attribute.repository_id == \"1144434287\""
+
+  oidc {
+    issuer_uri = "https://token.actions.githubusercontent.com"
+  }
+}
+
+# Service account for CLI analytics scripts
+# After apply: create + download a JSON key in GCP Console
+#   → APIs & Services → Credentials → Create credentials → Service account key
+#   → Save as apps/web/scripts/sa-key.json (gitignored)
 resource "google_service_account" "analytics_sa" {
   count = local.enable_gcp ? 1 : 0
 

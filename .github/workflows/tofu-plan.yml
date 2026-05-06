@@ -63,8 +63,8 @@ jobs:
           TF_VAR_clerk_publishable_key: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
           TF_VAR_cloudflare_api_token:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
           TF_VAR_cloudflare_zone_id:    ${{ secrets.CLOUDFLARE_ZONE_ID }}
-          TF_VAR_google_project_id:     project-bb73c742-70e6-4419-a66
-          TF_VAR_google_org_id:         "982527051911"
+          TF_VAR_google_project_id:     ${{ secrets.GCP_PROJECT_ID }}
+          TF_VAR_google_org_id:         ${{ secrets.GCP_ORG_ID }}
 
       - name: Post Plan to PR
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3  # v9.0.0
