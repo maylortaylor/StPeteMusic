@@ -31,7 +31,7 @@ updated: 2026-05-06
 Auth via Clerk. Env vars (`CLERK_SECRET_KEY`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`) sourced from SSM at `/stpetemusic/clerk/*`.
 Database: `stpetemusic` on RDS (`stpetemusic-postgres.cmnogyowgoe1.us-east-1.rds.amazonaws.com`).
 
-**Known issue (2026-05-06)**: App builds succeed but returns 500 at runtime. Clerk middleware crashes — likely `CLERK_SECRET_KEY` not available in the Next.js 16 proxy/middleware runtime on Amplify WEB_COMPUTE. See troubleshooting below.
+**Runtime env var gotcha**: Amplify WEB_COMPUTE does NOT inject non-`NEXT_PUBLIC_*` env vars at runtime. Fix: `amplify.yml` writes `CLERK_SECRET_KEY` and `DATABASE_URL` to `.env.production` during preBuild, then copies into `.next/` artifact. If you add new server-only env vars, update the `amplify.yml` preBuild step.
 
 ## DNS (Cloudflare — sole DNS provider)
 Route 53 hosted zone deleted. All records must be **DNS only (grey cloud — NOT proxied)**:
