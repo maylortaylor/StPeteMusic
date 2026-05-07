@@ -152,3 +152,20 @@ resource "google_service_account" "analytics_sa" {
 
   depends_on = [google_project_service.iam_api]
 }
+
+# Grant CI service account permission to enable/disable APIs on the analytics project.
+# Without this, tofu apply fails when managing google_project_service resources.
+#
+# Bootstrap: this IAM binding must be applied once locally (project owner credentials)
+# before CI can manage itself:
+#   gcloud auth application-default login
+#   cd infrastructure && AWS_PROFILE=personal tofu apply -target='google_project_iam_member.ci_service_usage_admin[0]'
+#
+# After that one-time run, CI manages everything autonomously.
+resource "google_project_iam_member" "ci_service_usage_admin" {
+  count = local.enable_gcp ? 1 : 0
+
+  project = google_project.analytics[0].project_id
+  role    = "roles/serviceusage.serviceUsageAdmin"
+  member  = "serviceAccount:spm-ci-planner@stpetemusic-analytics.iam.gserviceaccount.com"
+}
