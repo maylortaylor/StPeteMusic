@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion, useTransform, useSpring } from 'framer-motion';
 import { useScrollPinned } from './AnimateIn';
 import { pushEvent } from '@/lib/analytics';
+import { trackMetaEvent } from '@/lib/meta-pixel';
 
 export function Hero() {
   const outerRef = useRef<HTMLElement>(null);
@@ -148,6 +149,7 @@ export function Hero() {
               onClick={() => {
                 pushEvent('cta_click', { cta_label: 'get_tickets', cta_location: 'hero' });
                 pushEvent('outbound_link_click', { link_url: 'https://www.eventbrite.com/o/suite-e-studios-109188388681', link_text: 'Get Tickets' });
+                trackMetaEvent('InitiateCheckout', { content_name: 'Final Friday', content_category: 'event_ticket' });
               }}
               className="text-white font-inter font-bold text-base uppercase tracking-widest px-10 py-4 bg-brand-orange hover:opacity-85 transition-opacity"
             >
