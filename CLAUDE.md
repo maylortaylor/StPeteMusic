@@ -21,6 +21,7 @@ Parent company: Tangent LLC. Partner venue: Suite E Studios.
 | secret, token, github secret, rotate, credential, listmonk, env var, environment variable | [secrets.md](.claude/secrets.md) |
 | setup, direnv, envrc, pre-commit, install, first-time, hooks | [setup.md](.claude/setup.md) |
 | error, down, debug, troubleshoot, ssh, 403, 500, not responding, connection refused | [troubleshooting.md](.claude/troubleshooting.md) |
+| ads, google ads, microsoft ads, bing, bing ads, uet, ppc, paid, advertising, clarity | [ads-accounts-todo.md](.claude/ads-accounts-todo.md) |
 
 ## Key Files
 | File | Purpose |

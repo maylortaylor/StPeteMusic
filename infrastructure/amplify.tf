@@ -52,6 +52,8 @@ resource "aws_amplify_app" "web" {
     # Constructed from existing POSTGRES_USER / POSTGRES_PASSWORD GitHub Secrets.
     # SSL handled by db.ts (rejectUnauthorized:false for non-localhost connections).
     DATABASE_URL              = "postgresql://${var.db_username}:${var.db_password}@${aws_db_instance.main.address}:5432/n8n"
+    NEXT_PUBLIC_META_PIXEL_ID = var.meta_pixel_id
+    NEXT_PUBLIC_CLARITY_ID    = var.clarity_project_id
   }
 
   enable_auto_branch_creation = false

@@ -128,3 +128,23 @@ variable "google_org_id" {
   type        = string
   default     = ""  # empty default allows tofu validate/plan to pass without GCP creds
 }
+
+variable "meta_pixel_id" {
+  description = "Meta Pixel ID for Facebook/Instagram conversion tracking"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "clarity_project_id" {
+  description = "Microsoft Clarity project ID for session recording"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "bing_webmaster_verification_code" {
+  description = "Bing Webmaster Tools site verification code (msvalidate.01 value)"
+  type        = string
+  default     = ""
+}

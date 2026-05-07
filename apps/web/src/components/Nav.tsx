@@ -27,6 +27,7 @@ export function Nav() {
           <Link href="/events"   className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Events</Link>
           <Link href="/discover" className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Discover</Link>
           <Link href="/venues"   className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Venues</Link>
+          <Link href="/about" className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">About</Link>
           <a
             href="https://youtube.com/@StPeteMusic"
             target="_blank"
@@ -64,6 +65,7 @@ export function Nav() {
           <Link href="/events"   onClick={() => setMenuOpen(false)} className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Events</Link>
           <Link href="/discover" onClick={() => setMenuOpen(false)} className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Discover</Link>
           <Link href="/venues"   onClick={() => setMenuOpen(false)} className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Venues</Link>
+          <Link href="/about" onClick={() => setMenuOpen(false)} className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">About</Link>
           <a
             href="https://youtube.com/@StPeteMusic"
             target="_blank"

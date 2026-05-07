@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { CookieBanner } from '@/components/CookieBanner';
 import './globals.css';
@@ -81,9 +82,9 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/images/hero/hero-1.jpg',
-        width: 1200,
-        height: 630,
+        url: '/images/hero/SPM-hero.webp',
+        width: 1456,
+        height: 816,
         alt: 'Live music at Suite E Studios — St. Pete Music',
       },
     ],
@@ -92,7 +93,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@StPeteMusic',
     creator: '@StPeteMusic',
-    images: ['https://www.stpetemusic.live/images/hero/hero-1.jpg'],
+    images: ['https://www.stpetemusic.live/images/hero/SPM-hero.webp'],
   },
 };
 
@@ -104,10 +105,75 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
       </head>
+      <Script
+        id="gtm-consent-default"
+        strategy="beforeInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments)}
+            var consented = false;
+            try { consented = localStorage.getItem('spm_cookie_consent') === 'accepted'; } catch(e) {}
+            gtag('consent', 'default', {
+              analytics_storage: consented ? 'granted' : 'denied',
+              ad_storage: consented ? 'granted' : 'denied',
+              ad_user_data: consented ? 'granted' : 'denied',
+              ad_personalization: consented ? 'granted' : 'denied',
+              wait_for_update: 500
+            });
+          `,
+        }}
+      />
       {process.env.NEXT_PUBLIC_GTM_ID && (
         <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID} />
       )}
+      {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
+        <Script
+          id="meta-pixel"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              !function(f,b,e,v,n,t,s)
+              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+              n.queue=[];t=b.createElement(e);t.async=!0;
+              t.src=v;s=b.getElementsByTagName(e)[0];
+              s.parentNode.insertBefore(t,s)}(window, document,'script',
+              'https://connect.facebook.net/en_US/fbevents.js');
+              fbq('init', '${process.env.NEXT_PUBLIC_META_PIXEL_ID}');
+              fbq('track', 'PageView');
+            `,
+          }}
+        />
+      )}
+      {process.env.NEXT_PUBLIC_CLARITY_ID && (
+        <Script
+          id="ms-clarity"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+              })(window, document, "clarity", "script", "${process.env.NEXT_PUBLIC_CLARITY_ID}");
+            `,
+          }}
+        />
+      )}
       <body className="bg-background text-text-primary font-inter antialiased">
+        {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
+          <noscript>
+            <img
+              height="1"
+              width="1"
+              style={{ display: 'none' }}
+              src={`https://www.facebook.com/tr?id=${process.env.NEXT_PUBLIC_META_PIXEL_ID}&ev=PageView&noscript=1`}
+              alt=""
+            />
+          </noscript>
+        )}
         {children}
         <CookieBanner />
       </body>

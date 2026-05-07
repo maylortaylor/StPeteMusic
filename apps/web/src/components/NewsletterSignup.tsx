@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { AnimateIn } from './AnimateIn';
 import { pushEvent } from '@/lib/analytics';
+import { trackMetaEvent } from '@/lib/meta-pixel';
 
 interface NewsletterSignupProps {
   variant?: 'inline' | 'section';
@@ -25,6 +26,7 @@ export function NewsletterSignup({ variant = 'section' }: NewsletterSignupProps)
       });
       if (res.ok) {
         pushEvent('newsletter_signup');
+        trackMetaEvent('Lead', { content_name: 'newsletter_signup' });
         setStatus('success');
         setMessage("You're in. Monthly St. Pete music roundup incoming.");
         setEmail('');

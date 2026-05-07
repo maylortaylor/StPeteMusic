@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@StPeteMusic',
     creator: '@StPeteMusic',
-    images: ['https://www.stpetemusic.live/images/hero/hero-1.jpg'],
+    images: ['https://www.stpetemusic.live/images/hero/SPM-hero.webp'],
   },
 };
 
