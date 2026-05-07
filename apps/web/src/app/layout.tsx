@@ -19,17 +19,50 @@ export const metadata: Metadata = {
   description:
     'The home for live music in St. Petersburg, FL. Discover local bands, find upcoming shows, and stay connected to the Tampa Bay music scene.',
   keywords: [
+    // Brand
     'St Pete Music',
-    'St Petersburg FL music',
-    'live music',
-    'local bands',
+    // Live music — core
+    'live music St Pete',
+    'live music St Petersburg FL',
+    'live music tonight St Petersburg',
+    'live music this weekend St Pete',
+    // Nightlife / things to do
+    'St Pete nightlife',
+    'things to do in St Petersburg FL',
+    'things to do in St Pete tonight',
+    'best bars St Pete',
+    'date night St Petersburg FL',
+    // Music venues
+    'music venues St Petersburg FL',
+    'bars with live music St Pete',
+    'concert venues St Petersburg Florida',
+    'brewery live music St Pete',
+    // Local artists & bands
+    'St Pete bands',
+    'local bands St Petersburg Florida',
+    'Tampa Bay musicians',
+    'St Petersburg FL music artists',
+    // Events & concerts
+    'concerts St Petersburg FL',
+    'music events Tampa Bay',
+    'Final Friday St Pete',
+    'upcoming shows St Petersburg',
+    'free concerts St Petersburg FL',
+    // Geographic variants
+    'Tampa Bay music',
+    'Tampa Bay nightlife',
+    'downtown St Pete music',
+    'St Petersburg Florida music scene',
+    // Neighborhoods & partners
+    'EDGE District St Pete',
     'Suite E Studios',
     'Warehouse Arts District',
-    'Tampa Bay music',
-    'Final Friday',
-    'Instant Noodles',
+    // Broader reach
     'Florida live music',
   ],
+  other: {
+    'facebook-domain-verification': 'hazlmxxsqoiyfaryx63ql5xcaeubr5',
+  },
   icons: {
     icon: [
       { url: '/images/brand/favicon/favicon-32x32.png', sizes: '32x32', type: 'image/png' },

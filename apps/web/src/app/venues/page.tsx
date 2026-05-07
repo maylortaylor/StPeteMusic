@@ -5,12 +5,27 @@ import { VenueCard } from '@/components/VenueCard';
 import { getAllVenues } from '@/lib/queries/venues';
 
 export const metadata: Metadata = {
-  title: 'St. Pete Music Venues',
+  title: 'Live Music Venues in St. Petersburg, FL',
   description:
-    'Discover live music venues in St. Petersburg, FL — from intimate studios to local breweries. The stages that make the St. Pete scene.',
+    'Discover live music venues in St. Petersburg, FL — from intimate studios to local breweries and rooftop bars. The stages that make the St. Pete scene.',
+  keywords: [
+    'music venues St Petersburg FL',
+    'bars with live music St Pete',
+    'live music venues Tampa Bay',
+    'concert venues St Petersburg Florida',
+    'best music venues St Pete',
+    'small music venues St Pete',
+    'brewery live music St Pete',
+    'rooftop bar live music St Pete',
+    'live music bars downtown St Pete',
+    'nightlife venues St Petersburg FL',
+    'Suite E Studios',
+    'best bars St Pete',
+  ],
   openGraph: {
-    title: 'St. Pete Music | Venues',
-    description: 'Live music venues in St. Petersburg, FL.',
+    title: 'St. Pete Music | Live Music Venues',
+    description:
+      'Discover live music venues in St. Petersburg, FL — from intimate studios to local breweries and rooftop bars. The stages that make the St. Pete scene.',
     url: 'https://www.stpetemusic.live/venues',
   },
   twitter: {

@@ -27,12 +27,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const venue = await getVenueBySlug(slug);
     if (!venue) return {};
+    const description = venue.description ?? `${venue.name} — live music venue in St. Petersburg, FL.`;
     return {
       title: venue.name,
-      description: venue.description ?? `${venue.name} — live music venue in St. Petersburg, FL.`,
+      description,
+      keywords: [
+        venue.name,
+        `${venue.name} St Pete`,
+        `${venue.name} St Petersburg FL`,
+        'live music venue St Petersburg FL',
+        'bars with live music St Pete',
+        'music venue Tampa Bay',
+        'St Pete nightlife',
+        'live music St Pete',
+      ],
       openGraph: {
         title: `St. Pete Music | ${venue.name}`,
-        description: venue.description ?? `${venue.name} — live music in St. Pete, FL.`,
+        description,
         url: `https://www.stpetemusic.live/venues/${slug}`,
         ...(venue.hero_photo_url ? { images: [{ url: venue.hero_photo_url }] } : {}),
       },

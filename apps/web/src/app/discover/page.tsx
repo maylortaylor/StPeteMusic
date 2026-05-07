@@ -6,13 +6,30 @@ import { DiscoverClientGrid } from '@/components/DiscoverClientGrid';
 import { getAllArtists } from '@/lib/queries/artists';
 
 export const metadata: Metadata = {
-  title: 'Discover St. Pete Artists',
+  title: 'Discover Local Bands & Artists | St. Pete, FL',
   description:
-    'Explore bands, DJs, solo artists, and creatives from the greater St. Petersburg, FL area. All genres, all types, our growing community.',
+    'Explore local bands, DJs, solo artists, and creatives from St. Petersburg, FL — indie, hip-hop, jazz, reggae, and more. Discover the Tampa Bay music scene.',
+  keywords: [
+    'St Pete bands',
+    'local bands St Petersburg Florida',
+    'Tampa Bay musicians',
+    'St Petersburg FL music artists',
+    'indie bands Tampa Bay',
+    'St Pete musicians',
+    'local music scene St Petersburg',
+    'Tampa Bay hip hop artists',
+    'St Pete jazz musicians',
+    'Florida indie music',
+    'bands from St Pete',
+    'discover local artists St Pete',
+    'emerging artists St Pete',
+    'St Pete DJs',
+    'Tampa Bay reggae bands',
+  ],
   openGraph: {
-    title: 'St. Pete Music | Discover St. Pete Artists',
+    title: 'St. Pete Music | Discover Local Bands & Artists',
     description:
-      'Explore bands, DJs, solo artists, and creatives from the greater St. Petersburg, FL area. All genres, all types, our growing community.',
+      'Explore local bands, DJs, solo artists, and creatives from St. Petersburg, FL — indie, hip-hop, jazz, reggae, and more. Discover the Tampa Bay music scene.',
     url: 'https://www.stpetemusic.live/discover',
   },
   twitter: {
