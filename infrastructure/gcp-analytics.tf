@@ -153,19 +153,40 @@ resource "google_service_account" "analytics_sa" {
   depends_on = [google_project_service.iam_api]
 }
 
-# Grant CI service account permission to enable/disable APIs on the analytics project.
-# Without this, tofu apply fails when managing google_project_service resources.
+# Grant CI service account the minimum roles needed to apply gcp-analytics.tf autonomously.
 #
-# Bootstrap: this IAM binding must be applied once locally (project owner credentials)
-# before CI can manage itself:
+# Bootstrap (run once locally with project-owner credentials before CI can self-manage):
 #   gcloud auth application-default login
-#   cd infrastructure && AWS_PROFILE=personal tofu apply -target='google_project_iam_member.ci_service_usage_admin[0]'
+#   cd infrastructure && AWS_PROFILE=personal tofu apply \
+#     -target='google_project_iam_member.ci_service_usage_admin[0]' \
+#     -target='google_project_iam_member.ci_iam_admin[0]' \
+#     -target='google_project_iam_member.ci_project_iam_admin[0]'
 #
 # After that one-time run, CI manages everything autonomously.
+
+# Enable/disable GCP APIs (google_project_service resources)
 resource "google_project_iam_member" "ci_service_usage_admin" {
   count = local.enable_gcp ? 1 : 0
 
   project = google_project.analytics[0].project_id
   role    = "roles/serviceusage.serviceUsageAdmin"
+  member  = "serviceAccount:spm-ci-planner@stpetemusic-analytics.iam.gserviceaccount.com"
+}
+
+# Create and manage service accounts (google_service_account resources)
+resource "google_project_iam_member" "ci_iam_admin" {
+  count = local.enable_gcp ? 1 : 0
+
+  project = google_project.analytics[0].project_id
+  role    = "roles/iam.serviceAccountAdmin"
+  member  = "serviceAccount:spm-ci-planner@stpetemusic-analytics.iam.gserviceaccount.com"
+}
+
+# Manage IAM bindings on the project (google_project_iam_member resources)
+resource "google_project_iam_member" "ci_project_iam_admin" {
+  count = local.enable_gcp ? 1 : 0
+
+  project = google_project.analytics[0].project_id
+  role    = "roles/resourcemanager.projectIamAdmin"
   member  = "serviceAccount:spm-ci-planner@stpetemusic-analytics.iam.gserviceaccount.com"
 }
