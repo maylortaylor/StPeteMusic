@@ -104,6 +104,12 @@ resource "google_iam_workload_identity_pool" "github_actions" {
   description               = "WIF pool for GitHub Actions CI/CD"
 
   depends_on = [google_project_service.iam_api]
+
+  lifecycle {
+    # spm-ci-planner lacks iam.workloadIdentityPools.update — pool is stable once created,
+    # so prevent CI from ever attempting to modify it (bootstrapping trap).
+    ignore_changes = all
+  }
 }
 
 resource "google_iam_workload_identity_pool_provider" "github" {
@@ -126,6 +132,10 @@ resource "google_iam_workload_identity_pool_provider" "github" {
   oidc {
     issuer_uri = "https://token.actions.githubusercontent.com"
   }
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 # Service account for CLI analytics scripts
@@ -141,4 +151,21 @@ resource "google_service_account" "analytics_sa" {
   description  = "Used by ga4-export.mjs, ga4-setup.mjs, ga4-conversions.mjs, gtm-backup.mjs, gtm-apply.mjs"
 
   depends_on = [google_project_service.iam_api]
+}
+
+# Grant CI service account permission to enable/disable APIs on the analytics project.
+# Without this, tofu apply fails when managing google_project_service resources.
+#
+# Bootstrap: this IAM binding must be applied once locally (project owner credentials)
+# before CI can manage itself:
+#   gcloud auth application-default login
+#   cd infrastructure && AWS_PROFILE=personal tofu apply -target='google_project_iam_member.ci_service_usage_admin[0]'
+#
+# After that one-time run, CI manages everything autonomously.
+resource "google_project_iam_member" "ci_service_usage_admin" {
+  count = local.enable_gcp ? 1 : 0
+
+  project = google_project.analytics[0].project_id
+  role    = "roles/serviceusage.serviceUsageAdmin"
+  member  = "serviceAccount:spm-ci-planner@stpetemusic-analytics.iam.gserviceaccount.com"
 }
