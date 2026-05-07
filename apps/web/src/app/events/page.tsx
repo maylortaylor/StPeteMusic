@@ -5,13 +5,27 @@ import { EventsPageClient } from '@/components/events/EventsPageClient';
 import { getEventsForMonths } from '@/lib/queries/events';
 
 export const metadata: Metadata = {
-  title: 'Shows & Events',
+  title: 'Live Music Concerts & Shows in St. Pete, FL',
   description:
-    'Upcoming live music, community jams, and musical happenings in St. Petersburg, FL.',
+    'Browse upcoming concerts, live music shows, and community events in St. Petersburg, FL. Your go-to music calendar for the Tampa Bay area.',
+  keywords: [
+    'concerts St Petersburg FL',
+    'live music events St Pete',
+    'upcoming shows St Petersburg',
+    'live music this weekend St Pete',
+    'live music tonight St Petersburg',
+    'music events Tampa Bay',
+    'Final Friday St Pete',
+    'free concerts St Petersburg FL',
+    'things to do this weekend St Pete',
+    'St Pete concert calendar',
+    'music events this weekend Tampa Bay',
+    'live music schedule St Petersburg',
+  ],
   openGraph: {
-    title: 'St. Pete Music | Shows & Events',
+    title: 'St. Pete Music | Concerts & Live Music Events',
     description:
-      'Upcoming live music, community jams, and musical happenings in St. Petersburg, FL.',
+      'Browse upcoming concerts, live music shows, and community events in St. Petersburg, FL. Your go-to music calendar for the Tampa Bay area.',
     url: 'https://www.stpetemusic.live/events',
   },
   twitter: {

@@ -13,7 +13,23 @@ import { PhotoStrip, EventsTeaser, VibesSection } from '@/components/ClientSecti
 export const metadata: Metadata = {
   title: 'Live Music in St. Petersburg, FL',
   description:
-    'The home for live music in St. Petersburg, FL. Discover local bands, find upcoming shows, and stay connected to the Tampa Bay music scene.',
+    "St. Pete's home for live music — discover local bands, upcoming concerts, music venues, and nightlife in St. Petersburg, FL and the Tampa Bay area.",
+  keywords: [
+    'live music St Pete',
+    'things to do in St Petersburg FL',
+    'St Pete nightlife',
+    'live music tonight St Petersburg',
+    'live music this weekend St Pete',
+    'music venues St Petersburg FL',
+    'bars with live music St Pete',
+    'concerts St Petersburg FL',
+    'St Pete bands',
+    'Tampa Bay music scene',
+    'St Petersburg FL entertainment',
+    'things to do in St Pete tonight',
+    'best live music in St Petersburg Florida',
+    'what to do in St Pete tonight',
+  ],
 };
 
 const orgJsonLd = {
