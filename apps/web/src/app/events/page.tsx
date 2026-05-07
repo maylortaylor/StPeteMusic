@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Nav } from '@/components/Nav';
 import { Footer } from '@/components/Footer';
+import { MetaPixelViewContent } from '@/components/MetaPixelViewContent';
 import { EventsPageClient } from '@/components/events/EventsPageClient';
 import { getEventsForMonths } from '@/lib/queries/events';
 
@@ -22,6 +23,9 @@ export const metadata: Metadata = {
     'music events this weekend Tampa Bay',
     'live music schedule St Petersburg',
   ],
+  alternates: {
+    canonical: 'https://www.stpetemusic.live/events',
+  },
   openGraph: {
     title: 'St. Pete Music | Concerts & Live Music Events',
     description:
@@ -32,7 +36,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@StPeteMusic',
     creator: '@StPeteMusic',
-    images: ['https://www.stpetemusic.live/images/hero/hero-1.jpg'],
+    images: ['https://www.stpetemusic.live/images/hero/SPM-hero.webp'],
   },
 };
 
@@ -92,43 +96,72 @@ export default async function EventsPage() {
     },
   ];
 
+  const futureEvents = allEvents.filter(e => new Date(e.start_time) >= now);
+
+  const finalFridayEntry = {
+    '@type': 'MusicEvent',
+    '@id': 'https://www.stpetemusic.live/events#final-friday',
+    position: 1,
+    name: 'Final Friday',
+    description:
+      'Live music showcase — doors at 7pm, three bands performing 8pm–midnight. Last Friday of every month at Suite E Studios.',
+    startDate: nextFinalFriday(),
+    eventSchedule: {
+      '@type': 'Schedule',
+      repeatFrequency: 'P1M',
+      byDay: 'https://schema.org/Friday',
+      startDate: '2024-01-01',
+      startTime: '19:00:00',
+    },
+    location: {
+      '@type': 'Place',
+      name: 'Suite E Studios',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: '615 27th St S STE E',
+        addressLocality: 'St. Petersburg',
+        addressRegion: 'FL',
+        postalCode: '33712',
+        addressCountry: 'US',
+      },
+    },
+    organizer: {
+      '@type': 'Organization',
+      name: 'St. Pete Music',
+      url: 'https://www.stpetemusic.live',
+    },
+    url: 'https://final-friday.eventbrite.com/',
+  };
+
+  const dbEventEntries = futureEvents.slice(0, 20).map((event, index) => ({
+    '@type': 'MusicEvent',
+    position: index + 2,
+    name: event.title,
+    startDate: new Date(event.start_time).toISOString(),
+    ...(event.end_time ? { endDate: new Date(event.end_time).toISOString() } : {}),
+    location: {
+      '@type': 'Place',
+      name: event.location ?? 'St. Petersburg, FL',
+    },
+    url: event.ticket_url ?? 'https://www.stpetemusic.live/events',
+    organizer: {
+      '@type': 'Organization',
+      name: 'St. Pete Music',
+      url: 'https://www.stpetemusic.live',
+    },
+  }));
+
   const eventsJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: 'St. Pete Music Events',
-    itemListElement: [
-      {
-        '@type': 'MusicEvent',
-        position: 1,
-        name: 'Final Friday',
-        description:
-          'Live music showcase — doors at 7pm, three bands performing 8pm–midnight. Last Friday of every month at Suite E Studios.',
-        startDate: nextFinalFriday(),
-        location: {
-          '@type': 'Place',
-          name: 'Suite E Studios',
-          address: {
-            '@type': 'PostalAddress',
-            streetAddress: '615 27th St S STE E',
-            addressLocality: 'St. Petersburg',
-            addressRegion: 'FL',
-            postalCode: '33712',
-            addressCountry: 'US',
-          },
-        },
-        organizer: {
-          '@type': 'Organization',
-          name: 'St. Pete Music',
-          url: 'https://www.stpetemusic.live',
-        },
-        url: 'https://final-friday.eventbrite.com/',
-      },
-    ],
+    itemListElement: [finalFridayEntry, ...dbEventEntries],
   };
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(eventsJsonLd) }} />
+      <MetaPixelViewContent contentType="events" contentName="Events Calendar" />
       <Nav />
       <main className="min-h-screen bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">

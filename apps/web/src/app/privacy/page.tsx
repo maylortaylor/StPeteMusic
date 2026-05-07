@@ -7,6 +7,18 @@ export const metadata: Metadata = {
   title: 'Privacy Policy',
   description: 'Privacy policy for StPeteMusic.live — how we collect and use data.',
   robots: { index: true, follow: true },
+  openGraph: {
+    title: 'Privacy Policy | St. Pete Music',
+    description: 'Privacy policy for StPeteMusic.live — how we collect and use data.',
+    url: 'https://www.stpetemusic.live/privacy',
+    siteName: 'St. Pete Music',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Privacy Policy | St. Pete Music',
+    description: 'Privacy policy for StPeteMusic.live — how we collect and use data.',
+  },
 };
 
 const LAST_UPDATED = 'May 2026';
@@ -89,8 +101,8 @@ export default function PrivacyPage() {
             <section>
               <h2 className="font-inter font-black text-2xl text-black mb-3">Cookies</h2>
               <p>
-                We use cookies for analytics (GA4) only. We do not use advertising cookies or
-                sell your data to third parties. You can opt out of analytics tracking by:
+                We use cookies for analytics and audience insights. This includes Google Analytics
+                (GA4) and Meta Pixel for conversion tracking. You can opt out of analytics tracking by:
               </p>
               <ul className="list-disc pl-6 space-y-1 mt-2">
                 <li>
@@ -137,6 +149,24 @@ export default function PrivacyPage() {
                   <strong>Resend</strong> — email delivery; governed by{' '}
                   <a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-brand-orange underline">
                     Resend&apos;s Privacy Policy
+                  </a>
+                </li>
+                <li>
+                  <strong>Meta Pixel (Facebook/Instagram)</strong> — conversion tracking and audience analytics; governed by{' '}
+                  <a href="https://www.facebook.com/privacy/policy/" target="_blank" rel="noopener noreferrer" className="text-brand-orange underline">
+                    Meta&apos;s Privacy Policy
+                  </a>
+                </li>
+                <li>
+                  <strong>Microsoft Clarity</strong> — session recording and heatmaps (page interactions, scroll behavior); governed by{' '}
+                  <a href="https://privacy.microsoft.com/en-us/privacystatement" target="_blank" rel="noopener noreferrer" className="text-brand-orange underline">
+                    Microsoft&apos;s Privacy Policy
+                  </a>
+                </li>
+                <li>
+                  <strong>TikTok</strong> — social media platform linked from this site; governed by{' '}
+                  <a href="https://www.tiktok.com/legal/page/us/privacy-policy/en" target="_blank" rel="noopener noreferrer" className="text-brand-orange underline">
+                    TikTok&apos;s Privacy Policy
                   </a>
                 </li>
               </ul>

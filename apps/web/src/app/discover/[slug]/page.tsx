@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Nav } from '@/components/Nav';
 import { Footer } from '@/components/Footer';
 import { ArtistDetailSidebar } from '@/components/ArtistDetailSidebar';
+import { MetaPixelViewContent } from '@/components/MetaPixelViewContent';
 import { getArtistBySlug, getArtistShows, getAllArtistSlugs } from '@/lib/queries/artists';
 import type { Artist } from '@stpetemusic/types';
 
@@ -46,7 +47,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: `St. Pete Music | ${artist.name}`,
         description,
         url: `https://www.stpetemusic.live/discover/${slug}`,
-        ...(artist.hero_photo_url ? { images: [{ url: artist.hero_photo_url }] } : {}),
+        images: [
+          {
+            url: artist.hero_photo_url ?? '/images/brand/spm-logo-palm.png',
+            width: 1200,
+            height: 630,
+            alt: artist.hero_photo_url ? artist.name : 'St. Pete Music',
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: `St. Pete Music | ${artist.name}`,
+        description,
+        images: [artist.hero_photo_url ?? 'https://www.stpetemusic.live/images/brand/spm-logo-palm.png'],
       },
     };
   } catch {
@@ -55,14 +69,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const SOCIAL_LINKS = [
+  { key: 'website',        label: 'Visit Website' },
+  { key: 'linktree_url',   label: 'Linktree' },
   { key: 'instagram_url',  label: 'Instagram' },
-  { key: 'youtube_url',    label: 'YouTube' },
   { key: 'facebook_url',   label: 'Facebook' },
+  { key: 'youtube_url',    label: 'YouTube' },
   { key: 'spotify_url',    label: 'Spotify' },
   { key: 'bandcamp_url',   label: 'Bandcamp' },
   { key: 'soundcloud_url', label: 'SoundCloud' },
-  { key: 'linktree_url',   label: 'Linktree' },
-  { key: 'website',        label: 'Website' },
 ] as const;
 
 export default async function ArtistPage({ params }: Props) {
@@ -90,8 +104,27 @@ export default async function ArtistPage({ params }: Props) {
     '@type': 'MusicGroup',
     name: artist.name,
     description: artist.description,
-    ...(artist.instagram_url ? { sameAs: [artist.instagram_url] } : {}),
+    sameAs: [
+      artist.website,
+      artist.instagram_url,
+      artist.facebook_url,
+      artist.youtube_url,
+      artist.spotify_url,
+      artist.bandcamp_url,
+      artist.soundcloud_url,
+      artist.linktree_url,
+    ].filter((url): url is string => !!url),
     ...(artist.hero_photo_url ? { image: artist.hero_photo_url } : {}),
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.stpetemusic.live' },
+      { '@type': 'ListItem', position: 2, name: 'Discover', item: 'https://www.stpetemusic.live/discover' },
+      { '@type': 'ListItem', position: 3, name: artist.name, item: `https://www.stpetemusic.live/discover/${slug}` },
+    ],
   };
 
   const socialLinks = SOCIAL_LINKS
@@ -103,6 +136,8 @@ export default async function ArtistPage({ params }: Props) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <MetaPixelViewContent contentType="artist" contentName={artist.name} />
       <Nav />
       <main className="min-h-screen bg-surface">
 
@@ -189,7 +224,6 @@ export default async function ArtistPage({ params }: Props) {
             <div>
               <ArtistDetailSidebar
                 artistName={artist.name}
-                instagramUrl={artist.instagram_url ?? undefined}
                 socialLinks={socialLinks}
                 extraLinks={extraLinks}
                 email={artist.email ?? undefined}

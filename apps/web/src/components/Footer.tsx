@@ -11,6 +11,7 @@ const COLUMNS = [
       { label: 'Instagram', href: 'https://www.instagram.com/StPeteMusic' },
       { label: 'YouTube', href: 'https://youtube.com/@StPeteMusic' },
       { label: 'Facebook', href: 'https://www.facebook.com/stpeteflmusic/' },
+      { label: 'TikTok', href: 'https://www.tiktok.com/@stpetemusic' },
     ],
   },
   {
@@ -95,6 +96,12 @@ export function Footer() {
             className="font-inter text-sm text-black/70 hover:text-black transition-colors"
           >
             Privacy Policy
+          </Link>
+          <Link
+            href="/terms"
+            className="font-inter text-sm text-black/70 hover:text-black transition-colors"
+          >
+            Terms of Service
           </Link>
           <p className="font-inter font-medium text-sm tracking-[0.2em] uppercase text-black/70">
             Live Music · Local Artists · Real Community

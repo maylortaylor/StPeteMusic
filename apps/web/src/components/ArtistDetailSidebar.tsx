@@ -10,13 +10,12 @@ interface SocialLink {
 
 interface Props {
   artistName: string;
-  instagramUrl?: string;
   socialLinks: SocialLink[];
   extraLinks: SocialLink[];
   email?: string;
 }
 
-export function ArtistDetailSidebar({ artistName, instagramUrl, socialLinks, extraLinks, email }: Props) {
+export function ArtistDetailSidebar({ artistName, socialLinks, extraLinks, email }: Props) {
   function trackSocial(label: string, url: string) {
     pushEvent('artist_social_click', {
       artist_name: artistName,
@@ -25,26 +24,41 @@ export function ArtistDetailSidebar({ artistName, instagramUrl, socialLinks, ext
     });
   }
 
+  const [primaryLink, secondaryLink, ...restLinks] = socialLinks;
+  const allRestLinks = [...(restLinks ?? []), ...extraLinks];
+
   return (
     <div className="bg-white border border-border p-8 sticky top-24">
 
-      {/* Primary CTA */}
-      {instagramUrl && (
+      {primaryLink && (
         <a
-          href={instagramUrl}
+          href={primaryLink.url}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() => trackSocial('Instagram', instagramUrl)}
-          className="block w-full text-center text-white font-inter font-bold text-sm uppercase tracking-widest px-8 py-4 bg-black hover:opacity-85 transition-opacity mb-8"
+          onClick={() => trackSocial(primaryLink.label, primaryLink.url)}
+          className="block w-full text-center text-white font-inter font-bold text-sm uppercase tracking-widest px-8 py-4 bg-black hover:opacity-85 transition-opacity mb-3"
         >
-          Follow on Instagram
+          {primaryLink.label} →
         </a>
       )}
 
-      {/* Social + extra links */}
-      {(socialLinks.length > 0 || extraLinks.length > 0) && (
+      {secondaryLink && (
+        <a
+          href={secondaryLink.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => trackSocial(secondaryLink.label, secondaryLink.url)}
+          className="block w-full text-center font-inter font-bold text-sm uppercase tracking-widest px-8 py-4 border border-black text-black hover:bg-black hover:text-white transition-all mb-8"
+        >
+          {secondaryLink.label} →
+        </a>
+      )}
+
+      {!primaryLink && !secondaryLink && <div className="mb-8" />}
+
+      {allRestLinks.length > 0 && (
         <div className="flex flex-col gap-3">
-          {[...socialLinks, ...extraLinks].map(link => (
+          {allRestLinks.map(link => (
             <a
               key={link.label}
               href={link.url}
@@ -60,7 +74,6 @@ export function ArtistDetailSidebar({ artistName, instagramUrl, socialLinks, ext
         </div>
       )}
 
-      {/* Email */}
       {email && (
         <div className="mt-6 pt-6 border-t border-border">
           <p className="font-inter text-xs uppercase tracking-[0.3em] text-text-muted mb-1">Contact</p>

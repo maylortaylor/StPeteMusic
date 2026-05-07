@@ -89,3 +89,15 @@ resource "cloudflare_record" "google_search_console" {
   ttl     = 1
 }
 
+# ── Bing Webmaster Tools verification ─────────────────────────────────────────
+resource "cloudflare_record" "bing_webmaster_verification" {
+  count = var.bing_webmaster_verification_code != "" ? 1 : 0
+
+  zone_id = var.cloudflare_zone_id
+  name    = "@"
+  type    = "TXT"
+  content = "msvalidate.01=${var.bing_webmaster_verification_code}"
+  proxied = false
+  ttl     = 1
+}
+

@@ -16,6 +16,18 @@ export function CookieBanner() {
 
   function dismiss() {
     localStorage.setItem(STORAGE_KEY, 'accepted');
+    const win = window as unknown as Record<string, (...args: unknown[]) => void>;
+    if (typeof win.gtag === 'function') {
+      win.gtag('consent', 'update', {
+        analytics_storage: 'granted',
+        ad_storage: 'granted',
+        ad_user_data: 'granted',
+        ad_personalization: 'granted',
+      });
+    }
+    if (typeof win.fbq === 'function') {
+      win.fbq('consent', 'grant');
+    }
     setVisible(false);
   }
 

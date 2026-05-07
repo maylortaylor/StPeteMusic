@@ -4,11 +4,11 @@
 // Google Maps API loaded via @vis.gl/react-google-maps
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://maps.googleapis.com",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://maps.googleapis.com https://connect.facebook.net https://www.clarity.ms",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://www.googletagmanager.com https://www.google-analytics.com https://i.ytimg.com https://img.youtube.com https://maps.googleapis.com https://maps.gstatic.com",
+  "img-src 'self' data: blob: https://www.googletagmanager.com https://www.google-analytics.com https://i.ytimg.com https://img.youtube.com https://maps.googleapis.com https://maps.gstatic.com https://www.facebook.com",
   "font-src 'self'",
-  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://region1.analytics.google.com https://www.googletagmanager.com",
+  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://region1.analytics.google.com https://www.googletagmanager.com https://www.facebook.com https://*.facebook.net https://*.clarity.ms",
   "frame-src https://www.youtube.com https://www.youtube-nocookie.com",
   "frame-ancestors 'self'",
   "base-uri 'self'",

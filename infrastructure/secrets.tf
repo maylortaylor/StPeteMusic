@@ -40,3 +40,27 @@ resource "aws_ssm_parameter" "clerk_publishable_key" {
   value = var.clerk_publishable_key
   tags  = { Project = var.project }
 }
+
+resource "aws_ssm_parameter" "meta_pixel_id" {
+  count = var.meta_pixel_id != "" ? 1 : 0
+
+  name  = "/${var.project}/analytics/meta_pixel_id"
+  type  = "SecureString"
+  value = var.meta_pixel_id
+
+  tags = {
+    Project = var.project
+  }
+}
+
+resource "aws_ssm_parameter" "clarity_project_id" {
+  count = var.clarity_project_id != "" ? 1 : 0
+
+  name  = "/${var.project}/analytics/clarity_project_id"
+  type  = "SecureString"
+  value = var.clarity_project_id
+
+  tags = {
+    Project = var.project
+  }
+}

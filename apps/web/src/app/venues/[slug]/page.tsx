@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Nav } from '@/components/Nav';
 import { Footer } from '@/components/Footer';
+import { MetaPixelViewContent } from '@/components/MetaPixelViewContent';
 import { getVenueBySlug, getAllVenueSlugs } from '@/lib/queries/venues';
 import type { Venue } from '@stpetemusic/types';
 
@@ -45,7 +46,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: `St. Pete Music | ${venue.name}`,
         description,
         url: `https://www.stpetemusic.live/venues/${slug}`,
-        ...(venue.hero_photo_url ? { images: [{ url: venue.hero_photo_url }] } : {}),
+        images: [
+          {
+            url: venue.hero_photo_url ?? '/images/brand/spm-logo-palm.png',
+            width: 1200,
+            height: 630,
+            alt: venue.hero_photo_url ? venue.name : 'St. Pete Music',
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: `St. Pete Music | ${venue.name}`,
+        description,
+        images: [venue.hero_photo_url ?? 'https://www.stpetemusic.live/images/brand/spm-logo-palm.png'],
       },
     };
   } catch {
@@ -54,9 +68,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const SOCIAL_LINKS = [
+  { key: 'website',       label: 'Visit Website' },
   { key: 'instagram_url', label: 'Instagram' },
   { key: 'facebook_url',  label: 'Facebook' },
-  { key: 'website',       label: 'Website' },
 ] as const;
 
 export default async function VenuePage({ params }: Props) {
@@ -90,13 +104,29 @@ export default async function VenuePage({ params }: Props) {
     description: venue.description,
     address: venue.address,
     ...(hasMap ? { geo: { '@type': 'GeoCoordinates', latitude: venue.lat, longitude: venue.lng } } : {}),
-    ...(venue.instagram_url ? { sameAs: [venue.instagram_url] } : {}),
+    sameAs: [
+      venue.website,
+      venue.instagram_url,
+      venue.facebook_url,
+    ].filter((url): url is string => !!url),
     ...(venue.hero_photo_url ? { image: venue.hero_photo_url } : {}),
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.stpetemusic.live' },
+      { '@type': 'ListItem', position: 2, name: 'Venues', item: 'https://www.stpetemusic.live/venues' },
+      { '@type': 'ListItem', position: 3, name: venue.name, item: `https://www.stpetemusic.live/venues/${slug}` },
+    ],
   };
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <MetaPixelViewContent contentType="venue" contentName={venue.name} />
       <Nav />
       <main className="min-h-screen bg-surface">
 
@@ -198,49 +228,51 @@ export default async function VenuePage({ params }: Props) {
             {/* Right: social + CTA */}
             <div>
               <div className="bg-white border border-border p-8 sticky top-24">
-
-                {/* Primary CTA */}
-                {venue.instagram_url && (
-                  <a
-                    href={venue.instagram_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full text-center text-white font-inter font-bold text-sm uppercase tracking-widest px-8 py-4 bg-black hover:opacity-85 transition-opacity mb-8"
-                  >
-                    Follow on Instagram
-                  </a>
-                )}
-
-                {/* Social links */}
-                {(socialLinks.length > 0 || extraLinks.length > 0) && (
-                  <div className="flex flex-col gap-3">
-                    {socialLinks.map(link => (
-                      <a
-                        key={link.label}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-inter text-base text-text-secondary hover:text-black transition-colors flex items-center justify-between group"
-                      >
-                        <span>{link.label}</span>
-                        <span className="text-text-muted group-hover:text-black transition-colors">→</span>
-                      </a>
-                    ))}
-                    {extraLinks.map(link => (
-                      <a
-                        key={link.label}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-inter text-base text-text-secondary hover:text-black transition-colors flex items-center justify-between group"
-                      >
-                        <span>{link.label}</span>
-                        <span className="text-text-muted group-hover:text-black transition-colors">→</span>
-                      </a>
-                    ))}
-                  </div>
-                )}
-
+                {(() => {
+                  const allLinks = [...socialLinks, ...extraLinks];
+                  const [primaryLink, secondaryLink, ...restLinks] = allLinks;
+                  return (
+                    <>
+                      {primaryLink && (
+                        <a
+                          href={primaryLink.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block w-full text-center text-white font-inter font-bold text-sm uppercase tracking-widest px-8 py-4 bg-black hover:opacity-85 transition-opacity mb-3"
+                        >
+                          {primaryLink.label} →
+                        </a>
+                      )}
+                      {secondaryLink && (
+                        <a
+                          href={secondaryLink.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block w-full text-center font-inter font-bold text-sm uppercase tracking-widest px-8 py-4 border border-black text-black hover:bg-black hover:text-white transition-all mb-8"
+                        >
+                          {secondaryLink.label} →
+                        </a>
+                      )}
+                      {!primaryLink && !secondaryLink && <div className="mb-8" />}
+                      {restLinks.length > 0 && (
+                        <div className="flex flex-col gap-3 mb-6">
+                          {restLinks.map(link => (
+                            <a
+                              key={link.label}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-inter text-base text-text-secondary hover:text-black transition-colors flex items-center justify-between group"
+                            >
+                              <span>{link.label}</span>
+                              <span className="text-text-muted group-hover:text-black transition-colors">→</span>
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
                 <div className="mt-6 pt-6 border-t border-border">
                   <Link
                     href="/venues"
