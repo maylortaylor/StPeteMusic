@@ -1,7 +1,15 @@
 name: Deploy to AWS
 
-# Runs automatically after CI passes on main, on direct pushes to main,
-# or manually via workflow_dispatch.
+# Runs automatically after CI passes on main, or manually via workflow_dispatch.
+# CI runs on every push to main, so workflow_run covers all pushes — including
+# infra-only commits. The push trigger was removed because it raced with
+# tofu-apply for the shared concurrency slot, causing tofu-apply to be cancelled
+# (deploy fired twice: once on push and once via workflow_run, and the second
+# pending run displaced the pending tofu-apply).
+#
+# Correct ordering with only workflow_run:
+#   push → tofu-apply acquires production-deploy slot → CI passes → deploy queues
+#   → tofu finishes → deploy gets slot → SSH runs safely after infra is ready.
 #
 # Strategy: checkout repo on the Actions runner, package needed files into
 # a single tarball with a known structure, SCP it to EC2, extract and run.
@@ -11,15 +19,10 @@ name: Deploy to AWS
 # it is overwritten on every deploy. Manage all secrets in:
 # https://github.com/maylortaylor/StPeteMusic/settings/secrets/actions
 on:
-  # Fires after CI passes on a PR merge to main
   workflow_run:
     workflows: ["CI"]
     types: [completed]
     branches: [main]
-  # Fires on any direct push to main (e.g. infra-only commits that don't trigger CI)
-  push:
-    branches: [main]
-  # Allows manual trigger from the GitHub Actions UI
   workflow_dispatch:
 
 # Prevent two deploys from stomping each other on EC2 (/tmp/deploy-pkg is shared).
