@@ -27,9 +27,11 @@ export const metadata: Metadata = {
     'Warehouse Arts District',
     'Tampa Bay music',
     'Final Friday',
-    'Instant Noodles',
-    'Florida live music',
+'Florida live music',
   ],
+  other: {
+    'facebook-domain-verification': 'hazlmxxsqoiyfaryx63ql5xcaeubr5',
+  },
   icons: {
     icon: [
       { url: '/images/brand/favicon/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
