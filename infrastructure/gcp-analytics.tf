@@ -104,6 +104,12 @@ resource "google_iam_workload_identity_pool" "github_actions" {
   description               = "WIF pool for GitHub Actions CI/CD"
 
   depends_on = [google_project_service.iam_api]
+
+  lifecycle {
+    # spm-ci-planner lacks iam.workloadIdentityPools.update — pool is stable once created,
+    # so prevent CI from ever attempting to modify it (bootstrapping trap).
+    ignore_changes = all
+  }
 }
 
 resource "google_iam_workload_identity_pool_provider" "github" {
@@ -125,6 +131,10 @@ resource "google_iam_workload_identity_pool_provider" "github" {
 
   oidc {
     issuer_uri = "https://token.actions.githubusercontent.com"
+  }
+
+  lifecycle {
+    ignore_changes = all
   }
 }
 
