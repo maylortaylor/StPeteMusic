@@ -58,10 +58,10 @@ export default function TermsPage() {
               <p>
                 The St. Pete Music name, logo, and brand assets belong to Tangent LLC. Artist and
                 venue listings are shared in good faith to support the local music community — if
-                you&apos;re listed and want something updated or removed, just{' '}
-                <a href="mailto:hello@stpetemusic.live" className="text-brand-orange underline">
-                  reach out
-                </a>
+                you&apos;re listed and want something updated or removed, just reach out via the{' '}
+                <Link href="/contact" className="text-brand-orange underline">
+                  contact form
+                </Link>
                 .
               </p>
             </section>
@@ -87,16 +87,6 @@ export default function TermsPage() {
               </p>
             </section>
 
-            <section>
-              <h2 className="font-inter font-black text-2xl text-black mb-3">Questions?</h2>
-              <p>
-                Reach us at{' '}
-                <a href="mailto:hello@stpetemusic.live" className="text-brand-orange underline">
-                  hello@stpetemusic.live
-                </a>
-                . We&apos;re real people, we respond.
-              </p>
-            </section>
 
           </div>
 

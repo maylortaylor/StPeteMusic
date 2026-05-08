@@ -172,16 +172,6 @@ export default function PrivacyPage() {
               </ul>
             </section>
 
-            <section>
-              <h2 className="font-inter font-black text-2xl text-black mb-3">Contact</h2>
-              <p>
-                Questions about this policy? Reach us at{' '}
-                <a href="mailto:hello@stpetemusic.live" className="text-brand-orange underline">
-                  hello@stpetemusic.live
-                </a>
-                .
-              </p>
-            </section>
 
           </div>
 
