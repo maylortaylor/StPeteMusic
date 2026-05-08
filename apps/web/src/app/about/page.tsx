@@ -98,8 +98,7 @@ export default function AboutPage() {
                 fans connected to what&apos;s happening in their city.
               </p>
               <p className="mt-4">
-                We&apos;re built by{' '}
-                <strong>Tangent LLC</strong> in partnership with{' '}
+                We take pride in helping the community by being partnered with{' '}
                 <a
                   href="https://www.suiteestudios.com"
                   target="_blank"
@@ -107,42 +106,21 @@ export default function AboutPage() {
                   className="text-brand-orange underline"
                 >
                   Suite E Studios
-                </a>{' '}
-                — an independent music and arts venue at 615 27th St S in St. Petersburg.
+                </a>{' '}.
+                An independent music and arts third-space at 615 27th St S in St. Petersburg.
               </p>
             </section>
 
             <section>
               <h2 className="font-inter font-black text-2xl text-black mb-3">What we do</h2>
               <ul className="list-disc pl-6 space-y-2">
-                <li>Maintain a living directory of local bands, artists, and DJs in the Tampa Bay area</li>
+                <li>Promote local bands, musicians, DJs, and artists of all types in the Tampa Bay & St Pete, FL area</li>
                 <li>List upcoming shows, concerts, and community events</li>
-                <li>Spotlight local music venues — from intimate studios to rooftop bars</li>
-                <li>Host <strong>Final Friday</strong> — a monthly live music showcase at Suite E Studios</li>
+                <li>Spotlight local music venues</li>
                 <li>Send a monthly newsletter with what&apos;s happening in the St. Pete music scene</li>
               </ul>
             </section>
 
-            <section>
-              <h2 className="font-inter font-black text-2xl text-black mb-3">The team</h2>
-              <p>
-                <strong>Matt Taylor</strong> and <strong>Austen Van Der Bleek</strong> — two St. Pete locals
-                who wanted a better way to stay plugged into the music scene.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="font-inter font-black text-2xl text-black mb-3">Get involved</h2>
-              <p>
-                Artist or band based in St. Pete? Want your venue listed? Drop us a line —
-                we&apos;d love to feature you.
-              </p>
-              <p className="mt-4">
-                <a href="mailto:hello@stpetemusic.live" className="text-brand-orange underline font-bold">
-                  hello@stpetemusic.live
-                </a>
-              </p>
-            </section>
 
           </div>
 
