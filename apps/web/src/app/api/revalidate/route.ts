@@ -11,10 +11,13 @@ export async function POST(request: Request) {
   const { slug, oldSlug } = await request.json();
 
   revalidatePath(`/discover/${slug}`);
+  revalidatePath(`/venues/${slug}`);
   if (oldSlug && oldSlug !== slug) {
     revalidatePath(`/discover/${oldSlug}`);
+    revalidatePath(`/venues/${oldSlug}`);
   }
   revalidatePath('/discover');
+  revalidatePath('/venues');
 
   return Response.json({ revalidated: true });
 }
