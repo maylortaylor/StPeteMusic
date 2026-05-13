@@ -22,7 +22,11 @@
     "ga4:conversions": "node scripts/ga4-conversions.mjs",
     "ga4:setup": "node scripts/ga4-setup.mjs",
     "ga4:weekly-report": "node scripts/ga4-weekly-report.mjs",
-    "images:optimize": "node scripts/optimize-images.mjs"
+    "images:optimize": "node scripts/optimize-images.mjs",
+    "record-demo:home-scroll": "DEMO_URL=https://www.stpetemusic.live node scripts/record-demo.mjs --60fps --sequence=home-scroll",
+    "record-demo:events-list": "DEMO_URL=https://www.stpetemusic.live node scripts/record-demo.mjs --60fps --sequence=event-list",
+    "record-demo:events-calendar": "DEMO_URL=https://www.stpetemusic.live node scripts/record-demo.mjs --60fps --sequence=events-calendar",
+    "record-demo:discover": "DEMO_URL=https://www.stpetemusic.live node scripts/record-demo.mjs --60fps --sequence=discover"
   },
   "dependencies": {
     "@next/third-parties": "^16.2.4",

@@ -13,6 +13,8 @@ interface EventRow {
   tag: string | null;
   ticket_url: string | null;
   venue: string | null;
+  image_url: string | null;
+  extra_data: string; // JSON string from DB
   performers: string; // JSON string from DB
 }
 
@@ -43,6 +45,8 @@ async function _getEventsForMonths(specs: MonthSpec[]): Promise<Event[]> {
       e.tag,
       e.ticket_url,
       e.venue,
+      e.image_url,
+      COALESCE(e.extra_data, '{}')::TEXT AS extra_data,
       COALESCE(
         json_agg(
           json_build_object(
@@ -73,6 +77,7 @@ async function _getEventsForMonths(specs: MonthSpec[]): Promise<Event[]> {
 
   return rows.map(row => ({
     ...row,
+    extra_data: JSON.parse(row.extra_data),
     performers: JSON.parse(row.performers),
   }));
 }
@@ -84,4 +89,65 @@ export function getEventsForMonths(specs: { year: number; month: number }[]) {
   return unstable_cache(_getEventsForMonths, [`events-for-months-${key}`], {
     revalidate: 345_600,
   })(specs);
+}
+
+// ─── Venue-specific upcoming events ──────────────────────────────────────────
+
+async function _getEventsForVenue(venueSlug: string): Promise<Event[]> {
+  const rows = await query<EventRow>(`
+    SELECT
+      e.id,
+      e.google_event_id,
+      e.title,
+      e.description,
+      e.start_time::TEXT AS start_time,
+      e.end_time::TEXT AS end_time,
+      e.location,
+      e.tag,
+      e.ticket_url,
+      e.venue,
+      e.image_url,
+      COALESCE(e.extra_data, '{}')::TEXT AS extra_data,
+      COALESCE(
+        json_agg(
+          json_build_object(
+            'id', a.id,
+            'name', a.name,
+            'slug', a.slug,
+            'type', a.type,
+            'instagram_handle', a.instagram_handle,
+            'instagram_url', a.instagram_url,
+            'genres', a.genres,
+            'tags', a.tags,
+            'extra_links', a.extra_links,
+            'extra_data', a.extra_data,
+            'is_active', a.is_active,
+            'visible_on_website', a.visible_on_website
+          )
+        ) FILTER (WHERE a.id IS NOT NULL),
+        '[]'::json
+      )::TEXT AS performers
+    FROM events e
+    LEFT JOIN event_performers ep ON ep.event_id = e.id
+    LEFT JOIN artists a ON a.id = ep.artist_id AND a.is_active = true
+    WHERE e.is_active = true
+      AND e.venue = $1
+      AND e.start_time >= NOW()
+    GROUP BY e.id
+    ORDER BY e.start_time ASC
+    LIMIT 20
+  `, [venueSlug]);
+
+  return rows.map(row => ({
+    ...row,
+    extra_data: JSON.parse(row.extra_data),
+    performers: JSON.parse(row.performers),
+  }));
+}
+
+// Cache for 1 hour — venue upcoming events change more frequently than monthly views.
+export function getEventsForVenue(venueSlug: string) {
+  return unstable_cache(_getEventsForVenue, [`events-for-venue-${venueSlug}`], {
+    revalidate: 3_600,
+  })(venueSlug);
 }
