@@ -9,6 +9,7 @@ import {
   Users2,
   Building2,
   Zap,
+  Mail,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -42,6 +43,11 @@ const navItems = [
     label: 'Templates',
     href: '/dashboard/templates',
     icon: Zap,
+  },
+  {
+    label: 'Newsletter',
+    href: '/dashboard/newsletter',
+    icon: Mail,
   },
 ];
 

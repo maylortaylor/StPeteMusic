@@ -64,3 +64,50 @@ resource "aws_ssm_parameter" "clarity_project_id" {
     Project = var.project
   }
 }
+
+# ── Social stats ──────────────────────────────────────────────────────────────
+
+resource "aws_ssm_parameter" "ig_user_id" {
+  count = var.ig_user_id != "" ? 1 : 0
+
+  name  = "/${var.project}/instagram/user_id"
+  type  = "SecureString"
+  value = var.ig_user_id
+  tags  = { Project = var.project }
+}
+
+resource "aws_ssm_parameter" "ig_access_token" {
+  count = var.ig_access_token != "" ? 1 : 0
+
+  name  = "/${var.project}/instagram/access_token"
+  type  = "SecureString"
+  value = var.ig_access_token
+  tags  = { Project = var.project }
+}
+
+resource "aws_ssm_parameter" "fb_page_id" {
+  count = var.fb_page_id != "" ? 1 : 0
+
+  name  = "/${var.project}/facebook/page_id"
+  type  = "SecureString"
+  value = var.fb_page_id
+  tags  = { Project = var.project }
+}
+
+resource "aws_ssm_parameter" "fb_access_token" {
+  count = var.fb_access_token != "" ? 1 : 0
+
+  name  = "/${var.project}/facebook/access_token"
+  type  = "SecureString"
+  value = var.fb_access_token
+  tags  = { Project = var.project }
+}
+
+resource "aws_ssm_parameter" "youtube_api_key" {
+  count = var.youtube_api_key != "" ? 1 : 0
+
+  name  = "/${var.project}/youtube/api_key"
+  type  = "SecureString"
+  value = var.youtube_api_key
+  tags  = { Project = var.project }
+}

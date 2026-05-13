@@ -41,6 +41,11 @@ jobs:
       TF_VAR_cloudflare_zone_id:    ${{ secrets.CLOUDFLARE_ZONE_ID }}
       TF_VAR_google_project_id:     ${{ secrets.GCP_PROJECT_ID }}
       TF_VAR_google_org_id:         ${{ secrets.GCP_ORG_ID }}
+      TF_VAR_ig_user_id:            ${{ secrets.IG_USER_ID }}
+      TF_VAR_ig_access_token:       ${{ secrets.IG_ACCESS_TOKEN }}
+      TF_VAR_fb_page_id:            ${{ secrets.FB_PAGE_ID }}
+      TF_VAR_fb_access_token:       ${{ secrets.FB_ACCESS_TOKEN }}
+      TF_VAR_youtube_api_key:       ${{ secrets.YOUTUBE_API_KEY }}
 
     steps:
       - name: Checkout

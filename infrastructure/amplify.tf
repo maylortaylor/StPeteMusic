@@ -121,6 +121,16 @@ resource "aws_amplify_app" "admin" {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY   = data.aws_ssm_parameter.clerk_publishable_key.value
     NEXT_PUBLIC_CLERK_SIGN_IN_URL       = "/sign-in"
     NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL = "/dashboard"
+    # Listmonk — newsletter page + subscriber stat card
+    LISTMONK_API_URL                    = "https://listmonk.stpetemusic.live"
+    LISTMONK_USERNAME                   = data.aws_ssm_parameter.listmonk_username.value
+    LISTMONK_PASSWORD                   = data.aws_ssm_parameter.listmonk_password.value
+    # Social stat cards — optional, degrade to "—" if empty
+    IG_USER_ID                          = var.ig_user_id
+    IG_ACCESS_TOKEN                     = var.ig_access_token
+    FB_PAGE_ID                          = var.fb_page_id
+    FB_ACCESS_TOKEN                     = var.fb_access_token
+    YOUTUBE_API_KEY                     = var.youtube_api_key
   }
 
   enable_auto_branch_creation = false

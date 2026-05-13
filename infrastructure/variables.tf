@@ -148,3 +148,41 @@ variable "bing_webmaster_verification_code" {
   type        = string
   default     = ""
 }
+
+# ── Social stats (admin dashboard cards) ─────────────────────────────────────
+# All optional — admin dashboard degrades gracefully to "—" when not set.
+
+variable "ig_user_id" {
+  description = "Instagram Business Account numeric ID. Used by admin dashboard to fetch follower count. Set via TF_VAR_ig_user_id in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "ig_access_token" {
+  description = "Instagram long-lived page access token with instagram_basic permission. Set via TF_VAR_ig_access_token in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "fb_page_id" {
+  description = "Facebook Page numeric ID for StPeteFLMusic. Used by admin dashboard to fetch fan count. Set via TF_VAR_fb_page_id in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "fb_access_token" {
+  description = "Facebook Page access token with pages_read_engagement permission. Set via TF_VAR_fb_access_token in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "youtube_api_key" {
+  description = "YouTube Data API v3 key. Used by admin dashboard to fetch subscriber count for @StPeteMusic. Set via TF_VAR_youtube_api_key in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
