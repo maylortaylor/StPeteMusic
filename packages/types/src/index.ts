@@ -61,6 +61,12 @@ export interface Venue {
   notes?: string;
   is_active: boolean;
   visible_on_website: boolean;
+  // Platform IDs — stored in DB so n8n workflows and future tooling can query them.
+  facebook_page_id?: string;
+  instagram_page_id?: string;
+  google_calendar_id?: string;
+  // Automated event scraping sources for this venue.
+  events_sources: { type: 'facebook' | 'website' | 'instagram'; url: string }[];
 }
 
 export interface Collaborator {
@@ -111,6 +117,10 @@ export interface Event {
   ticket_url: string | null;
   venue: string | null;
   performers: Artist[];
+  // Populated by venue-events-sync; cleared after event passes.
+  image_url?: string | null;
+  // Source metadata: { source, fb_event_url, event_by, dedup_id, ... }
+  extra_data: Record<string, unknown>;
 }
 
 export interface Post {

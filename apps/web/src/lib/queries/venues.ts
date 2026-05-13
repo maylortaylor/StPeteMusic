@@ -6,7 +6,8 @@ export async function getAllVenues(): Promise<Venue[]> {
     SELECT
       id, name, slug, address, capacity, tags,
       instagram_url, instagram_username, facebook_url,
-      website, lat, lng, is_active
+      website, lat, lng, is_active, google_calendar_id,
+      events_sources
     FROM venues
     WHERE is_active = true AND visible_on_website = true AND slug IS NOT NULL
     ORDER BY name ASC
@@ -19,7 +20,9 @@ export async function getVenueBySlug(slug: string): Promise<Venue | null> {
       id, name, slug, description, address, phone, email,
       capacity, tags, instagram_url, instagram_username,
       facebook_url, facebook_username, website,
-      hero_photo_url, lat, lng, extra_links, is_active
+      hero_photo_url, lat, lng, extra_links, is_active,
+      facebook_page_id, instagram_page_id, google_calendar_id,
+      events_sources
     FROM venues
     WHERE slug = $1 AND is_active = true
     LIMIT 1

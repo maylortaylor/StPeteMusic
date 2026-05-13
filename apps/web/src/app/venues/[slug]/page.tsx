@@ -6,6 +6,7 @@ import { Nav } from '@/components/Nav';
 import { Footer } from '@/components/Footer';
 import { MetaPixelViewContent } from '@/components/MetaPixelViewContent';
 import { getVenueBySlug, getAllVenueSlugs } from '@/lib/queries/venues';
+import { getEventsForVenue } from '@/lib/queries/events';
 import type { Venue } from '@stpetemusic/types';
 
 export const revalidate = 86400;
@@ -77,8 +78,12 @@ export default async function VenuePage({ params }: Props) {
   const { slug } = await params;
 
   let venue;
+  let upcomingEvents: Awaited<ReturnType<typeof getEventsForVenue>> = [];
   try {
-    venue = await getVenueBySlug(slug);
+    [venue, upcomingEvents] = await Promise.all([
+      getVenueBySlug(slug),
+      getEventsForVenue(slug).catch(() => []),
+    ]);
   } catch {
     notFound();
   }
@@ -154,6 +159,55 @@ export default async function VenuePage({ params }: Props) {
             </h1>
           </div>
         </div>
+
+        {/* Upcoming Events */}
+        {upcomingEvents.length > 0 && (
+          <div className="max-w-7xl mx-auto px-6 pt-12 pb-2">
+            <h2 className="font-inter font-black uppercase tracking-[0.2em] text-sm text-text-muted mb-6">
+              Upcoming Events
+            </h2>
+            <div className="flex flex-col divide-y divide-border border-t border-border">
+              {upcomingEvents.map(event => {
+                const start = new Date(event.start_time);
+                const dateStr = start.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                const timeStr = start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                return (
+                  <div key={event.id} className="flex items-center gap-6 py-5">
+                    {event.image_url && (
+                      <div className="shrink-0 w-16 h-16 overflow-hidden bg-surface-alt">
+                        <Image
+                          src={event.image_url}
+                          alt={event.title}
+                          width={64}
+                          height={64}
+                          className="object-cover w-full h-full"
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-inter font-bold text-base text-text leading-tight truncate">
+                        {event.title}
+                      </p>
+                      <p className="font-inter text-sm text-text-muted mt-0.5">
+                        {dateStr} · {timeStr}
+                      </p>
+                    </div>
+                    {event.ticket_url && (
+                      <a
+                        href={event.ticket_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 font-inter font-bold text-xs uppercase tracking-widest px-5 py-2.5 bg-black text-white hover:opacity-80 transition-opacity"
+                      >
+                        Tickets →
+                      </a>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Body */}
         <div className="max-w-7xl mx-auto px-6 py-16">
