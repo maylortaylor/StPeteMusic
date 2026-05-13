@@ -24,6 +24,8 @@
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
@@ -51,29 +53,34 @@
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
     --ring: 0 0% 3.6%;
+    --success: 95 38% 42%;
+    --success-foreground: 0 0% 100%;
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 0 0% 3.6%;
-    --foreground: 0 0% 98.2%;
-    --card: 0 0% 3.6%;
-    --card-foreground: 0 0% 98.2%;
-    --popover: 0 0% 3.6%;
-    --popover-foreground: 0 0% 98.2%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 98.2%;
-    --accent-foreground: 0 0% 9%;
+    /* Claude color scheme */
+    --background: 20 10% 7%;          /* Very dark warm near-black */
+    --foreground: 34 63% 89%;         /* Cream #F5E6D3 */
+    --card: 20 10% 10%;               /* Slightly lighter surface */
+    --card-foreground: 34 63% 89%;    /* Cream */
+    --popover: 20 10% 10%;
+    --popover-foreground: 34 63% 89%;
+    --primary: 28 80% 52%;            /* Claude Orange #E67D22 */
+    --primary-foreground: 20 10% 7%;  /* Dark text on orange */
+    --secondary: 20 8% 14%;           /* Dark secondary surface */
+    --secondary-foreground: 31 35% 64%; /* Muted Tan #C4A584 */
+    --muted: 20 8% 14%;
+    --muted-foreground: 31 35% 64%;   /* Muted Tan #C4A584 */
+    --accent: 21 100% 77%;            /* Light Orange #FFB38A */
+    --accent-foreground: 20 10% 7%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98.2%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --primary: 0 0% 98.2%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98.2%;
-    --ring: 0 0% 83.1%;
+    --destructive-foreground: 34 63% 89%;
+    --border: 20 8% 18%;              /* Subtle warm dark border */
+    --input: 20 8% 14%;
+    --ring: 28 80% 52%;               /* Orange focus ring */
+    --success: 95 38% 62%;            /* Warm Green #98C379 */
+    --success-foreground: 20 10% 7%;
   }
 
   * {

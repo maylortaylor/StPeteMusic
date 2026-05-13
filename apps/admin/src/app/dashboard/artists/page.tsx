@@ -60,12 +60,12 @@ export default function ArtistsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Artists</h1>
-          <p className="mt-1 text-gray-600">Manage artist profiles and visibility</p>
+          <h1 className="text-3xl font-bold text-foreground">Artists</h1>
+          <p className="mt-1 text-muted-foreground">Manage artist profiles and visibility</p>
         </div>
         <Link
           href="/dashboard/artists/new"
-          className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
         >
           <Plus className="h-4 w-4" />
           New Artist
@@ -73,43 +73,43 @@ export default function ArtistsPage() {
       </div>
 
       {error && (
-        <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">
           {error}
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+      <div className="overflow-x-auto rounded-lg border border-border bg-card">
         <table className="min-w-full">
           <thead>
-            <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600">Type</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600">Username</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600">Active</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600">Public</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600">Actions</th>
+            <tr className="border-b border-border bg-muted">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Name</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Type</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Username</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Active</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Public</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Actions</th>
             </tr>
           </thead>
           <tbody>
             {artists.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={6} className="px-6 py-8 text-center text-muted-foreground">
                   No artists yet
                 </td>
               </tr>
             ) : (
               artists.map((artist) => (
-                <tr key={artist.id} className="border-b border-gray-200 hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{artist.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{artist.type}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{artist.username || '—'}</td>
+                <tr key={artist.id} className="border-b border-border hover:bg-muted/50">
+                  <td className="px-6 py-4 text-sm font-medium text-foreground">{artist.name}</td>
+                  <td className="px-6 py-4 text-sm text-muted-foreground">{artist.type}</td>
+                  <td className="px-6 py-4 text-sm text-muted-foreground">{artist.username || '—'}</td>
                   <td className="px-6 py-4 text-sm">
                     <button
                       onClick={() => handleToggleActive(artist.id, artist.is_active)}
                       className={`inline-block px-2 py-1 rounded text-xs font-medium ${
                         artist.is_active
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-gray-100 text-gray-600'
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                          : 'bg-muted text-muted-foreground'
                       }`}
                     >
                       {artist.is_active ? 'Active' : 'Inactive'}
@@ -119,8 +119,8 @@ export default function ArtistsPage() {
                     <span
                       className={`inline-block px-2 py-1 rounded text-xs font-medium ${
                         artist.visible_on_website
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'bg-gray-100 text-gray-600'
+                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                          : 'bg-muted text-muted-foreground'
                       }`}
                     >
                       {artist.visible_on_website ? 'Visible' : 'Hidden'}
@@ -129,7 +129,7 @@ export default function ArtistsPage() {
                   <td className="px-6 py-4 text-sm">
                     <Link
                       href={`/dashboard/artists/${artist.id}`}
-                      className="text-blue-600 hover:text-blue-800"
+                      className="text-primary hover:text-primary/80"
                     >
                       Edit
                     </Link>

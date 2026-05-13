@@ -10,18 +10,19 @@ Parent company: Tangent LLC. Partner venue: Suite E Studios.
 - Managed by Matt Taylor (@maylortaylor) · team: Matt + Austen Van Der Bleek
 
 ## Deep Context
-> Match task keywords → read that file. Skip the rest.
+> **Load by domain, not by keyword.** Before planning or implementing anything, ask: which of these domains will my work touch? Load every matching file before you start — don't wait for keywords.
 
-| Keywords | File |
-|---|---|
-| brand, @stpetemusic, suite e, team, social, ig, fb, instagram, facebook, youtube, eventbrite | [brand.md](.claude/brand.md) |
-| event, final friday, instant noodles, art walk, second saturday, jam, band, content, post, caption | [events.md](.claude/events.md) |
-| infra, aws, amplify, ec2, dns, tofu, terraform, branch, git, listmonk, newsletter, ssl, ci | [infrastructure.md](.claude/infrastructure.md) |
-| n8n, workflow, obsidian, posting, youtube, instagram, google drive, video, reel, publish | [n8n.md](.claude/n8n.md) |
-| secret, token, github secret, rotate, credential, listmonk, env var, environment variable | [secrets.md](.claude/secrets.md) |
-| setup, direnv, envrc, pre-commit, install, first-time, hooks | [setup.md](.claude/setup.md) |
-| error, down, debug, troubleshoot, ssh, 403, 500, not responding, connection refused | [troubleshooting.md](.claude/troubleshooting.md) |
-| ads, google ads, microsoft ads, bing, bing ads, uet, ppc, paid, advertising, clarity | [ads-accounts-todo.md](.claude/ads-accounts-todo.md) |
+| Load when... | File |
+|--------------|------|
+| Brand & social accounts (@stpetemusic, suite e, team, IG, FB, YouTube, EventBrite) | [brand.md](.claude/brand.md) |
+| Events & content (final friday, instant noodles, art walk, captions, posts, shows, bands) | [events.md](.claude/events.md) |
+| Infrastructure & deployment (aws, amplify, ec2, dns, tofu, terraform, ssl, cloudflare, listmonk, CI) | [infrastructure.md](.claude/infrastructure.md) |
+| n8n & automation (workflows, obsidian, posting, youtube, instagram, google drive, video, reel) | [n8n.md](.claude/n8n.md) |
+| Facebook & Instagram webhooks (fb automation, ig automation, page webhook, comment, message, mention) | [n8n-fb-ig-automation.md](.claude/n8n-fb-ig-automation.md) |
+| Secrets & credentials (tokens, github secrets, env vars, rotate, listmonk, credential management) | [secrets.md](.claude/secrets.md) |
+| Local setup (direnv, envrc, pre-commit, install, first-time, hooks) | [setup.md](.claude/setup.md) |
+| Debugging & troubleshooting (errors, down, ssh, 403, 500, not responding, connection refused) | [troubleshooting.md](.claude/troubleshooting.md) |
+| Ads & analytics (google ads, microsoft ads, bing, meta pixel, GTM, clarity, paid, advertising) | [ads-accounts-todo.md](.claude/ads-accounts-todo.md) |
 
 ## Key Files
 | File | Purpose |
