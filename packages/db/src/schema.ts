@@ -88,6 +88,12 @@ export const venues = pgTable('venues', {
   notes: text('notes'),
   is_active: boolean('is_active').default(true),
   visible_on_website: boolean('visible_on_website').default(false),
+  facebook_page_id: varchar('facebook_page_id', { length: 100 }),
+  instagram_page_id: varchar('instagram_page_id', { length: 100 }),
+  google_calendar_id: varchar('google_calendar_id', { length: 255 }),
+  events_sources: jsonb('events_sources')
+    .$type<{ type: 'facebook' | 'website' | 'instagram'; url: string }[]>()
+    .default([]),
   created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updated_at: timestamp('updated_at', { withTimezone: true })
     .defaultNow()
