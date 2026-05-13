@@ -52,9 +52,9 @@ interface VenueFormProps {
 }
 
 const inputClass =
-  'mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900';
+  'mt-2 block w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring';
 
-const labelClass = 'block text-sm font-medium text-gray-900';
+const labelClass = 'block text-sm font-medium text-foreground';
 
 export function VenueForm({ venueId }: VenueFormProps) {
   const router = useRouter();
@@ -206,7 +206,7 @@ export function VenueForm({ venueId }: VenueFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 rounded-lg border border-gray-200 bg-white p-8">
+    <form onSubmit={handleSubmit} className="space-y-6 rounded-lg border border-border bg-card p-8">
       {error && (
         <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700" role="alert">
           {error}
@@ -315,8 +315,8 @@ export function VenueForm({ venueId }: VenueFormProps) {
       </div>
 
       {/* ── Social Media & Links ── */}
-      <div className="space-y-4 border-t border-gray-200 pt-6">
-        <h3 className="font-medium text-gray-900">Social Media & Links</h3>
+      <div className="space-y-4 border-t border-border pt-6">
+        <h3 className="font-medium text-foreground">Social Media & Links</h3>
         <div className="grid gap-6 md:grid-cols-2">
           <div>
             <label className={labelClass}>Instagram URL</label>
@@ -381,10 +381,10 @@ export function VenueForm({ venueId }: VenueFormProps) {
       </div>
 
       {/* ── Platform IDs ── */}
-      <div className="space-y-4 border-t border-gray-200 pt-6">
+      <div className="space-y-4 border-t border-border pt-6">
         <div>
-          <h3 className="font-medium text-gray-900">Platform IDs</h3>
-          <p className="mt-1 text-xs text-gray-500">Used by n8n automation to query APIs directly.</p>
+          <h3 className="font-medium text-foreground">Platform IDs</h3>
+          <p className="mt-1 text-xs text-muted-foreground">Used by n8n automation to query APIs directly.</p>
         </div>
         <div className="grid gap-6 md:grid-cols-2">
           <div>
@@ -426,18 +426,18 @@ export function VenueForm({ venueId }: VenueFormProps) {
       </div>
 
       {/* ── Event Sources ── */}
-      <div className="space-y-4 border-t border-gray-200 pt-6">
+      <div className="space-y-4 border-t border-border pt-6">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-medium text-gray-900">Event Sources</h3>
-            <p className="mt-1 text-xs text-gray-500">
+            <h3 className="font-medium text-foreground">Event Sources</h3>
+            <p className="mt-1 text-xs text-muted-foreground">
               Sources n8n scrapes to auto-populate this venue&apos;s events.
             </p>
           </div>
           <button
             type="button"
             onClick={() => setEventsSources(prev => [...prev, { type: 'facebook', url: '' }])}
-            className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+            className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
           >
             <Plus className="h-3 w-3" />
             Add source
@@ -455,7 +455,7 @@ export function VenueForm({ venueId }: VenueFormProps) {
                     ),
                   )
                 }
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+                className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
               >
                 <option value="facebook">Facebook</option>
                 <option value="instagram">Instagram</option>
@@ -470,12 +470,12 @@ export function VenueForm({ venueId }: VenueFormProps) {
                   )
                 }
                 placeholder="https://..."
-                className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+                className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
               />
               <button
                 type="button"
                 onClick={() => setEventsSources(prev => prev.filter((_, idx) => idx !== i))}
-                className="rounded p-2 text-gray-400 hover:bg-gray-100 hover:text-red-500"
+                className="rounded p-2 text-muted-foreground hover:bg-muted hover:text-red-500"
                 aria-label="Remove source"
               >
                 <Trash2 className="h-4 w-4" />
@@ -483,14 +483,14 @@ export function VenueForm({ venueId }: VenueFormProps) {
             </div>
           ))}
           {eventsSources.length === 0 && (
-            <p className="text-sm text-gray-400">No sources configured.</p>
+            <p className="text-sm text-muted-foreground">No sources configured.</p>
           )}
         </div>
       </div>
 
       {/* ── Partnership & Contact ── */}
-      <div className="space-y-4 border-t border-gray-200 pt-6">
-        <h3 className="font-medium text-gray-900">Partnership & Contact</h3>
+      <div className="space-y-4 border-t border-border pt-6">
+        <h3 className="font-medium text-foreground">Partnership & Contact</h3>
         <div className="grid gap-6 md:grid-cols-2">
           <div>
             <label className={labelClass}>Partnership Level</label>
@@ -543,13 +543,13 @@ export function VenueForm({ venueId }: VenueFormProps) {
       </div>
 
       {/* ── Extra Links ── */}
-      <div className="space-y-4 border-t border-gray-200 pt-6">
+      <div className="space-y-4 border-t border-border pt-6">
         <div className="flex items-center justify-between">
-          <h3 className="font-medium text-gray-900">Extra Links</h3>
+          <h3 className="font-medium text-foreground">Extra Links</h3>
           <button
             type="button"
             onClick={() => setExtraLinks(prev => [...prev, { label: '', url: '' }])}
-            className="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+            className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
           >
             <Plus className="h-3 w-3" />
             Add link
@@ -567,7 +567,7 @@ export function VenueForm({ venueId }: VenueFormProps) {
                   )
                 }
                 placeholder="Label"
-                className="w-40 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+                className="w-40 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
               />
               <input
                 type="url"
@@ -578,12 +578,12 @@ export function VenueForm({ venueId }: VenueFormProps) {
                   )
                 }
                 placeholder="https://..."
-                className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+                className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
               />
               <button
                 type="button"
                 onClick={() => setExtraLinks(prev => prev.filter((_, idx) => idx !== i))}
-                className="rounded p-2 text-gray-400 hover:bg-gray-100 hover:text-red-500"
+                className="rounded p-2 text-muted-foreground hover:bg-muted hover:text-red-500"
                 aria-label="Remove link"
               >
                 <Trash2 className="h-4 w-4" />
@@ -591,14 +591,14 @@ export function VenueForm({ venueId }: VenueFormProps) {
             </div>
           ))}
           {extraLinks.length === 0 && (
-            <p className="text-sm text-gray-400">No extra links.</p>
+            <p className="text-sm text-muted-foreground">No extra links.</p>
           )}
         </div>
       </div>
 
       {/* ── Media & Location ── */}
-      <div className="space-y-4 border-t border-gray-200 pt-6">
-        <h3 className="font-medium text-gray-900">Media & Location</h3>
+      <div className="space-y-4 border-t border-border pt-6">
+        <h3 className="font-medium text-foreground">Media & Location</h3>
         <div className="grid gap-6 md:grid-cols-2">
           <div className="md:col-span-2">
             <label className={labelClass}>Hero Photo URL</label>
@@ -641,7 +641,7 @@ export function VenueForm({ venueId }: VenueFormProps) {
       </div>
 
       {/* ── Notes ── */}
-      <div className="border-t border-gray-200 pt-6">
+      <div className="border-t border-border pt-6">
         <label className={labelClass}>Notes</label>
         <textarea
           name="notes"
@@ -654,8 +654,8 @@ export function VenueForm({ venueId }: VenueFormProps) {
       </div>
 
       {/* ── Visibility & Status ── */}
-      <div className="space-y-4 border-t border-gray-200 pt-6">
-        <h3 className="font-medium text-gray-900">Visibility & Status</h3>
+      <div className="space-y-4 border-t border-border pt-6">
+        <h3 className="font-medium text-foreground">Visibility & Status</h3>
         <div className="space-y-3">
           <label className="flex items-center gap-3">
             <input
@@ -663,9 +663,9 @@ export function VenueForm({ venueId }: VenueFormProps) {
               name="is_active"
               checked={formData.is_active}
               onChange={handleChange}
-              className="h-4 w-4 rounded border-gray-300"
+              className="h-4 w-4 rounded border-border"
             />
-            <span className="text-sm font-medium text-gray-900">Active</span>
+            <span className="text-sm font-medium text-foreground">Active</span>
           </label>
           <label className="flex items-center gap-3">
             <input
@@ -673,27 +673,27 @@ export function VenueForm({ venueId }: VenueFormProps) {
               name="visible_on_website"
               checked={formData.visible_on_website}
               onChange={handleChange}
-              className="h-4 w-4 rounded border-gray-300"
+              className="h-4 w-4 rounded border-border"
             />
-            <span className="text-sm font-medium text-gray-900">Show on public site</span>
+            <span className="text-sm font-medium text-foreground">Show on public site</span>
           </label>
         </div>
       </div>
 
       {/* ── Actions ── */}
-      <div className="flex items-center justify-between border-t border-gray-200 pt-6">
+      <div className="flex items-center justify-between border-t border-border pt-6">
         <div className="flex gap-4">
           <button
             type="submit"
             disabled={submitting}
-            className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
             {submitting ? 'Saving...' : venueId ? 'Update Venue' : 'Create Venue'}
           </button>
           <button
             type="button"
             onClick={() => router.push('/dashboard/venues')}
-            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
           >
             Cancel
           </button>

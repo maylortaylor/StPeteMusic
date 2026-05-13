@@ -78,12 +78,12 @@ export default function VenuesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Venues</h1>
-          <p className="mt-1 text-gray-600">Manage performance venues and locations</p>
+          <h1 className="text-3xl font-bold text-foreground">Venues</h1>
+          <p className="mt-1 text-muted-foreground">Manage performance venues and locations</p>
         </div>
         <Link
           href="/dashboard/venues/new"
-          className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
         >
           <Plus className="h-4 w-4" />
           New Venue
@@ -91,43 +91,43 @@ export default function VenuesPage() {
       </div>
 
       {error && (
-        <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700" role="alert">
+        <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400" role="alert">
           {error}
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+      <div className="overflow-x-auto rounded-lg border border-border bg-card">
         <table className="min-w-full">
           <thead>
-            <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600">Address</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600">Capacity</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600">Active</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600">Public</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600">Actions</th>
+            <tr className="border-b border-border bg-muted">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Name</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Address</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Capacity</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Active</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Public</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground">Actions</th>
             </tr>
           </thead>
           <tbody>
             {venues.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={6} className="px-6 py-8 text-center text-muted-foreground">
                   No venues yet
                 </td>
               </tr>
             ) : (
               venues.map(venue => (
-                <tr key={venue.id} className="border-b border-gray-200 hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{venue.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{venue.address || '—'}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{venue.capacity ?? '—'}</td>
+                <tr key={venue.id} className="border-b border-border hover:bg-muted/50">
+                  <td className="px-6 py-4 text-sm font-medium text-foreground">{venue.name}</td>
+                  <td className="px-6 py-4 text-sm text-muted-foreground">{venue.address || '—'}</td>
+                  <td className="px-6 py-4 text-sm text-muted-foreground">{venue.capacity ?? '—'}</td>
                   <td className="px-6 py-4 text-sm">
                     <button
                       onClick={() => handleToggleActive(venue.id, venue.is_active)}
                       className={`inline-block rounded px-2 py-1 text-xs font-medium ${
                         venue.is_active
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-gray-100 text-gray-600'
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                          : 'bg-muted text-muted-foreground'
                       }`}
                     >
                       {venue.is_active ? 'Active' : 'Inactive'}
@@ -137,8 +137,8 @@ export default function VenuesPage() {
                     <span
                       className={`inline-block rounded px-2 py-1 text-xs font-medium ${
                         venue.visible_on_website
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'bg-gray-100 text-gray-600'
+                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                          : 'bg-muted text-muted-foreground'
                       }`}
                     >
                       {venue.visible_on_website ? 'Visible' : 'Hidden'}
@@ -148,7 +148,7 @@ export default function VenuesPage() {
                     <div className="flex items-center gap-3">
                       <Link
                         href={`/dashboard/venues/${venue.id}`}
-                        className="text-blue-600 hover:text-blue-800"
+                        className="text-primary hover:text-primary/80"
                       >
                         Edit
                       </Link>
@@ -160,7 +160,7 @@ export default function VenuesPage() {
                             ? 'Add event sources in the venue editor first'
                             : 'Trigger n8n scrape'
                         }
-                        className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-blue-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary disabled:cursor-not-allowed disabled:opacity-30"
                       >
                         <RefreshCw
                           className={`h-3.5 w-3.5 ${syncingId === venue.id ? 'animate-spin' : ''}`}

@@ -32,6 +32,11 @@ interface ArtistFormProps {
   artistId?: string;
 }
 
+const inputClass =
+  'mt-2 block w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring';
+
+const labelClass = 'block text-sm font-medium text-foreground';
+
 export function ArtistForm({ artistId }: ArtistFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(!!artistId);
@@ -151,38 +156,34 @@ export function ArtistForm({ artistId }: ArtistFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 rounded-lg border border-gray-200 bg-white p-8">
+    <form onSubmit={handleSubmit} className="space-y-6 rounded-lg border border-border bg-card p-8">
       {error && (
-        <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400" role="alert">
           {error}
         </div>
       )}
 
       <div className="grid gap-6 md:grid-cols-2">
         <div>
-          <label className="block text-sm font-medium text-gray-900">
-            Name *
-          </label>
+          <label className={labelClass}>Name *</label>
           <input
             type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
             required
-            className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+            className={inputClass}
             placeholder="Artist name"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-900">
-            Type *
-          </label>
+          <label className={labelClass}>Type *</label>
           <select
             name="type"
             value={formData.type}
             onChange={handleChange}
-            className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+            className={inputClass}
           >
             <option value="Band">Band</option>
             <option value="Solo Artist">Solo Artist</option>
@@ -194,169 +195,147 @@ export function ArtistForm({ artistId }: ArtistFormProps) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-900">
-            Username
-          </label>
+          <label className={labelClass}>Username</label>
           <input
             type="text"
             name="username"
             value={formData.username || ''}
             onChange={handleChange}
-            className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+            className={inputClass}
             placeholder="@username"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-900">
-            Home Base
-          </label>
+          <label className={labelClass}>Home Base</label>
           <input
             type="text"
             name="home_base"
             value={formData.home_base || ''}
             onChange={handleChange}
-            className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+            className={inputClass}
             placeholder="St. Pete, FL"
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-900">
-          Description
-        </label>
+        <label className={labelClass}>Description</label>
         <textarea
           name="description"
           value={formData.description || ''}
           onChange={handleChange}
           rows={4}
-          className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+          className={inputClass}
           placeholder="Tell us about this artist..."
         />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
         <div>
-          <label className="block text-sm font-medium text-gray-900">
-            Genres (comma-separated)
-          </label>
+          <label className={labelClass}>Genres (comma-separated)</label>
           <input
             type="text"
             name="genres"
             value={formData.genres || ''}
             onChange={handleChange}
-            className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+            className={inputClass}
             placeholder="Hip-Hop, Electronic, Rock"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-900">
-            Tags (comma-separated)
-          </label>
+          <label className={labelClass}>Tags (comma-separated)</label>
           <input
             type="text"
             name="tags"
             value={formData.tags || ''}
             onChange={handleChange}
-            className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+            className={inputClass}
             placeholder="Local, Featured, Rising"
           />
         </div>
       </div>
 
-      <div className="space-y-4 border-t border-gray-200 pt-6">
-        <h3 className="font-medium text-gray-900">Social Media & Links</h3>
+      <div className="space-y-4 border-t border-border pt-6">
+        <h3 className="font-medium text-foreground">Social Media & Links</h3>
         <div className="grid gap-6 md:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-gray-900">
-              Instagram Handle
-            </label>
+            <label className={labelClass}>Instagram Handle</label>
             <input
               type="text"
               name="instagram_handle"
               value={formData.instagram_handle || ''}
               onChange={handleChange}
-              className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+              className={inputClass}
               placeholder="@handle"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-900">
-              Instagram URL
-            </label>
+            <label className={labelClass}>Instagram URL</label>
             <input
               type="url"
               name="instagram_url"
               value={formData.instagram_url || ''}
               onChange={handleChange}
-              className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+              className={inputClass}
               placeholder="https://instagram.com/..."
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-900">
-              Facebook URL
-            </label>
+            <label className={labelClass}>Facebook URL</label>
             <input
               type="url"
               name="facebook_url"
               value={formData.facebook_url || ''}
               onChange={handleChange}
-              className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+              className={inputClass}
               placeholder="https://facebook.com/..."
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-900">
-              YouTube URL
-            </label>
+            <label className={labelClass}>YouTube URL</label>
             <input
               type="url"
               name="youtube_url"
               value={formData.youtube_url || ''}
               onChange={handleChange}
-              className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+              className={inputClass}
               placeholder="https://youtube.com/..."
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-900">
-              Website
-            </label>
+            <label className={labelClass}>Website</label>
             <input
               type="url"
               name="website"
               value={formData.website || ''}
               onChange={handleChange}
-              className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+              className={inputClass}
               placeholder="https://..."
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-900">
-              Linktree URL
-            </label>
+            <label className={labelClass}>Linktree URL</label>
             <input
               type="url"
               name="linktree_url"
               value={formData.linktree_url || ''}
               onChange={handleChange}
-              className="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
+              className={inputClass}
               placeholder="https://linktree.com/..."
             />
           </div>
         </div>
       </div>
 
-      <div className="space-y-4 border-t border-gray-200 pt-6">
-        <h3 className="font-medium text-gray-900">Visibility & Status</h3>
+      <div className="space-y-4 border-t border-border pt-6">
+        <h3 className="font-medium text-foreground">Visibility & Status</h3>
         <div className="space-y-3">
           <label className="flex items-center gap-3">
             <input
@@ -364,9 +343,9 @@ export function ArtistForm({ artistId }: ArtistFormProps) {
               name="is_active"
               checked={formData.is_active}
               onChange={handleChange}
-              className="h-4 w-4 rounded border-gray-300"
+              className="h-4 w-4 rounded border-border"
             />
-            <span className="text-sm font-medium text-gray-900">Active</span>
+            <span className="text-sm font-medium text-foreground">Active</span>
           </label>
           <label className="flex items-center gap-3">
             <input
@@ -374,25 +353,25 @@ export function ArtistForm({ artistId }: ArtistFormProps) {
               name="visible_on_website"
               checked={formData.visible_on_website}
               onChange={handleChange}
-              className="h-4 w-4 rounded border-gray-300"
+              className="h-4 w-4 rounded border-border"
             />
-            <span className="text-sm font-medium text-gray-900">Visible on Website</span>
+            <span className="text-sm font-medium text-foreground">Visible on Website</span>
           </label>
         </div>
       </div>
 
-      <div className="flex gap-4 border-t border-gray-200 pt-6">
+      <div className="flex gap-4 border-t border-border pt-6">
         <button
           type="submit"
           disabled={submitting}
-          className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
         >
           {submitting ? 'Saving...' : artistId ? 'Update Artist' : 'Create Artist'}
         </button>
         <button
           type="button"
           onClick={() => router.push('/dashboard/artists')}
-          className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
         >
           Cancel
         </button>
