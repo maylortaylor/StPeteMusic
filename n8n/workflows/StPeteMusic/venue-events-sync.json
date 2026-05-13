@@ -58,7 +58,7 @@
       "name": "Loop Over Sources",
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
-      "position": [940, -320]
+      "position": [740, -320]
     },
     {
       "parameters": {
@@ -87,59 +87,61 @@
       "name": "Route By Source Type",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 1,
-      "position": [1140, -320]
+      "position": [940, -320]
     },
     {
       "parameters": {
-        "jsCode": "// Phase 2 placeholder — Instagram scraping requires Graph API access from the venue\n// or Claude AI-assisted caption parsing. Skipped for now.\nconst slug = $json.slug ?? 'unknown';\nconsole.log(`[venue-events-sync] SKIP ${slug} instagram source — Phase 2 not yet implemented`);\nreturn [];"
+        "jsCode": "// Phase 2 placeholder — Instagram scraping requires Graph API access from the venue\n// or Claude AI-assisted caption parsing. Skipped for now.\nconst slug = $json.slug || 'unknown';\nconsole.log('[venue-events-sync] SKIP ' + slug + ' instagram source — Phase 2 not yet implemented');\nreturn [];"
       },
       "id": "a1b2c3d4-0008-4000-8000-000000000008",
       "name": "Instagram Skip (Phase 2)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1380, -160]
+      "position": [1180, -160]
     },
     {
       "parameters": {
-        "jsCode": "// Website scraping not yet wired — add HTTP Request + HTML Extract nodes here\n// when venue website URLs are confirmed (Ruby's Elixir, Blueberry Patch).\nconst slug = $json.slug ?? 'unknown';\nconsole.log(`[venue-events-sync] SKIP ${slug} website source — scraper not yet wired`);\nreturn [];"
+        "jsCode": "// Website scraping not yet wired — add HTTP Request + HTML Extract nodes here\n// when venue website URLs are confirmed (Ruby's Elixir, Blueberry Patch).\nconst slug = $json.slug || 'unknown';\nconsole.log('[venue-events-sync] SKIP ' + slug + ' website source — scraper not yet wired');\nreturn [];"
       },
       "id": "a1b2c3d4-0009-4000-8000-000000000009",
       "name": "Website Skip (Not Yet Wired)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1380, 0]
+      "position": [1180, 0]
     },
     {
       "parameters": {
-        "jsCode": "// ── Attempt 1: Facebook Graph API with App Access Token ──────────────────────\n// App access tokens are formed as {app_id}|{app_secret} — no user login needed.\n// Works for public pages if the app has pages_read_engagement permission.\n// Returns null on failure so the next node can fall back to mbasic.\nconst item = $input.first().json;\nconst pageId    = item.facebookPageId;\nconst appId     = $env.FB_APP_ID;\nconst appSecret = $env.FB_APP_SECRET;\n\nif (!pageId) {\n  console.log(`[venue-events-sync] ${item.slug}: no facebook_page_id set — skipping Graph API attempt`);\n  return [{ json: { ...item, graphApiEvents: null, graphApiSkipped: true } }];\n}\nif (!appId || !appSecret) {\n  console.log(`[venue-events-sync] ${item.slug}: FB_APP_ID or FB_APP_SECRET not set — skipping Graph API attempt`);\n  return [{ json: { ...item, graphApiEvents: null, graphApiSkipped: true } }];\n}\n\nconst nowUnix = Math.floor(Date.now() / 1000);\nconst maxUnix = nowUnix + 60 * 24 * 60 * 60; // 60 days out\nconst token   = `${appId}|${appSecret}`;\nconst fields  = 'id,name,description,start_time,end_time,cover,ticket_uri,place';\nconst url = `https://graph.facebook.com/v21.0/${pageId}/events` +\n  `?access_token=${encodeURIComponent(token)}` +\n  `&fields=${fields}` +\n  `&since=${nowUnix}` +\n  `&until=${maxUnix}` +\n  `&limit=50`;\n\ntry {\n  const resp = await fetch(url);\n  const body = await resp.json();\n  if (body.error) {\n    console.log(`[venue-events-sync] ${item.slug}: Graph API error — ${body.error.message}`);\n    return [{ json: { ...item, graphApiEvents: null, graphApiError: body.error.message } }];\n  }\n  const events = body.data ?? [];\n  console.log(`[venue-events-sync] ${item.slug}: Graph API returned ${events.length} events`);\n  return [{ json: { ...item, graphApiEvents: events } }];\n} catch (err) {\n  console.log(`[venue-events-sync] ${item.slug}: Graph API fetch threw — ${err.message}`);\n  return [{ json: { ...item, graphApiEvents: null, graphApiFetchError: err.message } }];\n}"
+        "jsCode": "// Build the Graph API URL and pass venue context through.\n// HTTP calls belong in HTTP Request nodes — this node only prepares data.\nconst item = $input.first().json;\nconst appId     = $env.FB_APP_ID;\nconst appSecret = $env.FB_APP_SECRET;\nconst pageId    = item.facebookPageId;\n\nif (!pageId || !appId || !appSecret) {\n  console.log('[venue-events-sync] ' + item.slug + ': missing FB_APP_ID, FB_APP_SECRET, or facebookPageId — skipping');\n  return [];\n}\n\nconst nowUnix = Math.floor(Date.now() / 1000);\nconst maxUnix = nowUnix + 60 * 24 * 60 * 60;\nconst token   = appId + '|' + appSecret;\nconst fields  = 'id,name,description,start_time,end_time,cover,ticket_uri,place';\n\nconst graphApiUrl = 'https://graph.facebook.com/v21.0/' + pageId + '/events'\n  + '?access_token=' + encodeURIComponent(token)\n  + '&fields=' + fields\n  + '&since=' + nowUnix\n  + '&until=' + maxUnix\n  + '&limit=50';\n\nreturn [{ json: { ...item, _graphApiUrl: graphApiUrl } }];"
       },
       "id": "a1b2c3d4-0010-4000-8000-000000000010",
-      "name": "FB Attempt 1 — Graph API",
+      "name": "FB: Build Graph API URL",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1380, -480],
+      "position": [1180, -480],
       "continueOnFail": true
     },
     {
       "parameters": {
-        "jsCode": "// ── Attempt 2: mbasic.facebook.com HTML scraping ─────────────────────────────\n// Only runs if Graph API returned 0 events or failed.\n// mbasic is Facebook's server-rendered site (no JS needed).\n// Uses a realistic mobile User-Agent; runs once/week — low detection risk.\nconst item = $input.first().json;\n\n// If Graph API already returned events, pass them through and skip mbasic.\nif (Array.isArray(item.graphApiEvents) && item.graphApiEvents.length > 0) {\n  return [{ json: { ...item, usedSource: 'graph_api' } }];\n}\n\nconst slug = item.slug;\nconst mbasicUrl = `https://mbasic.facebook.com/${slug}/events`;\nconsole.log(`[venue-events-sync] ${slug}: Graph API empty/failed — trying mbasic: ${mbasicUrl}`);\n\ntry {\n  const resp = await fetch(mbasicUrl, {\n    headers: {\n      'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',\n      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',\n      'Accept-Language': 'en-US,en;q=0.9',\n    },\n  });\n\n  if (!resp.ok) {\n    console.log(`[venue-events-sync] ${slug}: mbasic returned HTTP ${resp.status}`);\n    return [{ json: { ...item, mbasicHtml: null, usedSource: 'none', mbasicStatus: resp.status } }];\n  }\n\n  const html = await resp.text();\n  if (html.includes('You must log in') || html.includes('login_form')) {\n    console.log(`[venue-events-sync] ${slug}: mbasic redirected to login — blocked this run`);\n    return [{ json: { ...item, mbasicHtml: null, usedSource: 'none', mbasicBlocked: true } }];\n  }\n\n  return [{ json: { ...item, mbasicHtml: html, usedSource: 'mbasic' } }];\n} catch (err) {\n  console.log(`[venue-events-sync] ${slug}: mbasic fetch threw — ${err.message}`);\n  return [{ json: { ...item, mbasicHtml: null, usedSource: 'none', mbasicFetchError: err.message } }];\n}"
+        "method": "GET",
+        "url": "={{ $json._graphApiUrl }}",
+        "options": {}
       },
       "id": "a1b2c3d4-0011-4000-8000-000000000011",
-      "name": "FB Attempt 2 — mbasic HTML",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [1620, -480],
+      "name": "FB: Graph API Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1420, -480],
       "continueOnFail": true
     },
     {
       "parameters": {
-        "jsCode": "// ── Normalize + Filter events from whichever source succeeded ────────────────\n// Handles both Graph API JSON format and mbasic HTML (parsed with cheerio).\n// Filters to events starting within the next 60 days.\n// Generates a stable dedup_id: \"fb_{fbEventId}\" for GCal + DB upsert.\n\nconst item = $input.first().json;\nconst slug  = item.slug;\nconst now   = Date.now();\nconst max   = now + 60 * 24 * 60 * 60 * 1000;\n\nfunction parseDateToMs(str) {\n  if (!str) return null;\n  return new Date(str).getTime();\n}\n\nfunction extractFbEventId(url) {\n  if (!url) return null;\n  const m = String(url).match(/\\/events\\/(\\d+)/);\n  return m ? m[1] : null;\n}\n\nlet normalised = [];\n\n// ── Source A: Graph API JSON ──────────────────────────────────────────────────\nif (Array.isArray(item.graphApiEvents) && item.graphApiEvents.length > 0) {\n  for (const ev of item.graphApiEvents) {\n    try {\n      const startMs = parseDateToMs(ev.start_time);\n      if (!startMs || startMs < now || startMs > max) continue;\n      const fbEventId = String(ev.id);\n      if (!fbEventId) continue;\n      normalised.push({\n        fbEventId,\n        dedup_id:    `fb_${fbEventId}`,\n        title:       ev.name ?? '',\n        description: ev.description ?? null,\n        startTime:   ev.start_time,\n        endTime:     ev.end_time ?? null,\n        imageUrl:    ev.cover?.source ?? null,\n        ticketUrl:   ev.ticket_uri ?? null,\n        eventBy:     ev.place?.name ?? null,\n        fbEventUrl:  `https://www.facebook.com/events/${fbEventId}`,\n        source:      'graph_api',\n      });\n    } catch (e) {\n      console.log(`[venue-events-sync] ${slug}: error normalising graph_api event — ${e.message}`);\n    }\n  }\n  console.log(`[venue-events-sync] ${slug}: normalised ${normalised.length} events from graph_api`);\n}\n\n// ── Source B: mbasic HTML ─────────────────────────────────────────────────────\nif (normalised.length === 0 && item.mbasicHtml) {\n  try {\n    const cheerio = require('cheerio');\n    const $ = cheerio.load(item.mbasicHtml);\n\n    $('a[href*=\"/events/\"]').each((_, el) => {\n      try {\n        const href = $(el).attr('href') ?? '';\n        const fbEventId = extractFbEventId(href);\n        if (!fbEventId) return;\n\n        const title = $(el).find('h3,h4,strong,b').first().text().trim()\n          || $(el).text().trim();\n        if (!title || title.length < 3) return;\n\n        const parentText = $(el).parent().text();\n        const dateMatch = parentText.match(\n          /([A-Z][a-z]+,?\\s+[A-Z][a-z]+\\s+\\d{1,2}(?:,?\\s+\\d{4})?(?:\\s+at\\s+\\d{1,2}:\\d{2}\\s*[AP]M)?)/i\n        );\n        const dateStr = dateMatch ? dateMatch[1] : null;\n        const startMs = dateStr ? parseDateToMs(dateStr) : null;\n        if (startMs && (startMs < now || startMs > max)) return;\n\n        if (normalised.some(e => e.fbEventId === fbEventId)) return;\n\n        const absUrl = href.startsWith('http')\n          ? href\n          : `https://www.facebook.com${href.split('?')[0]}`;\n\n        normalised.push({\n          fbEventId,\n          dedup_id:    `fb_${fbEventId}`,\n          title,\n          description: null,\n          startTime:   dateStr ? new Date(dateStr).toISOString() : null,\n          endTime:     null,\n          imageUrl:    null,\n          ticketUrl:   null,\n          eventBy:     null,\n          fbEventUrl:  absUrl,\n          source:      'mbasic',\n        });\n      } catch (innerErr) {\n        // skip this element silently\n      }\n    });\n    console.log(`[venue-events-sync] ${slug}: normalised ${normalised.length} events from mbasic`);\n  } catch (e) {\n    console.log(`[venue-events-sync] ${slug}: mbasic parse error — ${e.message}`);\n  }\n}\n\nif (normalised.length === 0) {\n  console.log(`[venue-events-sync] ${slug}: 0 events found this run (source: ${item.usedSource ?? 'none'})`);\n  return [];\n}\n\nreturn normalised.map(ev => ({\n  json: {\n    _slug:           item.slug,\n    _calendarId:     item.googleCalendarId,\n    ...ev,\n  },\n}));"
+        "jsCode": "// Normalise Graph API response into the shape expected by Loop Over Events.\n// Source context (slug, calendarId) retrieved from the URL-builder node because\n// the HTTP Request node replaced $json with the API response body.\nconst sourceItem = $('FB: Build Graph API URL').first().json;\nconst response   = $input.first().json;\n\nconst slug       = sourceItem.slug;\nconst calendarId = sourceItem.googleCalendarId;\n\nconst events = response.data;\nif (!events || !Array.isArray(events) || events.length === 0) {\n  const reason = (response.error && response.error.message) ? response.error.message : 'empty or failed response';\n  console.log('[venue-events-sync] ' + slug + ': Graph API returned no events — ' + reason);\n  return [];\n}\n\nconst now = Date.now();\nconst max = now + 60 * 24 * 60 * 60 * 1000;\nconst normalised = [];\n\nfor (const ev of events) {\n  try {\n    const startMs = ev.start_time ? new Date(ev.start_time).getTime() : null;\n    if (!startMs || startMs < now || startMs > max) continue;\n    const id = String(ev.id);\n    normalised.push({ json: {\n      _slug:       slug,\n      _calendarId: calendarId,\n      fbEventId:   id,\n      dedup_id:    'fb_' + id,\n      title:       ev.name        || '',\n      description: ev.description || null,\n      startTime:   ev.start_time,\n      endTime:     ev.end_time    || null,\n      imageUrl:    (ev.cover && ev.cover.source) ? ev.cover.source : null,\n      ticketUrl:   ev.ticket_uri  || null,\n      eventBy:     (ev.place && ev.place.name) ? ev.place.name : null,\n      fbEventUrl:  'https://www.facebook.com/events/' + id,\n      source:      'graph_api'\n    }});\n  } catch (e) {\n    console.log('[venue-events-sync] ' + slug + ': error normalising event ' + ev.id + ' — ' + e.message);\n  }\n}\n\nconsole.log('[venue-events-sync] ' + slug + ': normalised ' + normalised.length + ' events from graph_api');\nreturn normalised;"
       },
       "id": "a1b2c3d4-0012-4000-8000-000000000012",
-      "name": "Normalise + Filter Events",
+      "name": "FB: Normalise Graph API Events",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1860, -480],
+      "position": [1660, -480],
       "continueOnFail": true
     },
     {
@@ -150,7 +152,7 @@
       "name": "Loop Over Events",
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
-      "position": [2060, -480]
+      "position": [1900, -480]
     },
     {
       "parameters": {
@@ -176,7 +178,7 @@
       "typeVersion": 1,
       "continueOnFail": true,
       "alwaysOutputData": true,
-      "position": [2260, -480],
+      "position": [2100, -480],
       "credentials": {
         "googleCalendarOAuth2Api": {
           "id": "bKr3uyzb1sZZD8hj",
@@ -186,13 +188,13 @@
     },
     {
       "parameters": {
-        "jsCode": "// Check if the event already exists in GCal by matching dedup_id in description\n// or by close title + date match.\nconst eventItem = $('Loop Over Events').first().json;\nconst gcalResults = $input.all();\n\nconst dedupId    = eventItem.dedup_id ?? '';\nconst eventTitle = (eventItem.title ?? '').toLowerCase().trim();\nconst eventStart = eventItem.startTime ? new Date(eventItem.startTime).getTime() : null;\n\nlet found = null;\nfor (const r of gcalResults) {\n  const desc  = (r.json.description ?? '').toLowerCase();\n  const title = (r.json.summary    ?? '').toLowerCase().trim();\n  const start = r.json.start?.dateTime ? new Date(r.json.start.dateTime).getTime() : null;\n\n  if (dedupId && desc.includes(`[dedup_id: ${dedupId}]`)) { found = r.json; break; }\n  if (eventTitle && title === eventTitle && eventStart && start) {\n    if (Math.abs(eventStart - start) / (1000 * 60 * 60) <= 12) { found = r.json; break; }\n  }\n}\n\nreturn [{\n  json: {\n    ...eventItem,\n    _gcalExists:  !!found,\n    _gcalEventId: found?.id ?? null,\n  },\n}];"
+        "jsCode": "// Check if the event already exists in GCal by matching dedup_id in description\n// or by close title + date match (±12h).\nconst eventItem = $('Loop Over Events').first().json;\nconst gcalResults = $input.all();\n\nconst dedupId    = eventItem.dedup_id || '';\nconst eventTitle = (eventItem.title || '').toLowerCase().trim();\nconst eventStart = eventItem.startTime ? new Date(eventItem.startTime).getTime() : null;\n\nlet found = null;\nfor (const r of gcalResults) {\n  const desc  = (r.json.description || '').toLowerCase();\n  const title = (r.json.summary     || '').toLowerCase().trim();\n  const start = (r.json.start && r.json.start.dateTime) ? new Date(r.json.start.dateTime).getTime() : null;\n\n  if (dedupId && desc.includes('[dedup_id: ' + dedupId + ']')) { found = r.json; break; }\n  if (eventTitle && title === eventTitle && eventStart && start) {\n    if (Math.abs(eventStart - start) / (1000 * 60 * 60) <= 12) { found = r.json; break; }\n  }\n}\n\nreturn [{\n  json: {\n    ...eventItem,\n    _gcalExists:  found ? true : false,\n    _gcalEventId: found ? found.id : null\n  }\n}];"
       },
       "id": "a1b2c3d4-0015-4000-8000-000000000015",
       "name": "Check Duplicate",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2460, -480],
+      "position": [2300, -480],
       "continueOnFail": true
     },
     {
@@ -206,7 +208,7 @@
           "conditions": [
             {
               "id": "check-not-exists",
-              "leftValue": "={{ $json._gcalExists }}",
+              "leftValue": "={{ String($json._gcalExists) }}",
               "rightValue": "true",
               "operator": {
                 "type": "string",
@@ -222,17 +224,17 @@
       "name": "Not In GCal Yet?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [2660, -480]
+      "position": [2500, -480]
     },
     {
       "parameters": {
-        "jsCode": "// Build the GCal event description with structured metadata.\n// The [dedup_id: fb_XXX] anchor is used by the duplicate-check node on future runs.\nconst ev = $input.first().json;\n\nconst parts = [];\nif (ev.eventBy)   parts.push(`Presented by: ${ev.eventBy}`);\nif (ev.ticketUrl) parts.push(`Tickets: ${ev.ticketUrl}`);\nif (ev.description) { parts.push('---'); parts.push(ev.description); }\nparts.push('');\nif (ev.fbEventUrl) parts.push(`Source: ${ev.fbEventUrl}`);\nparts.push(`[dedup_id: ${ev.dedup_id}]`);\n\nconst description = parts.join('\\n').trim();\n\nfunction toRFC3339(str) {\n  if (!str) return null;\n  const d = new Date(str);\n  return isNaN(d.getTime()) ? null : d.toISOString();\n}\n\nreturn [{ json: {\n  ...ev,\n  _gcalDescription: description,\n  _startRFC: toRFC3339(ev.startTime),\n  _endRFC:   ev.endTime ? toRFC3339(ev.endTime) : null,\n} }];"
+        "jsCode": "// Build the GCal event description with structured metadata.\n// The [dedup_id: fb_XXX] anchor is used by the duplicate-check node on future runs.\nconst ev = $input.first().json;\n\nconst parts = [];\nif (ev.eventBy)    parts.push('Presented by: ' + ev.eventBy);\nif (ev.ticketUrl)  parts.push('Tickets: ' + ev.ticketUrl);\nif (ev.description) { parts.push('---'); parts.push(ev.description); }\nparts.push('');\nif (ev.fbEventUrl) parts.push('Source: ' + ev.fbEventUrl);\nparts.push('[dedup_id: ' + ev.dedup_id + ']');\n\nconst description = parts.join('\\n').trim();\n\nfunction toRFC3339(str) {\n  if (!str) return null;\n  const d = new Date(str);\n  return isNaN(d.getTime()) ? null : d.toISOString();\n}\n\nreturn [{ json: {\n  ...ev,\n  _gcalDescription: description,\n  _startRFC: toRFC3339(ev.startTime),\n  _endRFC:   ev.endTime ? toRFC3339(ev.endTime) : null\n} }];"
       },
       "id": "a1b2c3d4-0017-4000-8000-000000000017",
       "name": "Build GCal Description",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2900, -560],
+      "position": [2740, -560],
       "continueOnFail": true
     },
     {
@@ -254,7 +256,7 @@
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1,
       "continueOnFail": true,
-      "position": [3100, -560],
+      "position": [2940, -560],
       "credentials": {
         "googleCalendarOAuth2Api": {
           "id": "bKr3uyzb1sZZD8hj",
@@ -264,35 +266,35 @@
     },
     {
       "parameters": {
-        "jsCode": "// Merge GCal event id from the create response back onto the event item.\nconst created  = $input.first().json;\nconst loopItem = $('Loop Over Events').first().json;\nconst gcalId   = created.id ?? loopItem._gcalEventId ?? null;\n\nif (!gcalId) {\n  console.log(`[venue-events-sync] ${loopItem._slug}: could not get GCal event id — skipping DB upsert`);\n  return [];\n}\nreturn [{ json: { ...loopItem, _gcalEventId: gcalId } }];"
+        "jsCode": "// Merge GCal event id from the create response back onto the event item.\nconst created  = $input.first().json;\nconst loopItem = $('Loop Over Events').first().json;\nconst gcalId   = created.id || loopItem._gcalEventId || null;\n\nif (!gcalId) {\n  console.log('[venue-events-sync] ' + loopItem._slug + ': could not get GCal event id — skipping DB upsert');\n  return [];\n}\nreturn [{ json: { ...loopItem, _gcalEventId: gcalId } }];"
       },
       "id": "a1b2c3d4-0019-4000-8000-000000000019",
       "name": "Merge GCal ID (new)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [3300, -560],
+      "position": [3140, -560],
       "continueOnFail": true
     },
     {
       "parameters": {
-        "jsCode": "// Already exists path — pass the existing GCal event id through.\nconst ev = $input.first().json;\nif (!ev._gcalEventId) {\n  console.log(`[venue-events-sync] ${ev._slug}: already in GCal but no id — skipping DB upsert`);\n  return [];\n}\nreturn [{ json: ev }];"
+        "jsCode": "// Already exists path — pass the existing GCal event id through.\nconst ev = $input.first().json;\nif (!ev._gcalEventId) {\n  console.log('[venue-events-sync] ' + ev._slug + ': already in GCal but no id — skipping DB upsert');\n  return [];\n}\nreturn [{ json: ev }];"
       },
       "id": "a1b2c3d4-0020-4000-8000-000000000020",
       "name": "Merge GCal ID (existing)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2900, -400],
+      "position": [2740, -400],
       "continueOnFail": true
     },
     {
       "parameters": {
-        "jsCode": "// Build the DB upsert SQL.\n// Intentionally does NOT set tag — owned by spm-multi-gcal-to-db-sync tag detection.\n// Does NOT overwrite extra_data or image_url if already set for this google_event_id.\n\nfunction esc(v) {\n  if (v === null || v === undefined) return 'NULL';\n  return \"'\" + String(v).replace(/'/g, \"''\") + \"'\";\n}\n\nconst ev = $input.first().json;\nif (!ev._gcalEventId) return [];\n\nconst extraData = JSON.stringify({\n  source:       ev.source       ?? 'facebook',\n  fb_event_url: ev.fbEventUrl   ?? null,\n  event_by:     ev.eventBy      ?? null,\n  dedup_id:     ev.dedup_id     ?? null,\n});\n\nconst sql = `\nINSERT INTO events (\n  google_event_id, title, description, start_time, end_time,\n  venue, ticket_url, image_url, extra_data, is_active, synced_at\n) VALUES (\n  ${esc(ev._gcalEventId)},\n  ${esc(ev.title)},\n  ${esc(ev.description)},\n  ${ev.startTime ? esc(ev.startTime) + '::TIMESTAMPTZ' : 'NULL'},\n  ${ev.endTime   ? esc(ev.endTime)   + '::TIMESTAMPTZ' : 'NULL'},\n  ${esc(ev._slug)},\n  ${esc(ev.ticketUrl)},\n  ${esc(ev.imageUrl)},\n  ${esc(extraData)}::jsonb,\n  true,\n  NOW()\n)\nON CONFLICT (google_event_id) DO UPDATE SET\n  title       = EXCLUDED.title,\n  description = EXCLUDED.description,\n  start_time  = EXCLUDED.start_time,\n  end_time    = EXCLUDED.end_time,\n  venue       = EXCLUDED.venue,\n  ticket_url  = EXCLUDED.ticket_url,\n  image_url   = EXCLUDED.image_url,\n  extra_data  = EXCLUDED.extra_data,\n  is_active   = true,\n  synced_at   = NOW()\nRETURNING id, google_event_id, title\n`.trim();\n\nreturn [{ json: { sql, title: ev.title, slug: ev._slug } }];"
+        "jsCode": "// Build the DB upsert SQL.\n// Does NOT set tag — owned by spm-multi-gcal-to-db-sync tag detection.\nfunction esc(v) {\n  if (v === null || v === undefined) return 'NULL';\n  return \"'\" + String(v).replace(/'/g, \"''\") + \"'\";\n}\n\nconst ev = $input.first().json;\nif (!ev._gcalEventId) return [];\n\nconst extraData = JSON.stringify({\n  source:       ev.source       || 'facebook',\n  fb_event_url: ev.fbEventUrl   || null,\n  event_by:     ev.eventBy      || null,\n  dedup_id:     ev.dedup_id     || null\n});\n\nconst sql = 'INSERT INTO events (\\n'\n  + '  google_event_id, title, description, start_time, end_time,\\n'\n  + '  venue, ticket_url, image_url, extra_data, is_active, synced_at\\n'\n  + ') VALUES (\\n'\n  + '  ' + esc(ev._gcalEventId) + ',\\n'\n  + '  ' + esc(ev.title) + ',\\n'\n  + '  ' + esc(ev.description) + ',\\n'\n  + '  ' + (ev.startTime ? esc(ev.startTime) + '::TIMESTAMPTZ' : 'NULL') + ',\\n'\n  + '  ' + (ev.endTime   ? esc(ev.endTime)   + '::TIMESTAMPTZ' : 'NULL') + ',\\n'\n  + '  ' + esc(ev._slug) + ',\\n'\n  + '  ' + esc(ev.ticketUrl) + ',\\n'\n  + '  ' + esc(ev.imageUrl) + ',\\n'\n  + '  ' + esc(extraData) + '::jsonb,\\n'\n  + '  true,\\n'\n  + '  NOW()\\n'\n  + ')\\n'\n  + 'ON CONFLICT (google_event_id) DO UPDATE SET\\n'\n  + '  title       = EXCLUDED.title,\\n'\n  + '  description = EXCLUDED.description,\\n'\n  + '  start_time  = EXCLUDED.start_time,\\n'\n  + '  end_time    = EXCLUDED.end_time,\\n'\n  + '  venue       = EXCLUDED.venue,\\n'\n  + '  ticket_url  = EXCLUDED.ticket_url,\\n'\n  + '  image_url   = EXCLUDED.image_url,\\n'\n  + '  extra_data  = EXCLUDED.extra_data,\\n'\n  + '  is_active   = true,\\n'\n  + '  synced_at   = NOW()\\n'\n  + 'RETURNING id, google_event_id, title';\n\nreturn [{ json: { sql, title: ev.title, slug: ev._slug } }];"
       },
       "id": "a1b2c3d4-0021-4000-8000-000000000021",
       "name": "Build DB Upsert SQL",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [3500, -480],
+      "position": [3340, -480],
       "continueOnFail": true
     },
     {
@@ -306,7 +308,7 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.5,
       "continueOnFail": true,
-      "position": [3700, -480],
+      "position": [3540, -480],
       "credentials": {
         "postgres": {
           "id": "pcxLOCySr6sIFHln",
@@ -316,13 +318,13 @@
     },
     {
       "parameters": {
-        "jsCode": "// 300ms throttle between events to stay under GCal API quota.\nawait new Promise(r => setTimeout(r, 300));\nreturn $input.all();"
+        "jsCode": "// 300ms throttle between events to stay under GCal API quota.\nawait new Promise(function(r) { setTimeout(r, 300); });\nreturn $input.all();"
       },
       "id": "a1b2c3d4-0023-4000-8000-000000000023",
       "name": "Event Rate Limit",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [3900, -480]
+      "position": [3740, -480]
     },
     {
       "parameters": {
@@ -335,7 +337,7 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.5,
       "continueOnFail": true,
-      "position": [4100, -320],
+      "position": [3940, -320],
       "credentials": {
         "postgres": {
           "id": "pcxLOCySr6sIFHln",
@@ -345,17 +347,17 @@
     },
     {
       "parameters": {
-        "jsCode": "const cleaned = $input.all();\nconsole.log(`[venue-events-sync] RUN COMPLETE — images cleaned: ${cleaned.length} — ${new Date().toISOString()}`);\nreturn [{ json: { ok: true, images_cleaned: cleaned.length, finished_at: new Date().toISOString() } }];"
+        "jsCode": "const cleaned = $input.all();\nconsole.log('[venue-events-sync] RUN COMPLETE — images cleaned: ' + cleaned.length + ' — ' + new Date().toISOString());\nreturn [{ json: { ok: true, images_cleaned: cleaned.length, finished_at: new Date().toISOString() } }];"
       },
       "id": "a1b2c3d4-0025-4000-8000-000000000025",
       "name": "Summary Log",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [4300, -320]
+      "position": [4140, -320]
     },
     {
       "parameters": {
-        "content": "## venue-events-sync\n\nRuns every **Monday midnight ET** (`0 5 * * 2`) or on demand via:\n`GET https://n8n.stpetemusic.live/webhook/venue-events-sync`\n\n**Flow:**\n1. Load venues with `events_sources` from DB\n2. Route by source type (facebook / website / instagram)\n3. Facebook: try Graph API first → mbasic fallback\n4. Normalise + filter to next 60 days\n5. Check GCal for duplicates (by dedup_id or title+date)\n6. Create new GCal events → immediately upsert to DB\n7. Clean up image_url on past events\n\n**Adding a venue (DB only, no workflow change):**\n```sql\nUPDATE venues\nSET facebook_page_id = '...',\n    events_sources = '[{\"type\":\"facebook\",\"url\":\"...\"}]'\nWHERE slug = 'new-venue';\n```",
+        "content": "## venue-events-sync\n\nRuns every **Monday midnight ET** (`0 5 * * 2`) or on demand via:\n`GET https://n8n.stpetemusic.live/webhook/venue-events-sync`\n\n**Flow:**\n1. Load venues with `events_sources` from DB (SQL expands JSONB array)\n2. Route by source type (facebook / website / instagram)\n3. Facebook: Code builds URL → HTTP Request → Normalise\n4. Check GCal for duplicates (dedup_id or title+date ±12h)\n5. Create new GCal events → immediately upsert to DB\n6. Clean up image_url on past events\n\n**Adding a venue (DB only, no workflow change):**\n```sql\nUPDATE venues\nSET facebook_page_id = '...',\n    events_sources = '[{\"type\":\"facebook\",\"url\":\"...\"}]'\nWHERE slug = 'new-venue';\n```",
         "height": 380,
         "width": 520
       },
@@ -385,18 +387,18 @@
     },
     "Route By Source Type": {
       "main": [
-        [{ "node": "FB Attempt 1 — Graph API", "type": "main", "index": 0 }],
+        [{ "node": "FB: Build Graph API URL", "type": "main", "index": 0 }],
         [{ "node": "Website Skip (Not Yet Wired)", "type": "main", "index": 0 }],
         [{ "node": "Instagram Skip (Phase 2)", "type": "main", "index": 0 }]
       ]
     },
-    "FB Attempt 1 — Graph API": {
-      "main": [[{ "node": "FB Attempt 2 — mbasic HTML", "type": "main", "index": 0 }]]
+    "FB: Build Graph API URL": {
+      "main": [[{ "node": "FB: Graph API Request", "type": "main", "index": 0 }]]
     },
-    "FB Attempt 2 — mbasic HTML": {
-      "main": [[{ "node": "Normalise + Filter Events", "type": "main", "index": 0 }]]
+    "FB: Graph API Request": {
+      "main": [[{ "node": "FB: Normalise Graph API Events", "type": "main", "index": 0 }]]
     },
-    "Normalise + Filter Events": {
+    "FB: Normalise Graph API Events": {
       "main": [[{ "node": "Loop Over Events", "type": "main", "index": 0 }]]
     },
     "Loop Over Events": {
