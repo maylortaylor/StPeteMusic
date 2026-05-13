@@ -88,8 +88,8 @@ export async function PUT(
         facebook_username: data.facebook_username,
         website: data.website,
         hero_photo_url: data.hero_photo_url,
-        lat: data.lat,
-        lng: data.lng,
+        lat: data.lat != null ? String(data.lat) : undefined,
+        lng: data.lng != null ? String(data.lng) : undefined,
         extra_links: data.extra_links ?? [],
         notes: data.notes,
         is_active: data.is_active,
@@ -110,9 +110,10 @@ export async function PUT(
 
     return Response.json(result[0]);
   } catch (error) {
-    console.error('Failed to update venue:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('Failed to update venue:', message);
     return Response.json(
-      { error: 'Failed to update venue' },
+      { error: 'Failed to update venue', detail: message },
       { status: 500 },
     );
   }
