@@ -21,68 +21,83 @@ const QUICK_LINKS: QuickLink[] = [
 ];
 
 // ── Social stat fetchers ────────────────────────────────────────────────────
+// Returns { count, error } so the UI can distinguish "API error" from "not configured"
 
-async function fetchInstagramFollowers(): Promise<number | null> {
+interface StatResult {
+  count: number | null;
+  error?: string;
+}
+
+async function fetchInstagramFollowers(): Promise<StatResult> {
   const userId = process.env.IG_USER_ID;
   const token = process.env.IG_ACCESS_TOKEN;
-  if (!userId || !token) return null;
+  if (!userId || !token) return { count: null };
 
   try {
     const res = await fetch(
       `https://graph.facebook.com/v21.0/${userId}?fields=followers_count&access_token=${token}`,
       { next: { revalidate: 3600 } },
     );
-    if (!res.ok) return null;
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({})) as { error?: { message?: string } };
+      return { count: null, error: body.error?.message ?? `HTTP ${res.status}` };
+    }
     const json = await res.json() as { followers_count?: number };
-    return json.followers_count ?? null;
-  } catch {
-    return null;
+    return { count: json.followers_count ?? null };
+  } catch (e) {
+    return { count: null, error: String(e) };
   }
 }
 
-async function fetchFacebookFans(): Promise<number | null> {
+async function fetchFacebookFans(): Promise<StatResult> {
   const pageId = process.env.FB_PAGE_ID;
   const token = process.env.FB_ACCESS_TOKEN;
-  if (!pageId || !token) return null;
+  if (!pageId || !token) return { count: null };
 
   try {
     const res = await fetch(
       `https://graph.facebook.com/v21.0/${pageId}?fields=fan_count&access_token=${token}`,
       { next: { revalidate: 3600 } },
     );
-    if (!res.ok) return null;
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({})) as { error?: { message?: string } };
+      return { count: null, error: body.error?.message ?? `HTTP ${res.status}` };
+    }
     const json = await res.json() as { fan_count?: number };
-    return json.fan_count ?? null;
-  } catch {
-    return null;
+    return { count: json.fan_count ?? null };
+  } catch (e) {
+    return { count: null, error: String(e) };
   }
 }
 
-async function fetchYouTubeSubscribers(): Promise<number | null> {
+async function fetchYouTubeSubscribers(): Promise<StatResult> {
   const apiKey = process.env.YOUTUBE_API_KEY;
-  if (!apiKey) return null;
+  if (!apiKey) return { count: null };
 
   try {
     const res = await fetch(
       `https://www.googleapis.com/youtube/v3/channels?part=statistics&forHandle=StPeteMusic&key=${apiKey}`,
       { next: { revalidate: 3600 } },
     );
-    if (!res.ok) return null;
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({})) as { error?: { message?: string } };
+      return { count: null, error: body.error?.message ?? `HTTP ${res.status}` };
+    }
     const json = await res.json() as {
       items?: { statistics?: { subscriberCount?: string } }[];
     };
-    const count = json.items?.[0]?.statistics?.subscriberCount;
-    return count ? parseInt(count, 10) : null;
-  } catch {
-    return null;
+    const raw = json.items?.[0]?.statistics?.subscriberCount;
+    return { count: raw ? parseInt(raw, 10) : null };
+  } catch (e) {
+    return { count: null, error: String(e) };
   }
 }
 
-async function fetchListmonkSubscribers(): Promise<number | null> {
+async function fetchListmonkSubscribers(): Promise<StatResult> {
   const apiUrl = process.env.LISTMONK_API_URL;
   const username = process.env.LISTMONK_USERNAME;
   const password = process.env.LISTMONK_PASSWORD;
-  if (!apiUrl || !username || !password) return null;
+  if (!apiUrl || !username || !password) return { count: null };
 
   try {
     const credentials = Buffer.from(`${username}:${password}`).toString('base64');
@@ -90,11 +105,13 @@ async function fetchListmonkSubscribers(): Promise<number | null> {
       headers: { Authorization: `Basic ${credentials}` },
       next: { revalidate: 3600 },
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      return { count: null, error: `HTTP ${res.status}` };
+    }
     const json = await res.json() as { data?: { subscriber_count?: number } };
-    return json.data?.subscriber_count ?? null;
-  } catch {
-    return null;
+    return { count: json.data?.subscriber_count ?? null };
+  } catch (e) {
+    return { count: null, error: String(e) };
   }
 }
 
@@ -116,10 +133,10 @@ export default async function DashboardPage() {
   ]);
 
   const stats = [
-    { label: 'Instagram', sublabel: 'Followers', value: formatCount(instagram), configured: !!process.env.IG_USER_ID },
-    { label: 'Facebook', sublabel: 'Page fans', value: formatCount(facebook), configured: !!process.env.FB_PAGE_ID },
-    { label: 'YouTube', sublabel: 'Subscribers', value: formatCount(youtube), configured: !!process.env.YOUTUBE_API_KEY },
-    { label: 'Newsletter', sublabel: 'Subscribers', value: formatCount(listmonk), configured: !!process.env.LISTMONK_API_URL },
+    { label: 'Instagram', sublabel: 'Followers', value: formatCount(instagram.count), configured: !!process.env.IG_USER_ID, error: instagram.error },
+    { label: 'Facebook', sublabel: 'Page fans', value: formatCount(facebook.count), configured: !!process.env.FB_PAGE_ID, error: facebook.error },
+    { label: 'YouTube', sublabel: 'Subscribers', value: formatCount(youtube.count), configured: !!process.env.YOUTUBE_API_KEY, error: youtube.error },
+    { label: 'Newsletter', sublabel: 'Subscribers', value: formatCount(listmonk.count), configured: !!process.env.LISTMONK_API_URL, error: listmonk.error },
   ];
 
   return (
@@ -135,8 +152,13 @@ export default async function DashboardPage() {
             <p className="text-sm font-medium text-muted-foreground">{s.label}</p>
             <p className="mt-2 text-2xl font-bold text-foreground">{s.value}</p>
             <p className="text-xs text-muted-foreground">
-              {s.configured ? s.sublabel : 'Not configured'}
+              {!s.configured ? 'Not configured' : s.error ? 'API error' : s.sublabel}
             </p>
+            {s.error && (
+              <p className="mt-1 text-xs text-destructive truncate" title={s.error}>
+                {s.error}
+              </p>
+            )}
           </div>
         ))}
       </div>
