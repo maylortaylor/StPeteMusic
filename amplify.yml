@@ -30,6 +30,8 @@ applications:
             - node --version
             - npm --prefix ../.. ci
             - npm --prefix ../.. run build --workspace=@stpetemusic/db
+            # Apply any pending schema additions to the production DB.
+            - DATABASE_URL=$DATABASE_URL node ../../packages/db/scripts/apply-venue-columns.mjs
             # Amplify WEB_COMPUTE does not inject non-NEXT_PUBLIC env vars at runtime.
             # Write them to .env.production so Next.js loads them in the server context.
             - |
