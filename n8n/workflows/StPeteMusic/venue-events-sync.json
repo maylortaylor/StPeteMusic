@@ -35,7 +35,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT slug, name, facebook_page_id, instagram_page_id, google_calendar_id, events_sources FROM venues WHERE events_sources != '[]'::jsonb AND is_active = true ORDER BY name ASC",
+        "query": "SELECT v.slug, v.name, v.facebook_page_id AS \"facebookPageId\", v.instagram_page_id AS \"instagramPageId\", v.google_calendar_id AS \"googleCalendarId\", (source->>'type') AS \"sourceType\", (source->>'url') AS \"sourceUrl\" FROM venues v, jsonb_array_elements(v.events_sources) AS source WHERE v.events_sources != '[]'::jsonb AND v.is_active = true ORDER BY v.name, source->>'type' ASC",
         "options": {}
       },
       "id": "a1b2c3d4-0004-4000-8000-000000000004",
@@ -49,16 +49,6 @@
           "name": "SPM Postgres DB account"
         }
       }
-    },
-    {
-      "parameters": {
-        "jsCode": "// Flatten each venue's events_sources array into individual items.\n// Each item = one venue × one source to process.\nconst results = [];\nfor (const item of $input.all()) {\n  const venue = item.json;\n  let sources = venue.events_sources;\n  if (typeof sources === 'string') {\n    try { sources = JSON.parse(sources); } catch { sources = []; }\n  }\n  if (!Array.isArray(sources) || sources.length === 0) continue;\n  for (const source of sources) {\n    results.push({\n      json: {\n        slug:             venue.slug,\n        name:             venue.name,\n        facebookPageId:   venue.facebook_page_id  ?? null,\n        instagramPageId:  venue.instagram_page_id ?? null,\n        googleCalendarId: venue.google_calendar_id ?? null,\n        sourceType:       source.type,\n        sourceUrl:        source.url,\n      },\n    });\n  }\n}\nreturn results;"
-      },
-      "id": "a1b2c3d4-0005-4000-8000-000000000005",
-      "name": "Expand Venue Sources",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [740, -320]
     },
     {
       "parameters": {
@@ -385,9 +375,6 @@
       "main": [[{ "node": "Load Venues With Sources", "type": "main", "index": 0 }]]
     },
     "Load Venues With Sources": {
-      "main": [[{ "node": "Expand Venue Sources", "type": "main", "index": 0 }]]
-    },
-    "Expand Venue Sources": {
       "main": [[{ "node": "Loop Over Sources", "type": "main", "index": 0 }]]
     },
     "Loop Over Sources": {
