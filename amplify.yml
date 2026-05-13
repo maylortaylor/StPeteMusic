@@ -9,6 +9,7 @@ applications:
             # Amplify WEB_COMPUTE does not inject non-NEXT_PUBLIC env vars at runtime.
             # Write them to .env.production so Next.js loads them in the server context.
             - |
+              echo "DATABASE_URL=$DATABASE_URL" >> .env.production
               echo "REVALIDATION_SECRET=$REVALIDATION_SECRET" >> .env.production
         build:
           commands:
