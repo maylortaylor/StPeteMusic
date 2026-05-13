@@ -381,8 +381,8 @@
     },
     "Loop Over Sources": {
       "main": [
-        [{ "node": "Route By Source Type", "type": "main", "index": 0 }],
-        [{ "node": "Cleanup Past Event Images", "type": "main", "index": 0 }]
+        [{ "node": "Cleanup Past Event Images", "type": "main", "index": 0 }],
+        [{ "node": "Route By Source Type", "type": "main", "index": 0 }]
       ]
     },
     "Route By Source Type": {
@@ -403,8 +403,8 @@
     },
     "Loop Over Events": {
       "main": [
-        [{ "node": "Search GCal For Duplicate", "type": "main", "index": 0 }],
-        [{ "node": "Loop Over Sources", "type": "main", "index": 0 }]
+        [{ "node": "Loop Over Sources", "type": "main", "index": 0 }],
+        [{ "node": "Search GCal For Duplicate", "type": "main", "index": 0 }]
       ]
     },
     "Search GCal For Duplicate": {
