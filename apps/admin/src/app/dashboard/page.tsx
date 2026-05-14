@@ -38,14 +38,11 @@ async function fetchInstagramFollowers(): Promise<StatResult> {
       `https://graph.facebook.com/v21.0/${igUserId}?fields=followers_count&access_token=${token}`,
       { next: { revalidate: 3600 } },
     );
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({})) as { error?: { message?: string } };
-      return { count: null, error: body.error?.message ?? `HTTP ${res.status}` };
-    }
+    if (!res.ok) return { count: null };
     const json = await res.json() as { followers_count?: number };
     return { count: json.followers_count ?? null };
-  } catch (e) {
-    return { count: null, error: String(e) };
+  } catch {
+    return { count: null };
   }
 }
 
@@ -56,15 +53,15 @@ async function fetchFacebookFans(): Promise<StatResult> {
 
   try {
     const res = await fetch(
-      `https://graph.facebook.com/v21.0/${pageId}?fields=followers_count&access_token=${token}`,
+      `https://graph.facebook.com/v21.0/${pageId}?fields=fan_count&access_token=${token}`,
       { next: { revalidate: 3600 } },
     );
     if (!res.ok) {
       const body = await res.json().catch(() => ({})) as { error?: { message?: string } };
       return { count: null, error: body.error?.message ?? `HTTP ${res.status}` };
     }
-    const json = await res.json() as { followers_count?: number };
-    return { count: json.followers_count ?? null };
+    const json = await res.json() as { fan_count?: number };
+    return { count: json.fan_count ?? null };
   } catch (e) {
     return { count: null, error: String(e) };
   }
