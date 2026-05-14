@@ -102,11 +102,30 @@
     },
     {
       "parameters": {
-        "jsCode": "// Combine PostSchedule + IG_PastPosts into a single structured prompt context.\n// The merge node passes both sheet results — index 0 = PostSchedule, index 1 = IG_PastPosts.\n// We grab all items and separate them by their source.\n\n// Get context from Get Month Info node\nconst monthCtx = $('Get Month Info').first().json;\n\n// PostSchedule rows (all items from first Merge input)\nconst scheduleRows = $('Read PostSchedule').all().map(i => i.json);\n\n// IG_PastPosts rows\nconst igRows = $('Read IG_PastPosts').all().map(i => i.json);\n\n// Format PostSchedule as readable text\nconst scheduleText = scheduleRows.length > 0\n  ? scheduleRows\n      .map(r => Object.entries(r).map(([k, v]) => `${k}: ${v}`).join(' | '))\n      .join('\\n')\n  : 'No upcoming events data available.';\n\n// Format recent IG posts (last 10)\nconst igText = igRows.length > 0\n  ? igRows\n      .slice(-10)\n      .map(r => Object.entries(r).map(([k, v]) => `${k}: ${v}`).join(' | '))\n      .join('\\n')\n  : 'No recent IG post data available.';\n\nconst prompt = `You are drafting the monthly newsletter for StPeteMusic for ${monthCtx.monthYear}.\n\nHere is the upcoming event/post schedule data (PostSchedule sheet):\n${scheduleText}\n\nHere are recent Instagram post records for the Social Roundup section (IG_PastPosts sheet):\n${igText}\n\nUsing the data above, write the full newsletter body HTML following your style guidelines.\nFocus on Suite E Studios events. For the Social Roundup, pick 2-3 of the most recent IG/YouTube posts.\nRemember: output ONLY the four-section HTML body. No extra text or markdown fences.`;\n\nreturn {\n  json: {\n    ...monthCtx,\n    prompt\n  }\n};"
+        "method": "GET",
+        "url": "={{ 'https://admin.stpetemusic.live/api/featured/blurbs?month=' + $('Get Month Info').first().json.year + '-' + $('Get Month Info').first().json.month }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "a1b2c3d4-0012-0012-0012-000000000012",
+      "name": "Fetch Featured Blurbs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 220],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine PostSchedule + IG_PastPosts + featured blurbs into a single structured prompt context.\n\nconst monthCtx = $('Get Month Info').first().json;\nconst scheduleRows = $('Read PostSchedule').all().map(i => i.json);\nconst igRows = $('Read IG_PastPosts').all().map(i => i.json);\n\n// Try to get pre-approved featured artist blurbs — graceful fallback if endpoint is down\nlet preApprovedBlurbs = [];\ntry {\n  const blurbsData = $('Fetch Featured Blurbs').first().json;\n  if (Array.isArray(blurbsData)) {\n    preApprovedBlurbs = blurbsData;\n  }\n} catch (e) {\n  // Blurbs unavailable — Claude will write the Featured Bands section from scratch\n}\n\nconsole.log('[newsletter] pre-approved blurbs found:', preApprovedBlurbs.length);\n\nconst scheduleText = scheduleRows.length > 0\n  ? scheduleRows\n      .map(r => Object.entries(r).map(([k, v]) => `${k}: ${v}`).join(' | '))\n      .join('\\n')\n  : 'No upcoming events data available.';\n\nconst igText = igRows.length > 0\n  ? igRows\n      .slice(-10)\n      .map(r => Object.entries(r).map(([k, v]) => `${k}: ${v}`).join(' | '))\n      .join('\\n')\n  : 'No recent IG post data available.';\n\nconst blurbsSection = preApprovedBlurbs.length > 0\n  ? '\\n\\nPRE-APPROVED FEATURED ARTIST BLURBS — insert these verbatim into the Featured Bands section, in order:\\n'\n    + preApprovedBlurbs\n        .sort((a, b) => a.order_position - b.order_position)\n        .map(b => '[Position ' + b.order_position + '] ' + b.artist_name\n          + (b.artist_instagram_handle ? ' (@' + b.artist_instagram_handle + ')' : '')\n          + ':\\n' + b.newsletter_blurb)\n        .join('\\n\\n')\n  : '';\n\nconst featuredBandsInstruction = preApprovedBlurbs.length > 0\n  ? 'For the Featured Bands section, use ONLY the PRE-APPROVED BLURBS above — insert them verbatim, do not rewrite or summarize.'\n  : 'For the Featured Bands section, spotlight 1-2 bands from the events data.';\n\nconst prompt = `You are drafting the monthly newsletter for StPeteMusic for ${monthCtx.monthYear}.\n\nHere is the upcoming event/post schedule data (PostSchedule sheet):\n${scheduleText}\n\nHere are recent Instagram post records for the Social Roundup section (IG_PastPosts sheet):\n${igText}${blurbsSection}\n\nUsing the data above, write the full newsletter body HTML following your style guidelines.\nFocus on Suite E Studios events. ${featuredBandsInstruction}\nFor the Social Roundup, pick 2-3 of the most recent IG/YouTube posts.\nRemember: output ONLY the four-section HTML body. No extra text or markdown fences.`;\n\nreturn {\n  json: {\n    ...monthCtx,\n    prompt\n  }\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1200, 220],
+      "position": [1460, 220],
       "id": "a1b2c3d4-0007-0007-0007-000000000007",
       "name": "Build AI Prompt"
     },
@@ -116,7 +135,7 @@
       },
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.5,
-      "position": [1440, 220],
+      "position": [1720, 220],
       "id": "a1b2c3d4-0008-0008-0008-000000000008",
       "name": "Draft Newsletter HTML"
     },
@@ -129,12 +148,12 @@
           "cachedResultName": "Claude Sonnet 4.6"
         },
         "options": {
-          "systemMessage": "You are the newsletter editor for @StPeteMusic — a music and arts community organization in St. Petersburg, FL, centered around Suite E Studios in the Warehouse Arts District.\n\nYour job is to draft the monthly newsletter body as clean HTML using only inline styles.\nOutput nothing but the four-section HTML body. No markdown fences, no explanation.\n\nThe email template has a WHITE background — use dark text on light backgrounds.\n\nBrand voice: Enthusiastic, authentic, community-oriented, welcoming. Slightly informal but not sloppy.\n\n## HTML Styles\n\nSection header:\n<h2 style=\"margin:28px 0 12px 0;font-size:20px;font-weight:700;color:#e85d26;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Section Title</h2>\n\nBody paragraph:\n<p style=\"margin:0 0 16px 0;font-size:15px;color:#333333;line-height:1.7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Text here.</p>\n\nEvent card (light warm bg with orange left border):\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" width=\"100%\" style=\"background-color:#f8f5f2;border-radius:8px;margin:0 0 16px 0;border-left:4px solid #e85d26;\">\n  <tr><td style=\"padding:16px 20px;\">\n    <p style=\"margin:0 0 3px 0;font-size:11px;color:#e85d26;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">DATE · TIME</p>\n    <p style=\"margin:0 0 8px 0;font-size:17px;font-weight:700;color:#1a1a1a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">EVENT / BAND NAME</p>\n    <p style=\"margin:0 0 12px 0;font-size:14px;color:#666666;line-height:1.6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Short description.</p>\n    <a href=\"URL\" style=\"display:inline-block;background-color:#e85d26;color:#ffffff;text-decoration:none;font-size:13px;font-weight:600;padding:8px 18px;border-radius:6px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Get Tickets →</a>\n  </td></tr>\n</table>\n\nSection divider: <hr style=\"border:none;border-top:1px solid #eeece9;margin:24px 0;\">\n\nSocial roundup item:\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" width=\"100%\" style=\"background-color:#f8f5f2;border-radius:8px;margin:0 0 12px 0;\">\n  <tr><td style=\"padding:14px 18px;\">\n    <p style=\"margin:0 0 4px 0;font-size:11px;color:#e85d26;font-weight:700;text-transform:uppercase;letter-spacing:1px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Platform</p>\n    <p style=\"margin:0 0 8px 0;font-size:15px;color:#1a1a1a;line-height:1.5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Description.</p>\n    <a href=\"URL\" style=\"color:#e85d26;text-decoration:none;font-size:13px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Watch / View →</a>\n  </td></tr>\n</table>\n\nInline link: <a href=\"URL\" style=\"color:#e85d26;text-decoration:none;font-weight:500;\">Link text</a>\n\n## Sections (write all four in order)\n1. Suite E Events This Month — event cards for upcoming shows, tickets link to https://www.eventbrite.com/o/st-pete-music-105663485881 as fallback\n2. Featured Bands — spotlight 1-2 artists, Instagram handle as inline link\n3. Venue & Community News — Suite E Studios updates, brief 2-4 sentences, link to https://linktr.ee/suite_e_studios\n4. Social Roundup — 2-3 recent YouTube/IG posts using social roundup item cards\n\nEnd with: <hr style=\"border:none;border-top:1px solid #eeece9;margin:24px 0;\">"
+          "systemMessage": "You are the newsletter editor for @StPeteMusic — a music and arts community organization in St. Petersburg, FL, centered around Suite E Studios in the Warehouse Arts District.\n\nYour job is to draft the monthly newsletter body as clean HTML using only inline styles.\nOutput nothing but the four-section HTML body. No markdown fences, no explanation.\n\nThe email template has a WHITE background — use dark text on light backgrounds.\n\nBrand voice: Enthusiastic, authentic, community-oriented, welcoming. Slightly informal but not sloppy.\n\n## HTML Styles\n\nSection header:\n<h2 style=\"margin:28px 0 12px 0;font-size:20px;font-weight:700;color:#e85d26;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Section Title</h2>\n\nBody paragraph:\n<p style=\"margin:0 0 16px 0;font-size:15px;color:#333333;line-height:1.7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Text here.</p>\n\nEvent card (light warm bg with orange left border):\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" width=\"100%\" style=\"background-color:#f8f5f2;border-radius:8px;margin:0 0 16px 0;border-left:4px solid #e85d26;\">\n  <tr><td style=\"padding:16px 20px;\">\n    <p style=\"margin:0 0 3px 0;font-size:11px;color:#e85d26;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">DATE · TIME</p>\n    <p style=\"margin:0 0 8px 0;font-size:17px;font-weight:700;color:#1a1a1a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">EVENT / BAND NAME</p>\n    <p style=\"margin:0 0 12px 0;font-size:14px;color:#666666;line-height:1.6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Short description.</p>\n    <a href=\"URL\" style=\"display:inline-block;background-color:#e85d26;color:#ffffff;text-decoration:none;font-size:13px;font-weight:600;padding:8px 18px;border-radius:6px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Get Tickets →</a>\n  </td></tr>\n</table>\n\nSection divider: <hr style=\"border:none;border-top:1px solid #eeece9;margin:24px 0;\">\n\nSocial roundup item:\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" width=\"100%\" style=\"background-color:#f8f5f2;border-radius:8px;margin:0 0 12px 0;\">\n  <tr><td style=\"padding:14px 18px;\">\n    <p style=\"margin:0 0 4px 0;font-size:11px;color:#e85d26;font-weight:700;text-transform:uppercase;letter-spacing:1px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Platform</p>\n    <p style=\"margin:0 0 8px 0;font-size:15px;color:#1a1a1a;line-height:1.5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Description.</p>\n    <a href=\"URL\" style=\"color:#e85d26;text-decoration:none;font-size:13px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;\">Watch / View →</a>\n  </td></tr>\n</table>\n\nInline link: <a href=\"URL\" style=\"color:#e85d26;text-decoration:none;font-weight:500;\">Link text</a>\n\n## Sections (write all four in order)\n1. Suite E Events This Month — event cards for upcoming shows, tickets link to https://www.eventbrite.com/o/st-pete-music-105663485881 as fallback\n2. Featured Bands — if PRE-APPROVED BLURBS were provided in the prompt, insert them verbatim wrapped in body paragraph style; otherwise spotlight 1-2 artists from events data\n3. Venue & Community News — Suite E Studios updates, brief 2-4 sentences, link to https://linktr.ee/suite_e_studios\n4. Social Roundup — 2-3 recent YouTube/IG posts using social roundup item cards\n\nEnd with: <hr style=\"border:none;border-top:1px solid #eeece9;margin:24px 0;\">"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
       "typeVersion": 1.3,
-      "position": [1440, 400],
+      "position": [1720, 420],
       "id": "a1b2c3d4-0009-0009-0009-000000000009",
       "name": "Claude Sonnet",
       "credentials": {
@@ -150,7 +169,7 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1680, 220],
+      "position": [1960, 220],
       "id": "a1b2c3d4-0010-0010-0010-000000000010",
       "name": "Build Newsletter Markdown"
     },
@@ -168,7 +187,7 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1920, 220],
+      "position": [2200, 220],
       "id": "a1b2c3d4-0011-0011-0011-000000000011",
       "name": "Write Draft to Obsidian",
       "credentials": {
@@ -211,6 +230,11 @@
     },
     "Merge Sheets Data": {
       "main": [
+        [{"node": "Fetch Featured Blurbs", "type": "main", "index": 0}]
+      ]
+    },
+    "Fetch Featured Blurbs": {
+      "main": [
         [{"node": "Build AI Prompt", "type": "main", "index": 0}]
       ]
     },
@@ -240,7 +264,7 @@
     "executionOrder": "v1",
     "timezone": "America/New_York"
   },
-  "versionId": "newsletter-draft-creator-v1",
+  "versionId": "newsletter-draft-creator-v2",
   "meta": {
     "templateCredsSetupCompleted": false
   },

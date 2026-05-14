@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.52.0",
     "@clerk/nextjs": "^6.5.0",
     "@stpetemusic/db": "*",
     "@stpetemusic/types": "*",
