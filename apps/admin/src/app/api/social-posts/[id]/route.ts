@@ -28,7 +28,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
     const { id } = await params;
     const data = await request.json();
-    const { platform, content_type, title, caption, hashtags, media_urls, scheduled_publish_at, status, artist_id } = data;
+    const { platform, content_type, title, caption, hashtags, media_urls, scheduled_publish_at, artist_id } = data;
 
     const db = getDb();
     const result = await db
@@ -40,7 +40,6 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         ...(caption !== undefined && { caption }),
         ...(hashtags !== undefined && { hashtags }),
         ...(media_urls !== undefined && { media_urls }),
-        ...(status !== undefined && { status }),
         ...(artist_id !== undefined && { artist_id }),
         ...(scheduled_publish_at !== undefined && {
           scheduled_publish_at: scheduled_publish_at ? new Date(scheduled_publish_at) : null,

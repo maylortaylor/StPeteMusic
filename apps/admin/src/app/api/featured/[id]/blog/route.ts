@@ -143,7 +143,7 @@ Write only the blog post body — no title, no "Here is...", just the article te
       messages: [{ role: 'user', content: prompt }],
     });
 
-    const generated = response.content[0].type === 'text' ? response.content[0].text : '';
+    const generated = response.content?.[0]?.type === 'text' ? response.content[0].text : '';
     const suggestedTitle = `Spotlight: ${record.artist_name}`;
 
     await db
@@ -191,23 +191,28 @@ export async function PUT(
 
     const record = featuredRows[0];
     const slug = generateSlug(title.trim());
+    const values = {
+      post_type: 'artist_spotlight' as const,
+      title: title.trim(),
+      slug,
+      excerpt: excerpt?.trim() || null,
+      body: body.trim(),
+      featured_image_url: featuredImageUrl || null,
+      tags: tags || [],
+      status: 'approved' as const,
+      publish_date: publishDate ? new Date(publishDate) : null,
+      artist_id: record.artist_id,
+      featured_artist_id: id,
+    };
 
-    const blogResult = await db
-      .insert(blog_posts)
-      .values({
-        post_type: 'artist_spotlight',
-        title: title.trim(),
-        slug,
-        excerpt: excerpt?.trim() || null,
-        body: body.trim(),
-        featured_image_url: featuredImageUrl || null,
-        tags: tags || [],
-        status: 'approved',
-        publish_date: publishDate ? new Date(publishDate) : null,
-        artist_id: record.artist_id,
-        featured_artist_id: id,
-      })
-      .returning();
+    const existing = await db
+      .select({ id: blog_posts.id })
+      .from(blog_posts)
+      .where(eq(blog_posts.featured_artist_id, id));
+
+    const blogResult = existing.length > 0
+      ? await db.update(blog_posts).set(values).where(eq(blog_posts.featured_artist_id, id)).returning()
+      : await db.insert(blog_posts).values(values).returning();
 
     await db
       .update(featured_artists)

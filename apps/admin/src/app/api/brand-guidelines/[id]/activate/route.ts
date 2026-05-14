@@ -9,14 +9,14 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
     const { id } = await params;
     const db = getDb();
 
-    // Deactivate all, then activate the target — do both in a transaction
-    await db.execute(sql`UPDATE brand_guidelines SET is_active = false`);
-
-    const result = await db
-      .update(brand_guidelines)
-      .set({ is_active: true })
-      .where(eq(brand_guidelines.id, id))
-      .returning();
+    const result = await db.transaction(async (tx) => {
+      await tx.execute(sql`UPDATE brand_guidelines SET is_active = false`);
+      return tx
+        .update(brand_guidelines)
+        .set({ is_active: true })
+        .where(eq(brand_guidelines.id, id))
+        .returning();
+    });
 
     if (result.length === 0) {
       return Response.json({ error: 'Guidelines not found' }, { status: 404 });

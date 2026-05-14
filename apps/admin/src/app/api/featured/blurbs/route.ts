@@ -1,8 +1,17 @@
 import { getDb, featured_artists, artists, eq, asc } from '@stpetemusic/db';
 
-// No auth — this endpoint is called by the n8n newsletter-draft-creator workflow
 export async function GET(request: Request) {
   try {
+    const secret = process.env.N8N_WEBHOOK_SECRET;
+    if (!secret) {
+      console.error('N8N_WEBHOOK_SECRET is not configured');
+      return new Response('Forbidden', { status: 403 });
+    }
+    const incomingSecret = request.headers.get('x-webhook-secret');
+    if (incomingSecret !== secret) {
+      return new Response('Forbidden', { status: 403 });
+    }
+
     const { searchParams } = new URL(request.url);
     const month = searchParams.get('month') || new Date().toISOString().slice(0, 7);
 

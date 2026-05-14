@@ -40,12 +40,7 @@ export async function POST(
 
     const record = result[0];
 
-    await db
-      .update(featured_artists)
-      .set({ status: 'pending_enrichment' })
-      .where(eq(featured_artists.id, id));
-
-    await fetch(webhookUrl, {
+    const webhookRes = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -58,6 +53,15 @@ export async function POST(
         bandcampUrl: record.artist_bandcamp_url,
       }),
     });
+
+    if (!webhookRes.ok) {
+      throw new Error(`Enrichment webhook returned ${webhookRes.status}`);
+    }
+
+    await db
+      .update(featured_artists)
+      .set({ status: 'pending_enrichment' })
+      .where(eq(featured_artists.id, id));
 
     return Response.json({ triggered: true });
   } catch (error) {

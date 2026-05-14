@@ -36,14 +36,14 @@ export default function BlogPostPage({
     params.then(({ featuredId: id }) => {
       setFeaturedId(id);
       fetch(`/api/featured/${id}`)
-        .then((r) => r.json())
+        .then((r) => { if (!r.ok) throw new Error(`Failed to load (${r.status})`); return r.json(); })
         .then((data) => {
           setRecord(data);
           if (data.artist_name) {
             setTitle(`Spotlight: ${data.artist_name}`);
           }
         })
-        .catch(() => setError('Failed to load featured artist'))
+        .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load featured artist'))
         .finally(() => setLoading(false));
     });
   }, [params]);

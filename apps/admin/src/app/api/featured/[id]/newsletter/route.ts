@@ -92,7 +92,7 @@ Write only the spotlight text — no headers, no intro like "Here is...", just t
       messages: [{ role: 'user', content: prompt }],
     });
 
-    const generated = response.content[0].type === 'text' ? response.content[0].text : '';
+    const generated = response.content?.[0]?.type === 'text' ? response.content[0].text : '';
 
     await db
       .update(featured_artists)

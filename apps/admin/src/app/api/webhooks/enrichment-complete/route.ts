@@ -3,9 +3,12 @@ import { getDb, featured_artists, eq } from '@stpetemusic/db';
 export async function POST(request: Request) {
   try {
     const secret = process.env.N8N_WEBHOOK_SECRET;
+    if (!secret) {
+      console.error('N8N_WEBHOOK_SECRET is not configured');
+      return new Response('Forbidden', { status: 403 });
+    }
     const incomingSecret = request.headers.get('x-webhook-secret');
-
-    if (secret && incomingSecret !== secret) {
+    if (incomingSecret !== secret) {
       return new Response('Forbidden', { status: 403 });
     }
 

@@ -76,9 +76,9 @@ export default function FeaturedPage() {
 
   useEffect(() => {
     fetch('/api/artists')
-      .then((r) => r.json())
+      .then((r) => { if (!r.ok) throw new Error(`Failed to load artists (${r.status})`); return r.json(); })
       .then((d) => setAllArtists(d.artists || []))
-      .catch(() => {});
+      .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load artist list'));
   }, []);
 
   const handleAddSlot = async (position: number) => {
