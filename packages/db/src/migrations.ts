@@ -852,4 +852,20 @@ CREATE TABLE IF NOT EXISTS brand_guidelines (
 CREATE INDEX IF NOT EXISTS idx_brand_guidelines_is_active ON brand_guidelines(is_active);
 `,
   },
+  {
+    filename: '020_add_event_review_queue.sql',
+    sql: `
+ALTER TABLE events
+  ADD COLUMN IF NOT EXISTS review_status TEXT NOT NULL DEFAULT 'approved',
+  ADD COLUMN IF NOT EXISTS source        TEXT,
+  ADD COLUMN IF NOT EXISTS reviewed_by  TEXT,
+  ADD COLUMN IF NOT EXISTS reviewed_at  TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS updated_at   TIMESTAMPTZ DEFAULT NOW();
+
+CREATE INDEX IF NOT EXISTS idx_events_review_status ON events(review_status);
+CREATE INDEX IF NOT EXISTS idx_events_source        ON events(source);
+
+UPDATE events SET source = extra_data->>'source' WHERE extra_data->>'source' IS NOT NULL;
+`,
+  },
 ];

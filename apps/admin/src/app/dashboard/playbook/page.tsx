@@ -10,40 +10,7 @@ import newsletterPromptMd from '../../../../../../n8n/workflows/StPeteMusic/news
 import enrichmentPromptMd from '../../../../../../n8n/workflows/StPeteMusic/artist-enrichment-system-prompt.md';
 import socialPromptMd from '../../../../../../n8n/workflows/StPeteMusic/system-prompt.md';
 
-// ── Doc registry ──────────────────────────────────────────────────────────────
-
-interface Doc {
-  id: string;
-  title: string;
-  subtitle: string;
-  content: string;
-}
-
-const SECTIONS: { heading: string; docs: Doc[] }[] = [
-  {
-    heading: 'Brand & Events',
-    docs: [
-      { id: 'brand',      title: 'Brand Reference',           subtitle: 'Team, social accounts, Google account',        content: brandMd },
-      { id: 'events',     title: 'Events & Content Guide',    subtitle: 'Final Friday, Instant Noodles, Art Walk',      content: eventsMd },
-      { id: 'brand-voice', title: 'Brand Voice Guidelines',  subtitle: 'Tone, platform formatting, post structure',     content: brandVoiceMd },
-    ],
-  },
-  {
-    heading: 'n8n Workflows',
-    docs: [
-      { id: 'n8n',      title: 'n8n Quick Reference',        subtitle: 'Active workflows, triggers, AI config',        content: n8nMd },
-      { id: 'n8n-main', title: 'n8n Technical Reference',    subtitle: 'Local dev, credentials, OAuth, editing rules', content: n8nMainMd },
-    ],
-  },
-  {
-    heading: 'AI System Prompts',
-    docs: [
-      { id: 'newsletter-prompt',  title: 'Newsletter System Prompt',       subtitle: 'Claude instructions for newsletter drafts', content: newsletterPromptMd },
-      { id: 'enrichment-prompt',  title: 'Artist Enrichment System Prompt', subtitle: 'Claude instructions for artist enrichment', content: enrichmentPromptMd },
-      { id: 'social-prompt',      title: 'Social Posting System Prompt',   subtitle: 'Claude instructions for Obsidian posts',   content: socialPromptMd },
-    ],
-  },
-];
+import { PlaybookClient } from './playbook-client';
 
 // ── Markdown renderer ─────────────────────────────────────────────────────────
 // Handles: headings, bold, inline code, links, bullet lists, numbered lists,
@@ -70,7 +37,6 @@ function renderMd(raw: string): string {
   let inUl = false;
   let inOl = false;
   let inCode = false;
-  let codeLang = '';
   const codeLines: string[] = [];
 
   const flushList = () => {
@@ -86,13 +52,11 @@ function renderMd(raw: string): string {
       if (!inCode) {
         flushList();
         inCode = true;
-        codeLang = line.slice(3).trim();
         codeLines.length = 0;
       } else {
         const escaped = codeLines.join('\n').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         html.push(`<pre class="my-2 overflow-x-auto rounded-md bg-muted p-3 text-xs font-mono leading-relaxed">${escaped}</pre>`);
         inCode = false;
-        codeLang = '';
       }
       continue;
     }
@@ -115,7 +79,7 @@ function renderMd(raw: string): string {
     } else if (line === '---' || line === '***' || line === '___') {
       flushList();
       html.push('<hr class="my-4 border-border" />');
-    // Table rows — render as monospace (simple approach)
+    // Table rows
     } else if (line.startsWith('|')) {
       flushList();
       if (line.replace(/[\s|:-]/g, '') === '') continue; // separator row
@@ -143,53 +107,46 @@ function renderMd(raw: string): string {
   return html.join('\n');
 }
 
+// ── Doc registry ──────────────────────────────────────────────────────────────
+
+const SECTIONS = [
+  {
+    heading: 'Brand & Events',
+    docs: [
+      { id: 'brand',       title: 'Brand Reference',             subtitle: 'Team, social accounts, Google account',        content: brandMd },
+      { id: 'events',      title: 'Events & Content Guide',      subtitle: 'Final Friday, Instant Noodles, Art Walk',      content: eventsMd },
+      { id: 'brand-voice', title: 'Brand Voice Guidelines',      subtitle: 'Tone, platform formatting, post structure',     content: brandVoiceMd },
+    ],
+  },
+  {
+    heading: 'n8n Workflows',
+    docs: [
+      { id: 'n8n',      title: 'n8n Quick Reference',        subtitle: 'Active workflows, triggers, AI config',        content: n8nMd },
+      { id: 'n8n-main', title: 'n8n Technical Reference',    subtitle: 'Local dev, credentials, OAuth, editing rules', content: n8nMainMd },
+    ],
+  },
+  {
+    heading: 'AI System Prompts',
+    docs: [
+      { id: 'newsletter-prompt',  title: 'Newsletter System Prompt',        subtitle: 'Claude instructions for newsletter drafts',  content: newsletterPromptMd },
+      { id: 'enrichment-prompt',  title: 'Artist Enrichment System Prompt', subtitle: 'Claude instructions for artist enrichment',  content: enrichmentPromptMd },
+      { id: 'social-prompt',      title: 'Social Posting System Prompt',    subtitle: 'Claude instructions for Obsidian posts',    content: socialPromptMd },
+    ],
+  },
+];
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function PlaybookPage() {
-  return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Playbook</h1>
-        <p className="mt-2 text-muted-foreground">
-          Reference docs pulled directly from the repo — always up to date with the source files.
-        </p>
+  const sections = SECTIONS.map((s) => ({
+    heading: s.heading,
+    docs: s.docs.map((d) => ({
+      id: d.id,
+      title: d.title,
+      subtitle: d.subtitle,
+      html: renderMd(d.content),
+    })),
+  }));
 
-        {/* Jump nav */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          {SECTIONS.flatMap((s) => s.docs).map((doc) => (
-            <a
-              key={doc.id}
-              href={`#${doc.id}`}
-              className="rounded-md border border-border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {doc.title}
-            </a>
-          ))}
-        </div>
-      </div>
-
-      {SECTIONS.map((section) => (
-        <div key={section.heading} className="space-y-4">
-          <h2 className="text-lg font-semibold text-foreground">{section.heading}</h2>
-
-          {section.docs.map((doc) => (
-            <div
-              key={doc.id}
-              id={doc.id}
-              className="rounded-lg border border-border bg-card overflow-hidden scroll-mt-6"
-            >
-              <div className="border-b border-border bg-muted/40 px-5 py-3">
-                <p className="font-semibold text-foreground">{doc.title}</p>
-                <p className="text-xs text-muted-foreground">{doc.subtitle}</p>
-              </div>
-              <div
-                className="px-5 py-4"
-                dangerouslySetInnerHTML={{ __html: renderMd(doc.content) }}
-              />
-            </div>
-          ))}
-        </div>
-      ))}
-    </div>
-  );
+  return <PlaybookClient sections={sections} />;
 }

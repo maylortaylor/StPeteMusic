@@ -97,10 +97,16 @@ export default async function NewsletterPage() {
         </div>
         <div className="flex gap-2">
           <Link
+            href="/dashboard/newsletter/compose"
+            className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+          >
+            Compose Newsletter
+          </Link>
+          <Link
             href={`${listmonkUrl}/admin/campaigns/new`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+            className="flex items-center gap-1.5 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
           >
             + New Campaign
             <ExternalLink className="h-3.5 w-3.5" />

@@ -159,6 +159,10 @@ export const events = pgTable('events', {
   image_url: varchar('image_url', { length: 500 }),
   extra_data: jsonb('extra_data').default({}),
   is_active: boolean('is_active').default(true),
+  review_status: text('review_status').notNull().default('approved'),
+  source: text('source'),
+  reviewed_by: text('reviewed_by'),
+  reviewed_at: timestamp('reviewed_at', { withTimezone: true }),
   created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updated_at: timestamp('updated_at', { withTimezone: true })
     .defaultNow()
