@@ -11,11 +11,11 @@ interface ListmonkCampaign {
   status: 'draft' | 'running' | 'scheduled' | 'paused' | 'cancelled' | 'finished';
   send_at: string | null;
   created_at: string;
-  stats: {
+  stats?: {
     sent: number;
     views: number;
     clicks: number;
-  };
+  } | null;
 }
 
 const STATUS_STYLES: Record<ListmonkCampaign['status'], string> = {
@@ -78,9 +78,8 @@ function formatDate(iso: string) {
 }
 
 function openRate(campaign: ListmonkCampaign): string {
-  const { sent, views } = campaign.stats;
-  if (!sent) return '—';
-  return `${Math.round((views / sent) * 100)}%`;
+  if (!campaign.stats?.sent) return '—';
+  return `${Math.round((campaign.stats.views / campaign.stats.sent) * 100)}%`;
 }
 
 export default async function NewsletterPage() {
@@ -171,7 +170,7 @@ export default async function NewsletterPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right text-muted-foreground">
-                    {c.stats.sent ? c.stats.sent.toLocaleString() : '—'}
+                    {c.stats?.sent ? c.stats.sent.toLocaleString() : '—'}
                   </td>
                   <td className="px-4 py-3 text-right text-muted-foreground">
                     {openRate(c)}
