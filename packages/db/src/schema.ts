@@ -156,6 +156,9 @@ export const events = pgTable('events', {
   tag: varchar('tag', { length: 100 }),
   ticket_url: varchar('ticket_url', { length: 500 }),
   venue: varchar('venue', { length: 255 }),
+  image_url: varchar('image_url', { length: 500 }),
+  extra_data: jsonb('extra_data').default({}),
+  is_active: boolean('is_active').default(true),
   created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updated_at: timestamp('updated_at', { withTimezone: true })
     .defaultNow()

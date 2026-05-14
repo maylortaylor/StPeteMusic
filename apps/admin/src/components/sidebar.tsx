@@ -12,6 +12,7 @@ import {
   Mail,
   Star,
   Calendar,
+  CalendarDays,
   Mic2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -36,6 +37,11 @@ const navItems = [
     label: 'Venues',
     href: '/dashboard/venues',
     icon: MapPin,
+  },
+  {
+    label: 'Events',
+    href: '/dashboard/events',
+    icon: CalendarDays,
   },
   {
     label: 'Persons',
