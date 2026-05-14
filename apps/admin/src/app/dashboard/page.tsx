@@ -98,15 +98,15 @@ async function fetchListmonkSubscribers(): Promise<StatResult> {
 
   try {
     const credentials = Buffer.from(`${username}:${password}`).toString('base64');
-    const res = await fetch(`${apiUrl}/api/lists/3`, {
+    const res = await fetch(`${apiUrl}/api/subscribers?per_page=1`, {
       headers: { Authorization: `Basic ${credentials}` },
       next: { revalidate: 3600 },
     });
     if (!res.ok) {
       return { count: null, error: `HTTP ${res.status}` };
     }
-    const json = await res.json() as { data?: { subscriber_count?: number } };
-    return { count: json.data?.subscriber_count ?? null };
+    const json = await res.json() as { data?: { total?: number } };
+    return { count: json.data?.total ?? null };
   } catch (e) {
     return { count: null, error: String(e) };
   }

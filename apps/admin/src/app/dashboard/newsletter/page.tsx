@@ -97,7 +97,7 @@ export default async function NewsletterPage() {
         </div>
         <div className="flex gap-2">
           <Link
-            href={`${listmonkUrl}/campaigns/new`}
+            href={`${listmonkUrl}/admin/campaigns/new`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
@@ -149,7 +149,7 @@ export default async function NewsletterPage() {
                 >
                   <td className="px-4 py-3">
                     <Link
-                      href={`${listmonkUrl}/campaigns/${c.id}`}
+                      href={`${listmonkUrl}/admin/campaigns/${c.id}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="font-medium text-foreground hover:underline"
