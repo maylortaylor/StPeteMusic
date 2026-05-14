@@ -3,17 +3,18 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Users,
-  MapPin,
-  Users2,
+  BookOpen,
   Building2,
-  Zap,
-  Mail,
-  Star,
   Calendar,
   CalendarDays,
+  LayoutDashboard,
+  Mail,
+  MapPin,
   Mic2,
+  Star,
+  Users,
+  Users2,
+  Zap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -72,6 +73,11 @@ const navItems = [
     label: 'Newsletter',
     href: '/dashboard/newsletter',
     icon: Mail,
+  },
+  {
+    label: 'Playbook',
+    href: '/dashboard/playbook',
+    icon: BookOpen,
   },
 ];
 

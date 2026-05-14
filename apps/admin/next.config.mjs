@@ -10,6 +10,11 @@ const securityHeaders = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  webpack(config) {
+    // Treat .md files as plain text strings so server components can import them.
+    config.module.rules.push({ test: /\.md$/, type: 'asset/source' });
+    return config;
+  },
   async headers() {
     return [{ source: '/(.*)', headers: securityHeaders }];
   },
