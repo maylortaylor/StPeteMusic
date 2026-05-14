@@ -229,3 +229,94 @@ export const templates = pgTable('templates', {
     .defaultNow()
     .$onUpdate(() => new Date()),
 });
+
+// status values: pending_enrichment | enrichment_ready | enrichment_failed |
+//   enrichment_approved | newsletter_generated | newsletter_approved |
+//   blog_generated | blog_approved
+export const featured_artists = pgTable('featured_artists', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  artist_id: uuid('artist_id')
+    .notNull()
+    .references(() => artists.id, { onDelete: 'cascade' }),
+  featured_month: varchar('featured_month', { length: 7 }).notNull(),
+  order_position: integer('order_position').notNull(),
+  status: text('status').notNull().default('pending_enrichment'),
+  scraped_raw: jsonb('scraped_raw').default({}),
+  enrichment_notes: text('enrichment_notes'),
+  newsletter_blurb: text('newsletter_blurb'),
+  created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updated_at: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
+// platform values: instagram | facebook | youtube | newsletter
+// content_type values: post | reel | story | short | carousel | video | email
+// status values: draft | pending_approval | approved | scheduled | published | failed | archived
+export const social_posts = pgTable('social_posts', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  platform: varchar('platform', { length: 50 }).notNull(),
+  content_type: varchar('content_type', { length: 50 }).default('post'),
+  status: text('status').notNull().default('draft'),
+  title: varchar('title', { length: 500 }),
+  caption: text('caption'),
+  media_urls: text('media_urls').array().default([]),
+  hashtags: text('hashtags').array().default([]),
+  scheduled_publish_at: timestamp('scheduled_publish_at', { withTimezone: true }),
+  published_at: timestamp('published_at', { withTimezone: true }),
+  artist_id: uuid('artist_id').references(() => artists.id, { onDelete: 'set null' }),
+  created_by: varchar('created_by', { length: 255 }),
+  approved_by: varchar('approved_by', { length: 255 }),
+  approval_notes: text('approval_notes'),
+  approval_timestamp: timestamp('approval_timestamp', { withTimezone: true }),
+  n8n_workflow_id: varchar('n8n_workflow_id', { length: 255 }),
+  platform_post_id: varchar('platform_post_id', { length: 255 }),
+  performance_stats: jsonb('performance_stats').default({}),
+  created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updated_at: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
+// is_active: only one record should have is_active=true at a time
+export const brand_guidelines = pgTable('brand_guidelines', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  version: integer('version').notNull().default(1),
+  name: varchar('name', { length: 255 }).notNull(),
+  system_prompt: text('system_prompt').notNull(),
+  tone_descriptors: text('tone_descriptors').array().default([]),
+  hashtag_library: text('hashtag_library').array().default([]),
+  example_posts: text('example_posts').array().default([]),
+  is_active: boolean('is_active').default(false),
+  created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updated_at: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
+// post_type values: artist_spotlight | event_recap | venue_feature | general
+// status values: draft | approved | published
+export const blog_posts = pgTable('blog_posts', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  post_type: text('post_type').notNull().default('general'),
+  title: varchar('title', { length: 500 }).notNull(),
+  slug: varchar('slug', { length: 500 }).notNull().unique(),
+  excerpt: text('excerpt'),
+  body: text('body').notNull(),
+  featured_image_url: varchar('featured_image_url', { length: 500 }),
+  tags: text('tags').array().default([]),
+  seo_title: varchar('seo_title', { length: 255 }),
+  seo_description: text('seo_description'),
+  status: text('status').notNull().default('draft'),
+  publish_date: timestamp('publish_date', { withTimezone: true }),
+  author_name: varchar('author_name', { length: 255 }),
+  author_clerk_id: varchar('author_clerk_id', { length: 255 }),
+  artist_id: uuid('artist_id').references(() => artists.id, { onDelete: 'set null' }),
+  featured_artist_id: uuid('featured_artist_id').references(() => featured_artists.id, {
+    onDelete: 'set null',
+  }),
+  created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updated_at: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
