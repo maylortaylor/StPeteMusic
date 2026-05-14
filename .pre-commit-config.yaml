@@ -68,3 +68,11 @@ repos:
         language: system
         stages: [commit]
         pass_filenames: false
+
+      - id: sync-n8n-prompts
+        name: Sync n8n system prompts into workflow JSON
+        entry: node scripts/sync-n8n-prompts.js
+        language: system
+        files: "n8n/workflows/StPeteMusic/(system-prompt|newsletter-system-prompt)\\.md$"
+        stages: [commit]
+        pass_filenames: false
