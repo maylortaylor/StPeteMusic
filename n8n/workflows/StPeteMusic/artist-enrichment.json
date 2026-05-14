@@ -1,0 +1,192 @@
+{
+  "name": "Artist Enrichment",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## artist-enrichment\n\nTriggered by the admin app when you click **\"Start Enrichment\"** on the Featured page.\n\n**Flow:**\n1. Webhook receives `{ featuredArtistId, name, instagramUrl, facebookUrl, linktreeUrl, website, bandcampUrl }`\n2. Scrapes each platform URL (best-effort — Facebook/Instagram may block scrapers)\n3. Claude synthesizes scraped text into structured enrichment notes\n4. POSTs callback to `ADMIN_ENRICHMENT_CALLBACK_URL` with `x-webhook-secret` header\n\n**Required env vars (set in n8n .env):**\n- `ADMIN_ENRICHMENT_CALLBACK_URL` — e.g. `https://admin.stpetemusic.live/api/webhooks/enrichment-complete`\n- `N8N_WEBHOOK_SECRET` — shared secret (must match admin app env var)\n\n**Note:** `$fetch()` is used in the Scrape node (requires n8n >= 1.0).\nIf scraping errors, the workflow still calls back with `hasError: true` so the admin UI shows \"Retry\".",
+        "height": 320,
+        "width": 560,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [240, -160],
+      "typeVersion": 1,
+      "id": "e1234567-e000-4000-8000-000000000009",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "artist-enrichment",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "e1234567-e000-4000-8000-000000000001",
+      "name": "Webhook: Artist Enrichment",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 260],
+      "webhookId": "artist-enrichment"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate and extract fields from the webhook POST body\nconst raw = $input.first().json;\nconst body = raw.body || raw;\n\nconst { featuredArtistId, name, instagramUrl, facebookUrl, linktreeUrl, website, bandcampUrl } = body;\n\nif (!featuredArtistId) {\n  throw new Error('[artist-enrichment] featuredArtistId is required in POST body');\n}\n\nconsole.log('[artist-enrichment] Starting enrichment for:', name, '| featuredArtistId:', featuredArtistId);\n\nreturn [{\n  json: {\n    featuredArtistId,\n    name: name || 'Unknown Artist',\n    instagramUrl: instagramUrl || null,\n    facebookUrl: facebookUrl || null,\n    linktreeUrl: linktreeUrl || null,\n    website: website || null,\n    bandcampUrl: bandcampUrl || null,\n  }\n}];"
+      },
+      "id": "e1234567-e000-4000-8000-000000000002",
+      "name": "Parse Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 260]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Scrape each platform URL concurrently using $fetch (n8n >= 1.0).\n// Facebook and Instagram may return login walls — that's expected. We still pass\n// whatever text we get to Claude, which will skip sections it can't fill.\n\nconst data = $input.first().json;\n\nfunction stripHtml(html) {\n  if (!html || typeof html !== 'string') return null;\n  return html\n    .replace(/<script[\\s\\S]*?<\\/script>/gi, '')\n    .replace(/<style[\\s\\S]*?<\\/style>/gi, '')\n    .replace(/<[^>]+>/g, ' ')\n    .replace(/&nbsp;/g, ' ')\n    .replace(/&amp;/g, '&')\n    .replace(/&lt;/g, '<')\n    .replace(/&gt;/g, '>')\n    .replace(/&quot;/g, '\"')\n    .replace(/&#39;/g, \"'\")\n    .replace(/\\s+/g, ' ')\n    .trim()\n    .slice(0, 2500);\n}\n\nasync function safeFetch(url) {\n  if (!url) return null;\n  try {\n    const response = await $fetch(url, {\n      method: 'GET',\n      headers: {\n        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120 Safari/537.36',\n        'Accept': 'text/html,application/xhtml+xml,*/*;q=0.8',\n        'Accept-Language': 'en-US,en;q=0.9',\n      },\n    });\n    const raw = typeof response === 'string' ? response : JSON.stringify(response);\n    const text = stripHtml(raw);\n    console.log('[artist-enrichment] Scraped', url, '—', text ? text.length + ' chars' : 'no text');\n    return text;\n  } catch (e) {\n    console.log('[artist-enrichment] Scrape failed for', url, '—', e.message);\n    return null;\n  }\n}\n\nconst [facebook, instagram, linktree, website, bandcamp] = await Promise.all([\n  safeFetch(data.facebookUrl),\n  safeFetch(data.instagramUrl),\n  safeFetch(data.linktreeUrl),\n  safeFetch(data.website),\n  safeFetch(data.bandcampUrl),\n]);\n\nreturn [{\n  json: {\n    ...data,\n    scraped: { facebook, instagram, linktree, website, bandcamp },\n  }\n}];"
+      },
+      "id": "e1234567-e000-4000-8000-000000000003",
+      "name": "Scrape All Platforms",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [760, 260],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build the prompt for Claude using scraped text from each platform.\n// Platforms with no data show \"NO DATA\" so Claude knows to skip those sections.\n\nconst data = $input.first().json;\nconst { name, scraped } = data;\n\nfunction fmt(platform, text) {\n  const label = '=== ' + platform.toUpperCase() + ' ===';\n  if (!text || text.trim().length < 20) {\n    return label + '\\nNO DATA\\n';\n  }\n  return label + '\\n' + text + '\\n';\n}\n\nconst prompt = 'ARTIST NAME: ' + name + '\\n\\n'\n  + fmt('FACEBOOK', scraped.facebook)\n  + '\\n'\n  + fmt('INSTAGRAM', scraped.instagram)\n  + '\\n'\n  + fmt('LINKTREE', scraped.linktree)\n  + '\\n'\n  + fmt('WEBSITE', scraped.website)\n  + '\\n'\n  + fmt('BANDCAMP', scraped.bandcamp);\n\nconsole.log('[artist-enrichment] Prompt length:', prompt.length, 'chars');\n\nreturn [{ json: { ...data, prompt } }];"
+      },
+      "id": "e1234567-e000-4000-8000-000000000004",
+      "name": "Build Claude Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1020, 260]
+    },
+    {
+      "parameters": {
+        "prompt": "={{ $json.prompt }}"
+      },
+      "id": "e1234567-e000-4000-8000-000000000005",
+      "name": "Synthesize with Claude",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [1280, 260],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-sonnet-4-6",
+          "mode": "list",
+          "cachedResultName": "Claude Sonnet 4.6"
+        },
+        "options": {
+          "systemMessage": "You are a music researcher synthesizing information about a local St. Pete, FL artist from multiple scraped web sources.\n\nYou will receive raw text scraped from the artist's Facebook page, Instagram profile, Linktree, website, and Bandcamp page. Synthesize this into clean, organized enrichment notes that will be used to write newsletter blurbs and blog posts.\n\n## Output Format\n\nOutput clean markdown with the following sections. ONLY include a section if relevant data was found — do not fabricate anything:\n\n## Bio\n[1-3 paragraph biography synthesizing the artist's own words from their profiles. Prioritize their own descriptions. Write in third person.]\n\n## Members\n[List band members and their roles if found. Format: Name — Role (e.g. vocals, guitar, drums)]\n\n## Founded\n[Year and city, e.g. \"Founded in 2018 in St. Petersburg, FL\"]\n\n## Genre / Sound\n[Description of their musical style in 1-3 sentences. Use their own words where possible.]\n\n## Upcoming Shows\n[Any listed upcoming shows or tour dates. Format: Date — Venue — City]\n\n## Links Found\n[Any additional URLs, social handles, or platforms found beyond what was provided]\n\n## Rules\n- Prioritize the artist's own words over third-party descriptions\n- Do NOT fabricate. If a section has no data from any source, omit it entirely\n- Keep it factual — no marketing hyperbole\n- If multiple sources have the same info, include it once\n- If a platform returned a login page or error, skip it silently\n- Output ONLY the markdown enrichment notes. No preamble like \"Here are the notes:\""
+        }
+      },
+      "id": "e1234567-e000-4000-8000-000000000006",
+      "name": "Claude Sonnet 4.6",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [1280, 460],
+      "credentials": {
+        "anthropicApi": {
+          "id": "GxEPu27ca9FmXxQA",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract LLM output and build the callback body for the admin app.\n// If the LLM step failed (continueOnFail), text will be empty and hasError is true.\n\nconst llmOutput = $input.first().json.text || '';\nconst original = $('Parse Input').first().json;\nconst scraped = $('Scrape All Platforms').first().json.scraped || {};\n\nconst hasError = llmOutput.trim().length === 0;\n\nif (hasError) {\n  console.log('[artist-enrichment] LLM returned no output — marking hasError=true');\n}\n\nconst callbackBody = {\n  featuredArtistId: original.featuredArtistId,\n  scrapedRaw: scraped,\n  synthesizedNotes: hasError ? null : llmOutput.trim(),\n  hasError,\n};\n\nconsole.log('[artist-enrichment] Callback ready — hasError:', hasError, '| notes length:', llmOutput.length);\n\nreturn [{ json: { callbackBody, callbackBodyStr: JSON.stringify(callbackBody) } }];"
+      },
+      "id": "e1234567-e000-4000-8000-000000000007",
+      "name": "Parse Claude Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, 260]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.ADMIN_ENRICHMENT_CALLBACK_URL }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-webhook-secret",
+              "value": "={{ $env.N8N_WEBHOOK_SECRET }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.callbackBodyStr }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "e1234567-e000-4000-8000-000000000008",
+      "name": "Send Callback to Admin",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1800, 260],
+      "continueOnFail": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook: Artist Enrichment": {
+      "main": [
+        [{ "node": "Parse Input", "type": "main", "index": 0 }]
+      ]
+    },
+    "Parse Input": {
+      "main": [
+        [{ "node": "Scrape All Platforms", "type": "main", "index": 0 }]
+      ]
+    },
+    "Scrape All Platforms": {
+      "main": [
+        [{ "node": "Build Claude Prompt", "type": "main", "index": 0 }]
+      ]
+    },
+    "Build Claude Prompt": {
+      "main": [
+        [{ "node": "Synthesize with Claude", "type": "main", "index": 0 }]
+      ]
+    },
+    "Claude Sonnet 4.6": {
+      "ai_languageModel": [
+        [{ "node": "Synthesize with Claude", "type": "ai_languageModel", "index": 0 }]
+      ]
+    },
+    "Synthesize with Claude": {
+      "main": [
+        [{ "node": "Parse Claude Response", "type": "main", "index": 0 }]
+      ]
+    },
+    "Parse Claude Response": {
+      "main": [
+        [{ "node": "Send Callback to Admin", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "meta": {
+    "instanceId": ""
+  }
+}
