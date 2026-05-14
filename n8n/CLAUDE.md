@@ -26,14 +26,21 @@ Only `workflows/StPeteMusic/` is active. All other workflow directories are lega
 | `obsidian-post-creator.json` | Chat agent → YouTube post metadata → Obsidian draft | Claude (default) |
 | `obsidian-to-youtube-posting.json` | Obsidian draft → YouTube publish | Claude (default) |
 | `youtube-shorts-tracker-creator.json` | YouTube Shorts tracking and creation | Gemini (backup) |
-| `system-prompt.md` | Source of truth for AI agent system prompt | — |
+| `system-prompt.md` | Source of truth for obsidian-post-creator AI prompt | — |
+| `newsletter-system-prompt.md` | Source of truth for newsletter-draft-creator AI prompt | — |
 
 ### System Prompt Rule
 
-`system-prompt.md` is the **human-readable source of truth**. When editing AI agent instructions:
-1. Edit `system-prompt.md` first
-2. Sync the `systemMessage` field inside the workflow JSON
-3. Commit both files together
+The `.md` files are the **human-readable source of truth**. The `systemMessage` field inside each workflow JSON is auto-synced — **never edit it directly**.
+
+When editing AI agent instructions:
+1. Edit the relevant `.md` file (`system-prompt.md` or `newsletter-system-prompt.md`)
+2. Commit — the pre-commit hook runs `scripts/sync-n8n-prompts.js` automatically and stages the updated JSON
+
+To sync manually without committing:
+```bash
+node scripts/sync-n8n-prompts.js
+```
 
 ---
 

@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
@@ -59,7 +60,7 @@ async function fetchCampaigns(): Promise<{ campaigns: ListmonkCampaign[]; error?
     }
 
     const json = await res.json() as { data: { results: ListmonkCampaign[] } };
-    return { campaigns: json.data.results };
+    return { campaigns: json.data?.results ?? [] };
   } catch (err) {
     clearTimeout(timeout);
     const msg = err instanceof Error ? err.message : String(err);
