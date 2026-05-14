@@ -13,12 +13,15 @@ export async function POST(request: Request) {
 
   revalidatePath(`/discover/${slug}`);
   revalidatePath(`/venues/${slug}`);
+  revalidatePath(`/blog/${slug}`);
   if (oldSlug && oldSlug !== slug) {
     revalidatePath(`/discover/${oldSlug}`);
     revalidatePath(`/venues/${oldSlug}`);
+    revalidatePath(`/blog/${oldSlug}`);
   }
   revalidatePath('/discover');
   revalidatePath('/venues');
+  revalidatePath('/blog');
 
   return Response.json({ revalidated: true });
 }

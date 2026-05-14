@@ -7,6 +7,7 @@ import { pushEvent } from '@/lib/analytics';
 import { trackMetaEvent } from '@/lib/meta-pixel';
 import { EVENT_TAGS, isEventTagSlug } from '@/lib/eventTags';
 import { VENUES, isVenueSlug } from '@/lib/venues';
+import { icalDate } from '@/lib/icalDate';
 
 interface EventModalProps {
   event: Event | null;
@@ -29,6 +30,17 @@ function formatTime(iso: string): string {
     minute: '2-digit',
     timeZone: 'America/New_York',
   });
+}
+
+function googleCalendarUrl(event: { title: string; start_time: string; end_time: string | null; description: string | null; location: string | null }): string {
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: event.title,
+    dates: `${icalDate(event.start_time)}/${icalDate(event.end_time ?? event.start_time)}`,
+  });
+  if (event.description) params.set('details', event.description);
+  if (event.location) params.set('location', event.location);
+  return `https://calendar.google.com/calendar/render?${params}`;
 }
 
 export function EventModal({ event, onClose }: EventModalProps) {
@@ -197,6 +209,27 @@ export function EventModal({ event, onClose }: EventModalProps) {
                   Get Tickets
                 </a>
               )}
+
+              {/* Calendar share */}
+              <div className="mt-4 flex items-center gap-4 border-t border-border pt-4">
+                <span className="font-inter text-xs uppercase tracking-widest text-text-muted">Add to calendar</span>
+                <a
+                  href={googleCalendarUrl(event)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => pushEvent('calendar_add_click', { event_title: event.title, calendar_type: 'google' })}
+                  className="font-inter text-xs font-medium text-black underline underline-offset-2 hover:opacity-60 transition-opacity"
+                >
+                  Google
+                </a>
+                <a
+                  href={`/api/events/ical?eventId=${event.id}`}
+                  onClick={() => pushEvent('calendar_add_click', { event_title: event.title, calendar_type: 'ical' })}
+                  className="font-inter text-xs font-medium text-black underline underline-offset-2 hover:opacity-60 transition-opacity"
+                >
+                  Apple / iCal
+                </a>
+              </div>
             </div>
           </motion.div>
         </>

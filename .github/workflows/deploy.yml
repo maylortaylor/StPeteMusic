@@ -100,6 +100,9 @@ jobs:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           # Notion
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          # Artist enrichment webhook security
+          N8N_WEBHOOK_SECRET: ${{ secrets.N8N_WEBHOOK_SECRET }}
+          ADMIN_ENRICHMENT_CALLBACK_URL: ${{ secrets.ADMIN_ENRICHMENT_CALLBACK_URL }}
           # Listmonk credentials and RDS host are read from SSM on EC2 (not injected here)
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -109,7 +112,8 @@ jobs:
             DEPLOY_RUN_ID,POSTGRES_USER,POSTGRES_PASSWORD,DB_ENCRYPTION_KEY,N8N_ENCRYPTION_KEY,
             N8N_API_KEY,OBSIDIAN_HOST,CLAUDE_API_KEY_N8N_STPETEMUSIC,GROQ_API_KEY,
             N8N_GEMINI_API_KEY,IG_USER_ID,IG_APP_ID,IG_ACCESS_TOKEN,FB_PAGE_ID,FB_ACCESS_TOKEN,
-            YOUTUBE_CLIENT_ID,YOUTUBE_CLIENT_SECRET,YOUTUBE_API_KEY,NOTION_API_KEY
+            YOUTUBE_CLIENT_ID,YOUTUBE_CLIENT_SECRET,YOUTUBE_API_KEY,NOTION_API_KEY,
+            N8N_WEBHOOK_SECRET,ADMIN_ENRICHMENT_CALLBACK_URL
           script: |
             set -e
 
@@ -179,6 +183,8 @@ jobs:
               printf 'YOUTUBE_CLIENT_SECRET=%s\n'            "${YOUTUBE_CLIENT_SECRET}"
               printf 'YOUTUBE_API_KEY=%s\n'                  "${YOUTUBE_API_KEY}"
               printf 'NOTION_API_KEY=%s\n'                   "${NOTION_API_KEY}"
+              printf 'N8N_WEBHOOK_SECRET=%s\n'              "${N8N_WEBHOOK_SECRET}"
+              printf 'ADMIN_ENRICHMENT_CALLBACK_URL=%s\n'   "${ADMIN_ENRICHMENT_CALLBACK_URL}"
               printf 'LISTMONK_USERNAME=%s\n'               "${LISTMONK_USERNAME}"
               printf 'LISTMONK_PASSWORD=%s\n'               "${LISTMONK_PASSWORD}"
               printf 'RDS_HOST=%s\n'                        "${RDS_HOST}"

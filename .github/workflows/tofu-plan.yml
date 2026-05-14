@@ -70,6 +70,9 @@ jobs:
           TF_VAR_fb_page_id:            ${{ secrets.FB_PAGE_ID }}
           TF_VAR_fb_access_token:       ${{ secrets.FB_ACCESS_TOKEN }}
           TF_VAR_youtube_api_key:       ${{ secrets.YOUTUBE_API_KEY }}
+          TF_VAR_anthropic_api_key:                  ${{ secrets.ANTHROPIC_API_KEY }}
+          TF_VAR_n8n_artist_enrichment_webhook_url:  ${{ secrets.N8N_ARTIST_ENRICHMENT_WEBHOOK_URL }}
+          TF_VAR_n8n_webhook_secret:                 ${{ secrets.N8N_WEBHOOK_SECRET }}
 
       - name: Post Plan to PR
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3  # v9.0.0

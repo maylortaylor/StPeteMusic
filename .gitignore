@@ -52,3 +52,7 @@ apps/**/tsconfig.tsbuildinfo
 .claude/settings.local.json
 .playwright-mcp/
 lighthouse-*.json
+
+# Agent-generated content (keep directories, ignore generated files)
+production_artifacts/**/*.md
+!production_artifacts/**/.gitkeep

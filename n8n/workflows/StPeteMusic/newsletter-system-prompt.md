@@ -126,6 +126,12 @@ Write exactly these four sections in order. Use the section header style for eac
 
 ### 2. Featured Bands
 
+**If `pre_approved_blurbs` are provided in the input data, use them verbatim — do not rewrite,
+summarize, or alter them. Insert them in order of `order_position` (1 first, 2 second). Wrap each
+blurb in a `<p>` tag with the body paragraph style. Add the artist's Instagram as an inline link
+at the end if provided.**
+
+If no `pre_approved_blurbs` are provided, fall back to:
 - Spotlight 1–2 performing artists from the events data
 - Short paragraph for each: who they are, their vibe, their Instagram handle as an inline link
   to `https://www.instagram.com/{handle}` (strip the @ symbol for the URL)

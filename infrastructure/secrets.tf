@@ -111,3 +111,32 @@ resource "aws_ssm_parameter" "youtube_api_key" {
   value = var.youtube_api_key
   tags  = { Project = var.project }
 }
+
+# ── Featured artists pipeline ─────────────────────────────────────────────────
+
+resource "aws_ssm_parameter" "anthropic_api_key" {
+  count = var.anthropic_api_key != "" ? 1 : 0
+
+  name  = "/${var.project}/anthropic/api_key"
+  type  = "SecureString"
+  value = var.anthropic_api_key
+  tags  = { Project = var.project }
+}
+
+resource "aws_ssm_parameter" "n8n_artist_enrichment_webhook_url" {
+  count = var.n8n_artist_enrichment_webhook_url != "" ? 1 : 0
+
+  name  = "/${var.project}/n8n/artist_enrichment_webhook_url"
+  type  = "SecureString"
+  value = var.n8n_artist_enrichment_webhook_url
+  tags  = { Project = var.project }
+}
+
+resource "aws_ssm_parameter" "n8n_webhook_secret" {
+  count = var.n8n_webhook_secret != "" ? 1 : 0
+
+  name  = "/${var.project}/n8n/webhook_secret"
+  type  = "SecureString"
+  value = var.n8n_webhook_secret
+  tags  = { Project = var.project }
+}

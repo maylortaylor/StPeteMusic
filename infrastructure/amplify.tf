@@ -29,6 +29,26 @@ data "aws_ssm_parameter" "listmonk_password" {
   with_decryption = true
 }
 
+# ── Featured artists pipeline ─────────────────────────────────────────────────
+
+data "aws_ssm_parameter" "anthropic_api_key" {
+  count           = var.anthropic_api_key != "" ? 1 : 0
+  name            = aws_ssm_parameter.anthropic_api_key[0].name
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "n8n_artist_enrichment_webhook_url" {
+  count           = var.n8n_artist_enrichment_webhook_url != "" ? 1 : 0
+  name            = aws_ssm_parameter.n8n_artist_enrichment_webhook_url[0].name
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "n8n_webhook_secret" {
+  count           = var.n8n_webhook_secret != "" ? 1 : 0
+  name            = aws_ssm_parameter.n8n_webhook_secret[0].name
+  with_decryption = true
+}
+
 resource "aws_amplify_app" "web" {
   name         = "${var.project}-web"
   repository   = "https://github.com/maylortaylor/StPeteMusic"
@@ -131,6 +151,10 @@ resource "aws_amplify_app" "admin" {
     FB_PAGE_ID                          = var.fb_page_id
     FB_ACCESS_TOKEN                     = var.fb_access_token
     YOUTUBE_API_KEY                     = var.youtube_api_key
+    # Featured artists pipeline
+    ANTHROPIC_API_KEY                   = var.anthropic_api_key != "" ? data.aws_ssm_parameter.anthropic_api_key[0].value : ""
+    N8N_ARTIST_ENRICHMENT_WEBHOOK_URL   = var.n8n_artist_enrichment_webhook_url != "" ? data.aws_ssm_parameter.n8n_artist_enrichment_webhook_url[0].value : ""
+    N8N_WEBHOOK_SECRET                  = var.n8n_webhook_secret != "" ? data.aws_ssm_parameter.n8n_webhook_secret[0].value : ""
   }
 
   enable_auto_branch_creation = false

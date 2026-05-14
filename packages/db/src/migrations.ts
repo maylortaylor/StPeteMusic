@@ -757,4 +757,99 @@ CREATE INDEX IF NOT EXISTS idx_venues_google_calendar_id ON venues(google_calend
 CREATE INDEX IF NOT EXISTS idx_events_extra_data ON events USING GIN (extra_data);
 `,
   },
+  {
+    filename: '018_add_featured_artists_and_blog_posts.sql',
+    sql: `
+CREATE TABLE IF NOT EXISTS featured_artists (
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  artist_id        UUID NOT NULL REFERENCES artists(id) ON DELETE CASCADE,
+  featured_month   VARCHAR(7) NOT NULL,
+  order_position   INTEGER NOT NULL CHECK (order_position IN (1, 2)),
+  status           TEXT NOT NULL DEFAULT 'pending_enrichment',
+  scraped_raw      JSONB NOT NULL DEFAULT '{}',
+  enrichment_notes TEXT,
+  newsletter_blurb TEXT,
+  created_at       TIMESTAMPTZ DEFAULT NOW(),
+  updated_at       TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE (artist_id, featured_month),
+  UNIQUE (featured_month, order_position)
+);
+
+CREATE INDEX IF NOT EXISTS idx_featured_artists_month ON featured_artists(featured_month);
+CREATE INDEX IF NOT EXISTS idx_featured_artists_artist_id ON featured_artists(artist_id);
+CREATE INDEX IF NOT EXISTS idx_featured_artists_status ON featured_artists(status);
+
+CREATE TABLE IF NOT EXISTS blog_posts (
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  post_type           TEXT NOT NULL DEFAULT 'general',
+  title               VARCHAR(500) NOT NULL,
+  slug                VARCHAR(500) NOT NULL UNIQUE,
+  excerpt             TEXT,
+  body                TEXT NOT NULL,
+  featured_image_url  VARCHAR(500),
+  tags                TEXT[] NOT NULL DEFAULT '{}',
+  seo_title           VARCHAR(255),
+  seo_description     TEXT,
+  status              TEXT NOT NULL DEFAULT 'draft',
+  publish_date        TIMESTAMPTZ,
+  author_name         VARCHAR(255),
+  author_clerk_id     VARCHAR(255),
+  artist_id           UUID REFERENCES artists(id) ON DELETE SET NULL,
+  featured_artist_id  UUID REFERENCES featured_artists(id) ON DELETE SET NULL,
+  created_at          TIMESTAMPTZ DEFAULT NOW(),
+  updated_at          TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_blog_posts_status ON blog_posts(status);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_publish_date ON blog_posts(publish_date);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_post_type ON blog_posts(post_type);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_artist_id ON blog_posts(artist_id);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_slug ON blog_posts(slug);
+`,
+  },
+  {
+    filename: '019_add_social_posts_and_brand_guidelines.sql',
+    sql: `
+CREATE TABLE IF NOT EXISTS social_posts (
+  id                   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  platform             TEXT NOT NULL,
+  content_type         TEXT NOT NULL DEFAULT 'post',
+  status               TEXT NOT NULL DEFAULT 'draft',
+  title                VARCHAR(500),
+  caption              TEXT,
+  media_urls           TEXT[] NOT NULL DEFAULT '{}',
+  hashtags             TEXT[] NOT NULL DEFAULT '{}',
+  scheduled_publish_at TIMESTAMPTZ,
+  published_at         TIMESTAMPTZ,
+  artist_id            UUID REFERENCES artists(id) ON DELETE SET NULL,
+  created_by           VARCHAR(255),
+  approved_by          VARCHAR(255),
+  approval_notes       TEXT,
+  approval_timestamp   TIMESTAMPTZ,
+  n8n_workflow_id      VARCHAR(255),
+  platform_post_id     VARCHAR(255),
+  performance_stats    JSONB NOT NULL DEFAULT '{}',
+  created_at           TIMESTAMPTZ DEFAULT NOW(),
+  updated_at           TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_social_posts_platform ON social_posts(platform);
+CREATE INDEX IF NOT EXISTS idx_social_posts_status ON social_posts(status);
+CREATE INDEX IF NOT EXISTS idx_social_posts_scheduled ON social_posts(scheduled_publish_at);
+CREATE INDEX IF NOT EXISTS idx_social_posts_artist_id ON social_posts(artist_id);
+
+CREATE TABLE IF NOT EXISTS brand_guidelines (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  version           INTEGER NOT NULL DEFAULT 1,
+  name              VARCHAR(255) NOT NULL,
+  system_prompt     TEXT NOT NULL,
+  tone_descriptors  TEXT[] NOT NULL DEFAULT '{}',
+  hashtag_library   TEXT[] NOT NULL DEFAULT '{}',
+  example_posts     TEXT[] NOT NULL DEFAULT '{}',
+  is_active         BOOLEAN NOT NULL DEFAULT false,
+  created_at        TIMESTAMPTZ DEFAULT NOW(),
+  updated_at        TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_brand_guidelines_is_active ON brand_guidelines(is_active);
+`,
+  },
 ];

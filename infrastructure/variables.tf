@@ -186,3 +186,26 @@ variable "youtube_api_key" {
   sensitive   = true
   default     = ""
 }
+
+# ── Featured artists pipeline ─────────────────────────────────────────────────
+
+variable "anthropic_api_key" {
+  description = "Anthropic API key for admin app — newsletter blurb + blog post generation via @anthropic-ai/sdk. Set via TF_VAR_anthropic_api_key in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "n8n_artist_enrichment_webhook_url" {
+  description = "n8n webhook URL that triggers the artist-enrichment workflow. Set via TF_VAR_n8n_artist_enrichment_webhook_url in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "n8n_webhook_secret" {
+  description = "Shared secret for n8n → admin webhook callbacks (x-webhook-secret header). Must match N8N_WEBHOOK_SECRET in the n8n EC2 .env. Set via TF_VAR_n8n_webhook_secret in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
