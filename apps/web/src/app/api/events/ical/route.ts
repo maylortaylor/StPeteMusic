@@ -1,6 +1,5 @@
 import { query } from '@/lib/db';
-
-export const revalidate = 3600; // 1 hour
+import { icalDate } from '@/lib/icalDate';
 
 interface EventRow {
   id: string;
@@ -30,7 +29,9 @@ function icalFold(line: string): string {
   let current = '';
   for (const ch of chars) {
     const next = current + ch;
-    if (Buffer.byteLength((chunks.length === 0 ? '' : ' ') + next, 'utf8') > 75) {
+    // Continuation lines start with \r\n<space> (3 bytes), count them in the limit.
+    const prefix = chunks.length === 0 ? '' : '\r\n ';
+    if (Buffer.byteLength(prefix + next, 'utf8') > 75) {
       chunks.push(current);
       current = ch;
     } else {
@@ -39,10 +40,6 @@ function icalFold(line: string): string {
   }
   if (current) chunks.push(current);
   return chunks[0] + chunks.slice(1).map(c => '\r\n ' + c).join('');
-}
-
-function icalDate(iso: string): string {
-  return new Date(iso).toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z';
 }
 
 function buildVEvent(event: EventRow): string {

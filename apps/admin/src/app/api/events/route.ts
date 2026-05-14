@@ -1,5 +1,5 @@
 import { auth } from '@clerk/nextjs/server';
-import { getDb, events, sql, asc, eq, and } from '@stpetemusic/db';
+import { getDb, events, event_performers, sql, asc, eq, and } from '@stpetemusic/db';
 import type { SQL } from 'drizzle-orm';
 
 export async function GET(request: Request) {
@@ -10,7 +10,7 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const monthParam = searchParams.get('month'); // YYYY-MM
+    const monthParam = searchParams.get('month');
     const venueParam = searchParams.get('venue');
     const tagParam = searchParams.get('tag');
 
@@ -48,10 +48,12 @@ export async function GET(request: Request) {
         ticket_url: events.ticket_url,
         image_url: events.image_url,
         is_active: events.is_active,
-        performer_count: sql<number>`(SELECT COUNT(*) FROM event_performers WHERE event_id = ${events.id})`.as('performer_count'),
+        performer_count: sql<number>`COUNT(${event_performers.artist_id})`.as('performer_count'),
       })
       .from(events)
+      .leftJoin(event_performers, eq(event_performers.event_id, events.id))
       .where(conditions.length > 0 ? and(...conditions) : undefined)
+      .groupBy(events.id)
       .orderBy(asc(events.start_time))
       .limit(500);
 

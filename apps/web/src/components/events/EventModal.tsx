@@ -7,6 +7,7 @@ import { pushEvent } from '@/lib/analytics';
 import { trackMetaEvent } from '@/lib/meta-pixel';
 import { EVENT_TAGS, isEventTagSlug } from '@/lib/eventTags';
 import { VENUES, isVenueSlug } from '@/lib/venues';
+import { icalDate } from '@/lib/icalDate';
 
 interface EventModalProps {
   event: Event | null;
@@ -29,10 +30,6 @@ function formatTime(iso: string): string {
     minute: '2-digit',
     timeZone: 'America/New_York',
   });
-}
-
-function icalDate(iso: string): string {
-  return new Date(iso).toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z';
 }
 
 function googleCalendarUrl(event: { title: string; start_time: string; end_time: string | null; description: string | null; location: string | null }): string {

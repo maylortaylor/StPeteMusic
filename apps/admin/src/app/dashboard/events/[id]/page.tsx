@@ -58,11 +58,19 @@ interface ArtistOption {
 
 function toDatetimeLocal(iso: string | null): string {
   if (!iso) return '';
-  // Display in Eastern time for usability
   const d = new Date(iso);
   const eastern = new Date(d.toLocaleString('en-US', { timeZone: 'America/New_York' }));
   const pad = (n: number) => String(n).padStart(2, '0');
   return `${eastern.getFullYear()}-${pad(eastern.getMonth() + 1)}-${pad(eastern.getDate())}T${pad(eastern.getHours())}:${pad(eastern.getMinutes())}`;
+}
+
+// Interprets a datetime-local string as Eastern time and returns UTC ISO.
+// Uses the sv-SE locale trick to derive the current ET→UTC offset, which handles DST correctly.
+function easternToUtcIso(dtLocal: string): string {
+  const asUtc = new Date(dtLocal + 'Z');
+  const etStr = asUtc.toLocaleString('sv-SE', { timeZone: 'America/New_York' }).replace(' ', 'T');
+  const offsetMs = asUtc.getTime() - new Date(etStr + 'Z').getTime();
+  return new Date(asUtc.getTime() + offsetMs).toISOString();
 }
 
 export default function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
@@ -139,13 +147,8 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,
-          // Interpret datetime-local values as Eastern time
-          start_time: form.start_time
-            ? new Date(form.start_time + ':00').toISOString()
-            : undefined,
-          end_time: form.end_time
-            ? new Date(form.end_time + ':00').toISOString()
-            : null,
+          start_time: form.start_time ? easternToUtcIso(form.start_time) : undefined,
+          end_time: form.end_time ? easternToUtcIso(form.end_time) : null,
         }),
       });
 
