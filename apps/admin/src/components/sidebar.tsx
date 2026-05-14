@@ -10,6 +10,9 @@ import {
   Building2,
   Zap,
   Mail,
+  Star,
+  Calendar,
+  Mic2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -25,6 +28,11 @@ const navItems = [
     icon: Users,
   },
   {
+    label: 'Featured',
+    href: '/dashboard/featured',
+    icon: Star,
+  },
+  {
     label: 'Venues',
     href: '/dashboard/venues',
     icon: MapPin,
@@ -38,6 +46,16 @@ const navItems = [
     label: 'Organizations',
     href: '/dashboard/organizations',
     icon: Building2,
+  },
+  {
+    label: 'Content Calendar',
+    href: '/dashboard/content-calendar',
+    icon: Calendar,
+  },
+  {
+    label: 'Brand Voice',
+    href: '/dashboard/brand-voice',
+    icon: Mic2,
   },
   {
     label: 'Templates',
