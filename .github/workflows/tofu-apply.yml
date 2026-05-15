@@ -49,6 +49,8 @@ jobs:
       TF_VAR_anthropic_api_key:                  ${{ secrets.ANTHROPIC_API_KEY }}
       TF_VAR_n8n_artist_enrichment_webhook_url:  ${{ secrets.N8N_ARTIST_ENRICHMENT_WEBHOOK_URL }}
       TF_VAR_n8n_webhook_secret:                 ${{ secrets.N8N_WEBHOOK_SECRET }}
+      TF_VAR_rtmp_stream_key:                    ${{ secrets.RTMP_STREAM_KEY }}
+      TF_VAR_youtube_channel_id:                 ${{ secrets.YOUTUBE_CHANNEL_ID }}
 
     steps:
       - name: Checkout

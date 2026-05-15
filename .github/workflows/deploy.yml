@@ -48,12 +48,14 @@ jobs:
         # Build tarball inside GITHUB_WORKSPACE — scp-action runs in a Docker
         # container that mounts the workspace, so /tmp/ on the runner is not visible.
         run: |
-          mkdir -p deploy-pkg/workflows
+          mkdir -p deploy-pkg/workflows deploy-pkg/scripts deploy-pkg/mediamtx
           cp n8n/docker-compose.prod.yaml deploy-pkg/docker-compose.prod.yaml
           cp n8n/nginx/listmonk.conf      deploy-pkg/listmonk.conf
           cp n8n/nginx/n8n.conf           deploy-pkg/n8n.conf
           cp -r n8n/workflows/StPeteMusic  deploy-pkg/workflows/StPeteMusic
+          cp -r n8n/mediamtx/.             deploy-pkg/mediamtx/
           cp -r database/                  deploy-pkg/database
+          cp scripts/vod-watcher.sh        deploy-pkg/scripts/vod-watcher.sh
           tar czf deploy.tar.gz -C deploy-pkg .
           echo "✓ deploy.tar.gz built ($(du -sh deploy.tar.gz | cut -f1))"
 
@@ -103,6 +105,8 @@ jobs:
           # Artist enrichment webhook security
           N8N_WEBHOOK_SECRET: ${{ secrets.N8N_WEBHOOK_SECRET }}
           ADMIN_ENRICHMENT_CALLBACK_URL: ${{ secrets.ADMIN_ENRICHMENT_CALLBACK_URL }}
+          # Streaming
+          RTMP_STREAM_KEY: ${{ secrets.RTMP_STREAM_KEY }}
           # Listmonk credentials and RDS host are read from SSM on EC2 (not injected here)
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -113,7 +117,7 @@ jobs:
             N8N_API_KEY,OBSIDIAN_HOST,CLAUDE_API_KEY_N8N_STPETEMUSIC,GROQ_API_KEY,
             N8N_GEMINI_API_KEY,IG_USER_ID,IG_APP_ID,IG_ACCESS_TOKEN,FB_PAGE_ID,FB_ACCESS_TOKEN,
             YOUTUBE_CLIENT_ID,YOUTUBE_CLIENT_SECRET,YOUTUBE_API_KEY,NOTION_API_KEY,
-            N8N_WEBHOOK_SECRET,ADMIN_ENRICHMENT_CALLBACK_URL
+            N8N_WEBHOOK_SECRET,ADMIN_ENRICHMENT_CALLBACK_URL,RTMP_STREAM_KEY
           script: |
             set -e
 
@@ -185,6 +189,7 @@ jobs:
               printf 'NOTION_API_KEY=%s\n'                   "${NOTION_API_KEY}"
               printf 'N8N_WEBHOOK_SECRET=%s\n'              "${N8N_WEBHOOK_SECRET}"
               printf 'ADMIN_ENRICHMENT_CALLBACK_URL=%s\n'   "${ADMIN_ENRICHMENT_CALLBACK_URL}"
+              printf 'RTMP_STREAM_KEY=%s\n'                "${RTMP_STREAM_KEY}"
               printf 'LISTMONK_USERNAME=%s\n'               "${LISTMONK_USERNAME}"
               printf 'LISTMONK_PASSWORD=%s\n'               "${LISTMONK_PASSWORD}"
               printf 'RDS_HOST=%s\n'                        "${RDS_HOST}"
@@ -334,6 +339,38 @@ jobs:
               --reinstall 2>/dev/null \
               && echo "✓ SSL cert active for n8n.stpetemusic.live" \
               || echo "⚠ Certbot skipped — DNS for n8n.stpetemusic.live may not be set yet"
+
+            echo "── Syncing MediaMTX config ──"
+            mkdir -p ~/stpetemusic/n8n/mediamtx
+            cp -r "${DEPLOY_DIR}/mediamtx/." ~/stpetemusic/n8n/mediamtx/
+            echo "✓ MediaMTX config synced"
+
+            echo "── Installing VOD watcher service ──"
+            sudo dnf install -y inotify-tools 2>/dev/null \
+              && echo "✓ inotify-tools installed" \
+              || echo "⚠ inotify-tools install failed — vod-watcher may not work"
+            mkdir -p ~/stpetemusic/scripts
+            cp "${DEPLOY_DIR}/scripts/vod-watcher.sh" ~/stpetemusic/scripts/vod-watcher.sh
+            chmod +x ~/stpetemusic/scripts/vod-watcher.sh
+            sudo tee /etc/systemd/system/vod-watcher.service > /dev/null <<'UNIT'
+[Unit]
+Description=StPeteMusic VOD Upload Watcher
+After=docker.service
+
+[Service]
+Type=simple
+User=ec2-user
+EnvironmentFile=/home/ec2-user/stpetemusic/.env
+ExecStart=/home/ec2-user/stpetemusic/scripts/vod-watcher.sh
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+            sudo systemctl daemon-reload
+            sudo systemctl enable --now vod-watcher.service
+            echo "✓ vod-watcher.service installed and started"
 
             echo "── Cleanup ──"
             rm -rf "${DEPLOY_DIR}" "${TARBALL}"

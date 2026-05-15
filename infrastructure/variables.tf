@@ -209,3 +209,16 @@ variable "n8n_webhook_secret" {
   sensitive   = true
   default     = ""
 }
+
+variable "rtmp_stream_key" {
+  description = "Secret stream key for RTMP ingest (MediaMTX publishPass). Restream must include this as the stream password. Set via TF_VAR_rtmp_stream_key in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "youtube_channel_id" {
+  description = "YouTube channel ID for @StPeteMusic (UCxxxxxxxx format — public, not sensitive). Used by the /live page to detect active broadcasts. Set via TF_VAR_youtube_channel_id in CI."
+  type        = string
+  default     = ""
+}

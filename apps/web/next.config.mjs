@@ -8,7 +8,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://www.googletagmanager.com https://www.google-analytics.com https://i.ytimg.com https://img.youtube.com https://maps.googleapis.com https://maps.gstatic.com https://www.facebook.com",
   "font-src 'self'",
-  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://region1.analytics.google.com https://www.googletagmanager.com https://www.facebook.com https://*.facebook.net https://*.clarity.ms",
+  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://region1.analytics.google.com https://www.googletagmanager.com https://www.facebook.com https://*.facebook.net https://*.clarity.ms https://www.googleapis.com",
   "frame-src https://www.youtube.com https://www.youtube-nocookie.com",
   "frame-ancestors 'self'",
   "base-uri 'self'",
@@ -60,6 +60,8 @@ const nextConfig = {
     LISTMONK_USERNAME: process.env.LISTMONK_USERNAME ?? 'admin',
     LISTMONK_PASSWORD: process.env.LISTMONK_PASSWORD ?? '',
     RESEND_API_KEY: process.env.RESEND_API_KEY ?? '',
+    YOUTUBE_CHANNEL_ID: process.env.YOUTUBE_CHANNEL_ID ?? '',
+    YOUTUBE_API_KEY: process.env.YOUTUBE_API_KEY ?? '',
   },
 };
 
