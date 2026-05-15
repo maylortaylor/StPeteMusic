@@ -928,4 +928,14 @@ CREATE TABLE IF NOT EXISTS youtube_playlists (
 );
 `,
   },
+  {
+    filename: '022_add_youtube_video_stats.sql',
+    sql: `
+ALTER TABLE youtube_videos
+  ADD COLUMN IF NOT EXISTS view_count INTEGER,
+  ADD COLUMN IF NOT EXISTS like_count INTEGER,
+  ADD COLUMN IF NOT EXISTS comment_count INTEGER,
+  ADD COLUMN IF NOT EXISTS privacy_status VARCHAR(20);
+`,
+  },
 ];

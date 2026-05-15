@@ -8,9 +8,14 @@ import {
   eq,
   sql,
 } from '@stpetemusic/db';
-import { listAllVideos, type VideoDetails } from '@/lib/youtube-client';
+import {
+  listAllVideos,
+  listVideosBatch,
+  getUploadsPlaylistId,
+  type VideoDetails,
+} from '@/lib/youtube-client';
 import { fetchEventsInRange, matchVideoToEvent, type CalendarEvent } from '@/lib/google-calendar';
-import { generateProposal, type YoutubeConfigData, type ArtistLink } from '@/lib/youtube-metadata';
+// import { generateProposal, type YoutubeConfigData, type ArtistLink } from '@/lib/youtube-metadata';
 
 // Allows long-running sync on EC2 / non-serverless deployments
 export const maxDuration = 300;
@@ -21,6 +26,8 @@ type DbPlaylist = { playlist_id: string; name: string; playlist_type: string };
 type DbArtist = { id: string; name: string; instagram_url: string | null; website: string | null };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
+
+type ArtistLink = { name: string; instagram_url: string | null; website: string | null };
 
 /** Find artists from DB whose names appear in the event text. */
 function matchArtistsToEvent(event: CalendarEvent, allArtists: DbArtist[]): ArtistLink[] {
@@ -85,8 +92,14 @@ export async function POST(request: Request) {
   const { userId } = await auth();
   if (!userId) return new Response('Unauthorized', { status: 401 });
 
-  const body = (await request.json().catch(() => ({}))) as { force?: boolean };
+  const body = (await request.json().catch(() => ({}))) as {
+    force?: boolean;
+    batchMode?: boolean;
+    pageToken?: string;
+    uploadsPlaylistId?: string;
+  };
   const force = body.force === true;
+  const batchMode = body.batchMode === true;
 
   const errors: string[] = [];
   let added = 0;
@@ -120,7 +133,7 @@ export async function POST(request: Request) {
     ]);
 
     const rawConfig = configRows[0];
-    const config: YoutubeConfigData = {
+    const config = {
       footer_links: rawConfig?.footer_links ?? [],
       channel_bio:
         rawConfig?.channel_bio ??
@@ -129,11 +142,21 @@ export async function POST(request: Request) {
       prompt_version: rawConfig?.prompt_version ?? 'v1',
     };
 
-    // ── 2. Fetch all YouTube videos ───────────────────────────────────────────
+    // ── 2. Fetch YouTube videos (batch or full) ───────────────────────────────
 
     let ytVideos: VideoDetails[];
+    let nextPageToken: string | undefined;
+    let uploadsPlaylistId: string | undefined;
+
     try {
-      ytVideos = await listAllVideos();
+      if (batchMode) {
+        uploadsPlaylistId = body.uploadsPlaylistId ?? (await getUploadsPlaylistId());
+        const result = await listVideosBatch(uploadsPlaylistId, body.pageToken);
+        ytVideos = result.videos;
+        nextPageToken = result.nextPageToken;
+      } else {
+        ytVideos = await listAllVideos();
+      }
     } catch (err) {
       console.error('YouTube API error during sync:', err);
       const msg = err instanceof Error ? err.message : String(err);
@@ -154,6 +177,57 @@ export async function POST(request: Request) {
       .from(youtube_videos);
 
     const existingMap = new Map(existingRows.map((r) => [r.video_id, r.status]));
+
+    // ── Batch mode: upsert raw YouTube data only, no Claude calls ─────────────
+    if (batchMode) {
+      for (const v of ytVideos) {
+        const isNew = !existingMap.has(v.videoId);
+        await db
+          .insert(youtube_videos)
+          .values({
+            video_id: v.videoId,
+            title: v.title,
+            description: v.description,
+            tags: v.tags,
+            thumbnail_url: v.thumbnailUrl,
+            duration_seconds: v.durationSeconds,
+            published_at: v.publishedAt,
+            is_livestream: v.isLivestream,
+            is_short: v.isShort,
+            view_count: v.viewCount,
+            like_count: v.likeCount,
+            comment_count: v.commentCount,
+            privacy_status: v.privacyStatus,
+            status: 'pending_review',
+          })
+          .onConflictDoUpdate({
+            target: youtube_videos.video_id,
+            set: {
+              title: v.title,
+              description: v.description,
+              tags: v.tags,
+              thumbnail_url: v.thumbnailUrl,
+              duration_seconds: v.durationSeconds,
+              is_livestream: v.isLivestream,
+              is_short: v.isShort,
+              view_count: v.viewCount,
+              like_count: v.likeCount,
+              comment_count: v.commentCount,
+              privacy_status: v.privacyStatus,
+              // status intentionally excluded — don't downgrade approved/published videos
+            },
+          });
+        if (isNew) added++;
+        else updated++;
+      }
+      return Response.json({
+        added,
+        updated,
+        nextPageToken,
+        uploadsPlaylistId,
+        hasMore: !!nextPageToken,
+      });
+    }
 
     const needsProposal = (v: VideoDetails): boolean => {
       const status = existingMap.get(v.videoId);
@@ -200,6 +274,10 @@ export async function POST(request: Request) {
         published_at: video.publishedAt,
         is_livestream: video.isLivestream,
         is_short: video.isShort,
+        view_count: video.viewCount,
+        like_count: video.likeCount,
+        comment_count: video.commentCount,
+        privacy_status: video.privacyStatus,
         calendar_event_id: event?.id ?? null,
         calendar_event_link: event?.htmlLink ?? null,
         calendar_match_confidence: confidence,
@@ -218,7 +296,9 @@ export async function POST(request: Request) {
         continue;
       }
 
-      // Generate proposal via Claude
+      // Generate proposal via Claude (commented out — re-enable when ready)
+      const proposal = null;
+      /*
       let proposal: Awaited<ReturnType<typeof generateProposal>> | null = null;
       try {
         proposal = await generateProposal({
@@ -238,18 +318,12 @@ export async function POST(request: Request) {
       } catch (err) {
         errors.push(`Proposal generation failed for ${video.videoId}: ${String(err)}`);
       }
+      */
 
+      // Proposal generation is disabled — set status directly
       const fullRecord = {
         ...baseFields,
-        ...(proposal
-          ? {
-              proposed_title: proposal.proposedTitle,
-              proposed_description: proposal.proposedDescription,
-              proposed_tags: proposal.proposedTags,
-              prompt_version: proposal.promptVersion,
-              status: initialStatus(video),
-            }
-          : { status: 'pending_review' }),
+        status: 'pending_review',
       };
 
       if (isNew) {
