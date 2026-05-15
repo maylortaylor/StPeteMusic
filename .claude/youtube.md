@@ -1,0 +1,176 @@
+---
+topic: youtube
+triggers: youtube, review queue, video metadata, publish, quota, oauth, sync, calendar match, timestamps, pinned comment, proposals, youtube-client, youtube-metadata, google calendar
+updated: 2026-05-14
+---
+
+# YouTube Feature Guide
+
+Admin panel for reviewing, editing, and publishing YouTube video metadata.
+Videos are fetched from the channel, matched to Google Calendar events, and Claude generates SEO-optimized title/description/tags proposals for human review.
+
+---
+
+## One-Time Setup
+
+### 1. Create OAuth Credentials (Google Cloud Console)
+- Enable **YouTube Data API v3** and **Google Calendar API**
+- Create OAuth 2.0 credentials (Desktop app type)
+- Set authorized redirect URI: `http://localhost:9876`
+
+### 2. Generate Refresh Token
+```bash
+node scripts/get-youtube-token.mjs
+```
+Follow the browser login prompt. Copy the printed `YOUTUBE_REFRESH_TOKEN` into `.env.local`.
+
+### 3. Required Environment Variables
+```
+YOUTUBE_CLIENT_ID=
+YOUTUBE_CLIENT_SECRET=
+YOUTUBE_REFRESH_TOKEN=
+GOOGLE_CALENDAR_ID=          # Suite E calendar email (e.g. xxx@group.calendar.google.com)
+ANTHROPIC_API_KEY=           # for Claude metadata generation
+CRON_SECRET=                 # random string, secures /api/youtube/cron/daily-poll
+```
+
+### 4. Run DB Migration
+```bash
+pnpm --filter @stpetemusic/db migrate
+# or apply directly:
+psql $DATABASE_URL -f database/migrations/018_add_youtube_tables.sql
+```
+
+### 5. Subscribe to PubSubHubbub (webhook push)
+In the admin UI → YouTube → Config → click **Subscribe / Renew**.
+This registers the channel with Google's hub so new uploads trigger instant notifications.
+Subscription expires after ~10 days — renew as needed (or set a calendar reminder).
+
+---
+
+## Review Queue Workflow
+
+```
+Sync → pending_review / needs_timestamps → Review → approved → Publish → published
+```
+
+### Step 1 — Sync
+`/dashboard/youtube` → click **Sync from YouTube**
+Fetches all channel videos, matches to calendar events, generates Claude proposals for new entries.
+Re-running sync is safe (idempotent on existing videos).
+
+### Step 2 — Review
+Click **Review →** on any video to open the detail page.
+
+On the review page:
+- **Left panel**: Claude's proposed title, description, and tags (editable)
+- **Right panel**: Original YouTube title and description
+- **Calendar match**: Shows matched event (confirmed / guessed / none) with a confidence badge
+- **Timestamps**: For livestreams, add or edit performer timestamps (`HH:MM:SS — Band Name`)
+- **Playlists**: Check/uncheck which playlists the video should be added to
+- **Notes**: Internal reviewer notes (not published anywhere)
+
+### Step 3 — Approve
+Click **Approve** (or use **Bulk Approve** on the queue page for confirmed matches).
+Status changes to `approved`.
+
+### Step 4 — Publish
+Click **Publish to YouTube** from the review page.
+This writes the metadata to YouTube, adds the video to selected playlists, and posts a pinned comment (if timestamps exist).
+
+---
+
+## Video Statuses
+
+| Status | Meaning |
+|--------|---------|
+| `pending_review` | Proposal generated, awaiting human review |
+| `needs_timestamps` | Livestream — needs timestamp list before approval |
+| `approved` | Reviewed and ready to publish |
+| `published` | Written to YouTube |
+| `skipped` | Manually marked as skip (won't be published) |
+
+---
+
+## Calendar Matching
+
+Videos are matched to Suite E Google Calendar events by date + title token overlap.
+
+| Confidence | Meaning |
+|-----------|---------|
+| `confirmed` | Strong date + title overlap — safe to bulk approve |
+| `guessed` | Weak match — review before approving |
+| `none` | No match found — edit the proposal manually if needed |
+
+---
+
+## Quota & Limits
+
+- **YouTube Data API**: 10,000 units/day (Google quota)
+- **Built-in publish cap**: 50 videos/day enforced by `/api/youtube/videos/[id]/publish`
+- Sync is cheap (~1 unit per 50 videos listed)
+- Publishing costs ~50–100 units per video (update + playlist adds + comment)
+
+If the 50/day cap is hit, the API returns HTTP 429 with a clear message. Remaining videos stay `approved` and are available the next day.
+
+---
+
+## Key Locations
+
+| Location | Purpose |
+|----------|---------|
+| `/dashboard/youtube` | Review queue (list of all videos) |
+| `/dashboard/youtube/[videoId]` | Single video review + publish |
+| `/dashboard/youtube/config` | Channel bio, footer links, contact emails, webhook subscribe |
+| `apps/admin/src/lib/youtube-client.ts` | YouTube Data API v3 OAuth client |
+| `apps/admin/src/lib/youtube-metadata.ts` | Claude prompt for title/description/tags/comment |
+| `apps/admin/src/lib/google-calendar.ts` | Calendar fetch + video-to-event matching |
+| `apps/admin/src/app/api/youtube/` | All YouTube API routes |
+| `apps/admin/src/app/api/webhooks/youtube/` | PubSubHubbub webhook receiver |
+| `database/migrations/018_add_youtube_tables.sql` | DB schema |
+| `scripts/get-youtube-token.mjs` | One-time OAuth token generator |
+
+---
+
+## DB Tables
+
+- **`youtube_config`** — single-row config: channel bio, footer links, contact emails, prompt version
+- **`youtube_videos`** — one row per video: original + proposed metadata, status, calendar match, timestamps
+- **`youtube_playlists`** — playlists synced from channel: id, title, type (year/venue/livestream/shorts/event)
+
+---
+
+## Common Tasks
+
+### Regenerate a proposal
+Review page → **Regenerate Proposal** button. Re-runs Claude with current DB config. Shows warning if status was already approved.
+
+### Add timestamps to a livestream
+Review page → Timestamps section → Add row per performer: `HH:MM:SS` and band name. Link to artist DB record for Instagram/website in the pinned comment.
+
+### Sync playlists from YouTube
+`/dashboard/youtube` → there is no dedicated UI button yet. Call `POST /api/youtube/playlists/sync` directly (or add it to config page).
+
+### Create a new playlist
+Config page → Playlists tab → fill title/description → **Create Playlist**. Creates on YouTube and stores in DB.
+
+---
+
+## Troubleshooting
+
+### OAuth token expired
+Re-run `node scripts/get-youtube-token.mjs` and update `YOUTUBE_REFRESH_TOKEN` in `.env.local` and in the GitHub Secrets / EC2 environment. Restart the admin app.
+
+### Quota exceeded (10k units)
+Wait until midnight UTC. Check the Google Cloud Console quota dashboard for actual usage. Consider deferring bulk syncs.
+
+### Webhook not receiving notifications
+1. Check subscription is active: Config page → Subscribe button
+2. Verify `NEXT_PUBLIC_SITE_URL` is publicly accessible (not localhost)
+3. Daily cron fallback (`/api/youtube/cron/daily-poll`) runs as a backup — check it's scheduled in your cron system with `CRON_SECRET` in the `Authorization: Bearer` header
+
+### Calendar not matching expected event
+1. Check `GOOGLE_CALENDAR_ID` points to the Suite E calendar
+2. Event must be within ±3 days of video upload
+3. Title tokens must overlap (band name in both video title and calendar event title)
+4. For low-confidence matches: edit the proposed title manually on the review page

@@ -16,6 +16,7 @@ import {
   Tag,
   Users,
   Users2,
+  Youtube,
   Zap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -32,6 +33,7 @@ const navItems = [
   { label: 'Content Calendar',href: '/dashboard/content-calendar', icon: Calendar },
   { label: 'Brand Voice',     href: '/dashboard/brand-voice',    icon: Mic2 },
   { label: 'Templates',       href: '/dashboard/templates',      icon: Zap },
+  { label: 'YouTube',          href: '/dashboard/youtube',        icon: Youtube, reviewQueue: false },
   { label: 'Newsletter',      href: '/dashboard/newsletter',     icon: Mail },
   { label: 'Playbook',        href: '/dashboard/playbook',       icon: BookOpen },
 ];
@@ -93,6 +95,19 @@ export function Sidebar() {
                     {pendingCount}
                   </span>
                 )}
+              </Link>
+            )}
+            {item.href === '/dashboard/youtube' && isActive && (
+              <Link
+                href="/dashboard/youtube/config"
+                className={cn(
+                  'ml-8 flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
+                  pathname === '/dashboard/youtube/config'
+                    ? 'bg-muted text-foreground'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                )}
+              >
+                Settings
               </Link>
             )}
           </div>

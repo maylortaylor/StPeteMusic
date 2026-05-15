@@ -301,6 +301,65 @@ export const brand_guidelines = pgTable('brand_guidelines', {
     .$onUpdate(() => new Date()),
 });
 
+// ─────────────────────────────────────────────────────────────────────────────
+// YOUTUBE INTEGRATION
+// ─────────────────────────────────────────────────────────────────────────────
+
+type YoutubeFooterLink = { label: string; url: string };
+type YoutubeVideoTimestamp = { time: string; band_name: string; artist_id?: string };
+
+export const youtube_config = pgTable('youtube_config', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  footer_links: jsonb('footer_links').$type<YoutubeFooterLink[]>().default([]),
+  channel_bio: text('channel_bio').default(''),
+  contact_emails: jsonb('contact_emails').$type<string[]>().default([]),
+  prompt_version: varchar('prompt_version', { length: 50 }).default('v1'),
+  updated_at: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
+// status: pending_review | approved | published | needs_timestamps | skipped
+// calendar_match_confidence: confirmed | guessed | none
+export const youtube_videos = pgTable('youtube_videos', {
+  video_id: varchar('video_id', { length: 20 }).primaryKey(),
+  title: text('title'),
+  description: text('description'),
+  tags: text('tags').array().default([]),
+  thumbnail_url: text('thumbnail_url'),
+  duration_seconds: integer('duration_seconds'),
+  published_at: timestamp('published_at', { withTimezone: true }),
+  is_livestream: boolean('is_livestream').default(false),
+  is_short: boolean('is_short').default(false),
+  proposed_title: text('proposed_title'),
+  proposed_description: text('proposed_description'),
+  proposed_tags: text('proposed_tags').array().default([]),
+  proposed_playlist_ids: text('proposed_playlist_ids').array().default([]),
+  status: text('status').default('pending_review'),
+  prompt_version: varchar('prompt_version', { length: 50 }),
+  calendar_event_id: text('calendar_event_id'),
+  calendar_event_link: text('calendar_event_link'),
+  calendar_match_confidence: text('calendar_match_confidence').default('none'),
+  timestamps: jsonb('timestamps').$type<YoutubeVideoTimestamp[]>().default([]),
+  reviewed_at: timestamp('reviewed_at', { withTimezone: true }),
+  published_to_youtube_at: timestamp('published_to_youtube_at', { withTimezone: true }),
+  review_notes: text('review_notes'),
+  created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updated_at: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
+// playlist_type: venue | year | series | content_type
+export const youtube_playlists = pgTable('youtube_playlists', {
+  playlist_id: varchar('playlist_id', { length: 50 }).primaryKey(),
+  name: text('name').notNull(),
+  description: text('description'),
+  video_count: integer('video_count').default(0),
+  playlist_type: text('playlist_type').default('venue'),
+  synced_at: timestamp('synced_at', { withTimezone: true }).defaultNow(),
+});
+
 // post_type values: artist_spotlight | event_recap | venue_feature | general
 // status values: draft | approved | published
 export const blog_posts = pgTable('blog_posts', {
