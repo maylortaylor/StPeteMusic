@@ -390,3 +390,10 @@ export const blog_posts = pgTable('blog_posts', {
     .defaultNow()
     .$onUpdate(() => new Date()),
 });
+
+export const tag_definitions = pgTable('tag_definitions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  type: varchar('type', { length: 50 }).notNull(),
+  value: varchar('value', { length: 200 }).notNull(),
+  created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});

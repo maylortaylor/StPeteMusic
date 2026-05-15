@@ -40,6 +40,9 @@ export async function POST(
 
     const record = result[0];
 
+    const body = await _request.json().catch(() => ({})) as { extraUrls?: string[] };
+    const extraUrls: string[] = Array.isArray(body.extraUrls) ? body.extraUrls : [];
+
     const webhookRes = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -51,11 +54,15 @@ export async function POST(
         linktreeUrl: record.artist_linktree_url,
         website: record.artist_website,
         bandcampUrl: record.artist_bandcamp_url,
+        extraUrls,
       }),
     });
 
     if (!webhookRes.ok) {
-      throw new Error(`Enrichment webhook returned ${webhookRes.status}`);
+      const responseBody = await webhookRes.text().catch(() => '');
+      throw new Error(
+        `n8n webhook returned ${webhookRes.status}${responseBody ? ': ' + responseBody.slice(0, 200) : ''}`,
+      );
     }
 
     await db

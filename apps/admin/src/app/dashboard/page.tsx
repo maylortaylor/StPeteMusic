@@ -21,31 +21,36 @@ const QUICK_LINKS: QuickLink[] = [
 ];
 
 // ── Social stat fetchers ────────────────────────────────────────────────────
-// Returns { count, error } so the UI can distinguish "API error" from "not configured"
 
 interface StatResult {
   count: number | null;
-  error?: string;
 }
 
 async function fetchInstagramFollowers(): Promise<StatResult> {
-  const igUserId = process.env.IG_USER_ID;
-  const token = process.env.IG_ACCESS_TOKEN;
-  if (!igUserId || !token) return { count: null };
+  const pageId = process.env.FB_PAGE_ID;
+  const token = process.env.FB_ACCESS_TOKEN;
+  if (!pageId || !token) return { count: null };
 
   try {
-    const res = await fetch(
-      `https://graph.facebook.com/v21.0/${igUserId}?fields=followers_count&access_token=${token}`,
-      { next: { revalidate: 3600 } },
-    );
+    // Derive IG followers via the connected FB Page — avoids direct IG User ID lookup
+    // which requires a different token type. URLSearchParams encodes {} correctly.
+    const url = new URL(`https://graph.facebook.com/v21.0/${pageId}`);
+    url.searchParams.set('fields', 'instagram_business_account{followers_count}');
+    url.searchParams.set('access_token', token);
+
+    const res = await fetch(url.toString(), { next: { revalidate: 3600 } });
     if (!res.ok) {
       const body = await res.json().catch(() => ({})) as { error?: { message?: string } };
-      return { count: null, error: body.error?.message ?? `HTTP ${res.status}` };
+      console.error('[dashboard] IG fetch error:', body.error?.message ?? `HTTP ${res.status}`);
+      return { count: null };
     }
-    const json = await res.json() as { followers_count?: number };
-    return { count: json.followers_count ?? null };
+    const json = await res.json() as {
+      instagram_business_account?: { followers_count?: number };
+    };
+    return { count: json.instagram_business_account?.followers_count ?? null };
   } catch (e) {
-    return { count: null, error: String(e) };
+    console.error('[dashboard] IG fetch threw:', e);
+    return { count: null };
   }
 }
 
@@ -55,18 +60,23 @@ async function fetchFacebookFans(): Promise<StatResult> {
   if (!pageId || !token) return { count: null };
 
   try {
-    const res = await fetch(
-      `https://graph.facebook.com/v21.0/${pageId}?fields=followers_count&access_token=${token}`,
-      { next: { revalidate: 3600 } },
-    );
+    // Request both fields; followers_count requires pages_read_engagement scope,
+    // fan_count is the legacy fallback.
+    const url = new URL(`https://graph.facebook.com/v21.0/${pageId}`);
+    url.searchParams.set('fields', 'followers_count,fan_count');
+    url.searchParams.set('access_token', token);
+
+    const res = await fetch(url.toString(), { next: { revalidate: 3600 } });
     if (!res.ok) {
       const body = await res.json().catch(() => ({})) as { error?: { message?: string } };
-      return { count: null, error: body.error?.message ?? `HTTP ${res.status}` };
+      console.error('[dashboard] FB fetch error:', body.error?.message ?? `HTTP ${res.status}`);
+      return { count: null };
     }
-    const json = await res.json() as { followers_count?: number };
-    return { count: json.followers_count ?? null };
+    const json = await res.json() as { followers_count?: number; fan_count?: number };
+    return { count: json.followers_count ?? json.fan_count ?? null };
   } catch (e) {
-    return { count: null, error: String(e) };
+    console.error('[dashboard] FB fetch threw:', e);
+    return { count: null };
   }
 }
 
@@ -81,7 +91,8 @@ async function fetchYouTubeSubscribers(): Promise<StatResult> {
     );
     if (!res.ok) {
       const body = await res.json().catch(() => ({})) as { error?: { message?: string } };
-      return { count: null, error: body.error?.message ?? `HTTP ${res.status}` };
+      console.error('[dashboard] YouTube fetch error:', body.error?.message ?? `HTTP ${res.status}`);
+      return { count: null };
     }
     const json = await res.json() as {
       items?: { statistics?: { subscriberCount?: string } }[];
@@ -89,7 +100,8 @@ async function fetchYouTubeSubscribers(): Promise<StatResult> {
     const raw = json.items?.[0]?.statistics?.subscriberCount;
     return { count: raw ? parseInt(raw, 10) : null };
   } catch (e) {
-    return { count: null, error: String(e) };
+    console.error('[dashboard] YouTube fetch threw:', e);
+    return { count: null };
   }
 }
 
@@ -106,12 +118,12 @@ async function fetchListmonkSubscribers(): Promise<StatResult> {
       next: { revalidate: 3600 },
     });
     if (!res.ok) {
-      return { count: null, error: `HTTP ${res.status}` };
+      return { count: null };
     }
     const json = await res.json() as { data?: { total?: number } };
     return { count: json.data?.total ?? null };
   } catch (e) {
-    return { count: null, error: String(e) };
+    return { count: null };
   }
 }
 
@@ -133,10 +145,10 @@ export default async function DashboardPage() {
   ]);
 
   const stats = [
-    { label: 'Instagram', sublabel: 'Followers', value: formatCount(instagram.count), configured: !!process.env.IG_USER_ID, error: instagram.error },
-    { label: 'Facebook', sublabel: 'Followers', value: formatCount(facebook.count), configured: !!process.env.FB_PAGE_ID, error: facebook.error },
-    { label: 'YouTube', sublabel: 'Subscribers', value: formatCount(youtube.count), configured: !!process.env.YOUTUBE_API_KEY, error: youtube.error },
-    { label: 'Newsletter', sublabel: 'Subscribers', value: formatCount(listmonk.count), configured: !!process.env.LISTMONK_API_URL, error: listmonk.error },
+    { label: 'Instagram', sublabel: 'Followers', value: formatCount(instagram.count), configured: !!process.env.FB_PAGE_ID },
+    { label: 'Facebook', sublabel: 'Followers', value: formatCount(facebook.count), configured: !!process.env.FB_PAGE_ID },
+    { label: 'YouTube', sublabel: 'Subscribers', value: formatCount(youtube.count), configured: !!process.env.YOUTUBE_API_KEY },
+    { label: 'Newsletter', sublabel: 'Subscribers', value: formatCount(listmonk.count), configured: !!process.env.LISTMONK_API_URL },
   ];
 
   return (
@@ -152,13 +164,8 @@ export default async function DashboardPage() {
             <p className="text-sm font-medium text-muted-foreground">{s.label}</p>
             <p className="mt-2 text-2xl font-bold text-foreground">{s.value}</p>
             <p className="text-xs text-muted-foreground">
-              {!s.configured ? 'Not configured' : s.error ? 'API error' : s.sublabel}
+              {!s.configured ? 'Not configured' : s.sublabel}
             </p>
-            {s.error && (
-              <p className="mt-1 text-xs text-destructive truncate" title={s.error}>
-                {s.error}
-              </p>
-            )}
           </div>
         ))}
       </div>

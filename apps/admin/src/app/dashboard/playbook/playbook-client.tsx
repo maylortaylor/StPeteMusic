@@ -53,7 +53,7 @@ function DocModal({ doc, onClose }: { doc: Doc; onClose: () => void }) {
         </div>
         {/* Scrollable content */}
         <div
-          className="overflow-y-auto px-6 py-5"
+          className="flex-1 min-h-0 overflow-y-auto px-6 py-5"
           dangerouslySetInnerHTML={{ __html: doc.html }}
         />
       </div>

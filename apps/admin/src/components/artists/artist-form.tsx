@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { toast } from 'sonner';
+import { TagInput } from '@/components/ui/tag-input';
 
 const artistSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -19,8 +20,8 @@ const artistSchema = z.object({
   linktree_url: z.string().url().optional().or(z.literal('')),
   home_base: z.string().optional(),
   hero_photo_url: z.string().url().optional().or(z.literal('')),
-  genres: z.string().optional(),
-  tags: z.string().optional(),
+  genres: z.array(z.string()).default([]),
+  tags: z.array(z.string()).default([]),
   notes: z.string().optional(),
   is_active: z.boolean().default(true),
   visible_on_website: z.boolean().default(false),
@@ -42,12 +43,27 @@ export function ArtistForm({ artistId }: ArtistFormProps) {
   const [loading, setLoading] = useState(!!artistId);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [genreSuggestions, setGenreSuggestions] = useState<string[]>([]);
+  const [tagSuggestions, setTagSuggestions] = useState<string[]>([]);
   const [formData, setFormData] = useState<ArtistFormData>({
     name: '',
     type: 'Band',
+    genres: [],
+    tags: [],
     is_active: true,
     visible_on_website: false,
   });
+
+  useEffect(() => {
+    fetch('/api/tags')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (!data) return;
+        setGenreSuggestions((data.artistGenres ?? []).map((e: { value: string }) => e.value));
+        setTagSuggestions((data.artistTags ?? []).map((e: { value: string }) => e.value));
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (artistId) {
@@ -74,8 +90,8 @@ export function ArtistForm({ artistId }: ArtistFormProps) {
             notes: nullToEmpty(data.notes) as string,
             is_active: data.is_active ?? true,
             visible_on_website: data.visible_on_website ?? false,
-            genres: Array.isArray(data.genres) ? data.genres.join(', ') : '',
-            tags: Array.isArray(data.tags) ? data.tags.join(', ') : '',
+            genres: Array.isArray(data.genres) ? data.genres : [],
+            tags: Array.isArray(data.tags) ? data.tags : [],
           });
         } catch (err) {
           setError(err instanceof Error ? err.message : 'An error occurred');
@@ -117,12 +133,6 @@ export function ArtistForm({ artistId }: ArtistFormProps) {
 
       const payload = {
         ...validation.data,
-        genres: validation.data.genres
-          ? validation.data.genres.split(',').map(g => g.trim()).filter(Boolean)
-          : [],
-        tags: validation.data.tags
-          ? validation.data.tags.split(',').map(t => t.trim()).filter(Boolean)
-          : [],
         slug: validation.data.slug || validation.data.name.toLowerCase().replace(/\s+/g, '-'),
       };
 
@@ -233,26 +243,22 @@ export function ArtistForm({ artistId }: ArtistFormProps) {
 
       <div className="grid gap-6 md:grid-cols-2">
         <div>
-          <label className={labelClass}>Genres (comma-separated)</label>
-          <input
-            type="text"
-            name="genres"
-            value={formData.genres || ''}
-            onChange={handleChange}
-            className={inputClass}
-            placeholder="Hip-Hop, Electronic, Rock"
+          <label className={labelClass}>Genres</label>
+          <TagInput
+            value={formData.genres ?? []}
+            onChange={(genres) => setFormData((prev) => ({ ...prev, genres }))}
+            placeholder="Hip-Hop, Electronic, Rock…"
+            suggestions={genreSuggestions}
           />
         </div>
 
         <div>
-          <label className={labelClass}>Tags (comma-separated)</label>
-          <input
-            type="text"
-            name="tags"
-            value={formData.tags || ''}
-            onChange={handleChange}
-            className={inputClass}
-            placeholder="Local, Featured, Rising"
+          <label className={labelClass}>Tags</label>
+          <TagInput
+            value={formData.tags ?? []}
+            onChange={(tags) => setFormData((prev) => ({ ...prev, tags }))}
+            placeholder="Local, Featured, Rising…"
+            suggestions={tagSuggestions}
           />
         </div>
       </div>
