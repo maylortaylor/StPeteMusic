@@ -17,6 +17,7 @@
     "@tanstack/react-form": "^1.0.0",
     "@tanstack/react-table": "^8.20.0",
     "clsx": "^2.1.1",
+    "googleapis": "^144.0.0",
     "drizzle-orm": "^0.45.2",
     "lucide-react": "^0.408.0",
     "next": "^16.2.4",

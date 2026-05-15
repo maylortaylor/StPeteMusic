@@ -2,6 +2,7 @@
 // Webpack asset/source bundles these at build time — no fs calls at runtime.
 // Path from: apps/admin/src/app/dashboard/playbook/ → repo root = ../../../../../../
 import brandMd from '../../../../../../.claude/brand.md';
+import youtubeMd from '../../../../../../.claude/youtube.md';
 import eventsMd from '../../../../../../.claude/events.md';
 import n8nMd from '../../../../../../.claude/n8n.md';
 import brandVoiceMd from '../../../../../../.agents/context/brand-voice.md';
@@ -123,6 +124,12 @@ const SECTIONS = [
     docs: [
       { id: 'n8n',      title: 'n8n Quick Reference',        subtitle: 'Active workflows, triggers, AI config',        content: n8nMd },
       { id: 'n8n-main', title: 'n8n Technical Reference',    subtitle: 'Local dev, credentials, OAuth, editing rules', content: n8nMainMd },
+    ],
+  },
+  {
+    heading: 'YouTube',
+    docs: [
+      { id: 'youtube', title: 'YouTube Feature Guide', subtitle: 'Review queue, metadata automation, publishing workflow', content: youtubeMd },
     ],
   },
   {

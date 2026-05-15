@@ -23,6 +23,7 @@ Parent company: Tangent LLC. Partner venue: Suite E Studios.
 | Local setup (direnv, envrc, pre-commit, install, first-time, hooks) | [setup.md](.claude/setup.md) |
 | Debugging & troubleshooting (errors, down, ssh, 403, 500, not responding, connection refused) | [troubleshooting.md](.claude/troubleshooting.md) |
 | Ads & analytics (google ads, microsoft ads, bing, meta pixel, GTM, clarity, paid, advertising) | [ads-accounts-todo.md](.claude/ads-accounts-todo.md) |
+| YouTube feature (review queue, admin UI, publish workflow, quota, OAuth, sync, proposals, calendar match) | [youtube.md](.claude/youtube.md) |
 
 ## Key Files
 | File | Purpose |

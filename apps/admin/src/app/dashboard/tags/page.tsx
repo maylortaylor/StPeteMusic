@@ -187,6 +187,7 @@ export default function TagsPage() {
     try {
       const res = await fetch('/api/tags');
       const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? 'Failed to load tags');
       setData(json);
     } catch {
       toast.error('Failed to load tags');
