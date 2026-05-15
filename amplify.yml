@@ -11,6 +11,8 @@ applications:
             - |
               echo "DATABASE_URL=$DATABASE_URL" >> .env.production
               echo "REVALIDATION_SECRET=$REVALIDATION_SECRET" >> .env.production
+              echo "YOUTUBE_CHANNEL_ID=$YOUTUBE_CHANNEL_ID" >> .env.production
+              echo "YOUTUBE_API_KEY=$YOUTUBE_API_KEY" >> .env.production
         build:
           commands:
             - npm run build

@@ -1,9 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { pushEvent } from '@/lib/analytics';
+
+function LiveBadge() {
+  const [isLive, setIsLive] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/stream/youtube-status', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((d) => setIsLive(d.live))
+      .catch(() => {});
+  }, []);
+
+  if (!isLive) return null;
+  return <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" aria-label="Live now" />;
+}
 
 export function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -28,6 +42,10 @@ export function Nav() {
           <Link href="/discover" className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Discover</Link>
           <Link href="/venues"   className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Venues</Link>
           <Link href="/about" className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">About</Link>
+          <Link href="/live" className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity flex items-center gap-1.5">
+            <LiveBadge />
+            Live
+          </Link>
           <a
             href="https://youtube.com/@StPeteMusic"
             target="_blank"
@@ -66,6 +84,10 @@ export function Nav() {
           <Link href="/discover" onClick={() => setMenuOpen(false)} className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Discover</Link>
           <Link href="/venues"   onClick={() => setMenuOpen(false)} className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Venues</Link>
           <Link href="/about" onClick={() => setMenuOpen(false)} className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">About</Link>
+          <Link href="/live" onClick={() => setMenuOpen(false)} className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity flex items-center gap-1.5">
+            <LiveBadge />
+            Live
+          </Link>
           <a
             href="https://youtube.com/@StPeteMusic"
             target="_blank"

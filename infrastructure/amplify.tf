@@ -74,6 +74,8 @@ resource "aws_amplify_app" "web" {
     DATABASE_URL              = "postgresql://${var.db_username}:${var.db_password}@${aws_db_instance.main.address}:5432/n8n"
     NEXT_PUBLIC_META_PIXEL_ID = var.meta_pixel_id
     NEXT_PUBLIC_CLARITY_ID    = var.clarity_project_id
+    YOUTUBE_API_KEY           = var.youtube_api_key
+    YOUTUBE_CHANNEL_ID        = var.youtube_channel_id
   }
 
   enable_auto_branch_creation = false

@@ -58,6 +58,22 @@ resource "cloudflare_record" "admin" {
   ttl     = 1
 }
 
+# ── Streaming: stream.stpetemusic.live ────────────────────────────────────────
+# RTMP ingest endpoint for Restream custom destination.
+# Must be DNS-only (proxied = false) — Cloudflare proxy blocks TCP port 1935.
+
+resource "cloudflare_record" "stream" {
+  count = local.enable_cloudflare ? 1 : 0
+
+  zone_id         = var.cloudflare_zone_id
+  name            = "stream"
+  type            = "A"
+  content         = aws_eip.n8n.public_ip
+  proxied         = false
+  ttl             = 60
+  allow_overwrite = true
+}
+
 # ── ACM SSL verification ───────────────────────────────────────────────────────
 # Amplify-managed ACM cert validation record. NEVER delete — Amplify uses it for
 # automatic annual renewal. Value is static after initial cert issuance.
