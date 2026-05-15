@@ -36,6 +36,8 @@ function TagList({
   const [renaming, setRenaming] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
   const [busy, setBusy] = useState<string | null>(null);
+  const [newTag, setNewTag] = useState('');
+  const [adding, setAdding] = useState(false);
 
   const startRename = (value: string) => {
     setRenaming(value);
@@ -43,6 +45,32 @@ function TagList({
   };
 
   const cancelRename = () => { setRenaming(null); setRenameValue(''); };
+
+  const addTag = async () => {
+    const value = newTag.trim();
+    if (!value) return;
+    setAdding(true);
+    try {
+      const res = await fetch('/api/tags/define', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, value }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to add tag');
+      if (data.exists) {
+        toast.info(`"${value}" already exists`);
+      } else {
+        toast.success(`Added "${value}"`);
+        setNewTag('');
+        onRefresh();
+      }
+    } catch {
+      toast.error('Failed to add tag');
+    } finally {
+      setAdding(false);
+    }
+  };
 
   const submitRename = async (from: string) => {
     const to = renameValue.trim();
@@ -86,17 +114,42 @@ function TagList({
     }
   };
 
+  const addForm = (
+    <div className="flex gap-2 mb-4">
+      <input
+        type="text"
+        value={newTag}
+        onChange={(e) => setNewTag(e.target.value)}
+        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
+        placeholder="New tag value…"
+        className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+      />
+      <button
+        onClick={addTag}
+        disabled={adding || !newTag.trim()}
+        className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+      >
+        {adding ? '…' : 'Add'}
+      </button>
+    </div>
+  );
+
   if (entries.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-muted-foreground">
-        No values found in the database.
-      </p>
+      <>
+        {addForm}
+        <p className="py-8 text-center text-sm text-muted-foreground">
+          No values found in the database.
+        </p>
+      </>
     );
   }
 
   return (
-    <div className="rounded-lg border border-border bg-card overflow-hidden">
-      <table className="w-full text-sm">
+    <>
+      {addForm}
+      <div className="rounded-lg border border-border bg-card overflow-hidden">
+        <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border bg-muted/40 text-left text-xs text-muted-foreground">
             <th className="px-4 py-3 font-medium">Value</th>
@@ -129,7 +182,11 @@ function TagList({
                     <span className="font-medium text-foreground">{entry.value}</span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-muted-foreground">{entry.count}</td>
+                <td className="px-4 py-3 text-muted-foreground">
+                  {entry.count === 0
+                    ? <span className="text-xs italic">not yet applied</span>
+                    : entry.count}
+                </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center justify-end gap-2">
                     {isRenaming ? (
@@ -173,7 +230,8 @@ function TagList({
           })}
         </tbody>
       </table>
-    </div>
+      </div>
+    </>
   );
 }
 

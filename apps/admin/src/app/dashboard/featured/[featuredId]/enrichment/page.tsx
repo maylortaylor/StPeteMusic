@@ -24,6 +24,7 @@ export default function EnrichmentReviewPage({
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [retriggering, setRetriggering] = useState(false);
+  const [skipping, setSkipping] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -56,6 +57,27 @@ export default function EnrichmentReviewPage({
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setRetriggering(false);
+    }
+  };
+
+  const handleSkip = async () => {
+    if (!featuredId) return;
+    setSkipping(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/featured/${featuredId}/enrichment`, { method: 'POST' });
+      if (!res.ok) {
+        const d = await res.json();
+        throw new Error(d.error || 'Failed to skip enrichment');
+      }
+      // Reload so the page shows the empty scraped_raw and note entry form
+      const updated = await fetch(`/api/featured/${featuredId}`);
+      const data = await updated.json();
+      setRecord(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setSkipping(false);
     }
   };
 
@@ -120,13 +142,39 @@ export default function EnrichmentReviewPage({
           <p className="text-sm font-medium text-red-700 dark:text-red-400">
             Enrichment failed — the scraper encountered errors.
           </p>
+          <div className="mt-2 flex gap-2">
+            <button
+              onClick={handleRetrigger}
+              disabled={retriggering || skipping}
+              className="inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
+            >
+              {retriggering && <RefreshCw className="h-3 w-3 animate-spin" />}
+              Retry Enrichment
+            </button>
+            <button
+              onClick={handleSkip}
+              disabled={skipping || retriggering}
+              className="inline-flex items-center gap-1.5 rounded-md border border-red-300 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950 disabled:opacity-50"
+            >
+              {skipping && <RefreshCw className="h-3 w-3 animate-spin" />}
+              Skip — Enter Manually
+            </button>
+          </div>
+        </div>
+      )}
+
+      {record?.status === 'pending_enrichment' && (
+        <div className="rounded-lg border border-border bg-muted/30 p-4">
+          <p className="text-sm text-muted-foreground">
+            Waiting for n8n to complete enrichment. If n8n is unavailable, you can enter notes manually.
+          </p>
           <button
-            onClick={handleRetrigger}
-            disabled={retriggering}
-            className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
+            onClick={handleSkip}
+            disabled={skipping}
+            className="mt-2 inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
           >
-            {retriggering && <RefreshCw className="h-3 w-3 animate-spin" />}
-            Retry Enrichment
+            {skipping && <RefreshCw className="h-3 w-3 animate-spin" />}
+            Skip — Enter Manually
           </button>
         </div>
       )}
