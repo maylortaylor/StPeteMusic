@@ -38,11 +38,14 @@ async function fetchInstagramFollowers(): Promise<StatResult> {
       `https://graph.facebook.com/v21.0/${igUserId}?fields=followers_count&access_token=${token}`,
       { next: { revalidate: 3600 } },
     );
-    if (!res.ok) return { count: null };
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({})) as { error?: { message?: string } };
+      return { count: null, error: body.error?.message ?? `HTTP ${res.status}` };
+    }
     const json = await res.json() as { followers_count?: number };
     return { count: json.followers_count ?? null };
-  } catch {
-    return { count: null };
+  } catch (e) {
+    return { count: null, error: String(e) };
   }
 }
 
@@ -53,15 +56,15 @@ async function fetchFacebookFans(): Promise<StatResult> {
 
   try {
     const res = await fetch(
-      `https://graph.facebook.com/v21.0/${pageId}?fields=fan_count&access_token=${token}`,
+      `https://graph.facebook.com/v21.0/${pageId}?fields=followers_count&access_token=${token}`,
       { next: { revalidate: 3600 } },
     );
     if (!res.ok) {
       const body = await res.json().catch(() => ({})) as { error?: { message?: string } };
       return { count: null, error: body.error?.message ?? `HTTP ${res.status}` };
     }
-    const json = await res.json() as { fan_count?: number };
-    return { count: json.fan_count ?? null };
+    const json = await res.json() as { followers_count?: number };
+    return { count: json.followers_count ?? null };
   } catch (e) {
     return { count: null, error: String(e) };
   }
@@ -131,7 +134,7 @@ export default async function DashboardPage() {
 
   const stats = [
     { label: 'Instagram', sublabel: 'Followers', value: formatCount(instagram.count), configured: !!process.env.IG_USER_ID, error: instagram.error },
-    { label: 'Facebook', sublabel: 'Page fans', value: formatCount(facebook.count), configured: !!process.env.FB_PAGE_ID, error: facebook.error },
+    { label: 'Facebook', sublabel: 'Followers', value: formatCount(facebook.count), configured: !!process.env.FB_PAGE_ID, error: facebook.error },
     { label: 'YouTube', sublabel: 'Subscribers', value: formatCount(youtube.count), configured: !!process.env.YOUTUBE_API_KEY, error: youtube.error },
     { label: 'Newsletter', sublabel: 'Subscribers', value: formatCount(listmonk.count), configured: !!process.env.LISTMONK_API_URL, error: listmonk.error },
   ];
