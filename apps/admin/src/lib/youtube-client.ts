@@ -12,6 +12,10 @@ export type VideoDetails = {
   publishedAt: Date;
   isLivestream: boolean;
   isShort: boolean;
+  viewCount: number;
+  likeCount: number;
+  commentCount: number;
+  privacyStatus: string; // 'public' | 'private' | 'unlisted'
 };
 
 export type PlaylistDetails = {
@@ -75,7 +79,7 @@ function detectShort(durationSeconds: number, title: string, description: string
   return combined.includes('#shorts');
 }
 
-async function getUploadsPlaylistId(): Promise<string> {
+export async function getUploadsPlaylistId(): Promise<string> {
   const res = await yt().channels.list({ part: ['contentDetails'], mine: true });
   const id = res.data.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
   if (!id) throw new Error('Could not find uploads playlist for authenticated channel');
@@ -116,7 +120,7 @@ export async function listAllVideos(): Promise<VideoDetails[]> {
   for (let i = 0; i < videoIds.length; i += 50) {
     const batch = videoIds.slice(i, i + 50);
     const res = await client.videos.list({
-      part: ['snippet', 'contentDetails', 'liveStreamingDetails'],
+      part: ['snippet', 'contentDetails', 'liveStreamingDetails', 'statistics', 'status'],
       id: batch,
     });
 
@@ -138,11 +142,72 @@ export async function listAllVideos(): Promise<VideoDetails[]> {
         publishedAt: new Date(item.snippet?.publishedAt ?? Date.now()),
         isLivestream: !!item.liveStreamingDetails,
         isShort: detectShort(durationSeconds, title, description),
+        viewCount: parseInt(item.statistics?.viewCount ?? '0', 10),
+        likeCount: parseInt(item.statistics?.likeCount ?? '0', 10),
+        commentCount: parseInt(item.statistics?.commentCount ?? '0', 10),
+        privacyStatus: item.status?.privacyStatus ?? 'public',
       });
     }
   }
 
   return videos;
+}
+
+/**
+ * Fetch one page of channel videos for incremental batch import.
+ * Quota cost: 1 unit (playlistItems.list) + 1 unit (videos.list).
+ * Pass uploadsPlaylistId from the first call's response to avoid a repeated channels.list call.
+ */
+export async function listVideosBatch(
+  uploadsPlaylistId: string,
+  pageToken?: string,
+  maxResults = 25,
+): Promise<{ videos: VideoDetails[]; nextPageToken?: string }> {
+  const client = yt();
+
+  const res = await client.playlistItems.list({
+    part: ['contentDetails'],
+    playlistId: uploadsPlaylistId,
+    maxResults,
+    pageToken,
+  });
+
+  const videoIds = (res.data.items ?? [])
+    .map((item) => item.contentDetails?.videoId)
+    .filter(Boolean) as string[];
+
+  if (videoIds.length === 0) return { videos: [], nextPageToken: undefined };
+
+  const detailsRes = await client.videos.list({
+    part: ['snippet', 'contentDetails', 'liveStreamingDetails', 'statistics', 'status'],
+    id: videoIds,
+  });
+
+  const videos: VideoDetails[] = (detailsRes.data.items ?? []).map((item) => {
+    const durationSeconds = parseDuration(item.contentDetails?.duration ?? '');
+    const title = item.snippet?.title ?? '';
+    const description = item.snippet?.description ?? '';
+    return {
+      videoId: item.id!,
+      title,
+      description,
+      tags: item.snippet?.tags ?? [],
+      thumbnailUrl:
+        item.snippet?.thumbnails?.maxres?.url ??
+        item.snippet?.thumbnails?.high?.url ??
+        '',
+      durationSeconds,
+      publishedAt: new Date(item.snippet?.publishedAt ?? Date.now()),
+      isLivestream: !!item.liveStreamingDetails,
+      isShort: detectShort(durationSeconds, title, description),
+      viewCount: parseInt(item.statistics?.viewCount ?? '0', 10),
+      likeCount: parseInt(item.statistics?.likeCount ?? '0', 10),
+      commentCount: parseInt(item.statistics?.commentCount ?? '0', 10),
+      privacyStatus: item.status?.privacyStatus ?? 'public',
+    };
+  });
+
+  return { videos, nextPageToken: res.data.nextPageToken ?? undefined };
 }
 
 // ─── Video Metadata ───────────────────────────────────────────────────────────
@@ -271,7 +336,7 @@ export async function listRecentVideos(since: Date): Promise<VideoDetails[]> {
   if (recentIds.length === 0) return [];
 
   const res = await client.videos.list({
-    part: ['snippet', 'contentDetails', 'liveStreamingDetails'],
+    part: ['snippet', 'contentDetails', 'liveStreamingDetails', 'statistics', 'status'],
     id: recentIds,
   });
 
@@ -292,6 +357,10 @@ export async function listRecentVideos(since: Date): Promise<VideoDetails[]> {
       publishedAt: new Date(item.snippet?.publishedAt ?? Date.now()),
       isLivestream: !!item.liveStreamingDetails,
       isShort: detectShort(durationSeconds, title, description),
+      viewCount: parseInt(item.statistics?.viewCount ?? '0', 10),
+      likeCount: parseInt(item.statistics?.likeCount ?? '0', 10),
+      commentCount: parseInt(item.statistics?.commentCount ?? '0', 10),
+      privacyStatus: item.status?.privacyStatus ?? 'public',
     };
   });
 }

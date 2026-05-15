@@ -71,6 +71,18 @@ export default function YouTubeQueuePage() {
   const [filter, setFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const [syncCursor, setSyncCursor] = useState<string | undefined>(() =>
+    typeof window !== 'undefined' ? localStorage.getItem('yt_sync_cursor') ?? undefined : undefined,
+  );
+  const [syncPlaylistId, setSyncPlaylistId] = useState<string | undefined>(() =>
+    typeof window !== 'undefined' ? localStorage.getItem('yt_sync_playlist_id') ?? undefined : undefined,
+  );
+  const [syncFetched, setSyncFetched] = useState<number>(() =>
+    typeof window !== 'undefined' ? parseInt(localStorage.getItem('yt_sync_fetched') ?? '0', 10) : 0,
+  );
+  const [syncDone, setSyncDone] = useState<boolean>(() =>
+    typeof window !== 'undefined' ? localStorage.getItem('yt_sync_done') === 'true' : false,
+  );
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkApproving, setBulkApproving] = useState(false);
 
@@ -96,17 +108,57 @@ export default function YouTubeQueuePage() {
   const runSync = async () => {
     setSyncing(true);
     try {
-      const res = await fetch('/api/youtube/videos/sync', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+      const res = await fetch('/api/youtube/videos/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          batchMode: true,
+          pageToken: syncCursor,
+          uploadsPlaylistId: syncPlaylistId,
+        }),
+      });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      toast.success(`Sync complete — added: ${data.added}, updated: ${data.updated}, proposals: ${data.proposalsGenerated}`);
-      if (data.errors?.length) toast.warning(`${data.errors.length} error(s) during sync`);
+      if (!res.ok) {
+        toast.error(data.error ?? 'Sync failed');
+        return;
+      }
+      const count = (data.added ?? 0) + (data.updated ?? 0);
+      const newFetched = syncFetched + count;
+      const done = !data.hasMore;
+
+      setSyncFetched(newFetched);
+      setSyncCursor(data.nextPageToken);
+      setSyncPlaylistId(data.uploadsPlaylistId);
+      setSyncDone(done);
+
+      if (data.nextPageToken) {
+        localStorage.setItem('yt_sync_cursor', data.nextPageToken);
+      } else {
+        localStorage.removeItem('yt_sync_cursor');
+      }
+      if (data.uploadsPlaylistId) {
+        localStorage.setItem('yt_sync_playlist_id', data.uploadsPlaylistId);
+      }
+      localStorage.setItem('yt_sync_fetched', String(newFetched));
+      localStorage.setItem('yt_sync_done', String(done));
+
+      toast.success(`Imported ${data.added} new, updated ${data.updated}`);
       fetchVideos();
     } catch (err) {
       toast.error(`Sync failed: ${String(err)}`);
     } finally {
       setSyncing(false);
     }
+  };
+
+  const resetSync = () => {
+    ['yt_sync_cursor', 'yt_sync_playlist_id', 'yt_sync_fetched', 'yt_sync_done'].forEach(
+      (k) => localStorage.removeItem(k),
+    );
+    setSyncCursor(undefined);
+    setSyncPlaylistId(undefined);
+    setSyncFetched(0);
+    setSyncDone(false);
   };
 
   const toggleSelect = (id: string) => {
@@ -157,13 +209,29 @@ export default function YouTubeQueuePage() {
             Review and approve video metadata before publishing to YouTube.
           </p>
         </div>
-        <button
-          onClick={runSync}
-          disabled={syncing}
-          className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
-        >
-          {syncing ? 'Syncing…' : 'Sync from YouTube'}
-        </button>
+        <div className="flex flex-col items-end gap-2">
+          <button
+            onClick={runSync}
+            disabled={syncing || syncDone}
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
+          >
+            {syncing
+              ? 'Importing…'
+              : syncDone
+                ? 'All Videos Imported'
+                : syncFetched === 0
+                  ? 'Import 25 Videos'
+                  : `Import Next 25 (${syncFetched}/544)`}
+          </button>
+          {(syncFetched > 0 || syncDone) && (
+            <button
+              onClick={resetSync}
+              className="text-xs text-muted-foreground underline hover:text-foreground"
+            >
+              Reset import
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Stats */}
