@@ -32,7 +32,7 @@ updated: 2026-05-06
 Auth via Clerk. Env vars (`CLERK_SECRET_KEY`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`) sourced from SSM at `/stpetemusic/clerk/*`.
 Database: `stpetemusic` on RDS (`stpetemusic-postgres.cmnogyowgoe1.us-east-1.rds.amazonaws.com`).
 
-**Runtime env var gotcha**: Amplify WEB_COMPUTE does NOT inject non-`NEXT_PUBLIC_*` env vars at runtime. Fix: `amplify.yml` writes `CLERK_SECRET_KEY` and `DATABASE_URL` to `.env.production` during preBuild, then copies into `.next/` artifact. If you add new server-only env vars, update the `amplify.yml` preBuild step.
+**Runtime env var gotcha**: Amplify WEB_COMPUTE does NOT inject non-`NEXT_PUBLIC_*` env vars at runtime. Fix: `amplify.yml` writes specific vars to `.env.production` during preBuild, then copies into `.next/` artifact. **Every new server-only env var needs two changes**: (1) add to Amplify console via `AWS_PROFILE=personal aws amplify update-app --app-id d2n0tn0yijqxny --cli-input-json ...`, AND (2) add the corresponding `echo "VAR=$VAR" >> .env.production` line in `amplify.yml`. Missing either step = env var silently absent at runtime → 500/502.
 
 ## DNS (Cloudflare — sole DNS provider)
 Route 53 hosted zone deleted. All records must be **DNS only (grey cloud — NOT proxied)**:

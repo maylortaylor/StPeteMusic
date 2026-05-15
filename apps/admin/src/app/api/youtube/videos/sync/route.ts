@@ -136,7 +136,11 @@ export async function POST(request: Request) {
       ytVideos = await listAllVideos();
     } catch (err) {
       console.error('YouTube API error during sync:', err);
-      return Response.json({ error: 'Failed to fetch videos from YouTube API' }, { status: 502 });
+      const msg = err instanceof Error ? err.message : String(err);
+      return Response.json(
+        { error: 'Failed to fetch videos from YouTube API', details: msg },
+        { status: 502 },
+      );
     }
 
     if (ytVideos.length === 0) {
