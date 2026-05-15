@@ -31,10 +31,10 @@ function DocModal({ doc, onClose }: { doc: Doc; onClose: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm p-4 pt-16"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="relative flex flex-col w-full max-w-3xl max-h-[80vh] rounded-xl border border-border bg-card shadow-2xl">
+      <div className="relative flex flex-col w-full max-w-6xl h-[95vh] rounded-xl border border-border bg-card shadow-2xl">
         {/* Header */}
         <div className="flex items-start justify-between border-b border-border bg-muted/40 px-6 py-4 shrink-0 rounded-t-xl">
           <div>
