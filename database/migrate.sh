@@ -37,3 +37,4 @@ apply_if_new "014_update_venues.sql"                   "/sql/migrations/014_upda
 apply_if_new "015_add_events_table.sql"                "/sql/migrations/015_add_events_table.sql"
 apply_if_new "016_add_venue_to_events.sql"             "/sql/migrations/016_add_venue_to_events.sql"
 apply_if_new "017_add_venue_platform_ids.sql"          "/sql/migrations/017_add_venue_platform_ids.sql"
+apply_if_new "021_add_youtube_tables.sql"              "/sql/migrations/021_add_youtube_tables.sql"
