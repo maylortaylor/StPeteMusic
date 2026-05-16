@@ -341,6 +341,7 @@ jobs:
               || echo "⚠ Certbot skipped — DNS for n8n.stpetemusic.live may not be set yet"
 
             echo "── Syncing MediaMTX config ──"
+            rm -rf ~/stpetemusic/n8n/mediamtx
             mkdir -p ~/stpetemusic/n8n/mediamtx
             cp -r "${DEPLOY_DIR}/mediamtx/." ~/stpetemusic/n8n/mediamtx/
             echo "✓ MediaMTX config synced"
