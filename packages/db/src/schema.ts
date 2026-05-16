@@ -330,6 +330,13 @@ export const youtube_config = pgTable('youtube_config', {
   channel_bio: text('channel_bio').default(''),
   contact_emails: jsonb('contact_emails').$type<string[]>().default([]),
   prompt_version: varchar('prompt_version', { length: 50 }).default('v1'),
+  // Admin-controlled override: when set, /api/stream/youtube-status returns this video as live
+  stream_override_video_id: varchar('stream_override_video_id', { length: 20 }),
+  // DB-level cache for YouTube API response (prevents quota exhaustion on force-dynamic route)
+  yt_cache_video_id: varchar('yt_cache_video_id', { length: 20 }),
+  yt_cache_is_live: boolean('yt_cache_is_live').default(false),
+  yt_cache_title: text('yt_cache_title'),
+  yt_cache_expires_at: timestamp('yt_cache_expires_at', { withTimezone: true }),
   updated_at: timestamp('updated_at', { withTimezone: true })
     .defaultNow()
     .$onUpdate(() => new Date()),
