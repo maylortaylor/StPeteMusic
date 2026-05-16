@@ -352,22 +352,7 @@ jobs:
             mkdir -p ~/stpetemusic/scripts
             cp "${DEPLOY_DIR}/scripts/vod-watcher.sh" ~/stpetemusic/scripts/vod-watcher.sh
             chmod +x ~/stpetemusic/scripts/vod-watcher.sh
-            sudo tee /etc/systemd/system/vod-watcher.service > /dev/null <<'UNIT'
-[Unit]
-Description=StPeteMusic VOD Upload Watcher
-After=docker.service
-
-[Service]
-Type=simple
-User=ec2-user
-EnvironmentFile=/home/ec2-user/stpetemusic/.env
-ExecStart=/home/ec2-user/stpetemusic/scripts/vod-watcher.sh
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-UNIT
+            printf '[Unit]\nDescription=StPeteMusic VOD Upload Watcher\nAfter=docker.service\n\n[Service]\nType=simple\nUser=ec2-user\nEnvironmentFile=/home/ec2-user/stpetemusic/.env\nExecStart=/home/ec2-user/stpetemusic/scripts/vod-watcher.sh\nRestart=always\nRestartSec=10\n\n[Install]\nWantedBy=multi-user.target\n' | sudo tee /etc/systemd/system/vod-watcher.service > /dev/null
             sudo systemctl daemon-reload
             sudo systemctl enable --now vod-watcher.service
             echo "✓ vod-watcher.service installed and started"

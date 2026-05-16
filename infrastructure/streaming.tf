@@ -27,7 +27,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "vod" {
     status = "Enabled"
     filter {}
     transition {
-      days          = 14
+      days          = 30
       storage_class = "STANDARD_IA"
     }
   }
