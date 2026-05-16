@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@next/third-parties": "^16.2.4",
+    "@stpetemusic/db": "*",
     "@stpetemusic/types": "*",
     "@types/pg": "^8.20.0",
     "framer-motion": "^12.38.0",
