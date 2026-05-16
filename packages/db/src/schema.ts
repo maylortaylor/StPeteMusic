@@ -413,3 +413,89 @@ export const tag_definitions = pgTable('tag_definitions', {
   value: varchar('value', { length: 200 }).notNull(),
   created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EVENTBRITE INTEGRATION
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const eventbrite_events = pgTable('eventbrite_events', {
+  // PK — Eventbrite's numeric event ID stored as string
+  eventbrite_id: varchar('eventbrite_id', { length: 50 }).primaryKey(),
+
+  // Core identity
+  name: text('name').notNull(),
+  description_text: text('description_text'),
+  description_html: text('description_html'),
+  url: text('url'),
+  status: varchar('status', { length: 50 }), // live|started|ended|completed|canceled|draft|postponed
+  currency: varchar('currency', { length: 10 }),
+
+  // Times — store both UTC and local for display flexibility
+  start_utc: timestamp('start_utc', { withTimezone: true }),
+  start_local: text('start_local'),         // e.g. "2026-08-01T20:00:00"
+  start_timezone: varchar('start_timezone', { length: 50 }), // IANA e.g. "America/New_York"
+  end_utc: timestamp('end_utc', { withTimezone: true }),
+  end_local: text('end_local'),
+  end_timezone: varchar('end_timezone', { length: 50 }),
+
+  // Media
+  logo_url: text('logo_url'),
+  logo_id: varchar('logo_id', { length: 50 }),
+
+  // Format / category
+  category_id: varchar('category_id', { length: 50 }),
+  category_name: text('category_name'),
+  subcategory_id: varchar('subcategory_id', { length: 50 }),
+  subcategory_name: text('subcategory_name'),
+  format_id: varchar('format_id', { length: 50 }),
+  format_name: text('format_name'),
+
+  // Flags
+  is_free: boolean('is_free').notNull().default(false),
+  online_event: boolean('online_event').notNull().default(false),
+
+  // Capacity & availability
+  capacity: integer('capacity'),
+  ticket_availability_status: varchar('ticket_availability_status', { length: 50 }), // available|sold_out|unavailable
+  quantity_available: integer('quantity_available'),
+
+  // Venue — denormalized from expand (Eventbrite venue ≠ our venues table)
+  venue_id_eb: varchar('venue_id_eb', { length: 50 }),
+  venue_name: text('venue_name'),
+  venue_address: text('venue_address'),
+  venue_city: varchar('venue_city', { length: 100 }),
+  venue_region: varchar('venue_region', { length: 100 }),
+  venue_country: varchar('venue_country', { length: 10 }),
+  venue_latitude: varchar('venue_latitude', { length: 20 }),
+  venue_longitude: varchar('venue_longitude', { length: 20 }),
+
+  // Organizer
+  organizer_id_eb: varchar('organizer_id_eb', { length: 50 }),
+  organizer_name: text('organizer_name'),
+  org_id: varchar('org_id', { length: 50 }),
+
+  // Ticket classes as JSONB array + rolled-up totals for fast list queries
+  ticket_classes: jsonb('ticket_classes').notNull().default([]),
+  quantity_sold: integer('quantity_sold'),
+  quantity_total: integer('quantity_total'),
+
+  // Revenue from /reports/sales/ endpoint
+  gross_revenue_cents: integer('gross_revenue_cents'),
+  net_revenue_cents: integer('net_revenue_cents'),
+  fees_cents: integer('fees_cents'),
+  report_currency: varchar('report_currency', { length: 10 }),
+
+  // Full Eventbrite API response for future-proofing
+  raw_data: jsonb('raw_data'),
+
+  // Admin-set link to a local DB event — preserved through syncs
+  linked_event_id: uuid('linked_event_id').references(() => events.id, { onDelete: 'set null' }),
+
+  // Sync metadata
+  synced_at: timestamp('synced_at', { withTimezone: true }).notNull().defaultNow(),
+  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});

@@ -14,6 +14,7 @@ import {
   Mic2,
   Star,
   Tag,
+  Ticket,
   Users,
   Users2,
   Youtube,
@@ -34,6 +35,7 @@ const navItems = [
   { label: 'Brand Voice',     href: '/dashboard/brand-voice',    icon: Mic2 },
   { label: 'Templates',       href: '/dashboard/templates',      icon: Zap },
   { label: 'YouTube',          href: '/dashboard/youtube',        icon: Youtube, reviewQueue: false },
+  { label: 'Eventbrite',      href: '/dashboard/eventbrite',     icon: Ticket },
   { label: 'Newsletter',      href: '/dashboard/newsletter',     icon: Mail },
   { label: 'Playbook',        href: '/dashboard/playbook',       icon: BookOpen },
 ];

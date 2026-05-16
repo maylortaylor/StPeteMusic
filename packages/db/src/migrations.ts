@@ -939,19 +939,6 @@ ALTER TABLE youtube_videos
 `,
   },
   {
-    filename: '023_add_tag_definitions.sql',
-    sql: `
-CREATE TABLE IF NOT EXISTS tag_definitions (
-  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  type       VARCHAR(50) NOT NULL,
-  value      VARCHAR(200) NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE (type, value)
-);
-CREATE INDEX IF NOT EXISTS idx_tag_definitions_type ON tag_definitions(type);
-`,
-  },
-  {
     filename: '024_add_featured_venues.sql',
     sql: `
 CREATE TABLE IF NOT EXISTS featured_venues (
@@ -978,6 +965,65 @@ ALTER TABLE post_stats
   ADD COLUMN IF NOT EXISTS post_id  VARCHAR(255),
   ADD COLUMN IF NOT EXISTS comments INTEGER DEFAULT 0,
   ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+`,
+  },
+  {
+    filename: '026_add_eventbrite_events.sql',
+    sql: `
+CREATE TABLE IF NOT EXISTS eventbrite_events (
+  eventbrite_id                VARCHAR(50) PRIMARY KEY,
+  name                         TEXT NOT NULL,
+  description_text             TEXT,
+  description_html             TEXT,
+  url                          TEXT,
+  status                       VARCHAR(50),
+  currency                     VARCHAR(10),
+  start_utc                    TIMESTAMPTZ,
+  start_local                  TEXT,
+  start_timezone               VARCHAR(50),
+  end_utc                      TIMESTAMPTZ,
+  end_local                    TEXT,
+  end_timezone                 VARCHAR(50),
+  logo_url                     TEXT,
+  logo_id                      VARCHAR(50),
+  category_id                  VARCHAR(50),
+  category_name                TEXT,
+  subcategory_id               VARCHAR(50),
+  subcategory_name             TEXT,
+  format_id                    VARCHAR(50),
+  format_name                  TEXT,
+  is_free                      BOOLEAN NOT NULL DEFAULT FALSE,
+  online_event                 BOOLEAN NOT NULL DEFAULT FALSE,
+  capacity                     INTEGER,
+  ticket_availability_status   VARCHAR(50),
+  quantity_available           INTEGER,
+  venue_id_eb                  VARCHAR(50),
+  venue_name                   TEXT,
+  venue_address                TEXT,
+  venue_city                   VARCHAR(100),
+  venue_region                 VARCHAR(100),
+  venue_country                VARCHAR(10),
+  venue_latitude               VARCHAR(20),
+  venue_longitude              VARCHAR(20),
+  organizer_id_eb              VARCHAR(50),
+  organizer_name               TEXT,
+  org_id                       VARCHAR(50),
+  ticket_classes               JSONB NOT NULL DEFAULT '[]',
+  quantity_sold                INTEGER,
+  quantity_total               INTEGER,
+  gross_revenue_cents          INTEGER,
+  net_revenue_cents            INTEGER,
+  fees_cents                   INTEGER,
+  report_currency              VARCHAR(10),
+  raw_data                     JSONB,
+  linked_event_id              UUID REFERENCES events(id) ON DELETE SET NULL,
+  synced_at                    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at                   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at                   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_eb_events_status     ON eventbrite_events(status);
+CREATE INDEX IF NOT EXISTS idx_eb_events_start_utc  ON eventbrite_events(start_utc DESC);
+CREATE INDEX IF NOT EXISTS idx_eb_events_linked     ON eventbrite_events(linked_event_id) WHERE linked_event_id IS NOT NULL;
 `,
   },
 ];
