@@ -253,6 +253,12 @@ jobs:
               postgres:16-alpine sh /sql/migrate.sh \
               && echo "✓ Migrations complete" || echo "⚠ Migration step failed"
 
+            echo "── Syncing MediaMTX config ──"
+            rm -rf ~/stpetemusic/n8n/mediamtx
+            mkdir -p ~/stpetemusic/n8n/mediamtx
+            cp -r "${DEPLOY_DIR}/mediamtx/." ~/stpetemusic/n8n/mediamtx/
+            echo "✓ MediaMTX config synced"
+
             echo "── Applying compose config (restarts changed containers) ──"
             cd ~/stpetemusic/n8n
             docker-compose -f docker-compose.prod.yaml --env-file ../.env up -d
@@ -339,12 +345,6 @@ jobs:
               --reinstall 2>/dev/null \
               && echo "✓ SSL cert active for n8n.stpetemusic.live" \
               || echo "⚠ Certbot skipped — DNS for n8n.stpetemusic.live may not be set yet"
-
-            echo "── Syncing MediaMTX config ──"
-            rm -rf ~/stpetemusic/n8n/mediamtx
-            mkdir -p ~/stpetemusic/n8n/mediamtx
-            cp -r "${DEPLOY_DIR}/mediamtx/." ~/stpetemusic/n8n/mediamtx/
-            echo "✓ MediaMTX config synced"
 
             echo "── Installing VOD watcher service ──"
             sudo dnf install -y inotify-tools 2>/dev/null \
