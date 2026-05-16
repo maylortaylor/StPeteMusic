@@ -222,3 +222,33 @@ variable "youtube_channel_id" {
   type        = string
   default     = ""
 }
+
+# ── Eventbrite (theburgmusic@gmail.com) ──────────────────────────────────────
+
+variable "eventbrite_private_token" {
+  description = "Eventbrite Private Token for server-to-server API calls (theburgmusic@gmail.com). Set via TF_VAR_eventbrite_private_token in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "eventbrite_api_key" {
+  description = "Eventbrite OAuth API Key (theburgmusic@gmail.com). Set via TF_VAR_eventbrite_api_key in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "eventbrite_client_secret" {
+  description = "Eventbrite OAuth Client Secret (theburgmusic@gmail.com). Set via TF_VAR_eventbrite_client_secret in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "eventbrite_public_token" {
+  description = "Eventbrite Public Token (theburgmusic@gmail.com). Set via TF_VAR_eventbrite_public_token in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}

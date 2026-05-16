@@ -38,6 +38,7 @@ applications:
             - node --version
             - npm --prefix ../.. ci
             - npm --prefix ../.. run build --workspace=@stpetemusic/db
+            - npm --prefix ../.. run db:migrate --workspace=@stpetemusic/db
             # Amplify WEB_COMPUTE does not inject non-NEXT_PUBLIC env vars at runtime.
             # Write them to .env.production so Next.js loads them in the server context.
             - |
@@ -59,6 +60,7 @@ applications:
               echo "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY" >> .env.production
               echo "N8N_ARTIST_ENRICHMENT_WEBHOOK_URL=$N8N_ARTIST_ENRICHMENT_WEBHOOK_URL" >> .env.production
               echo "N8N_WEBHOOK_SECRET=$N8N_WEBHOOK_SECRET" >> .env.production
+              echo "EVENTBRITE_PRIVATE_TOKEN=$EVENTBRITE_PRIVATE_TOKEN" >> .env.production
         build:
           commands:
             - npm run build

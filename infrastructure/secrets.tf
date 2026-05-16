@@ -140,3 +140,41 @@ resource "aws_ssm_parameter" "n8n_webhook_secret" {
   value = var.n8n_webhook_secret
   tags  = { Project = var.project }
 }
+
+# ── Eventbrite (theburgmusic@gmail.com) ──────────────────────────────────────
+
+resource "aws_ssm_parameter" "eventbrite_private_token" {
+  count = var.eventbrite_private_token != "" ? 1 : 0
+
+  name  = "/${var.project}/eventbrite/private_token"
+  type  = "SecureString"
+  value = var.eventbrite_private_token
+  tags  = { Project = var.project }
+}
+
+resource "aws_ssm_parameter" "eventbrite_api_key" {
+  count = var.eventbrite_api_key != "" ? 1 : 0
+
+  name  = "/${var.project}/eventbrite/api_key"
+  type  = "SecureString"
+  value = var.eventbrite_api_key
+  tags  = { Project = var.project }
+}
+
+resource "aws_ssm_parameter" "eventbrite_client_secret" {
+  count = var.eventbrite_client_secret != "" ? 1 : 0
+
+  name  = "/${var.project}/eventbrite/client_secret"
+  type  = "SecureString"
+  value = var.eventbrite_client_secret
+  tags  = { Project = var.project }
+}
+
+resource "aws_ssm_parameter" "eventbrite_public_token" {
+  count = var.eventbrite_public_token != "" ? 1 : 0
+
+  name  = "/${var.project}/eventbrite/public_token"
+  type  = "SecureString"
+  value = var.eventbrite_public_token
+  tags  = { Project = var.project }
+}

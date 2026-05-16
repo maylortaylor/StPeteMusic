@@ -49,6 +49,12 @@ data "aws_ssm_parameter" "n8n_webhook_secret" {
   with_decryption = true
 }
 
+data "aws_ssm_parameter" "eventbrite_private_token" {
+  count           = var.eventbrite_private_token != "" ? 1 : 0
+  name            = aws_ssm_parameter.eventbrite_private_token[0].name
+  with_decryption = true
+}
+
 resource "aws_amplify_app" "web" {
   name         = "${var.project}-web"
   repository   = "https://github.com/maylortaylor/StPeteMusic"
@@ -157,6 +163,8 @@ resource "aws_amplify_app" "admin" {
     ANTHROPIC_API_KEY                   = var.anthropic_api_key != "" ? data.aws_ssm_parameter.anthropic_api_key[0].value : ""
     N8N_ARTIST_ENRICHMENT_WEBHOOK_URL   = var.n8n_artist_enrichment_webhook_url != "" ? data.aws_ssm_parameter.n8n_artist_enrichment_webhook_url[0].value : ""
     N8N_WEBHOOK_SECRET                  = var.n8n_webhook_secret != "" ? data.aws_ssm_parameter.n8n_webhook_secret[0].value : ""
+    # Eventbrite integration (admin only — never exposed to web app)
+    EVENTBRITE_PRIVATE_TOKEN            = var.eventbrite_private_token != "" ? data.aws_ssm_parameter.eventbrite_private_token[0].value : ""
   }
 
   enable_auto_branch_creation = false

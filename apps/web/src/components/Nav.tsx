@@ -39,6 +39,7 @@ export function Nav() {
         {/* Desktop nav links */}
         <div className="hidden md:flex items-center gap-10">
           <Link href="/events"   className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Events</Link>
+          <Link href="/tickets"  className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Tickets</Link>
           <Link href="/discover" className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Discover</Link>
           <Link href="/venues"   className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Venues</Link>
           <Link href="/about" className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">About</Link>
@@ -81,6 +82,7 @@ export function Nav() {
       {menuOpen && (
         <div className="md:hidden bg-gradient-orange border-t border-black/10 px-6 py-4 flex flex-col gap-4">
           <Link href="/events"   onClick={() => setMenuOpen(false)} className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Events</Link>
+          <Link href="/tickets"  onClick={() => setMenuOpen(false)} className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Tickets</Link>
           <Link href="/discover" onClick={() => setMenuOpen(false)} className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Discover</Link>
           <Link href="/venues"   onClick={() => setMenuOpen(false)} className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">Venues</Link>
           <Link href="/about" onClick={() => setMenuOpen(false)} className="font-inter text-black font-medium text-base hover:opacity-70 transition-opacity">About</Link>
