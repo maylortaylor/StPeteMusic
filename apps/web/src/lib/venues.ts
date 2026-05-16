@@ -2,7 +2,7 @@ export const VENUES = {
   'suite-e-studios': {
     name: 'Suite E Studios',
     color: '#FF8C00',
-    calendarId: '98a6b333df9c0d145983eab458358c58692344b3436a7c292772019118db6e19@group.calendar.google.com',
+    calendarId: 'suite.e.stpete@gmail.com',
   },
   'blueberry-patch': {
     name: 'Blueberry Patch',

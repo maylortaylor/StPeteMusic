@@ -1026,4 +1026,12 @@ CREATE INDEX IF NOT EXISTS idx_eb_events_start_utc  ON eventbrite_events(start_u
 CREATE INDEX IF NOT EXISTS idx_eb_events_linked     ON eventbrite_events(linked_event_id) WHERE linked_event_id IS NOT NULL;
 `,
   },
+  {
+    filename: '027_fix_suite_e_calendar_id.sql',
+    sql: `
+UPDATE venues
+  SET google_calendar_id = 'suite.e.stpete@gmail.com'
+  WHERE slug = 'suite-e-studios';
+`,
+  },
 ];
