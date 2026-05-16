@@ -41,3 +41,4 @@ apply_if_new "021_add_youtube_tables.sql"              "/sql/migrations/021_add_
 apply_if_new "022_add_youtube_video_stats.sql"         "/sql/migrations/022_add_youtube_video_stats.sql"
 apply_if_new "023_add_tag_definitions.sql"            "/sql/migrations/023_add_tag_definitions.sql"
 apply_if_new "024_add_featured_venues.sql"            "/sql/migrations/024_add_featured_venues.sql"
+apply_if_new "027_fix_suite_e_calendar_id.sql"        "/sql/migrations/027_fix_suite_e_calendar_id.sql"

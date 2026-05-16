@@ -243,6 +243,16 @@ jobs:
               && echo "✓ listmonk_stpetemusic database created" \
               || echo "✓ listmonk_stpetemusic database already exists"
 
+            echo "── Creating stpetemusic database on RDS if needed ──"
+            docker run --rm \
+              -e PGPASSWORD="${POSTGRES_PASSWORD}" \
+              -e PGSSLMODE=require \
+              postgres:16-alpine \
+              psql -h "${RDS_HOST}" -U "${POSTGRES_USER}" -d n8n \
+              -c "CREATE DATABASE stpetemusic;" 2>/dev/null \
+              && echo "✓ stpetemusic database created" \
+              || echo "✓ stpetemusic database already exists"
+
             echo "── Running database migrations ──"
             docker run --rm \
               -v "${DEPLOY_DIR}/database:/sql" \
@@ -254,7 +264,7 @@ jobs:
               && echo "✓ Migrations complete" || echo "⚠ Migration step failed"
 
             echo "── Syncing MediaMTX config ──"
-            rm -rf ~/stpetemusic/n8n/mediamtx
+            sudo rm -rf ~/stpetemusic/n8n/mediamtx
             mkdir -p ~/stpetemusic/n8n/mediamtx
             cp -r "${DEPLOY_DIR}/mediamtx/." ~/stpetemusic/n8n/mediamtx/
             echo "✓ MediaMTX config synced"

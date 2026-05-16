@@ -22,6 +22,7 @@ export async function POST(request: Request) {
   revalidatePath('/discover');
   revalidatePath('/venues');
   revalidatePath('/blog');
+  revalidatePath('/events');
 
   return Response.json({ revalidated: true });
 }
