@@ -16,12 +16,11 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = 'force-dynamic';
-
 interface StreamStatus {
   live: boolean;
   videoId: string | null;
   title: string | null;
+  error?: string;
 }
 
 async function getStreamStatus(): Promise<StreamStatus> {
@@ -39,13 +38,13 @@ async function getStreamStatus(): Promise<StreamStatus> {
 }
 
 export default async function LivePage() {
-  const { live, videoId, title } = await getStreamStatus();
+  const { live, videoId, title, error } = await getStreamStatus();
 
   return (
     <>
       <Nav />
       <main className="min-h-screen bg-background">
-        <LivePlayer isLive={live} videoId={videoId} title={title} />
+        <LivePlayer isLive={live} videoId={videoId} title={title} error={error} />
       </main>
       <Footer />
     </>
