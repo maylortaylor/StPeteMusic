@@ -938,4 +938,46 @@ ALTER TABLE youtube_videos
   ADD COLUMN IF NOT EXISTS privacy_status VARCHAR(20);
 `,
   },
+  {
+    filename: '023_add_tag_definitions.sql',
+    sql: `
+CREATE TABLE IF NOT EXISTS tag_definitions (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  type       VARCHAR(50) NOT NULL,
+  value      VARCHAR(200) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (type, value)
+);
+CREATE INDEX IF NOT EXISTS idx_tag_definitions_type ON tag_definitions(type);
+`,
+  },
+  {
+    filename: '024_add_featured_venues.sql',
+    sql: `
+CREATE TABLE IF NOT EXISTS featured_venues (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  venue_id        UUID NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+  featured_month  VARCHAR(7) NOT NULL UNIQUE,
+  event_id        UUID REFERENCES events(id) ON DELETE SET NULL,
+  callout_text    TEXT,
+  status          TEXT NOT NULL DEFAULT 'draft',
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_featured_venues_month    ON featured_venues(featured_month);
+CREATE INDEX IF NOT EXISTS idx_featured_venues_venue_id ON featured_venues(venue_id);
+`,
+  },
+  {
+    filename: '025_align_post_stats_columns.sql',
+    sql: `
+-- Add columns that schema.ts declares but the original migration never created.
+-- The original migration used platform_post_id/comments_count; schema.ts uses post_id/comments.
+-- We add the new names as nullable so existing rows are unaffected.
+ALTER TABLE post_stats
+  ADD COLUMN IF NOT EXISTS post_id  VARCHAR(255),
+  ADD COLUMN IF NOT EXISTS comments INTEGER DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+`,
+  },
 ];

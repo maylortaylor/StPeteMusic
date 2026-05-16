@@ -257,6 +257,22 @@ export const featured_artists = pgTable('featured_artists', {
     .$onUpdate(() => new Date()),
 });
 
+// status values: draft | approved
+export const featured_venues = pgTable('featured_venues', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  venue_id: uuid('venue_id')
+    .notNull()
+    .references(() => venues.id, { onDelete: 'cascade' }),
+  featured_month: varchar('featured_month', { length: 7 }).notNull().unique(),
+  event_id: uuid('event_id').references(() => events.id, { onDelete: 'set null' }),
+  callout_text: text('callout_text'),
+  status: text('status').notNull().default('draft'),
+  created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updated_at: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
 // platform values: instagram | facebook | youtube | newsletter
 // content_type values: post | reel | story | short | carousel | video | email
 // status values: draft | pending_approval | approved | scheduled | published | failed | archived
