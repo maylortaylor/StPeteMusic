@@ -32,6 +32,18 @@ interface BrandGuideline {
   hashtag_library: string[];
 }
 
+interface FeaturedVenue {
+  id: string;
+  venue_name: string | null;
+  venue_instagram_username: string | null;
+  venue_website: string | null;
+  event_title: string | null;
+  event_start_time: string | null;
+  event_ticket_url: string | null;
+  callout_text: string | null;
+  status: string;
+}
+
 const ANCHOR_TAGS = ['final-friday', 'final_friday', 'instant-noodles', 'instant_noodles'];
 
 function formatDateET(iso: string) {
@@ -83,6 +95,7 @@ export default function ComposePage() {
   const [blurbs, setBlurbs] = useState<FeaturedBlurb[]>([]);
   const [events, setEvents] = useState<EventItem[]>([]);
   const [guidelines, setGuidelines] = useState<BrandGuideline | null>(null);
+  const [featuredVenue, setFeaturedVenue] = useState<FeaturedVenue | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [selectedBlurbs, setSelectedBlurbs] = useState<Set<string>>(new Set());
@@ -94,15 +107,17 @@ export default function ComposePage() {
     setLoading(true);
     try {
       const months = [m, ...(withNext ? [nextMonth(m)] : [])];
-      const [blurbsRes, ...eventReses] = await Promise.all([
+      const [blurbsRes, venueRes, ...eventReses] = await Promise.all([
         fetch(`/api/featured/blurbs/admin?month=${m}`),
+        fetch(`/api/featured-venues?month=${m}`),
         ...months.map((mo) => fetch(`/api/events?month=${mo}`)),
         fetch('/api/brand-guidelines'),
       ]);
 
       const guidelinesRes = await fetch('/api/brand-guidelines');
-      const [blurbsData, guidelinesData] = await Promise.all([
+      const [blurbsData, venueData, guidelinesData] = await Promise.all([
         blurbsRes.json(),
+        venueRes.json(),
         guidelinesRes.json(),
       ]);
 
@@ -116,6 +131,7 @@ export default function ComposePage() {
       const deduped = allEvents.filter((e) => { if (seen.has(e.id)) return false; seen.add(e.id); return true; });
 
       setBlurbs(blurbsData.blurbs ?? []);
+      setFeaturedVenue(venueData.featured_venue ?? null);
       setEvents(deduped.sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime()));
 
       const active = (guidelinesData as BrandGuideline[]).find((g) => g.is_active) ?? null;
@@ -169,12 +185,20 @@ export default function ComposePage() {
       }
     }
 
+    if (featuredVenue?.callout_text) {
+      lines.push('📍 VENUE SPOTLIGHT', '');
+      lines.push(featuredVenue.venue_name ?? '');
+      lines.push(featuredVenue.callout_text);
+      if (featuredVenue.venue_instagram_username) lines.push(featuredVenue.venue_instagram_username);
+      lines.push('');
+    }
+
     if (hashtags.length > 0) {
       lines.push('---', '', hashtags.join(' '));
     }
 
     return lines.join('\n');
-  }, [intro, chosenBlurbs, chosenEvents, hashtags]);
+  }, [intro, chosenBlurbs, chosenEvents, featuredVenue, hashtags]);
 
   const htmlText = useMemo(() => {
     const parts: string[] = [];
@@ -196,12 +220,22 @@ export default function ComposePage() {
       }
     }
 
+    if (featuredVenue?.callout_text) {
+      parts.push('<p><strong>📍 VENUE SPOTLIGHT</strong></p>');
+      parts.push(`<p><strong>${featuredVenue.venue_name ?? ''}</strong></p>`);
+      parts.push(`<p>${featuredVenue.callout_text.replace(/\n/g, '<br>')}</p>`);
+      if (featuredVenue.venue_instagram_username) {
+        const handle = featuredVenue.venue_instagram_username.replace(/^@/, '');
+        parts.push(`<p><a href="https://www.instagram.com/${handle}">${featuredVenue.venue_instagram_username}</a></p>`);
+      }
+    }
+
     if (hashtags.length > 0) {
       parts.push('<hr>', `<p>${hashtags.join(' ')}</p>`);
     }
 
     return parts.join('\n');
-  }, [intro, chosenBlurbs, chosenEvents, hashtags]);
+  }, [intro, chosenBlurbs, chosenEvents, featuredVenue, hashtags]);
 
   const copy = async (text: string, label: string) => {
     try {
@@ -378,6 +412,48 @@ export default function ComposePage() {
                 </ul>
               )}
             </div>
+          </div>
+
+          {/* Venue Spotlight */}
+          <div className="rounded-lg border border-border bg-card p-5 space-y-3">
+            <h2 className="text-base font-semibold text-foreground">
+              2c. Venue Spotlight
+              {featuredVenue && (
+                <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-medium ${
+                  featuredVenue.status === 'approved'
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                    : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                }`}>
+                  {featuredVenue.status}
+                </span>
+              )}
+            </h2>
+            {featuredVenue ? (
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-foreground">{featuredVenue.venue_name}</p>
+                {featuredVenue.venue_instagram_username && (
+                  <p className="text-xs text-muted-foreground">{featuredVenue.venue_instagram_username}</p>
+                )}
+                {featuredVenue.event_title && (
+                  <p className="text-xs text-muted-foreground">
+                    Event: {featuredVenue.event_title}
+                    {featuredVenue.event_start_time && ` — ${formatDateET(featuredVenue.event_start_time)}`}
+                  </p>
+                )}
+                {featuredVenue.callout_text ? (
+                  <p className="text-xs text-foreground whitespace-pre-wrap border-l-2 border-primary pl-3">
+                    {featuredVenue.callout_text}
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground italic">No callout text yet — edit in Featured dashboard.</p>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No venue spotlight set for {monthLabel(month)}.{' '}
+                <a href="/dashboard/featured" className="text-primary hover:underline">Add one →</a>
+              </p>
+            )}
           </div>
 
           {/* Preview */}

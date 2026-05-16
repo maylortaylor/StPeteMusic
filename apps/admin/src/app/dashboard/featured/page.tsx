@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Star, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, RefreshCw, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 
 interface FeaturedArtist {
   id: string;
@@ -24,6 +24,34 @@ interface Artist {
   id: string;
   name: string;
   type: string;
+}
+
+interface FeaturedVenue {
+  id: string;
+  venue_id: string;
+  featured_month: string;
+  event_id: string | null;
+  callout_text: string | null;
+  status: string;
+  venue_name: string | null;
+  venue_slug: string | null;
+  venue_instagram_url: string | null;
+  venue_instagram_username: string | null;
+  venue_website: string | null;
+  event_title: string | null;
+  event_start_time: string | null;
+  event_ticket_url: string | null;
+}
+
+interface Venue {
+  id: string;
+  name: string;
+}
+
+interface EventItem {
+  id: string;
+  title: string;
+  start_time: string;
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string; action?: string; actionPath?: string }> = {
@@ -67,6 +95,13 @@ export default function FeaturedPage() {
   const [extraUrlInput, setExtraUrlInput] = useState('');
   const [newSlot, setNewSlot] = useState<{ position: number; artistId: string }>({ position: 0, artistId: '' });
 
+  const [featuredVenue, setFeaturedVenue] = useState<FeaturedVenue | null>(null);
+  const [allVenues, setAllVenues] = useState<Venue[]>([]);
+  const [venueEvents, setVenueEvents] = useState<EventItem[]>([]);
+  const [venueForm, setVenueForm] = useState({ venueId: '', eventId: '', calloutText: '', status: 'draft' });
+  const [venueEditing, setVenueEditing] = useState(false);
+  const [venueSaving, setVenueSaving] = useState(false);
+
   const fetchFeatured = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -82,16 +117,50 @@ export default function FeaturedPage() {
     }
   }, [month]);
 
+  const fetchFeaturedVenue = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/featured-venues?month=${month}`);
+      if (!res.ok) throw new Error('Failed to fetch featured venue');
+      const data = await res.json();
+      setFeaturedVenue(data.featured_venue ?? null);
+      if (data.featured_venue) {
+        setVenueForm({
+          venueId: data.featured_venue.venue_id,
+          eventId: data.featured_venue.event_id ?? '',
+          calloutText: data.featured_venue.callout_text ?? '',
+          status: data.featured_venue.status,
+        });
+      } else {
+        setVenueForm({ venueId: '', eventId: '', calloutText: '', status: 'draft' });
+        setVenueEditing(false);
+      }
+    } catch {
+      // non-fatal — venue spotlight is optional
+    }
+  }, [month]);
+
   useEffect(() => {
     fetchFeatured();
-  }, [fetchFeatured]);
+    fetchFeaturedVenue();
+  }, [fetchFeatured, fetchFeaturedVenue]);
 
   useEffect(() => {
     fetch('/api/artists')
       .then((r) => { if (!r.ok) throw new Error(`Failed to load artists (${r.status})`); return r.json(); })
       .then((d) => setAllArtists(d.artists || []))
       .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load artist list'));
+    fetch('/api/venues')
+      .then((r) => r.json())
+      .then((d) => setAllVenues((d.venues || []).map((v: { id: string; name: string }) => ({ id: v.id, name: v.name }))))
+      .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    fetch(`/api/events?month=${month}`)
+      .then((r) => r.json())
+      .then((d) => setVenueEvents(d.events || []))
+      .catch(() => {});
+  }, [month]);
 
   const handleAddSlot = async (position: number) => {
     if (!newSlot.artistId || newSlot.position !== position) return;
@@ -110,6 +179,53 @@ export default function FeaturedPage() {
       fetchFeatured();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
+    }
+  };
+
+  const handleSaveVenue = async () => {
+    if (!venueForm.venueId) return;
+    setVenueSaving(true);
+    try {
+      const body = {
+        venueId: venueForm.venueId,
+        eventId: venueForm.eventId || null,
+        calloutText: venueForm.calloutText || null,
+        status: venueForm.status,
+      };
+      const res = featuredVenue
+        ? await fetch(`/api/featured-venues/${featuredVenue.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          })
+        : await fetch('/api/featured-venues', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...body, featuredMonth: month }),
+          });
+      if (!res.ok) {
+        const d = await res.json();
+        throw new Error(d.error || 'Failed to save venue spotlight');
+      }
+      setVenueEditing(false);
+      fetchFeaturedVenue();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save venue spotlight');
+    } finally {
+      setVenueSaving(false);
+    }
+  };
+
+  const handleDeleteVenue = async () => {
+    if (!featuredVenue || !confirm('Remove venue spotlight for this month?')) return;
+    try {
+      const res = await fetch(`/api/featured-venues/${featuredVenue.id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to remove');
+      setFeaturedVenue(null);
+      setVenueForm({ venueId: '', eventId: '', calloutText: '', status: 'draft' });
+      setVenueEditing(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to remove venue spotlight');
     }
   };
 
@@ -317,6 +433,159 @@ export default function FeaturedPage() {
           {renderSlot(2)}
         </div>
       )}
+
+      <div className="rounded-lg border border-border bg-card p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <MapPin className="h-5 w-5 text-muted-foreground" />
+            <h2 className="text-lg font-semibold text-foreground">Venue Spotlight</h2>
+          </div>
+          <div className="flex gap-2">
+            {featuredVenue && !venueEditing && (
+              <>
+                <button
+                  onClick={() => setVenueEditing(true)}
+                  className="rounded-md border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={handleDeleteVenue}
+                  className="rounded-md border border-border px-3 py-1.5 text-xs text-muted-foreground hover:text-destructive"
+                >
+                  Remove
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {!featuredVenue && !venueEditing ? (
+          <div className="rounded-lg border-2 border-dashed border-border p-6 text-center">
+            <p className="mb-3 text-sm text-muted-foreground">No venue spotlight set for {formatMonth(month)}</p>
+            <button
+              onClick={() => setVenueEditing(true)}
+              className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm text-muted-foreground hover:bg-muted"
+            >
+              <MapPin className="h-4 w-4" />
+              Add Venue Spotlight
+            </button>
+          </div>
+        ) : featuredVenue && !venueEditing ? (
+          <div className="space-y-3">
+            <div>
+              <p className="text-xs font-medium text-muted-foreground">Venue</p>
+              <p className="text-base font-semibold text-foreground">{featuredVenue.venue_name}</p>
+              {featuredVenue.venue_instagram_username && (
+                <p className="text-sm text-muted-foreground">{featuredVenue.venue_instagram_username}</p>
+              )}
+            </div>
+            {featuredVenue.event_title && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground">Featured Event</p>
+                <p className="text-sm text-foreground">{featuredVenue.event_title}</p>
+                {featuredVenue.event_start_time && (
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(featuredVenue.event_start_time).toLocaleDateString('en-US', {
+                      timeZone: 'America/New_York',
+                      weekday: 'short',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </p>
+                )}
+              </div>
+            )}
+            {featuredVenue.callout_text && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground">Callout</p>
+                <p className="text-sm text-foreground whitespace-pre-wrap">{featuredVenue.callout_text}</p>
+              </div>
+            )}
+            <span className={`inline-block rounded px-2 py-1 text-xs font-medium ${
+              featuredVenue.status === 'approved'
+                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                : 'bg-muted text-muted-foreground'
+            }`}>
+              {featuredVenue.status === 'approved' ? 'Approved' : 'Draft'}
+            </span>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-foreground">Venue</label>
+              <select
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                value={venueForm.venueId}
+                onChange={(e) => setVenueForm((f) => ({ ...f, venueId: e.target.value }))}
+              >
+                <option value="">Select a venue...</option>
+                {allVenues.map((v) => (
+                  <option key={v.id} value={v.id}>{v.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-foreground">
+                Featured Event <span className="text-muted-foreground font-normal">(optional)</span>
+              </label>
+              <select
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                value={venueForm.eventId}
+                onChange={(e) => setVenueForm((f) => ({ ...f, eventId: e.target.value }))}
+              >
+                <option value="">No specific event</option>
+                {venueEvents.map((ev) => (
+                  <option key={ev.id} value={ev.id}>
+                    {ev.title} — {new Date(ev.start_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'America/New_York' })}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-foreground">
+                Callout Text <span className="text-muted-foreground font-normal">(manually written)</span>
+              </label>
+              <textarea
+                rows={4}
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm resize-none"
+                placeholder="Write 3–4 sentences about this venue and why readers should check out the event..."
+                value={venueForm.calloutText}
+                onChange={(e) => setVenueForm((f) => ({ ...f, calloutText: e.target.value }))}
+              />
+            </div>
+            <div className="flex items-center gap-3">
+              <label className="text-sm font-medium text-foreground">Status</label>
+              <select
+                className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+                value={venueForm.status}
+                onChange={(e) => setVenueForm((f) => ({ ...f, status: e.target.value }))}
+              >
+                <option value="draft">Draft</option>
+                <option value="approved">Approved</option>
+              </select>
+            </div>
+            <div className="flex gap-2 pt-1">
+              <button
+                onClick={handleSaveVenue}
+                disabled={!venueForm.venueId || venueSaving}
+                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+              >
+                {venueSaving ? 'Saving...' : 'Save Venue Spotlight'}
+              </button>
+              <button
+                onClick={() => {
+                  setVenueEditing(false);
+                  if (!featuredVenue) setVenueForm({ venueId: '', eventId: '', calloutText: '', status: 'draft' });
+                }}
+                className="rounded-md border border-border px-4 py-2 text-sm text-muted-foreground hover:bg-muted"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
       {enrichingArtist && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">

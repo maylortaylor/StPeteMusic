@@ -57,24 +57,10 @@ export function LivePlayer({ isLive: initialLive, videoId: initialVideoId, title
           </AnimateIn>
           <AnimateIn delay={0.2}>
             <p className="font-inter text-text-secondary text-lg mb-8">
-              No stream is live right now. Past streams are available for members on Patreon.
+              No stream is live right now. Past streams are available on Youtube.
             </p>
           </AnimateIn>
           <AnimateIn delay={0.3} className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="https://www.patreon.com/stpetemusic"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block font-inter font-bold text-sm uppercase tracking-widest px-8 py-3 bg-black text-white hover:opacity-85 transition-opacity"
-              onClick={() =>
-                pushEvent('outbound_link_click', {
-                  link_url: 'https://www.patreon.com/stpetemusic',
-                  link_text: 'Join on Patreon',
-                })
-              }
-            >
-              Join on Patreon →
-            </a>
             <a
               href="https://youtube.com/@StPeteMusic"
               target="_blank"
