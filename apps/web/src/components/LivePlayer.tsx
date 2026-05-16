@@ -8,16 +8,19 @@ interface LivePlayerProps {
   isLive: boolean;
   videoId: string | null;
   title: string | null;
+  error?: string;
 }
 
-export function LivePlayer({ isLive: initialLive, videoId: initialVideoId, title }: LivePlayerProps) {
+export function LivePlayer({ isLive: initialLive, videoId: initialVideoId, title, error: initialError }: LivePlayerProps) {
   const [isLive, setIsLive] = useState(initialLive);
   const [videoId, setVideoId] = useState(initialVideoId);
+  const [error, setError] = useState(initialError);
 
   const checkStatus = useCallback(async () => {
     try {
-      const res = await fetch('/api/stream/youtube-status', { cache: 'no-store' });
+      const res = await fetch('/api/stream/youtube-status');
       const data = await res.json();
+      setError(data.error);
       if (data.live && data.videoId) {
         setIsLive(true);
         setVideoId(data.videoId);
@@ -37,6 +40,11 @@ export function LivePlayer({ isLive: initialLive, videoId: initialVideoId, title
   }, [isLive, videoId, checkStatus]);
 
   if (!isLive || !videoId) {
+    const isQuotaError = error === 'quota_exceeded';
+    const subtext = isQuotaError
+      ? 'We may be live right now — check our YouTube channel directly.'
+      : 'No stream is live right now. Past streams are available on Youtube.';
+
     return (
       <section className="px-6 py-32">
         <div className="max-w-4xl mx-auto text-center">
@@ -57,7 +65,7 @@ export function LivePlayer({ isLive: initialLive, videoId: initialVideoId, title
           </AnimateIn>
           <AnimateIn delay={0.2}>
             <p className="font-inter text-text-secondary text-lg mb-8">
-              No stream is live right now. Past streams are available on Youtube.
+              {subtext}
             </p>
           </AnimateIn>
           <AnimateIn delay={0.3} className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -76,9 +84,11 @@ export function LivePlayer({ isLive: initialLive, videoId: initialVideoId, title
               Watch on YouTube
             </a>
           </AnimateIn>
-          <p className="font-inter text-text-muted text-sm mt-10">
-            This page checks automatically — no need to refresh.
-          </p>
+          {!isQuotaError && (
+            <p className="font-inter text-text-muted text-sm mt-10">
+              This page checks automatically — no need to refresh.
+            </p>
+          )}
         </div>
       </section>
     );

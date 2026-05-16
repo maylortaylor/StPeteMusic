@@ -1,13 +1,15 @@
 import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic';
+// Cache server-side for 15 min: max 96 YouTube API calls/day = 9,600 units (within 10k quota).
+// All concurrent visitors and client polls share this cached response.
+export const revalidate = 900;
 
 export async function GET() {
   const channelId = process.env.YOUTUBE_CHANNEL_ID;
   const apiKey = process.env.YOUTUBE_API_KEY;
 
   if (!channelId || !apiKey) {
-    return NextResponse.json({ live: false, videoId: null, title: null });
+    return NextResponse.json({ live: false, videoId: null, title: null, error: 'config_missing' });
   }
 
   try {
@@ -18,12 +20,14 @@ export async function GET() {
     url.searchParams.set('eventType', 'live');
     url.searchParams.set('key', apiKey);
 
-    const res = await fetch(url.toString(), {
-      next: { revalidate: 0 },
-      signal: AbortSignal.timeout(4000),
-    });
+    const res = await fetch(url.toString(), { signal: AbortSignal.timeout(4000) });
 
-    if (!res.ok) return NextResponse.json({ live: false, videoId: null, title: null });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      const reason = errData?.error?.errors?.[0]?.reason;
+      const error = reason === 'quotaExceeded' ? 'quota_exceeded' : 'api_error';
+      return NextResponse.json({ live: false, videoId: null, title: null, error });
+    }
 
     const data = await res.json();
     const item = data.items?.[0];
@@ -34,6 +38,6 @@ export async function GET() {
       title: item?.snippet?.title ?? null,
     });
   } catch {
-    return NextResponse.json({ live: false, videoId: null, title: null });
+    return NextResponse.json({ live: false, videoId: null, title: null, error: 'api_error' });
   }
 }
