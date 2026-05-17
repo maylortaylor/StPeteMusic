@@ -2,8 +2,26 @@ import { NextResponse } from 'next/server';
 import { getDb, youtube_config, eq } from '@stpetemusic/db';
 
 // force-dynamic: must run on every request so the DB override and cache are always current.
-// Quota is protected by storing the YouTube API result in the DB with a 15-min TTL.
+// Quota is protected by storing the YouTube API result in the DB with a TTL that lands on
+// the next :10 or :40 mark (roughly every 30 min, predictable schedule).
 export const dynamic = 'force-dynamic';
+
+/** Returns the next cache expiry time — either :10 or :40 past the hour. */
+function nextScheduledCheck(): Date {
+  const now = new Date();
+  const result = new Date(now);
+  result.setSeconds(0, 0);
+  const m = now.getMinutes();
+  if (m < 10) {
+    result.setMinutes(10);
+  } else if (m < 40) {
+    result.setMinutes(40);
+  } else {
+    result.setHours(result.getHours() + 1);
+    result.setMinutes(10);
+  }
+  return result;
+}
 
 export async function GET() {
   try {
@@ -11,6 +29,8 @@ export async function GET() {
     const [cfg] = await db
       .select({
         override: youtube_config.stream_override_video_id,
+        overridePlatform: youtube_config.stream_override_platform,
+        overrideExpiresAt: youtube_config.stream_override_expires_at,
         cacheVideoId: youtube_config.yt_cache_video_id,
         cacheLive: youtube_config.yt_cache_is_live,
         cacheTitle: youtube_config.yt_cache_title,
@@ -19,9 +39,16 @@ export async function GET() {
       .from(youtube_config)
       .limit(1);
 
-    // Admin override — bypass YouTube API entirely
-    if (cfg?.override) {
-      return NextResponse.json({ live: true, videoId: cfg.override, title: null });
+    // Admin override — bypass YouTube API entirely (ignored if expired)
+    const overrideActive =
+      cfg?.override && (!cfg.overrideExpiresAt || new Date() < cfg.overrideExpiresAt);
+    if (overrideActive) {
+      return NextResponse.json({
+        live: true,
+        videoId: cfg.override,
+        platform: cfg.overridePlatform ?? 'youtube',
+        title: null,
+      });
     }
 
     // Serve from DB cache if still fresh
@@ -29,6 +56,7 @@ export async function GET() {
       return NextResponse.json({
         live: cfg.cacheLive ?? false,
         videoId: cfg.cacheVideoId ?? null,
+        platform: 'youtube',
         title: cfg.cacheTitle ?? null,
       });
     }
@@ -68,7 +96,7 @@ export async function GET() {
       title: item?.snippet?.title ?? null,
     };
 
-    // Store in DB cache — 15 min TTL keeps daily usage under 10k quota units
+    // Cache until next :10 or :40 mark — predictable schedule, stays well under 10k quota units/day
     try {
       const db = getDb();
       const [existing] = await db
@@ -79,7 +107,7 @@ export async function GET() {
         yt_cache_video_id: result.videoId,
         yt_cache_is_live: result.live,
         yt_cache_title: result.title,
-        yt_cache_expires_at: new Date(Date.now() + 15 * 60 * 1000),
+        yt_cache_expires_at: nextScheduledCheck(),
       };
       if (existing) {
         await db.update(youtube_config).set(cacheData).where(eq(youtube_config.id, existing.id));
@@ -88,7 +116,7 @@ export async function GET() {
       }
     } catch { /* non-fatal — cache miss on next request is fine */ }
 
-    return NextResponse.json(result);
+    return NextResponse.json({ ...result, platform: 'youtube' });
   } catch {
     return NextResponse.json({ live: false, videoId: null, title: null, error: 'api_error' });
   }
