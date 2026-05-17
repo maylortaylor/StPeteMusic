@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getDb, youtube_config } from '@stpetemusic/db';
+import { getDb, youtube_config, eq } from '@stpetemusic/db';
 
 // force-dynamic: must run on every request so the DB override and cache are always current.
 // Quota is protected by storing the YouTube API result in the DB with a 15-min TTL.
@@ -82,7 +82,7 @@ export async function GET() {
         yt_cache_expires_at: new Date(Date.now() + 15 * 60 * 1000),
       };
       if (existing) {
-        await db.update(youtube_config).set(cacheData);
+        await db.update(youtube_config).set(cacheData).where(eq(youtube_config.id, existing.id));
       } else {
         await db.insert(youtube_config).values(cacheData);
       }
