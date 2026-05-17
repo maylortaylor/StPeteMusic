@@ -23,8 +23,8 @@ authInternalUsers:
 # Record every published stream as a single .mp4 (OBS encodes; we just remux)
 record: yes
 recordPath: /recordings/%path/%Y-%m-%dT%H-%M-%S.mp4
-recordFormat: mp4
-recordDeleteAfter: 0    # vod-watcher.service uploads to S3 and handles cleanup
+recordFormat: fmp4
+recordDeleteAfter: 0s   # vod-watcher.service uploads to S3 and handles cleanup
 
 paths:
   live:
