@@ -165,6 +165,13 @@ jobs:
             fi
             echo "✓ RDS host: ${RDS_HOST}"
 
+            echo "── Validating required secrets ──"
+            if [[ -z "${RTMP_STREAM_KEY}" ]]; then
+              echo "❌ RTMP_STREAM_KEY is empty — GitHub Secret not set. Aborting to prevent mediamtx auth failure."
+              exit 1
+            fi
+            echo "✓ RTMP_STREAM_KEY is set"
+
             echo "── Writing .env from GitHub Secrets ──"
             # printf '%s' is used for each value to safely handle special characters
             # (colons, slashes, equals signs) without shell interpretation
@@ -367,6 +374,15 @@ jobs:
             sudo systemctl daemon-reload
             sudo systemctl enable --now vod-watcher.service
             echo "✓ vod-watcher.service installed and started"
+
+            echo "── Installing mediamtx watchdog timer ──"
+            printf '[Unit]\nDescription=MediaMTX RTMP Health Watchdog\n\n[Service]\nType=oneshot\nUser=ec2-user\nWorkingDirectory=/home/ec2-user/stpetemusic/n8n\nExecStart=/bin/bash -c "nc -z localhost 1935 || docker compose -f docker-compose.prod.yaml --env-file ../.env up -d mediamtx"\n' \
+              | sudo tee /etc/systemd/system/mediamtx-watchdog.service > /dev/null
+            printf '[Unit]\nDescription=MediaMTX Watchdog Timer\n\n[Timer]\nOnBootSec=3min\nOnUnitActiveSec=2min\n\n[Install]\nWantedBy=timers.target\n' \
+              | sudo tee /etc/systemd/system/mediamtx-watchdog.timer > /dev/null
+            sudo systemctl daemon-reload
+            sudo systemctl enable --now mediamtx-watchdog.timer
+            echo "✓ mediamtx-watchdog.timer installed (checks port 1935 every 2 min)"
 
             echo "── Cleanup ──"
             rm -rf "${DEPLOY_DIR}" "${TARBALL}"

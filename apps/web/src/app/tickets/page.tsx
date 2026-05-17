@@ -40,6 +40,29 @@ export default async function TicketsPage() {
               Upcoming ticketed events in St. Pete. Presented by StPeteMusic at Suite E Studios and
               beyond.
             </p>
+
+            {/* Eventbrite attribution */}
+            <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border border-border bg-card px-5 py-4 max-w-2xl">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                {/* Eventbrite wordmark color */}
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#f05537" className="w-5 h-5 shrink-0" aria-hidden="true">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+                </svg>
+                <span>
+                  Events are powered by{' '}
+                  <span className="font-semibold text-foreground">Eventbrite</span>
+                  {' '}— browse and purchase tickets directly on our Eventbrite page.
+                </span>
+              </div>
+              <a
+                href="https://www.eventbrite.com/o/st-pete-music-105663485881"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 rounded-lg bg-[#f05537] px-4 py-2 text-sm font-semibold text-white hover:bg-[#d94a2e] transition-colors whitespace-nowrap"
+              >
+                View All on Eventbrite →
+              </a>
+            </div>
           </div>
 
           {/* Events grid */}

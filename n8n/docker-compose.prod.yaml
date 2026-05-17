@@ -112,6 +112,17 @@ services:
     mem_limit: 128m    # Recording only — no HLS serving, very light footprint
     memswap_limit: 256m
 
+  autoheal:
+    image: willfarrell/autoheal:latest
+    container_name: autoheal
+    restart: unless-stopped
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=all
+      - AUTOHEAL_INTERVAL=60
+      - AUTOHEAL_START_PERIOD=300
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
 networks:
   n8n-net:
     driver: bridge

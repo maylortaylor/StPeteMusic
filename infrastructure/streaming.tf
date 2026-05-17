@@ -40,3 +40,18 @@ resource "aws_ssm_parameter" "rtmp_stream_key" {
   value = var.rtmp_stream_key
   tags  = { Project = var.project }
 }
+
+# Route53 health check — monitors TCP:1935 from AWS edge nodes every 30s
+# ~$0.50/month. Visible in Route53 console; attach to SNS for alerts later.
+resource "aws_route53_health_check" "rtmp" {
+  type              = "TCP"
+  ip_address        = aws_eip.n8n.public_ip
+  port              = 1935
+  request_interval  = 30
+  failure_threshold = 3
+
+  tags = {
+    Name    = "${var.project}-rtmp-health"
+    Project = var.project
+  }
+}
