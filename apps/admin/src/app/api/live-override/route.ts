@@ -1,5 +1,5 @@
 import { auth } from '@clerk/nextjs/server';
-import { getDb, youtube_config } from '@stpetemusic/db';
+import { getDb, youtube_config, eq } from '@stpetemusic/db';
 
 function extractVideoId(input: string): string | null {
   const trimmed = input.trim();
@@ -47,7 +47,7 @@ export async function PATCH(request: Request) {
     .limit(1);
 
   if (existing) {
-    await db.update(youtube_config).set({ stream_override_video_id: videoId });
+    await db.update(youtube_config).set({ stream_override_video_id: videoId }).where(eq(youtube_config.id, existing.id));
   } else {
     await db.insert(youtube_config).values({ stream_override_video_id: videoId });
   }

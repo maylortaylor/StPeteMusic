@@ -1034,4 +1034,15 @@ UPDATE venues
   WHERE slug = 'suite-e-studios';
 `,
   },
+  {
+    filename: '028_add_stream_override.sql',
+    sql: `
+ALTER TABLE youtube_config
+  ADD COLUMN IF NOT EXISTS stream_override_video_id VARCHAR(20),
+  ADD COLUMN IF NOT EXISTS yt_cache_video_id        VARCHAR(20),
+  ADD COLUMN IF NOT EXISTS yt_cache_is_live         BOOLEAN NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS yt_cache_title           TEXT,
+  ADD COLUMN IF NOT EXISTS yt_cache_expires_at      TIMESTAMPTZ;
+`,
+  },
 ];
