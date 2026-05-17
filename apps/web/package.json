@@ -34,6 +34,7 @@
     "@stpetemusic/types": "*",
     "@types/pg": "^8.20.0",
     "framer-motion": "^12.38.0",
+    "hls.js": "^1.6.16",
     "next": "^16.2.4",
     "pg": "^8.20.0",
     "react-dom": "^19.2.6",

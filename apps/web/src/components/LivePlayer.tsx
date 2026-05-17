@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { AnimateIn } from './AnimateIn';
 import { pushEvent } from '@/lib/analytics';
 
-type Platform = 'youtube' | 'facebook' | 'twitch' | null;
+type Platform = 'youtube' | 'facebook' | 'twitch' | 'hls' | null;
 
 interface LivePlayerProps {
   isLive: boolean;
@@ -29,30 +29,45 @@ export function LivePlayer({
   const [platform, setPlatform] = useState<Platform>(initialPlatform);
   const [error, setError] = useState(initialError);
 
+  const offAirTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const checkStatus = useCallback(async () => {
     try {
       const res = await fetch('/api/stream/youtube-status');
       const data = await res.json();
       setError(data.error);
-      if (data.live && data.videoId) {
+      if (data.live) {
+        if (offAirTimerRef.current) {
+          clearTimeout(offAirTimerRef.current);
+          offAirTimerRef.current = null;
+        }
         setIsLive(true);
-        setVideoId(data.videoId);
+        setVideoId(data.videoId ?? null);
         setPlatform(data.platform ?? 'youtube');
+      } else if (!offAirTimerRef.current) {
+        // Grace period: avoid an abrupt "Off Air" flash on brief detection gaps
+        offAirTimerRef.current = setTimeout(() => {
+          setIsLive(false);
+          offAirTimerRef.current = null;
+        }, 5_000);
       }
     } catch { /* silent — next poll will retry */ }
   }, []);
 
+  // Always poll — detects stream start when offline and stream end when live
   useEffect(() => {
     if (isLive) {
       pushEvent('live_stream_view', { video_id: videoId, platform: platform ?? 'youtube' });
-      return;
     }
-    // Poll every 60s when offline
     const interval = setInterval(checkStatus, 60_000);
     return () => clearInterval(interval);
   }, [isLive, videoId, platform, checkStatus]);
 
-  if (!isLive || !videoId) {
+  useEffect(() => () => {
+    if (offAirTimerRef.current) clearTimeout(offAirTimerRef.current);
+  }, []);
+
+  if (!isLive || (!videoId && platform !== 'hls')) {
     const isQuotaError = error === 'quota_exceeded';
     return (
       <section className="px-6 py-32">
@@ -130,13 +145,14 @@ export function LivePlayer({
         </div>
 
         {platform === 'facebook' ? (
-          <FacebookLiveCard url={videoId} />
+          <FacebookLiveCard url={videoId ?? ''} />
         ) : (
           <div className="relative aspect-video bg-black">
-            {platform === 'twitch' && (
+            {platform === 'hls' && <HlsPlayer />}
+            {platform === 'twitch' && videoId && (
               <TwitchEmbed channel={videoId} />
             )}
-            {(platform === 'youtube' || !platform) && (
+            {(platform === 'youtube' || !platform) && videoId && (
               <iframe
                 src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&modestbranding=1`}
                 className="absolute inset-0 w-full h-full"
@@ -153,6 +169,51 @@ export function LivePlayer({
         </p>
       </div>
     </section>
+  );
+}
+
+const HLS_STREAM_URL = process.env.NEXT_PUBLIC_HLS_STREAM_URL ?? 'https://hls.stpetemusic.live/live/index.m3u8';
+
+function HlsPlayer() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Safari has native HLS — no library needed
+      video.src = HLS_STREAM_URL;
+      return;
+    }
+
+    // Chrome/Firefox: load hls.js dynamically to keep it out of the initial bundle
+    let hlsInstance: { destroy: () => void } | null = null;
+    void import('hls.js').then(({ default: Hls }) => {
+      if (!Hls.isSupported() || !videoRef.current) return;
+      const hls = new Hls();
+      hls.on(Hls.Events.ERROR, (_event, data) => {
+        if (data.fatal) hls.destroy();
+      });
+      hls.loadSource(HLS_STREAM_URL);
+      hls.attachMedia(videoRef.current);
+      hlsInstance = hls;
+    });
+
+    return () => {
+      hlsInstance?.destroy();
+    };
+  }, []);
+
+  return (
+    <video
+      ref={videoRef}
+      autoPlay
+      controls
+      playsInline
+      className="absolute inset-0 w-full h-full"
+      title="St. Pete Music Live Stream"
+    />
   );
 }
 
