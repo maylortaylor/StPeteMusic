@@ -101,6 +101,8 @@ services:
     ports:
       # RTMP — must bind to 0.0.0.0 so Restream can connect from the internet
       - "0.0.0.0:1935:1935"
+      # HLS — localhost only, nginx proxies to CloudFront origin
+      - "127.0.0.1:8888:8888"
     networks:
       - n8n-net
     healthcheck:
@@ -109,8 +111,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-    mem_limit: 128m    # Recording only — no HLS serving, very light footprint
-    memswap_limit: 256m
+    mem_limit: 256m    # HLS segment buffering requires extra headroom
+    memswap_limit: 512m
 
   autoheal:
     image: willfarrell/autoheal:latest

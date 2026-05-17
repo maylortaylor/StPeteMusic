@@ -1,23 +1,29 @@
-# MediaMTX — RTMP ingest + recording only
-# YouTube handles live delivery to viewers; this server saves the .mp4 for post-processing.
-# OBS → Restream → this server (records) + YouTube (streams to viewers)
+# MediaMTX — RTMP ingest + recording + HLS serving
+# OBS → Restream → this server (records + HLS) + YouTube/Facebook/Twitch (live audiences)
 
 rtmpAddress: :1935
+hlsAddress: :8888
+hlsAllowOrigin: '*'
 
-# HLS/RTSP/WebRTC not needed — disable to reduce attack surface and memory
-hlsAddress: ""
+# Disable unused protocols to reduce attack surface
 rtspAddress: ""
 rtspsAddress: ""
 webrtcAddress: ""
 srtAddress: ""
 
 # Only allow publishing with the correct stream key (set via RTMP_STREAM_KEY env var at runtime)
+# Anonymous reads are allowed so HLS viewers and CloudFront can fetch segments/manifests.
 authMethod: internal
 authInternalUsers:
   - user: stream
     pass: "${RTMP_STREAM_KEY}"
     permissions:
       - action: publish
+        path: live
+  - user: any
+    pass: any
+    permissions:
+      - action: read
         path: live
 
 # Record every published stream as a single .mp4 (OBS encodes; we just remux)

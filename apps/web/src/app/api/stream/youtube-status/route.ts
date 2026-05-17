@@ -51,6 +51,19 @@ export async function GET() {
       });
     }
 
+    // Check self-hosted HLS stream — always copyright-safe, no API quota consumed.
+    // CloudFront returns 200 when MediaMTX has an active stream; 404 when offline.
+    const hlsManifest = process.env.HLS_STREAM_URL ?? 'https://hls.stpetemusic.live/live/index.m3u8';
+    try {
+      const hlsRes = await fetch(hlsManifest, {
+        method: 'HEAD',
+        signal: AbortSignal.timeout(2000),
+      });
+      if (hlsRes.ok) {
+        return NextResponse.json({ live: true, videoId: null, platform: 'hls', title: null });
+      }
+    } catch { /* HLS not active or unreachable — continue to YouTube checks */ }
+
     // Serve from DB cache if still fresh
     if (cfg?.cacheExpiresAt && new Date() < cfg.cacheExpiresAt) {
       return NextResponse.json({

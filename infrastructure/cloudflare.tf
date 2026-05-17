@@ -74,6 +74,23 @@ resource "cloudflare_record" "stream" {
   allow_overwrite = true
 }
 
+# ── HLS viewer endpoint: hls.stpetemusic.live ─────────────────────────────────
+# CloudFront CDN for HLS live stream. stream.stpetemusic.live (RTMP ingest) is
+# unchanged — this is a separate subdomain for viewer-facing HLS delivery.
+# DNS-only (not proxied) — CloudFront is the CDN; don't route through Cloudflare too.
+
+resource "cloudflare_record" "hls" {
+  count = local.enable_cloudflare ? 1 : 0
+
+  zone_id         = var.cloudflare_zone_id
+  name            = "hls"
+  type            = "CNAME"
+  content         = aws_cloudfront_distribution.hls_stream.domain_name
+  proxied         = false
+  ttl             = 1
+  allow_overwrite = true
+}
+
 # ── ACM SSL verification ───────────────────────────────────────────────────────
 # Amplify-managed ACM cert validation record. NEVER delete — Amplify uses it for
 # automatic annual renewal. Value is static after initial cert issuance.
