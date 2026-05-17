@@ -3,6 +3,8 @@ import { Nav } from '@/components/Nav';
 import { Footer } from '@/components/Footer';
 import { LivePlayer } from '@/components/LivePlayer';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Live Stream | St. Pete Music',
   description:

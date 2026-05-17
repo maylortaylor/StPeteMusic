@@ -32,8 +32,8 @@ export async function GET() {
         title: cfg.cacheTitle ?? null,
       });
     }
-  } catch {
-    // DB unavailable — fall through to YouTube API
+  } catch (err) {
+    console.error('[youtube-status] DB read failed, falling through to YouTube API:', err);
   }
 
   const channelId = process.env.YOUTUBE_CHANNEL_ID;
