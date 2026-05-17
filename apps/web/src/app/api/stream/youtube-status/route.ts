@@ -24,6 +24,13 @@ function nextScheduledCheck(): Date {
 }
 
 export async function GET() {
+  // Fire HLS check immediately so it overlaps with the DB query — no serial wait.
+  // CloudFront returns 200 when MediaMTX has an active stream; 404 when offline.
+  const hlsManifest = process.env.HLS_STREAM_URL ?? 'https://hls.stpetemusic.live/live/index.m3u8';
+  const hlsPromise = fetch(hlsManifest, { method: 'HEAD', signal: AbortSignal.timeout(2000) })
+    .then(r => r.ok)
+    .catch(() => false);
+
   try {
     const db = getDb();
     const [cfg] = await db
@@ -39,7 +46,7 @@ export async function GET() {
       .from(youtube_config)
       .limit(1);
 
-    // Admin override — bypass YouTube API entirely (ignored if expired)
+    // Admin override — bypass all auto-detection (ignored if expired)
     const overrideActive =
       cfg?.override && (!cfg.overrideExpiresAt || new Date() < cfg.overrideExpiresAt);
     if (overrideActive) {
@@ -51,18 +58,11 @@ export async function GET() {
       });
     }
 
-    // Check self-hosted HLS stream — always copyright-safe, no API quota consumed.
-    // CloudFront returns 200 when MediaMTX has an active stream; 404 when offline.
-    const hlsManifest = process.env.HLS_STREAM_URL ?? 'https://hls.stpetemusic.live/live/index.m3u8';
-    try {
-      const hlsRes = await fetch(hlsManifest, {
-        method: 'HEAD',
-        signal: AbortSignal.timeout(2000),
-      });
-      if (hlsRes.ok) {
-        return NextResponse.json({ live: true, videoId: null, platform: 'hls', title: null });
-      }
-    } catch { /* HLS not active or unreachable — continue to YouTube checks */ }
+    // HLS check — DB query has completed by now so hlsPromise has had max overlap time.
+    // Always copyright-safe, no API quota consumed.
+    if (await hlsPromise) {
+      return NextResponse.json({ live: true, videoId: null, platform: 'hls', title: null });
+    }
 
     // Serve from DB cache if still fresh
     if (cfg?.cacheExpiresAt && new Date() < cfg.cacheExpiresAt) {
@@ -75,6 +75,10 @@ export async function GET() {
     }
   } catch (err) {
     console.error('[youtube-status] DB read failed, falling through to YouTube API:', err);
+    // Still surface HLS even when DB is unavailable
+    if (await hlsPromise) {
+      return NextResponse.json({ live: true, videoId: null, platform: 'hls', title: null });
+    }
   }
 
   const channelId = process.env.YOUTUBE_CHANNEL_ID;

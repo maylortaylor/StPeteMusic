@@ -29,28 +29,43 @@ export function LivePlayer({
   const [platform, setPlatform] = useState<Platform>(initialPlatform);
   const [error, setError] = useState(initialError);
 
+  const offAirTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const checkStatus = useCallback(async () => {
     try {
       const res = await fetch('/api/stream/youtube-status');
       const data = await res.json();
       setError(data.error);
-      if (data.live && data.videoId) {
+      if (data.live) {
+        if (offAirTimerRef.current) {
+          clearTimeout(offAirTimerRef.current);
+          offAirTimerRef.current = null;
+        }
         setIsLive(true);
-        setVideoId(data.videoId);
+        setVideoId(data.videoId ?? null);
         setPlatform(data.platform ?? 'youtube');
+      } else if (!offAirTimerRef.current) {
+        // Grace period: avoid an abrupt "Off Air" flash on brief detection gaps
+        offAirTimerRef.current = setTimeout(() => {
+          setIsLive(false);
+          offAirTimerRef.current = null;
+        }, 5_000);
       }
     } catch { /* silent — next poll will retry */ }
   }, []);
 
+  // Always poll — detects stream start when offline and stream end when live
   useEffect(() => {
     if (isLive) {
       pushEvent('live_stream_view', { video_id: videoId, platform: platform ?? 'youtube' });
-      return;
     }
-    // Poll every 60s when offline
     const interval = setInterval(checkStatus, 60_000);
     return () => clearInterval(interval);
   }, [isLive, videoId, platform, checkStatus]);
+
+  useEffect(() => () => {
+    if (offAirTimerRef.current) clearTimeout(offAirTimerRef.current);
+  }, []);
 
   if (!isLive || (!videoId && platform !== 'hls')) {
     const isQuotaError = error === 'quota_exceeded';
@@ -130,7 +145,7 @@ export function LivePlayer({
         </div>
 
         {platform === 'facebook' ? (
-          <FacebookLiveCard url={videoId!} />
+          <FacebookLiveCard url={videoId ?? ''} />
         ) : (
           <div className="relative aspect-video bg-black">
             {platform === 'hls' && <HlsPlayer />}
@@ -157,7 +172,7 @@ export function LivePlayer({
   );
 }
 
-const HLS_STREAM_URL = 'https://hls.stpetemusic.live/live/index.m3u8';
+const HLS_STREAM_URL = process.env.NEXT_PUBLIC_HLS_STREAM_URL ?? 'https://hls.stpetemusic.live/live/index.m3u8';
 
 function HlsPlayer() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -177,6 +192,9 @@ function HlsPlayer() {
     void import('hls.js').then(({ default: Hls }) => {
       if (!Hls.isSupported() || !videoRef.current) return;
       const hls = new Hls();
+      hls.on(Hls.Events.ERROR, (_event, data) => {
+        if (data.fatal) hls.destroy();
+      });
       hls.loadSource(HLS_STREAM_URL);
       hls.attachMedia(videoRef.current);
       hlsInstance = hls;
