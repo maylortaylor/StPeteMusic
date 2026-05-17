@@ -5,7 +5,9 @@ applications:
         preBuild:
           commands:
             - node --version
-            - npm ci
+            # Install from monorepo root so workspace packages (@stpetemusic/db) are symlinked
+            - npm --prefix ../.. ci
+            - npm --prefix ../.. run build --workspace=@stpetemusic/db
             # Amplify WEB_COMPUTE does not inject non-NEXT_PUBLIC env vars at runtime.
             # Write them to .env.production so Next.js loads them in the server context.
             - |
@@ -28,7 +30,7 @@ applications:
           - '**/*'
       cache:
         paths:
-          - node_modules/**/*
+          - ../../node_modules/**/*
           - .next/cache/**/*
     appRoot: apps/web
   - frontend:
