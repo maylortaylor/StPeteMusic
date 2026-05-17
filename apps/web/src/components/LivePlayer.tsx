@@ -129,23 +129,24 @@ export function LivePlayer({
           )}
         </div>
 
-        <div className="relative aspect-video bg-black">
-          {platform === 'twitch' && (
-            <TwitchEmbed channel={videoId} />
-          )}
-          {platform === 'facebook' && (
-            <FacebookEmbed url={videoId} />
-          )}
-          {(platform === 'youtube' || !platform) && (
-            <iframe
-              src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&modestbranding=1`}
-              className="absolute inset-0 w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              title="St. Pete Music Live Stream"
-            />
-          )}
-        </div>
+        {platform === 'facebook' ? (
+          <FacebookLiveCard url={videoId} />
+        ) : (
+          <div className="relative aspect-video bg-black">
+            {platform === 'twitch' && (
+              <TwitchEmbed channel={videoId} />
+            )}
+            {(platform === 'youtube' || !platform) && (
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&modestbranding=1`}
+                className="absolute inset-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                title="St. Pete Music Live Stream"
+              />
+            )}
+          </div>
+        )}
 
         <p className="font-inter text-text-muted text-sm mt-4">
           Live from Suite E Studios · St. Petersburg, FL
@@ -168,17 +169,26 @@ function TwitchEmbed({ channel }: { channel: string }) {
   );
 }
 
-function FacebookEmbed({ url }: { url: string }) {
-  // Uses Facebook's video plugin iframe — no JS SDK required.
-  // Works for public live streams and recorded videos.
-  const src = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false&width=1280&autoplay=true`;
+// Facebook embeds require third-party cookies + App Domain registration and are blocked by most
+// modern browsers without that setup. A direct link is more reliable for live streams.
+function FacebookLiveCard({ url }: { url: string }) {
   return (
-    <iframe
-      src={src}
-      className="absolute inset-0 w-full h-full"
-      allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-      allowFullScreen
-      title="St. Pete Music Live on Facebook"
-    />
+    <div className="border border-black p-10 text-center">
+      <p className="font-inter font-medium text-sm tracking-[0.5em] uppercase mb-4" style={{ color: '#B57048' }}>
+        Streaming Live on Facebook
+      </p>
+      <p className="font-inter text-text-secondary mb-8">
+        We&apos;re live on Facebook right now. Tap below to watch.
+      </p>
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-block font-inter font-bold text-sm uppercase tracking-widest px-8 py-3 bg-black text-white hover:opacity-80 transition-opacity"
+        onClick={() => pushEvent('outbound_link_click', { link_url: url, link_text: 'Watch Live on Facebook' })}
+      >
+        Watch Live on Facebook →
+      </a>
+    </div>
   );
 }
