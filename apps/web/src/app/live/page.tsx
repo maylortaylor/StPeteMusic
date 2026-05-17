@@ -21,6 +21,7 @@ export const metadata: Metadata = {
 interface StreamStatus {
   live: boolean;
   videoId: string | null;
+  platform: 'youtube' | 'facebook' | 'twitch' | null;
   title: string | null;
   error?: string;
 }
@@ -32,21 +33,21 @@ async function getStreamStatus(): Promise<StreamStatus> {
       cache: 'no-store',
       signal: AbortSignal.timeout(5000),
     });
-    if (!res.ok) return { live: false, videoId: null, title: null };
+    if (!res.ok) return { live: false, videoId: null, platform: null, title: null };
     return res.json();
   } catch {
-    return { live: false, videoId: null, title: null };
+    return { live: false, videoId: null, platform: null, title: null };
   }
 }
 
 export default async function LivePage() {
-  const { live, videoId, title, error } = await getStreamStatus();
+  const { live, videoId, platform, title, error } = await getStreamStatus();
 
   return (
     <>
       <Nav />
       <main className="min-h-screen bg-background">
-        <LivePlayer isLive={live} videoId={videoId} title={title} error={error} />
+        <LivePlayer isLive={live} videoId={videoId} platform={platform} title={title} error={error} />
       </main>
       <Footer />
     </>

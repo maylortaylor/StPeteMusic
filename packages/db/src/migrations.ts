@@ -1045,4 +1045,19 @@ ALTER TABLE youtube_config
   ADD COLUMN IF NOT EXISTS yt_cache_expires_at      TIMESTAMPTZ;
 `,
   },
+  {
+    filename: '029_add_stream_override_expiry.sql',
+    sql: `
+ALTER TABLE youtube_config
+  ADD COLUMN IF NOT EXISTS stream_override_expires_at TIMESTAMPTZ;
+`,
+  },
+  {
+    filename: '030_add_stream_override_platform.sql',
+    sql: `
+ALTER TABLE youtube_config
+  ALTER COLUMN stream_override_video_id TYPE TEXT,
+  ADD COLUMN IF NOT EXISTS stream_override_platform VARCHAR(20) DEFAULT 'youtube';
+`,
+  },
 ];
