@@ -87,3 +87,23 @@ output "linktree_api_suite_e_studios" {
   description = "Full URL to fetch the suite_e_studios profile"
   value       = "${aws_apigatewayv2_api.linktree.api_endpoint}/linktree/suite_e_studios"
 }
+
+output "vod_bucket" {
+  description = "S3 bucket name for VOD recordings (private; EC2 uploads here after each stream)"
+  value       = aws_s3_bucket.vod.id
+}
+
+output "rtmp_ingest_url" {
+  description = "RTMP URL to enter as Restream custom destination server"
+  value       = "rtmp://stream.stpetemusic.live/live"
+}
+
+output "hls_playback_url" {
+  description = "Public HLS manifest URL for the live stream (embed this on the website)"
+  value       = "https://hls.stpetemusic.live/live/index.m3u8"
+}
+
+output "cloudfront_hls_domain" {
+  description = "CloudFront distribution domain name for the HLS stream"
+  value       = aws_cloudfront_distribution.hls_stream.domain_name
+}

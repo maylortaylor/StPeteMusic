@@ -23,7 +23,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Add new venue here to sync it — also add to apps/web/src/lib/venues.ts\nreturn [\n  { json: { slug: 'suite-e-studios', calendarId: '98a6b333df9c0d145983eab458358c58692344b3436a7c292772019118db6e19@group.calendar.google.com' } },\n  { json: { slug: 'blueberry-patch', calendarId: '71e2433f12b9a7ffe5cfa52bb00dba523406043b321fe5f9dcf354476ea08555@group.calendar.google.com' } },\n  { json: { slug: 'cage-brewing',    calendarId: 'e0cc088fc8847d4de888142b6d18c69c6de370afaa268432ccae930d6e1b7108@group.calendar.google.com' } },\n  { json: { slug: 'rubys-elixir',    calendarId: 'ac1f54b2bbdd7ba7e94d95ec6a6090b26af944c614e35e3a01582f956ed275dd@group.calendar.google.com' } },\n  { json: { slug: 'the-bends',       calendarId: '2c1103fbae69f2a222a4a163203aff4decaa5af400fb9a68a0dada62860d7f38@group.calendar.google.com' } },\n];"
+        "jsCode": "// Add new venue here to sync it — also add to apps/web/src/lib/venues.ts\nreturn [\n  { json: { slug: 'suite-e-studios', calendarId: 'suite.e.stpete@gmail.com' } },\n  { json: { slug: 'blueberry-patch', calendarId: '71e2433f12b9a7ffe5cfa52bb00dba523406043b321fe5f9dcf354476ea08555@group.calendar.google.com' } },\n  { json: { slug: 'cage-brewing',    calendarId: 'e0cc088fc8847d4de888142b6d18c69c6de370afaa268432ccae930d6e1b7108@group.calendar.google.com' } },\n  { json: { slug: 'rubys-elixir',    calendarId: 'ac1f54b2bbdd7ba7e94d95ec6a6090b26af944c614e35e3a01582f956ed275dd@group.calendar.google.com' } },\n  { json: { slug: 'the-bends',       calendarId: '2c1103fbae69f2a222a4a163203aff4decaa5af400fb9a68a0dada62860d7f38@group.calendar.google.com' } },\n];"
       },
       "id": "b41c9233-136f-427f-9785-3a9a4fd70150",
       "name": "Venue Config",

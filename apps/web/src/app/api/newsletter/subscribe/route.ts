@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { logError } from '@stpetemusic/db';
 
 const LISTMONK_API_URL = process.env.LISTMONK_API_URL ?? 'http://localhost:9000';
 const LISTMONK_USERNAME = process.env.LISTMONK_USERNAME ?? 'admin';
@@ -38,7 +39,15 @@ export async function POST(req: NextRequest) {
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error('[newsletter] Listmonk unreachable:', msg, LISTMONK_API_URL);
+    logError({
+      app: 'web',
+      status_code: 503,
+      path: '/api/newsletter/subscribe',
+      method: 'POST',
+      message: `[newsletter] Listmonk unreachable: ${msg}`,
+      stack: err instanceof Error ? err.stack : undefined,
+      metadata: { apiUrl: LISTMONK_API_URL },
+    });
     return NextResponse.json({ message: 'Newsletter service unavailable. Try again later.' }, { status: 503 });
   } finally {
     clearTimeout(timeout);
@@ -54,6 +63,13 @@ export async function POST(req: NextRequest) {
   }
 
   const errorBody = await res.text().catch(() => '(unreadable)');
-  console.error('[newsletter] Listmonk error:', res.status, errorBody, { listId: LISTMONK_LIST_ID, apiUrl: LISTMONK_API_URL });
+  logError({
+    app: 'web',
+    status_code: 500,
+    path: '/api/newsletter/subscribe',
+    method: 'POST',
+    message: `[newsletter] Listmonk error: ${res.status} ${errorBody}`,
+    metadata: { listId: LISTMONK_LIST_ID, apiUrl: LISTMONK_API_URL },
+  });
   return NextResponse.json({ message: 'Subscription failed. Try again.' }, { status: 500 });
 }

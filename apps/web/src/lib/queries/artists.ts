@@ -7,7 +7,7 @@ export async function getAllArtists(): Promise<Artist[]> {
       id, name, slug, type, genres, tags,
       instagram_handle, instagram_url, is_active
     FROM artists
-    WHERE is_active = true AND slug IS NOT NULL
+    WHERE is_active = true AND visible_on_website = true AND slug IS NOT NULL
     ORDER BY name ASC
   `);
 }
@@ -37,7 +37,7 @@ export async function getArtistShows(artistId: string): Promise<ArtistShow[]> {
 
 export async function getAllArtistSlugs(): Promise<string[]> {
   const rows = await query<{ slug: string }>(`
-    SELECT slug FROM artists WHERE is_active = true AND slug IS NOT NULL
+    SELECT slug FROM artists WHERE is_active = true AND visible_on_website = true AND slug IS NOT NULL
   `);
   return rows.map(r => r.slug);
 }

@@ -41,6 +41,20 @@ jobs:
       TF_VAR_cloudflare_zone_id:    ${{ secrets.CLOUDFLARE_ZONE_ID }}
       TF_VAR_google_project_id:     ${{ secrets.GCP_PROJECT_ID }}
       TF_VAR_google_org_id:         ${{ secrets.GCP_ORG_ID }}
+      TF_VAR_ig_user_id:            ${{ secrets.IG_USER_ID }}
+      TF_VAR_ig_access_token:       ${{ secrets.IG_ACCESS_TOKEN }}
+      TF_VAR_fb_page_id:            ${{ secrets.FB_PAGE_ID }}
+      TF_VAR_fb_access_token:       ${{ secrets.FB_ACCESS_TOKEN }}
+      TF_VAR_youtube_api_key:       ${{ secrets.YOUTUBE_API_KEY }}
+      TF_VAR_anthropic_api_key:                  ${{ secrets.ANTHROPIC_API_KEY }}
+      TF_VAR_n8n_artist_enrichment_webhook_url:  ${{ secrets.N8N_ARTIST_ENRICHMENT_WEBHOOK_URL }}
+      TF_VAR_n8n_webhook_secret:                 ${{ secrets.N8N_WEBHOOK_SECRET }}
+      TF_VAR_rtmp_stream_key:                    ${{ secrets.RTMP_STREAM_KEY }}
+      TF_VAR_youtube_channel_id:                 ${{ secrets.YOUTUBE_CHANNEL_ID }}
+      TF_VAR_eventbrite_private_token:           ${{ secrets.EVENTBRITE_PRIVATE_TOKEN }}
+      TF_VAR_eventbrite_api_key:                 ${{ secrets.EVENTBRITE_API_KEY }}
+      TF_VAR_eventbrite_client_secret:           ${{ secrets.EVENTBRITE_CLIENT_SECRET }}
+      TF_VAR_eventbrite_public_token:            ${{ secrets.EVENTBRITE_PUBLIC_TOKEN }}
 
     steps:
       - name: Checkout

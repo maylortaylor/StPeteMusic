@@ -110,10 +110,16 @@ export async function PUT(
 
     return Response.json(result[0]);
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    console.error('Failed to update venue:', message);
+    const pg = error as Record<string, unknown>;
+    const detail = [
+      pg.code,
+      pg.message ?? String(error),
+      pg.detail,
+      pg.hint,
+    ].filter(Boolean).join(' | ');
+    console.error('Failed to update venue:', detail);
     return Response.json(
-      { error: 'Failed to update venue', detail: message },
+      { error: 'Failed to update venue', detail },
       { status: 500 },
     );
   }

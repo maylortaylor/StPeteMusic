@@ -1,0 +1,37 @@
+# MediaMTX — RTMP ingest + recording + HLS serving
+# OBS → Restream → this server (records + HLS) + YouTube/Facebook/Twitch (live audiences)
+
+rtmpAddress: :1935
+hlsAddress: :8888
+hlsAllowOrigin: '*'
+
+# Disable unused protocols to reduce attack surface
+rtspAddress: ""
+rtspsAddress: ""
+webrtcAddress: ""
+srtAddress: ""
+
+# Only allow publishing with the correct stream key (set via RTMP_STREAM_KEY env var at runtime)
+# Anonymous reads are allowed so HLS viewers and CloudFront can fetch segments/manifests.
+authMethod: internal
+authInternalUsers:
+  - user: stream
+    pass: "${RTMP_STREAM_KEY}"
+    permissions:
+      - action: publish
+        path: live
+  - user: any
+    pass: any
+    permissions:
+      - action: read
+        path: live
+
+# Record every published stream as a single .mp4 (OBS encodes; we just remux)
+record: yes
+recordPath: /recordings/%path/%Y-%m-%dT%H-%M-%S.mp4
+recordFormat: fmp4
+recordDeleteAfter: 0s   # vod-watcher.service uploads to S3 and handles cleanup
+
+paths:
+  live:
+    source: publisher

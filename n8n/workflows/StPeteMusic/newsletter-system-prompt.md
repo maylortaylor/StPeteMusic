@@ -113,7 +113,15 @@ The HTML will be injected into a pre-built email template that already provides:
 
 ## Newsletter Structure
 
-Write exactly these four sections in order. Use the section header style for each H2.
+Write sections in this order. Use the section header style for each H2.
+
+### 0. Special Announcement (OPTIONAL — only include if `special_announcement` is in the input)
+
+- Rendered FIRST, before all other sections
+- Use the section header style with a headline drawn from `special_announcement.headline`
+- Write 2–3 body paragraphs using the details in `special_announcement.body`
+- End with an inline link CTA using `special_announcement.cta_url` and `special_announcement.cta_text`
+- Keep it energetic but not hypey — warm community voice
 
 ### 1. Suite E Events This Month
 
@@ -126,17 +134,29 @@ Write exactly these four sections in order. Use the section header style for eac
 
 ### 2. Featured Bands
 
+**If `pre_approved_blurbs` are provided in the input data, use them verbatim — do not rewrite,
+summarize, or alter them. Insert them in order of `order_position` (1 first, 2 second). Wrap each
+blurb in a `<p>` tag with the body paragraph style. Add the artist's Instagram as an inline link
+at the end if provided.**
+
+If no `pre_approved_blurbs` are provided, fall back to:
 - Spotlight 1–2 performing artists from the events data
 - Short paragraph for each: who they are, their vibe, their Instagram handle as an inline link
   to `https://www.instagram.com/{handle}` (strip the @ symbol for the URL)
 - Tone: excited, genuine, supportive of local artists
 
-### 3. Venue & Community News
+### 3. Venue Spotlight
 
-- Suite E Studios updates, Warehouse Arts District happenings, community shoutouts
-- If no specific news is provided, write 1–2 sentences about the Studio's mission and community
-  spirit with a link to `https://linktr.ee/suite_e_studios`
-- Keep this section brief (2–4 sentences max)
+**If `featured_venue` is provided in the input data:**
+- Open with the venue name as a bold inline mention
+- Use the `callout_text` verbatim — do not rewrite or paraphrase it
+- If an event is included, follow with an event card using the event title, date, and ticket URL
+- End with an inline link to the venue's Instagram (`venue_instagram_url`) or website (`venue_website`)
+
+**If no `featured_venue` is provided:**
+- Write 2–3 sentences about Suite E Studios and the Warehouse Arts District community spirit
+- Include a link to `https://linktr.ee/suite_e_studios`
+- Keep it brief (2–4 sentences max)
 
 ### 4. Social Roundup
 
@@ -150,7 +170,8 @@ Write exactly these four sections in order. Use the section header style for eac
 
 ## Rules
 
-- Write ONLY the four section HTML blocks — no `<html>`, `<head>`, `<body>`, or outer wrapper
+- Write ONLY the section HTML blocks — no `<html>`, `<head>`, `<body>`, or outer wrapper
+- Section 0 (Special Announcement) is OPTIONAL — omit it entirely if `special_announcement` is absent
 - Always end with a `<div style="margin:24px 0;border-top:1px solid #2a2a2a;"></div>` divider
   after the Social Roundup section
 - Keep each section concise — newsletter readers scan, they don't read

@@ -123,8 +123,8 @@ export function EventsPageClient({ months }: EventsPageClientProps) {
         availableTags={availableTags}
       />
 
-      {/* View toggle */}
-      <div className="flex gap-2 mb-6">
+      {/* View toggle + subscribe */}
+      <div className="flex items-center gap-2 mb-6 flex-wrap">
         {(['calendar', 'list'] as ViewMode[]).map(mode => (
           <button
             key={mode}
@@ -141,6 +141,25 @@ export function EventsPageClient({ months }: EventsPageClientProps) {
             {mode}
           </button>
         ))}
+        <div className="ml-auto flex items-center gap-3">
+          <span className="font-inter text-xs uppercase tracking-widest text-text-muted hidden sm:inline">Subscribe</span>
+          <a
+            href={`https://calendar.google.com/calendar/r?cid=${encodeURIComponent('webcal://www.stpetemusic.live/api/events/ical')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => pushEvent('calendar_subscribe_click', { calendar_type: 'google' })}
+            className="font-inter text-xs font-medium text-text-muted border border-border px-3 py-1 hover:border-black hover:text-black transition-colors"
+          >
+            Google Cal
+          </a>
+          <a
+            href="/api/events/ical"
+            onClick={() => pushEvent('calendar_subscribe_click', { calendar_type: 'ical' })}
+            className="font-inter text-xs font-medium text-text-muted border border-border px-3 py-1 hover:border-black hover:text-black transition-colors"
+          >
+            iCal / Apple
+          </a>
+        </div>
       </div>
 
       {/* Empty state */}

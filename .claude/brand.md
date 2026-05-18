@@ -23,7 +23,7 @@ updated: 2026-04-30
 | Instagram | https://www.instagram.com/StPeteMusic |
 | Facebook | https://www.facebook.com/StPeteFLMusic |
 | YouTube | https://youtube.com/@StPeteMusic |
-| EventBrite (general) | https://www.eventbrite.com/o/st-pete-music-105663485881 |
+| EventBrite (Suite E Studios) | https://www.eventbrite.com/o/suite-e-studios-109188388681 |
 | EventBrite (#FinalFriday) | https://final-friday.eventbrite.com/ |
 | Suite E Studios | https://linktr.ee/suite_e_studios |
 

@@ -5,7 +5,16 @@ applications:
         preBuild:
           commands:
             - node --version
-            - npm ci
+            # Install from monorepo root so workspace packages (@stpetemusic/db) are symlinked
+            - npm --prefix ../.. ci
+            - npm --prefix ../.. run build --workspace=@stpetemusic/db
+            # Amplify WEB_COMPUTE does not inject non-NEXT_PUBLIC env vars at runtime.
+            # Write them to .env.production so Next.js loads them in the server context.
+            - |
+              echo "DATABASE_URL=$DATABASE_URL" >> .env.production
+              echo "REVALIDATION_SECRET=$REVALIDATION_SECRET" >> .env.production
+              echo "YOUTUBE_CHANNEL_ID=$YOUTUBE_CHANNEL_ID" >> .env.production
+              echo "YOUTUBE_API_KEY=$YOUTUBE_API_KEY" >> .env.production
         build:
           commands:
             - npm run build
@@ -14,13 +23,14 @@ applications:
             # (hence baseDirectory: .next), and Next.js needs public/ at that
             # same root to serve static assets at runtime.
             - cp -r public .next/
+            - cp .env.production .next/.env.production
       artifacts:
         baseDirectory: .next
         files:
           - '**/*'
       cache:
         paths:
-          - node_modules/**/*
+          - ../../node_modules/**/*
           - .next/cache/**/*
     appRoot: apps/web
   - frontend:
@@ -30,11 +40,31 @@ applications:
             - node --version
             - npm --prefix ../.. ci
             - npm --prefix ../.. run build --workspace=@stpetemusic/db
+            - npm --prefix ../.. run db:migrate --workspace=@stpetemusic/db
             # Amplify WEB_COMPUTE does not inject non-NEXT_PUBLIC env vars at runtime.
             # Write them to .env.production so Next.js loads them in the server context.
             - |
               echo "CLERK_SECRET_KEY=$CLERK_SECRET_KEY" >> .env.production
               echo "DATABASE_URL=$DATABASE_URL" >> .env.production
+              echo "REVALIDATION_SECRET=$REVALIDATION_SECRET" >> .env.production
+              echo "LISTMONK_API_URL=$LISTMONK_API_URL" >> .env.production
+              echo "LISTMONK_USERNAME=$LISTMONK_USERNAME" >> .env.production
+              echo "LISTMONK_PASSWORD=$LISTMONK_PASSWORD" >> .env.production
+              echo "IG_USER_ID=$IG_USER_ID" >> .env.production
+              echo "IG_ACCESS_TOKEN=$IG_ACCESS_TOKEN" >> .env.production
+              echo "FB_PAGE_ID=$FB_PAGE_ID" >> .env.production
+              echo "FB_ACCESS_TOKEN=$FB_ACCESS_TOKEN" >> .env.production
+              echo "YOUTUBE_API_KEY=$YOUTUBE_API_KEY" >> .env.production
+              echo "YOUTUBE_OAUTH_CLIENT_ID=$YOUTUBE_OAUTH_CLIENT_ID" >> .env.production
+              echo "YOUTUBE_OAUTH_CLIENT_SECRET=$YOUTUBE_OAUTH_CLIENT_SECRET" >> .env.production
+              echo "YOUTUBE_REFRESH_TOKEN=$YOUTUBE_REFRESH_TOKEN" >> .env.production
+              echo "GOOGLE_CALENDAR_ID=$GOOGLE_CALENDAR_ID" >> .env.production
+              echo "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY" >> .env.production
+              echo "N8N_ARTIST_ENRICHMENT_WEBHOOK_URL=$N8N_ARTIST_ENRICHMENT_WEBHOOK_URL" >> .env.production
+              echo "N8N_WEBHOOK_SECRET=$N8N_WEBHOOK_SECRET" >> .env.production
+              echo "EVENTBRITE_PRIVATE_TOKEN=$EVENTBRITE_PRIVATE_TOKEN" >> .env.production
+              echo "EVENTBRITE_ORG_ID=$EVENTBRITE_ORG_ID" >> .env.production
+              echo "SYNC_SECRET=$SYNC_SECRET" >> .env.production
         build:
           commands:
             - npm run build

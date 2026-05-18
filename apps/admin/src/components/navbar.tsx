@@ -2,6 +2,7 @@
 
 import { UserButton } from '@clerk/nextjs';
 import { ThemeToggle } from './theme-toggle';
+import { ToastHistoryPopover } from './toast-history-popover';
 
 export function Navbar() {
   return (
@@ -11,6 +12,7 @@ export function Navbar() {
       </div>
       <div className="flex items-center gap-4">
         <ThemeToggle />
+        <ToastHistoryPopover />
         <UserButton />
       </div>
     </nav>

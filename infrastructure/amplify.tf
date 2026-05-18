@@ -29,6 +29,32 @@ data "aws_ssm_parameter" "listmonk_password" {
   with_decryption = true
 }
 
+# ── Featured artists pipeline ─────────────────────────────────────────────────
+
+data "aws_ssm_parameter" "anthropic_api_key" {
+  count           = var.anthropic_api_key != "" ? 1 : 0
+  name            = aws_ssm_parameter.anthropic_api_key[0].name
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "n8n_artist_enrichment_webhook_url" {
+  count           = var.n8n_artist_enrichment_webhook_url != "" ? 1 : 0
+  name            = aws_ssm_parameter.n8n_artist_enrichment_webhook_url[0].name
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "n8n_webhook_secret" {
+  count           = var.n8n_webhook_secret != "" ? 1 : 0
+  name            = aws_ssm_parameter.n8n_webhook_secret[0].name
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "eventbrite_private_token" {
+  count           = var.eventbrite_private_token != "" ? 1 : 0
+  name            = aws_ssm_parameter.eventbrite_private_token[0].name
+  with_decryption = true
+}
+
 resource "aws_amplify_app" "web" {
   name         = "${var.project}-web"
   repository   = "https://github.com/maylortaylor/StPeteMusic"
@@ -54,6 +80,8 @@ resource "aws_amplify_app" "web" {
     DATABASE_URL              = "postgresql://${var.db_username}:${var.db_password}@${aws_db_instance.main.address}:5432/n8n"
     NEXT_PUBLIC_META_PIXEL_ID = var.meta_pixel_id
     NEXT_PUBLIC_CLARITY_ID    = var.clarity_project_id
+    YOUTUBE_API_KEY           = var.youtube_api_key
+    YOUTUBE_CHANNEL_ID        = var.youtube_channel_id
   }
 
   enable_auto_branch_creation = false
@@ -121,6 +149,22 @@ resource "aws_amplify_app" "admin" {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY   = data.aws_ssm_parameter.clerk_publishable_key.value
     NEXT_PUBLIC_CLERK_SIGN_IN_URL       = "/sign-in"
     NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL = "/dashboard"
+    # Listmonk — newsletter page + subscriber stat card
+    LISTMONK_API_URL                    = "https://listmonk.stpetemusic.live"
+    LISTMONK_USERNAME                   = data.aws_ssm_parameter.listmonk_username.value
+    LISTMONK_PASSWORD                   = data.aws_ssm_parameter.listmonk_password.value
+    # Social stat cards — optional, degrade to "—" if empty
+    IG_USER_ID                          = var.ig_user_id
+    IG_ACCESS_TOKEN                     = var.ig_access_token
+    FB_PAGE_ID                          = var.fb_page_id
+    FB_ACCESS_TOKEN                     = var.fb_access_token
+    YOUTUBE_API_KEY                     = var.youtube_api_key
+    # Featured artists pipeline
+    ANTHROPIC_API_KEY                   = var.anthropic_api_key != "" ? data.aws_ssm_parameter.anthropic_api_key[0].value : ""
+    N8N_ARTIST_ENRICHMENT_WEBHOOK_URL   = var.n8n_artist_enrichment_webhook_url != "" ? data.aws_ssm_parameter.n8n_artist_enrichment_webhook_url[0].value : ""
+    N8N_WEBHOOK_SECRET                  = var.n8n_webhook_secret != "" ? data.aws_ssm_parameter.n8n_webhook_secret[0].value : ""
+    # Eventbrite integration (admin only — never exposed to web app)
+    EVENTBRITE_PRIVATE_TOKEN            = var.eventbrite_private_token != "" ? data.aws_ssm_parameter.eventbrite_private_token[0].value : ""
   }
 
   enable_auto_branch_creation = false

@@ -148,3 +148,107 @@ variable "bing_webmaster_verification_code" {
   type        = string
   default     = ""
 }
+
+# ── Social stats (admin dashboard cards) ─────────────────────────────────────
+# All optional — admin dashboard degrades gracefully to "—" when not set.
+
+variable "ig_user_id" {
+  description = "Instagram Business Account numeric ID. Used by admin dashboard to fetch follower count. Set via TF_VAR_ig_user_id in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "ig_access_token" {
+  description = "Instagram long-lived page access token with instagram_basic permission. Set via TF_VAR_ig_access_token in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "fb_page_id" {
+  description = "Facebook Page numeric ID for StPeteFLMusic. Used by admin dashboard to fetch fan count. Set via TF_VAR_fb_page_id in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "fb_access_token" {
+  description = "Facebook Page access token with pages_read_engagement permission. Set via TF_VAR_fb_access_token in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "youtube_api_key" {
+  description = "YouTube Data API v3 key. Used by admin dashboard to fetch subscriber count for @StPeteMusic. Set via TF_VAR_youtube_api_key in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+# ── Featured artists pipeline ─────────────────────────────────────────────────
+
+variable "anthropic_api_key" {
+  description = "Anthropic API key for admin app — newsletter blurb + blog post generation via @anthropic-ai/sdk. Set via TF_VAR_anthropic_api_key in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "n8n_artist_enrichment_webhook_url" {
+  description = "n8n webhook URL that triggers the artist-enrichment workflow. Set via TF_VAR_n8n_artist_enrichment_webhook_url in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "n8n_webhook_secret" {
+  description = "Shared secret for n8n → admin webhook callbacks (x-webhook-secret header). Must match N8N_WEBHOOK_SECRET in the n8n EC2 .env. Set via TF_VAR_n8n_webhook_secret in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "rtmp_stream_key" {
+  description = "Secret stream key for RTMP ingest (MediaMTX publishPass). Restream must include this as the stream password. Set via TF_VAR_rtmp_stream_key in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "youtube_channel_id" {
+  description = "YouTube channel ID for @StPeteMusic (UCxxxxxxxx format — public, not sensitive). Used by the /live page to detect active broadcasts. Set via TF_VAR_youtube_channel_id in CI."
+  type        = string
+  default     = ""
+}
+
+# ── Eventbrite (theburgmusic@gmail.com) ──────────────────────────────────────
+
+variable "eventbrite_private_token" {
+  description = "Eventbrite Private Token for server-to-server API calls (theburgmusic@gmail.com). Set via TF_VAR_eventbrite_private_token in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "eventbrite_api_key" {
+  description = "Eventbrite OAuth API Key (theburgmusic@gmail.com). Set via TF_VAR_eventbrite_api_key in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "eventbrite_client_secret" {
+  description = "Eventbrite OAuth Client Secret (theburgmusic@gmail.com). Set via TF_VAR_eventbrite_client_secret in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "eventbrite_public_token" {
+  description = "Eventbrite Public Token (theburgmusic@gmail.com). Set via TF_VAR_eventbrite_public_token in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
