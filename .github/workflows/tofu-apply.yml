@@ -51,6 +51,7 @@ jobs:
       TF_VAR_n8n_webhook_secret:                 ${{ secrets.N8N_WEBHOOK_SECRET }}
       TF_VAR_rtmp_stream_key:                    ${{ secrets.RTMP_STREAM_KEY }}
       TF_VAR_youtube_channel_id:                 ${{ secrets.YOUTUBE_CHANNEL_ID }}
+      TF_VAR_eventbrite_org_id:                  ${{ secrets.EVENTBRITE_ORG_ID }}
       TF_VAR_eventbrite_private_token:           ${{ secrets.EVENTBRITE_PRIVATE_TOKEN }}
       TF_VAR_eventbrite_api_key:                 ${{ secrets.EVENTBRITE_API_KEY }}
       TF_VAR_eventbrite_client_secret:           ${{ secrets.EVENTBRITE_CLIENT_SECRET }}
