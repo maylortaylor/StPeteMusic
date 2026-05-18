@@ -1,0 +1,113 @@
+{
+  "name": "eventbrite-sync",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 10 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Daily at 10:00 UTC",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://admin.stpetemusic.live/api/eventbrite/events/sync",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-sync-secret",
+              "value": "={{ $env.SYNC_SECRET }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "sync-request",
+      "name": "POST Sync Endpoint",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [200, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-errors",
+              "leftValue": "={{ $json.errors.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "check-errors",
+      "name": "Has Errors?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [400, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = $input.first().json;\nconsole.error('Eventbrite sync errors:', JSON.stringify(result.errors, null, 2));\nreturn [{ json: { message: `Sync completed with ${result.errors.length} error(s)`, ...result } }];\n"
+      },
+      "id": "log-errors",
+      "name": "Log Errors",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [600, -100]
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = $input.first().json;\nconsole.log(`Eventbrite sync OK: synced=${result.synced} added=${result.added} updated=${result.updated}`);\nreturn [{ json: result }];\n"
+      },
+      "id": "log-success",
+      "name": "Log Success",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [600, 100]
+    }
+  ],
+  "connections": {
+    "Daily at 10:00 UTC": {
+      "main": [[{ "node": "POST Sync Endpoint", "type": "main", "index": 0 }]]
+    },
+    "POST Sync Endpoint": {
+      "main": [[{ "node": "Has Errors?", "type": "main", "index": 0 }]]
+    },
+    "Has Errors?": {
+      "main": [
+        [{ "node": "Log Errors", "type": "main", "index": 0 }],
+        [{ "node": "Log Success", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    { "name": "StPeteMusic" }
+  ]
+}
