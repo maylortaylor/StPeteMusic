@@ -1,5 +1,5 @@
 import { auth } from '@clerk/nextjs/server';
-import { getDb, venues } from '@stpetemusic/db';
+import { getDb, venues, logError } from '@stpetemusic/db';
 import { asc } from 'drizzle-orm';
 
 export async function GET() {
@@ -18,11 +18,15 @@ export async function GET() {
 
     return Response.json({ venues: result });
   } catch (error) {
-    console.error('Failed to fetch venues:', error);
-    return Response.json(
-      { error: 'Failed to fetch venues' },
-      { status: 500 },
-    );
+    logError({
+      app: 'admin',
+      status_code: 500,
+      path: '/api/venues',
+      method: 'GET',
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    return Response.json({ error: 'Failed to fetch venues' }, { status: 500 });
   }
 }
 
@@ -72,10 +76,14 @@ export async function POST(request: Request) {
 
     return Response.json(result[0], { status: 201 });
   } catch (error) {
-    console.error('Failed to create venue:', error);
-    return Response.json(
-      { error: 'Failed to create venue' },
-      { status: 500 },
-    );
+    logError({
+      app: 'admin',
+      status_code: 500,
+      path: '/api/venues',
+      method: 'POST',
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    return Response.json({ error: 'Failed to create venue' }, { status: 500 });
   }
 }

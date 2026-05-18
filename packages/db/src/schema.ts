@@ -510,3 +510,21 @@ export const eventbrite_events = pgTable('eventbrite_events', {
     .defaultNow()
     .$onUpdate(() => new Date()),
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ERROR LOGS
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const error_logs = pgTable('error_logs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  app: varchar('app', { length: 20 }).notNull(),
+  level: varchar('level', { length: 20 }).notNull().default('error'),
+  status_code: integer('status_code'),
+  path: text('path'),
+  method: varchar('method', { length: 10 }),
+  message: text('message').notNull(),
+  stack: text('stack'),
+  metadata: jsonb('metadata').notNull().default({}),
+  user_id: text('user_id'),
+});

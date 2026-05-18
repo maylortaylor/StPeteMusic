@@ -63,6 +63,8 @@ applications:
               echo "N8N_ARTIST_ENRICHMENT_WEBHOOK_URL=$N8N_ARTIST_ENRICHMENT_WEBHOOK_URL" >> .env.production
               echo "N8N_WEBHOOK_SECRET=$N8N_WEBHOOK_SECRET" >> .env.production
               echo "EVENTBRITE_PRIVATE_TOKEN=$EVENTBRITE_PRIVATE_TOKEN" >> .env.production
+              echo "EVENTBRITE_ORG_ID=$EVENTBRITE_ORG_ID" >> .env.production
+              echo "SYNC_SECRET=$SYNC_SECRET" >> .env.production
         build:
           commands:
             - npm run build
