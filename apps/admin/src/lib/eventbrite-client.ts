@@ -186,6 +186,11 @@ function mapEvent(raw: any, orgId: string, ticketClasses: EbTicketClass[]): EbEv
 // ─── API Functions ────────────────────────────────────────────────────────────
 
 export async function getOrgId(): Promise<{ id: string; name: string }> {
+  const pinned = process.env.EVENTBRITE_ORG_ID;
+  if (pinned) {
+    const data = await ebFetch<{ name: string }>(`/organizations/${pinned}/`);
+    return { id: pinned, name: data.name };
+  }
   const data = await ebFetch<{ organizations: { id: string; name: string }[] }>(
     '/users/me/organizations/',
   );
@@ -250,14 +255,31 @@ export async function getSalesReport(
   }
 }
 
+async function batchedSalesReports(
+  orgId: string,
+  events: EbEvent[],
+  concurrency = 5,
+): Promise<(EbSalesReport | null)[]> {
+  const results: (EbSalesReport | null)[] = [];
+  for (let i = 0; i < events.length; i += concurrency) {
+    const batch = events.slice(i, i + concurrency);
+    results.push(...(await Promise.all(batch.map((e) => getSalesReport(orgId, e.eventbriteId)))));
+    if (i + concurrency < events.length) await new Promise((r) => setTimeout(r, 200));
+  }
+  return results;
+}
+
 export async function syncAllEvents(orgId: string): Promise<EbEvent[]> {
   const events = await listOrgEvents(orgId);
 
-  // Fetch sales reports for all events in parallel (gracefully skips on 403)
-  const reports = await Promise.all(events.map((e) => getSalesReport(orgId, e.eventbriteId)));
+  // Only fetch sales reports for non-ended events to stay within API rate limits
+  const activeStatuses = new Set(['live', 'started', 'draft']);
+  const activeEvents = events.filter((e) => e.status && activeStatuses.has(e.status));
+  const reports = await batchedSalesReports(orgId, activeEvents);
 
-  return events.map((event, i) => {
-    const report = reports[i];
+  return events.map((event) => {
+    const activeIdx = activeEvents.findIndex((e) => e.eventbriteId === event.eventbriteId);
+    const report = activeIdx >= 0 ? reports[activeIdx] : null;
     if (!report) return event;
     return {
       ...event,
