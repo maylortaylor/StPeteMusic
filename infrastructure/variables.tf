@@ -225,6 +225,12 @@ variable "youtube_channel_id" {
 
 # ── Eventbrite (theburgmusic@gmail.com) ──────────────────────────────────────
 
+variable "eventbrite_org_id" {
+  description = "Eventbrite API organization ID (from /users/me/organizations/ — NOT the profile URL number). Set via TF_VAR_eventbrite_org_id in CI."
+  type        = string
+  default     = ""
+}
+
 variable "eventbrite_private_token" {
   description = "Eventbrite Private Token for server-to-server API calls (theburgmusic@gmail.com). Set via TF_VAR_eventbrite_private_token in CI."
   type        = string

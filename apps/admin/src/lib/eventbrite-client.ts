@@ -192,7 +192,12 @@ export async function getOrgId(): Promise<{ id: string; name: string }> {
   const pinned = process.env.EVENTBRITE_ORG_ID;
   if (pinned) {
     const match = data.organizations.find((o) => o.id === pinned);
-    return { id: pinned, name: match?.name ?? pinned };
+    if (match) return { id: match.id, name: match.name };
+    // Pinned ID is not the API org ID (e.g. it's a profile URL ID) — fall through to first real org
+    console.warn(
+      `EVENTBRITE_ORG_ID="${pinned}" not found in /users/me/organizations/ — falling back to first org. ` +
+        `Real org IDs: ${data.organizations.map((o) => o.id).join(', ')}`,
+    );
   }
   const org = data.organizations[0];
   if (!org) throw new Error('No Eventbrite organizations found for this account');
