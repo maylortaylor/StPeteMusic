@@ -1,4 +1,4 @@
-import { revalidatePath, revalidateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 
 export async function POST(request: Request) {
   const secret = process.env.REVALIDATION_SECRET;
@@ -12,7 +12,6 @@ export async function POST(request: Request) {
   const { slug, oldSlug, scope } = body as { slug?: string; oldSlug?: string; scope?: string };
 
   if (scope === 'eventbrite') {
-    revalidateTag('active-eventbrite-events');
     revalidatePath('/tickets');
     return Response.json({ revalidated: true, scope: 'eventbrite' });
   }
