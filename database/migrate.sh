@@ -42,3 +42,7 @@ apply_if_new "022_add_youtube_video_stats.sql"         "/sql/migrations/022_add_
 apply_if_new "023_add_tag_definitions.sql"            "/sql/migrations/023_add_tag_definitions.sql"
 apply_if_new "024_add_featured_venues.sql"            "/sql/migrations/024_add_featured_venues.sql"
 apply_if_new "027_fix_suite_e_calendar_id.sql"        "/sql/migrations/027_fix_suite_e_calendar_id.sql"
+apply_if_new "028_add_stream_override.sql"            "/sql/migrations/028_add_stream_override.sql"
+apply_if_new "029_add_stream_override_expiry.sql"     "/sql/migrations/029_add_stream_override_expiry.sql"
+apply_if_new "030_add_stream_override_platform.sql"   "/sql/migrations/030_add_stream_override_platform.sql"
+apply_if_new "031_set_suite_e_hero_photos.sql"        "/sql/migrations/031_set_suite_e_hero_photos.sql"
