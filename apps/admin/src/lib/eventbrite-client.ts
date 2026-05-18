@@ -186,14 +186,14 @@ function mapEvent(raw: any, orgId: string, ticketClasses: EbTicketClass[]): EbEv
 // ─── API Functions ────────────────────────────────────────────────────────────
 
 export async function getOrgId(): Promise<{ id: string; name: string }> {
-  const pinned = process.env.EVENTBRITE_ORG_ID;
-  if (pinned) {
-    const data = await ebFetch<{ name: string }>(`/organizations/${pinned}/`);
-    return { id: pinned, name: data.name };
-  }
   const data = await ebFetch<{ organizations: { id: string; name: string }[] }>(
     '/users/me/organizations/',
   );
+  const pinned = process.env.EVENTBRITE_ORG_ID;
+  if (pinned) {
+    const match = data.organizations.find((o) => o.id === pinned);
+    return { id: pinned, name: match?.name ?? pinned };
+  }
   const org = data.organizations[0];
   if (!org) throw new Error('No Eventbrite organizations found for this account');
   return { id: org.id, name: org.name };
