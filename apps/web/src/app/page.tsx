@@ -52,7 +52,7 @@ const orgJsonLd = {
     'https://www.facebook.com/StPeteFLMusic',
     'https://youtube.com/@StPeteMusic',
     'https://www.tiktok.com/@stpetemusic',
-    'https://www.eventbrite.com/o/st-pete-music-105663485881',
+    'https://www.eventbrite.com/o/suite-e-studios-109188388681',
   ],
 };
 

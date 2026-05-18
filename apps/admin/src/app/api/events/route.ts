@@ -1,5 +1,5 @@
 import { auth } from '@clerk/nextjs/server';
-import { getDb, events, event_performers, sql, asc, eq, and } from '@stpetemusic/db';
+import { getDb, events, event_performers, sql, asc, eq, and, logError } from '@stpetemusic/db';
 import type { SQL } from 'drizzle-orm';
 
 export async function GET(request: Request) {
@@ -71,7 +71,14 @@ export async function GET(request: Request) {
 
     return Response.json({ events: result });
   } catch (error) {
-    console.error('Failed to fetch events:', error);
+    logError({
+      app: 'admin',
+      status_code: 500,
+      path: '/api/events',
+      method: 'GET',
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return Response.json({ error: 'Failed to fetch events' }, { status: 500 });
   }
 }
@@ -106,7 +113,14 @@ export async function POST(request: Request) {
 
     return Response.json(result[0], { status: 201 });
   } catch (error) {
-    console.error('Failed to create event:', error);
+    logError({
+      app: 'admin',
+      status_code: 500,
+      path: '/api/events',
+      method: 'POST',
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return Response.json({ error: 'Failed to create event' }, { status: 500 });
   }
 }

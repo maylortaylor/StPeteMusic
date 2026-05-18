@@ -165,6 +165,13 @@ jobs:
             fi
             echo "✓ RDS host: ${RDS_HOST}"
 
+            echo "── Validating required secrets ──"
+            if [[ -z "${RTMP_STREAM_KEY}" ]]; then
+              echo "❌ RTMP_STREAM_KEY is empty — GitHub Secret not set. Aborting to prevent mediamtx auth failure."
+              exit 1
+            fi
+            echo "✓ RTMP_STREAM_KEY is set"
+
             echo "── Writing .env from GitHub Secrets ──"
             # printf '%s' is used for each value to safely handle special characters
             # (colons, slashes, equals signs) without shell interpretation
@@ -243,6 +250,16 @@ jobs:
               && echo "✓ listmonk_stpetemusic database created" \
               || echo "✓ listmonk_stpetemusic database already exists"
 
+            echo "── Creating stpetemusic database on RDS if needed ──"
+            docker run --rm \
+              -e PGPASSWORD="${POSTGRES_PASSWORD}" \
+              -e PGSSLMODE=require \
+              postgres:16-alpine \
+              psql -h "${RDS_HOST}" -U "${POSTGRES_USER}" -d n8n \
+              -c "CREATE DATABASE stpetemusic;" 2>/dev/null \
+              && echo "✓ stpetemusic database created" \
+              || echo "✓ stpetemusic database already exists"
+
             echo "── Running database migrations ──"
             docker run --rm \
               -v "${DEPLOY_DIR}/database:/sql" \
@@ -252,6 +269,12 @@ jobs:
               -e PGSSLMODE=require \
               postgres:16-alpine sh /sql/migrate.sh \
               && echo "✓ Migrations complete" || echo "⚠ Migration step failed"
+
+            echo "── Syncing MediaMTX config ──"
+            sudo rm -rf ~/stpetemusic/n8n/mediamtx
+            mkdir -p ~/stpetemusic/n8n/mediamtx
+            cp -r "${DEPLOY_DIR}/mediamtx/." ~/stpetemusic/n8n/mediamtx/
+            echo "✓ MediaMTX config synced"
 
             echo "── Applying compose config (restarts changed containers) ──"
             cd ~/stpetemusic/n8n
@@ -340,11 +363,6 @@ jobs:
               && echo "✓ SSL cert active for n8n.stpetemusic.live" \
               || echo "⚠ Certbot skipped — DNS for n8n.stpetemusic.live may not be set yet"
 
-            echo "── Syncing MediaMTX config ──"
-            mkdir -p ~/stpetemusic/n8n/mediamtx
-            cp -r "${DEPLOY_DIR}/mediamtx/." ~/stpetemusic/n8n/mediamtx/
-            echo "✓ MediaMTX config synced"
-
             echo "── Installing VOD watcher service ──"
             sudo dnf install -y inotify-tools 2>/dev/null \
               && echo "✓ inotify-tools installed" \
@@ -356,6 +374,15 @@ jobs:
             sudo systemctl daemon-reload
             sudo systemctl enable --now vod-watcher.service
             echo "✓ vod-watcher.service installed and started"
+
+            echo "── Installing mediamtx watchdog timer ──"
+            printf '[Unit]\nDescription=MediaMTX RTMP Health Watchdog\n\n[Service]\nType=oneshot\nUser=ec2-user\nWorkingDirectory=/home/ec2-user/stpetemusic/n8n\nExecStart=/bin/bash -c "nc -z localhost 1935 || docker compose -f docker-compose.prod.yaml --env-file ../.env up -d mediamtx"\n' \
+              | sudo tee /etc/systemd/system/mediamtx-watchdog.service > /dev/null
+            printf '[Unit]\nDescription=MediaMTX Watchdog Timer\n\n[Timer]\nOnBootSec=3min\nOnUnitActiveSec=2min\n\n[Install]\nWantedBy=timers.target\n' \
+              | sudo tee /etc/systemd/system/mediamtx-watchdog.timer > /dev/null
+            sudo systemctl daemon-reload
+            sudo systemctl enable --now mediamtx-watchdog.timer
+            echo "✓ mediamtx-watchdog.timer installed (checks port 1935 every 2 min)"
 
             echo "── Cleanup ──"
             rm -rf "${DEPLOY_DIR}" "${TARBALL}"

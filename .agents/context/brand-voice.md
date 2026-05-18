@@ -42,7 +42,7 @@
 | Instagram | @StPeteMusic · instagram.com/StPeteMusic |
 | Facebook | @StPeteFLMusic · facebook.com/StPeteFLMusic |
 | YouTube | @StPeteMusic · youtube.com/@StPeteMusic |
-| EventBrite | eventbrite.com/o/st-pete-music-105663485881 |
+| EventBrite | eventbrite.com/o/suite-e-studios-109188388681 |
 | EventBrite (FinalFriday) | final-friday.eventbrite.com |
 | LinkTree (@StPeteMusic) | linktr.ee/stpetemusic |
 | LinkTree (Suite E) | linktr.ee/suite_e_studios |

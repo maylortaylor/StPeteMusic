@@ -8,6 +8,7 @@ Parent company: Tangent LLC. Partner venue: Suite E Studios.
 - Staging: https://develop.d1fjwgk99cbqor.amplifyapp.com
 - Never push directly to `main` — CI + 1 PR review required
 - Managed by Matt Taylor (@maylortaylor) · team: Matt + Austen Van Der Bleek
+- Key skills: `/github`, `/brainstorm` (before features), `/grill-me` (pre-push), `/security-review`, `/feature-dev:feature-dev`
 
 ## Deep Context
 > **Load by domain, not by keyword.** Before planning or implementing anything, ask: which of these domains will my work touch? Load every matching file before you start — don't wait for keywords.
@@ -18,12 +19,14 @@ Parent company: Tangent LLC. Partner venue: Suite E Studios.
 | Events & content (final friday, instant noodles, art walk, captions, posts, shows, bands) | [events.md](.claude/events.md) |
 | Infrastructure & deployment (aws, amplify, ec2, dns, tofu, terraform, ssl, cloudflare, listmonk, CI) | [infrastructure.md](.claude/infrastructure.md) |
 | n8n & automation (workflows, obsidian, posting, youtube, instagram, google drive, video, reel) | [n8n.md](.claude/n8n.md) |
-| Facebook & Instagram webhooks (fb automation, ig automation, page webhook, comment, message, mention) | [n8n-fb-ig-automation.md](.claude/n8n-fb-ig-automation.md) |
+| Facebook & Instagram webhooks (fb automation, ig automation, page webhook, comment, message, mention) | [FACEBOOK_INSTAGRAM_AUTOMATION.md](docs/plans/FACEBOOK_INSTAGRAM_AUTOMATION.md) |
 | Secrets & credentials (tokens, github secrets, env vars, rotate, listmonk, credential management) | [secrets.md](.claude/secrets.md) |
-| Local setup (direnv, envrc, pre-commit, install, first-time, hooks) | [setup.md](.claude/setup.md) |
-| Debugging & troubleshooting (errors, down, ssh, 403, 500, not responding, connection refused) | [troubleshooting.md](.claude/troubleshooting.md) |
+| Local setup (direnv, envrc, pre-commit, install, first-time, hooks) | [SETUP.md](SETUP.md) |
+| Debugging & troubleshooting (errors, down, ssh, 403, 500, not responding, connection refused, error logs, production errors, logError, what broke, site down, check logs) | [troubleshooting.md](.claude/troubleshooting.md) |
 | Ads & analytics (google ads, microsoft ads, bing, meta pixel, GTM, clarity, paid, advertising) | [ads-accounts-todo.md](.claude/ads-accounts-todo.md) |
 | YouTube feature (review queue, admin UI, publish workflow, quota, OAuth, sync, proposals, calendar match) | [youtube.md](.claude/youtube.md) |
+| Database & schema (db, schema, migration, drizzle, postgres, table, query, model, uuid, column) | [database.md](.claude/database.md) |
+| Admin auth & Clerk (protected routes, middleware, session, login, sign-in, clerk, dashboard) | [clerk.md](.claude/clerk.md) |
 
 ## Key Files
 | File | Purpose |

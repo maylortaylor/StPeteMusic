@@ -76,3 +76,13 @@ repos:
         files: "n8n/workflows/StPeteMusic/(system-prompt|newsletter-system-prompt)\\.md$"
         stages: [commit]
         pass_filenames: false
+
+      - id: commitlint
+        name: Lint commit message (Conventional Commits)
+        language: node
+        entry: commitlint
+        args: ["--edit"]
+        stages: [commit-msg]
+        additional_dependencies:
+          - "@commitlint/cli@19"
+          - "@commitlint/config-conventional@19"

@@ -330,6 +330,17 @@ export const youtube_config = pgTable('youtube_config', {
   channel_bio: text('channel_bio').default(''),
   contact_emails: jsonb('contact_emails').$type<string[]>().default([]),
   prompt_version: varchar('prompt_version', { length: 50 }).default('v1'),
+  // Admin-controlled override: when set, /api/stream/youtube-status returns this stream as live.
+  // streamId meaning varies by platform: YouTube videoId, Twitch channel name, Facebook full URL.
+  // Ignored after stream_override_expires_at (set to NOW+8h on activate to prevent stale overrides).
+  stream_override_video_id: text('stream_override_video_id'),
+  stream_override_platform: varchar('stream_override_platform', { length: 20 }),
+  stream_override_expires_at: timestamp('stream_override_expires_at', { withTimezone: true }),
+  // DB-level cache for YouTube API response (prevents quota exhaustion on force-dynamic route)
+  yt_cache_video_id: varchar('yt_cache_video_id', { length: 20 }),
+  yt_cache_is_live: boolean('yt_cache_is_live').default(false),
+  yt_cache_title: text('yt_cache_title'),
+  yt_cache_expires_at: timestamp('yt_cache_expires_at', { withTimezone: true }),
   updated_at: timestamp('updated_at', { withTimezone: true })
     .defaultNow()
     .$onUpdate(() => new Date()),
@@ -498,4 +509,22 @@ export const eventbrite_events = pgTable('eventbrite_events', {
     .notNull()
     .defaultNow()
     .$onUpdate(() => new Date()),
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ERROR LOGS
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const error_logs = pgTable('error_logs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  app: varchar('app', { length: 20 }).notNull(),
+  level: varchar('level', { length: 20 }).notNull().default('error'),
+  status_code: integer('status_code'),
+  path: text('path'),
+  method: varchar('method', { length: 10 }),
+  message: text('message').notNull(),
+  stack: text('stack'),
+  metadata: jsonb('metadata').notNull().default({}),
+  user_id: text('user_id'),
 });

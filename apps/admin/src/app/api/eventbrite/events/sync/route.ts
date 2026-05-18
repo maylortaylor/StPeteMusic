@@ -4,10 +4,14 @@ import { getOrgId, syncAllEvents } from '@/lib/eventbrite-client';
 
 export const maxDuration = 60;
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
     const { userId } = await auth();
-    if (!userId) return new Response('Unauthorized', { status: 401 });
+    const syncSecret = process.env.SYNC_SECRET;
+    const isServiceAuth = Boolean(
+      syncSecret && request.headers.get('x-sync-secret') === syncSecret,
+    );
+    if (!userId && !isServiceAuth) return new Response('Unauthorized', { status: 401 });
 
     if (!process.env.EVENTBRITE_PRIVATE_TOKEN) {
       return Response.json({ error: 'EVENTBRITE_PRIVATE_TOKEN is not configured' }, { status: 500 });
