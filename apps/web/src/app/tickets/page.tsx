@@ -55,7 +55,7 @@ export default async function TicketsPage() {
                 </span>
               </div>
               <a
-                href="https://www.eventbrite.com/o/st-pete-music-105663485881"
+                href="https://www.eventbrite.com/o/suite-e-studios-109188388681"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="shrink-0 rounded-lg bg-[#f05537] px-4 py-2 text-sm font-semibold text-white hover:bg-[#d94a2e] transition-colors whitespace-nowrap"
