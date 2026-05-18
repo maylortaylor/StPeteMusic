@@ -1,7 +1,7 @@
 ---
 topic: infrastructure
 triggers: aws, amplify, dns, cloudflare, tofu, terraform, ec2, tailscale, hosting, deploy, branch, git, listmonk, newsletter, ssl, ci, cd, admin
-updated: 2026-05-06
+updated: 2026-05-17
 ---
 
 # Infrastructure
@@ -43,6 +43,15 @@ Route 53 hosted zone deleted. All records must be **DNS only (grey cloud — NOT
 ⚠️ Cloudflare proxy (orange cloud) must stay OFF — Amplify ACM SSL requires direct DNS resolution.
 ⚠️ `acm_validation` record has `allow_overwrite = true` in cloudflare.tf — safe, it's static after cert issuance.
 ⚠️ If domain association is deleted+recreated, a **new CloudFront distribution** is issued. You must: delete old CNAME, recreate domain association, add new CNAME, then trigger a fresh build to wire the new distribution.
+
+## Database Migrations
+
+Migrations run **automatically on every deploy to `main`** via `deploy.yml` → SSH → `database/migrate.sh`.
+
+- Runner: `postgres:16-alpine` Docker container, connects to RDS with `PGSSLMODE=require`
+- Tracking: `schema_migrations` table in the `stpetemusic` DB records every applied filename
+- Idempotent: `apply_if_new` skips already-applied files — safe to redeploy
+- **Adding a migration**: drop a `NNN_description.sql` file in `database/migrations/` — it will be auto-discovered and applied on the next deploy. No edits to `migrate.sh` needed.
 
 ## n8n Production Server (AWS EC2)
 - URL: https://n8n.stpetemusic.live

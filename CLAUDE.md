@@ -18,9 +18,9 @@ Parent company: Tangent LLC. Partner venue: Suite E Studios.
 | Events & content (final friday, instant noodles, art walk, captions, posts, shows, bands) | [events.md](.claude/events.md) |
 | Infrastructure & deployment (aws, amplify, ec2, dns, tofu, terraform, ssl, cloudflare, listmonk, CI) | [infrastructure.md](.claude/infrastructure.md) |
 | n8n & automation (workflows, obsidian, posting, youtube, instagram, google drive, video, reel) | [n8n.md](.claude/n8n.md) |
-| Facebook & Instagram webhooks (fb automation, ig automation, page webhook, comment, message, mention) | [n8n-fb-ig-automation.md](.claude/n8n-fb-ig-automation.md) |
+| Facebook & Instagram webhooks (fb automation, ig automation, page webhook, comment, message, mention) | [FACEBOOK_INSTAGRAM_AUTOMATION.md](docs/plans/FACEBOOK_INSTAGRAM_AUTOMATION.md) |
 | Secrets & credentials (tokens, github secrets, env vars, rotate, listmonk, credential management) | [secrets.md](.claude/secrets.md) |
-| Local setup (direnv, envrc, pre-commit, install, first-time, hooks) | [setup.md](.claude/setup.md) |
+| Local setup (direnv, envrc, pre-commit, install, first-time, hooks) | [SETUP.md](SETUP.md) |
 | Debugging & troubleshooting (errors, down, ssh, 403, 500, not responding, connection refused) | [troubleshooting.md](.claude/troubleshooting.md) |
 | Ads & analytics (google ads, microsoft ads, bing, meta pixel, GTM, clarity, paid, advertising) | [ads-accounts-todo.md](.claude/ads-accounts-todo.md) |
 | YouTube feature (review queue, admin UI, publish workflow, quota, OAuth, sync, proposals, calendar match) | [youtube.md](.claude/youtube.md) |
