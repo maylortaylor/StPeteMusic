@@ -6,6 +6,14 @@
 #   2. Push a change to infrastructure/ to trigger tofu-apply.yml
 #   3. Push to main to apply to EC2 + Amplify rebuild
 
+resource "aws_ssm_parameter" "revalidation_secret" {
+  count = var.revalidation_secret != "" ? 1 : 0
+  name  = "/${var.project}/revalidation_secret"
+  type  = "SecureString"
+  value = var.revalidation_secret
+  tags  = { Project = var.project }
+}
+
 resource "aws_ssm_parameter" "listmonk_username" {
   name  = "/${var.project}/listmonk/username"
   type  = "SecureString"

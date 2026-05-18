@@ -109,6 +109,20 @@ export async function POST(request: Request) {
       }
     }
 
+    // Bust the web app's /tickets cache so newly synced events appear immediately
+    const webAppUrl = process.env.WEB_APP_URL;
+    const revalidationSecret = process.env.REVALIDATION_SECRET;
+    if (webAppUrl && revalidationSecret) {
+      await fetch(`${webAppUrl}/api/revalidate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${revalidationSecret}`,
+        },
+        body: JSON.stringify({ scope: 'eventbrite' }),
+      }).catch((err) => console.warn('Revalidation call failed (non-fatal):', err));
+    }
+
     return Response.json({ synced: events.length, added, updated, errors });
   } catch (err) {
     console.error('POST /api/eventbrite/events/sync error:', err);

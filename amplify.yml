@@ -46,6 +46,7 @@ applications:
             - |
               echo "CLERK_SECRET_KEY=$CLERK_SECRET_KEY" >> .env.production
               echo "DATABASE_URL=$DATABASE_URL" >> .env.production
+              echo "WEB_APP_URL=$WEB_APP_URL" >> .env.production
               echo "REVALIDATION_SECRET=$REVALIDATION_SECRET" >> .env.production
               echo "LISTMONK_API_URL=$LISTMONK_API_URL" >> .env.production
               echo "LISTMONK_USERNAME=$LISTMONK_USERNAME" >> .env.production

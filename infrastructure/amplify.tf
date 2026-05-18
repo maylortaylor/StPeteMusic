@@ -4,6 +4,12 @@
 # Build spec: amplify.yml at repo root
 
 # Read secrets from SSM so Amplify env vars stay in sync
+data "aws_ssm_parameter" "revalidation_secret" {
+  count           = var.revalidation_secret != "" ? 1 : 0
+  name            = aws_ssm_parameter.revalidation_secret[0].name
+  with_decryption = true
+}
+
 data "aws_ssm_parameter" "clerk_secret_key" {
   name            = aws_ssm_parameter.clerk_secret_key.name
   with_decryption = true
@@ -82,6 +88,7 @@ resource "aws_amplify_app" "web" {
     NEXT_PUBLIC_CLARITY_ID    = var.clarity_project_id
     YOUTUBE_API_KEY           = var.youtube_api_key
     YOUTUBE_CHANNEL_ID        = var.youtube_channel_id
+    REVALIDATION_SECRET       = var.revalidation_secret != "" ? data.aws_ssm_parameter.revalidation_secret[0].value : ""
   }
 
   enable_auto_branch_creation = false
@@ -163,6 +170,9 @@ resource "aws_amplify_app" "admin" {
     ANTHROPIC_API_KEY                   = var.anthropic_api_key != "" ? data.aws_ssm_parameter.anthropic_api_key[0].value : ""
     N8N_ARTIST_ENRICHMENT_WEBHOOK_URL   = var.n8n_artist_enrichment_webhook_url != "" ? data.aws_ssm_parameter.n8n_artist_enrichment_webhook_url[0].value : ""
     N8N_WEBHOOK_SECRET                  = var.n8n_webhook_secret != "" ? data.aws_ssm_parameter.n8n_webhook_secret[0].value : ""
+    # Revalidation — admin calls web app's /api/revalidate after syncs
+    WEB_APP_URL                         = "https://www.stpetemusic.live"
+    REVALIDATION_SECRET                 = var.revalidation_secret != "" ? data.aws_ssm_parameter.revalidation_secret[0].value : ""
     # Eventbrite integration (admin only — never exposed to web app)
     EVENTBRITE_ORG_ID                   = var.eventbrite_org_id
     EVENTBRITE_PRIVATE_TOKEN            = var.eventbrite_private_token != "" ? data.aws_ssm_parameter.eventbrite_private_token[0].value : ""
