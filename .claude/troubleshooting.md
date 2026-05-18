@@ -1,10 +1,46 @@
 ---
 topic: troubleshooting
-triggers: error, down, debug, troubleshoot, ssh, terraform issue, connection refused, 403, 500, not responding, credentials issue, env leakage, contamination
-updated: 2026-05-02
+triggers: error, down, debug, troubleshoot, ssh, terraform issue, connection refused, 403, 500, not responding, credentials issue, env leakage, contamination, error logs, production errors
+updated: 2026-05-17
 ---
 
 # Troubleshooting
+
+## Querying Production Error Logs
+
+Both the web app and admin app write structured errors to the `error_logs` table in Postgres. Logs are retained for 30 days.
+
+**Via admin API (easiest for Claude agents — requires a logged-in Clerk session):**
+```
+GET https://admin.stpetemusic.live/api/admin/error-logs?hours=24
+GET https://admin.stpetemusic.live/api/admin/error-logs?hours=48&app=web
+GET https://admin.stpetemusic.live/api/admin/error-logs?hours=6&level=error&limit=50
+```
+
+Query params:
+- `hours` — look back N hours (default 24, max 168)
+- `app` — `web` or `admin` (default: both)
+- `level` — `error` or `warn` (default: both)
+- `limit` — number of results (default 100, max 500)
+
+Response shape:
+```json
+{
+  "summary": { "total": 12, "by_app": {"web": 8, "admin": 4}, "by_status_code": {"500": 10} },
+  "errors": [{ "created_at": "...", "app": "web", "status_code": 500, "path": "/api/contact", "message": "..." }]
+}
+```
+
+**Via direct DB query (for Claude agents with DATABASE_URL):**
+```sql
+SELECT app, status_code, path, message, created_at
+FROM error_logs
+WHERE created_at > now() - interval '24 hours'
+ORDER BY created_at DESC
+LIMIT 50;
+```
+
+---
 
 ## AWS Credentials Issues
 

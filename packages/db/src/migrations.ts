@@ -1060,4 +1060,25 @@ ALTER TABLE youtube_config
   ADD COLUMN IF NOT EXISTS stream_override_platform VARCHAR(20) DEFAULT 'youtube';
 `,
   },
+  {
+    filename: '031_add_error_logs.sql',
+    sql: `
+CREATE TABLE IF NOT EXISTS error_logs (
+  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  app         VARCHAR(20) NOT NULL,
+  level       VARCHAR(20) NOT NULL DEFAULT 'error',
+  status_code INTEGER,
+  path        TEXT,
+  method      VARCHAR(10),
+  message     TEXT NOT NULL,
+  stack       TEXT,
+  metadata    JSONB       NOT NULL DEFAULT '{}',
+  user_id     TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_error_logs_created_at  ON error_logs (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_error_logs_app         ON error_logs (app);
+CREATE INDEX IF NOT EXISTS idx_error_logs_status_code ON error_logs (status_code);
+`,
+  },
 ];

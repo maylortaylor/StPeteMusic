@@ -21,7 +21,7 @@ Parent company: Tangent LLC. Partner venue: Suite E Studios.
 | Facebook & Instagram webhooks (fb automation, ig automation, page webhook, comment, message, mention) | [FACEBOOK_INSTAGRAM_AUTOMATION.md](docs/plans/FACEBOOK_INSTAGRAM_AUTOMATION.md) |
 | Secrets & credentials (tokens, github secrets, env vars, rotate, listmonk, credential management) | [secrets.md](.claude/secrets.md) |
 | Local setup (direnv, envrc, pre-commit, install, first-time, hooks) | [SETUP.md](SETUP.md) |
-| Debugging & troubleshooting (errors, down, ssh, 403, 500, not responding, connection refused) | [troubleshooting.md](.claude/troubleshooting.md) |
+| Debugging & troubleshooting (errors, down, ssh, 403, 500, not responding, connection refused, error logs, production errors, logError, what broke, site down, check logs) | [troubleshooting.md](.claude/troubleshooting.md) |
 | Ads & analytics (google ads, microsoft ads, bing, meta pixel, GTM, clarity, paid, advertising) | [ads-accounts-todo.md](.claude/ads-accounts-todo.md) |
 | YouTube feature (review queue, admin UI, publish workflow, quota, OAuth, sync, proposals, calendar match) | [youtube.md](.claude/youtube.md) |
 

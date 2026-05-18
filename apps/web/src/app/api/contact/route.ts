@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { logError } from '@stpetemusic/db';
 
 export async function POST(req: NextRequest) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -74,7 +75,14 @@ export async function POST(req: NextRequest) {
     }
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error('[contact] Resend error:', msg);
+    logError({
+      app: 'web',
+      status_code: 500,
+      path: '/api/contact',
+      method: 'POST',
+      message: `[contact] Resend error: ${msg}`,
+      stack: err instanceof Error ? err.stack : undefined,
+    });
     return NextResponse.json({ message: 'Failed to send message. Please try again.' }, { status: 500 });
   } finally {
     clearTimeout(timeout);
