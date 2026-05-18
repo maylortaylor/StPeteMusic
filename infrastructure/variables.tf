@@ -225,6 +225,13 @@ variable "youtube_channel_id" {
 
 # ── Eventbrite (theburgmusic@gmail.com) ──────────────────────────────────────
 
+variable "revalidation_secret" {
+  description = "Shared secret for web app on-demand ISR revalidation (POST /api/revalidate). Set via TF_VAR_revalidation_secret in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 variable "eventbrite_org_id" {
   description = "Eventbrite API organization ID (from /users/me/organizations/ — NOT the profile URL number). Set via TF_VAR_eventbrite_org_id in CI."
   type        = string
