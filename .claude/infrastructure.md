@@ -51,7 +51,7 @@ Migrations run **automatically on every deploy to `main`** via `deploy.yml` → 
 - Runner: `postgres:16-alpine` Docker container, connects to RDS with `PGSSLMODE=require`
 - Tracking: `schema_migrations` table in the `stpetemusic` DB records every applied filename
 - Idempotent: `apply_if_new` skips already-applied files — safe to redeploy
-- **Required step when adding a migration**: add an `apply_if_new` line to `database/migrate.sh` or it will never run. The file existing in `database/migrations/` is not enough.
+- **Adding a migration**: drop a `NNN_description.sql` file in `database/migrations/` — it will be auto-discovered and applied on the next deploy. No edits to `migrate.sh` needed.
 
 ## n8n Production Server (AWS EC2)
 - URL: https://n8n.stpetemusic.live
