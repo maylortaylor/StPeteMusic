@@ -53,6 +53,9 @@ apps/**/tsconfig.tsbuildinfo
 .playwright-mcp/
 lighthouse-*.json
 
+# Demo / screen recordings (local only)
+apps/web/demo-recordings/
+
 # Agent-generated content (keep directories, ignore generated files)
 production_artifacts/**/*.md
 !production_artifacts/**/.gitkeep
