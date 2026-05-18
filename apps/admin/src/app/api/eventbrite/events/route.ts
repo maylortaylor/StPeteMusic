@@ -1,5 +1,5 @@
 import { auth } from '@clerk/nextjs/server';
-import { getDb, eventbrite_events, desc, sql } from '@stpetemusic/db';
+import { getDb, eventbrite_events, desc, sql, inArray } from '@stpetemusic/db';
 
 export async function GET(request: Request) {
   try {
@@ -44,7 +44,7 @@ export async function GET(request: Request) {
       if (statuses.length === 1) {
         query = query.where(sql`${eventbrite_events.status} = ${statuses[0]}`) as typeof query;
       } else if (statuses.length > 1) {
-        query = query.where(sql`${eventbrite_events.status} = ANY(${statuses})`) as typeof query;
+        query = query.where(inArray(eventbrite_events.status, statuses)) as typeof query;
       }
     }
 
