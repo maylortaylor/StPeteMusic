@@ -61,10 +61,11 @@ export function markAllRead() {
   writeHistory(readHistory().map((e) => ({ ...e, read: true })));
 }
 
-export function copyErrorToClipboard(entry: ToastEntry) {
-  navigator.clipboard.writeText(
-    JSON.stringify(entry.detail ?? { message: entry.message }, null, 2),
-  );
+export function copyNotificationToClipboard(entry: ToastEntry) {
+  const payload: Record<string, unknown> = { type: entry.type, message: entry.message };
+  if (entry.description) payload.description = entry.description;
+  if (entry.detail) payload.detail = entry.detail;
+  navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
 }
 
 export { TOAST_EVENT };
@@ -77,8 +78,11 @@ type ErrorOpts = SonnerOpts & {
 
 export const toast = {
   success(message: string, opts?: SonnerOpts) {
-    pushToHistory({ type: 'success', message });
-    return sonnerToast.success(message, opts);
+    const entry = pushToHistory({ type: 'success', message, description: opts?.description as string | undefined });
+    return sonnerToast.success(message, {
+      ...opts,
+      action: { label: 'Copy', onClick: () => copyNotificationToClipboard(entry) },
+    });
   },
 
   error(message: string, opts?: ErrorOpts) {
@@ -91,19 +95,23 @@ export const toast = {
     return sonnerToast.error(message, {
       ...rest,
       description: autoDescription,
-      action: detail
-        ? { label: 'Copy error', onClick: () => copyErrorToClipboard(entry) }
-        : (rest as { action?: unknown }).action,
+      action: { label: 'Copy', onClick: () => copyNotificationToClipboard(entry) },
     } as SonnerOpts);
   },
 
   info(message: string, opts?: SonnerOpts) {
-    pushToHistory({ type: 'info', message });
-    return sonnerToast.info(message, opts);
+    const entry = pushToHistory({ type: 'info', message, description: opts?.description as string | undefined });
+    return sonnerToast.info(message, {
+      ...opts,
+      action: { label: 'Copy', onClick: () => copyNotificationToClipboard(entry) },
+    });
   },
 
   warning(message: string, opts?: SonnerOpts) {
-    pushToHistory({ type: 'warning', message });
-    return sonnerToast.warning(message, opts);
+    const entry = pushToHistory({ type: 'warning', message, description: opts?.description as string | undefined });
+    return sonnerToast.warning(message, {
+      ...opts,
+      action: { label: 'Copy', onClick: () => copyNotificationToClipboard(entry) },
+    });
   },
 };
