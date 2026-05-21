@@ -63,6 +63,10 @@ export default function EventbritePage() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [lastSynced, setLastSynced] = useState<string | null>(null);
+  const [importUrl, setImportUrl] = useState('');
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<{ name: string; status: string | null } | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -108,6 +112,28 @@ export default function EventbritePage() {
     }
   };
 
+  const importEvent = async () => {
+    setImporting(true);
+    setImportResult(null);
+    setImportError(null);
+    try {
+      const res = await fetch('/api/eventbrite/events/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: importUrl }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Import failed');
+      setImportResult({ name: data.name, status: data.status });
+      setImportUrl('');
+      await load();
+    } catch (err) {
+      setImportError(err instanceof Error ? err.message : 'Import failed');
+    } finally {
+      setImporting(false);
+    }
+  };
+
   const totalSold = Object.entries(stats).reduce((s) => s, 0);
   const totalRevenue = events.reduce((s, e) => s + (e.gross_revenue_cents ?? 0), 0);
   const linked = events.filter((e) => e.linked_event_id).length;
@@ -132,6 +158,42 @@ export default function EventbritePage() {
         >
           {syncing ? 'Syncing…' : 'Sync Events'}
         </button>
+      </div>
+
+      {/* Import external event */}
+      <div className="rounded-lg border border-border bg-card p-4">
+        <div className="mb-3">
+          <h2 className="text-sm font-semibold">Import External Event</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Add an event from another org&apos;s Eventbrite page
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <input
+            type="url"
+            value={importUrl}
+            onChange={(e) => { setImportUrl(e.target.value); setImportResult(null); setImportError(null); }}
+            onKeyDown={(e) => { if (e.key === 'Enter' && importUrl && !importing) importEvent(); }}
+            placeholder="https://www.eventbrite.com/e/..."
+            className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+          <button
+            onClick={importEvent}
+            disabled={importing || !importUrl.trim()}
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 whitespace-nowrap"
+          >
+            {importing ? 'Importing…' : 'Import →'}
+          </button>
+        </div>
+        {importResult && (
+          <p className="mt-2 text-xs text-green-700 dark:text-green-400">
+            ✓ Imported: &ldquo;{importResult.name}&rdquo;
+            {importResult.status ? ` (${importResult.status})` : ''}
+          </p>
+        )}
+        {importError && (
+          <p className="mt-2 text-xs text-red-600 dark:text-red-400">✗ {importError}</p>
+        )}
       </div>
 
       {/* Stats row */}

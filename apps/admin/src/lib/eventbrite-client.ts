@@ -183,6 +183,22 @@ function mapEvent(raw: any, orgId: string, ticketClasses: EbTicketClass[]): EbEv
   };
 }
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+// Extracts the numeric event ID from an Eventbrite event URL.
+// Handles: https://www.eventbrite.com/e/some-name-tickets-12345678901
+export function parseEventbriteEventId(url: string): string | null {
+  const match = url.match(/\/(\d{6,15})(?:[?#/]|$)/);
+  return match?.[1] ?? null;
+}
+
+export async function fetchEventById(eventId: string): Promise<EbEvent> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const raw = await ebFetch<any>(`/events/${eventId}/?expand=${EVENT_EXPAND}`);
+  const ticketClasses = (raw.ticket_classes ?? []).map(mapTicketClass);
+  return mapEvent(raw, raw.organizer?.id ?? '', ticketClasses);
+}
+
 // ─── API Functions ────────────────────────────────────────────────────────────
 
 export async function getOrgId(): Promise<{ id: string; name: string }> {
