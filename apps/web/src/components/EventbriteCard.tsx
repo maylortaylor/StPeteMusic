@@ -86,7 +86,7 @@ export function EventbriteCard({ event }: { event: EventbriteEventCard }) {
           href={event.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute inset-0 z-0 rounded-xl"
+          className="absolute inset-0 z-[1] rounded-xl"
           aria-label={`View ${event.name} on Eventbrite`}
         />
       )}
