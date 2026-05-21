@@ -79,7 +79,18 @@ export function EventbriteCard({ event }: { event: EventbriteEventCard }) {
   const unavailable = event.ticket_availability_status === 'unavailable';
 
   return (
-    <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden flex flex-col">
+    <div className="relative rounded-xl border border-border bg-white shadow-sm overflow-hidden flex flex-col cursor-pointer hover:shadow-md transition-shadow">
+      {/* Stretched link — makes the whole card clickable without nesting <a> inside <a> */}
+      {event.url && (
+        <a
+          href={event.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute inset-0 z-0 rounded-xl"
+          aria-label={`View ${event.name} on Eventbrite`}
+        />
+      )}
+
       {/* Image */}
       {event.logo_url && (
         <div className="relative h-44 bg-muted overflow-hidden">
@@ -119,9 +130,9 @@ export function EventbriteCard({ event }: { event: EventbriteEventCard }) {
           )}
         </div>
 
-        {/* Eventbrite checkout widget or fallback */}
+        {/* Eventbrite checkout widget or fallback — lifted above the stretched link */}
         {!soldOut && !unavailable ? (
-          <div className="mt-auto">
+          <div className="relative z-10 mt-auto">
             <div id={widgetContainerId} className="min-h-[80px]" />
             {/* Fallback CTA shown while widget loads or if it fails */}
             <a
@@ -134,7 +145,7 @@ export function EventbriteCard({ event }: { event: EventbriteEventCard }) {
             </a>
           </div>
         ) : (
-          <div className="mt-auto">
+          <div className="relative z-10 mt-auto">
             <a
               href={event.url ?? '#'}
               target="_blank"
