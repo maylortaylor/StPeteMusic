@@ -188,7 +188,7 @@ function mapEvent(raw: any, orgId: string, ticketClasses: EbTicketClass[]): EbEv
 // Extracts the numeric event ID from an Eventbrite event URL.
 // Handles: https://www.eventbrite.com/e/some-name-tickets-12345678901
 export function parseEventbriteEventId(url: string): string | null {
-  const match = url.match(/\/(\d{6,15})(?:[?#/]|$)/);
+  const match = url.match(/[-/](\d{6,15})(?:[?#/]|$)/);
   return match?.[1] ?? null;
 }
 
