@@ -12,27 +12,27 @@ export async function POST(request: Request) {
   const { slug, oldSlug, scope } = body as { slug?: string; oldSlug?: string; scope?: string };
 
   if (scope === 'eventbrite') {
-    revalidateTag('eventbrite-events');
-    revalidatePath('/tickets');
+    revalidateTag('eventbrite-events', {});
+    revalidatePath('/tickets', 'page');
     return Response.json({ revalidated: true, scope: 'eventbrite' });
   }
 
   if (slug) {
-    revalidatePath(`/discover/${slug}`);
-    revalidatePath(`/venues/${slug}`);
-    revalidatePath(`/blog/${slug}`);
+    revalidatePath(`/discover/${slug}`, 'page');
+    revalidatePath(`/venues/${slug}`, 'page');
+    revalidatePath(`/blog/${slug}`, 'page');
     if (oldSlug && oldSlug !== slug) {
-      revalidatePath(`/discover/${oldSlug}`);
-      revalidatePath(`/venues/${oldSlug}`);
-      revalidatePath(`/blog/${oldSlug}`);
+      revalidatePath(`/discover/${oldSlug}`, 'page');
+      revalidatePath(`/venues/${oldSlug}`, 'page');
+      revalidatePath(`/blog/${oldSlug}`, 'page');
     }
   }
 
-  revalidatePath('/discover');
-  revalidatePath('/venues');
-  revalidatePath('/blog');
-  revalidatePath('/events');
-  revalidatePath('/tickets');
+  revalidatePath('/discover', 'page');
+  revalidatePath('/venues', 'page');
+  revalidatePath('/blog', 'page');
+  revalidatePath('/events', 'page');
+  revalidatePath('/tickets', 'page');
 
   return Response.json({ revalidated: true });
 }

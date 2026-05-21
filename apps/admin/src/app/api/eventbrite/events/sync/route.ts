@@ -120,7 +120,11 @@ export async function POST(request: Request) {
           Authorization: `Bearer ${revalidationSecret}`,
         },
         body: JSON.stringify({ scope: 'eventbrite' }),
-      }).catch((err) => console.warn('Revalidation call failed (non-fatal):', err));
+      })
+        .then((r) => { if (!r.ok) r.text().then((b) => console.warn('Revalidation non-ok:', r.status, b)); })
+        .catch((err) => console.warn('Revalidation call failed (non-fatal):', err));
+    } else {
+      console.warn('Revalidation skipped: WEB_APP_URL or REVALIDATION_SECRET not set');
     }
 
     return Response.json({ synced: events.length, added, updated, errors });
