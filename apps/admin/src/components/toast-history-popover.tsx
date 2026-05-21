@@ -5,7 +5,7 @@ import { CheckCircle, XCircle, Info, AlertTriangle, Clock, Clipboard, Trash2 } f
 import {
   type ToastEntry,
   clearToastHistory,
-  copyErrorToClipboard,
+  copyNotificationToClipboard,
   getToastHistory,
   markAllRead,
   TOAST_EVENT,
@@ -65,7 +65,7 @@ export function ToastHistoryPopover() {
   }
 
   function handleCopy(entry: ToastEntry) {
-    copyErrorToClipboard(entry);
+    copyNotificationToClipboard(entry);
   }
 
   return (
@@ -122,15 +122,13 @@ export function ToastHistoryPopover() {
                         )}
                       </div>
                       <div className="flex shrink-0 items-center gap-1">
-                        {entry.detail && (
-                          <button
-                            onClick={() => handleCopy(entry)}
-                            title="Copy full error"
-                            className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                          >
-                            <Clipboard className="h-3 w-3" />
-                          </button>
-                        )}
+                        <button
+                          onClick={() => handleCopy(entry)}
+                          title="Copy notification"
+                          className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                        >
+                          <Clipboard className="h-3 w-3" />
+                        </button>
                         <span className="text-xs text-muted-foreground">{relativeTime(entry.timestamp)}</span>
                       </div>
                     </div>
