@@ -45,7 +45,7 @@
     "@anthropic-ai/sdk": "^0.96.0",
     "@eslint/eslintrc": "^3.3.5",
     "@google-analytics/admin": "^9.1.0",
-    "@google-analytics/data": "^5.2.2",
+    "@google-analytics/data": "^6.0.0",
     "@tailwindcss/postcss": "^4.2.4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
