@@ -67,6 +67,7 @@ export default function EventbritePage() {
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<{ name: string; status: string | null } | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
+  const [refreshingCache, setRefreshingCache] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -112,6 +113,20 @@ export default function EventbritePage() {
     }
   };
 
+  const refreshCache = async () => {
+    setRefreshingCache(true);
+    try {
+      const res = await fetch('/api/eventbrite/revalidate', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Cache refresh failed');
+      toast.success('/tickets cache refreshed');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Cache refresh failed');
+    } finally {
+      setRefreshingCache(false);
+    }
+  };
+
   const importEvent = async () => {
     setImporting(true);
     setImportResult(null);
@@ -151,13 +166,22 @@ export default function EventbritePage() {
             </p>
           )}
         </div>
-        <button
-          onClick={sync}
-          disabled={syncing}
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-        >
-          {syncing ? 'Syncing…' : 'Sync Events'}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={refreshCache}
+            disabled={refreshingCache}
+            className="rounded-md border border-border bg-card px-4 py-2 text-sm font-medium hover:bg-muted disabled:opacity-50"
+          >
+            {refreshingCache ? 'Refreshing…' : 'Refresh Cache'}
+          </button>
+          <button
+            onClick={sync}
+            disabled={syncing}
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+          >
+            {syncing ? 'Syncing…' : 'Sync Events'}
+          </button>
+        </div>
       </div>
 
       {/* Import external event */}

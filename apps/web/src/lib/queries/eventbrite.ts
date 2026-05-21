@@ -49,6 +49,6 @@ async function _getActiveEventbriteEvents(): Promise<EventbriteEventCard[]> {
 
 export const getActiveEventbriteEvents = unstable_cache(
   _getActiveEventbriteEvents,
-  ['active-eventbrite-events'],
-  { revalidate: 1800, tags: ['eventbrite-events'] },
+  ['active-eventbrite-events-v2'],
+  { revalidate: 300, tags: ['eventbrite-events'] },
 );
