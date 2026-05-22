@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og';
 import { ogImageTemplate } from '@/lib/og/image-template';
-import { readPublicImage } from '@/lib/og/read-public-image';
+import { OG_BASE_URL } from '@/lib/og/base-url';
 import { getArtistBySlug } from '@/lib/queries/artists';
 
 export const runtime = 'nodejs';
@@ -11,10 +11,8 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   const { slug } = await params;
   const artist = await getArtistBySlug(slug).catch(() => null);
 
-  const backgroundSrc = artist?.hero_photo_url
-    ? artist.hero_photo_url
-    : readPublicImage('/images/og/discover-bg2.png');
-  const logoSrc = readPublicImage('/images/brand/spm-logo-cable-white.png');
+  const backgroundSrc = artist?.hero_photo_url ?? `${OG_BASE_URL}/images/og/discover-bg2.png`;
+  const logoSrc = `${OG_BASE_URL}/images/brand/spm-logo-cable-white.png`;
 
   const title = artist?.name ?? 'Discover Artists';
   const subtitle = artist

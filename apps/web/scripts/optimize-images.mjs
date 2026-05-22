@@ -37,6 +37,7 @@ const PROCESS_DIRS = [
   'images/vibes',
   'images/hero',
   'images/events',
+  'images/og',
 ];
 
 // Directories/patterns to skip entirely
@@ -111,7 +112,7 @@ async function processImage(absPath, relFromPublic) {
 
   const fp = getFocalPoint(relFromPublic);
 
-  // 1. Re-compress original JPG in-place (skip PNGs — logos in vibes dirs are rare)
+  // 1. Re-compress original in-place (JPG and PNG)
   if (isJpg) {
     const tmpPath = absPath + '.tmp';
     await sharp(absPath)
@@ -120,6 +121,14 @@ async function processImage(absPath, relFromPublic) {
       .toFile(tmpPath);
     fs.renameSync(tmpPath, absPath);
     process.stdout.write(' jpg✓');
+  }
+  if (isPng) {
+    const tmpPath = absPath + '.tmp';
+    await sharp(absPath)
+      .png({ compressionLevel: 9, effort: 10 })
+      .toFile(tmpPath);
+    fs.renameSync(tmpPath, absPath);
+    process.stdout.write(' png✓');
   }
 
   // 2. Create .webp sibling (skip if exists and not --force)
