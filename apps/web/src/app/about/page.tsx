@@ -15,21 +15,14 @@ export const metadata: Metadata = {
     url: 'https://www.stpetemusic.live/about',
     siteName: 'St. Pete Music',
     type: 'website',
-    images: [
-      {
-        url: '/images/brand/spm-logo-palm.png',
-        width: 1200,
-        height: 630,
-        alt: 'St. Pete Music',
-      },
-    ],
+    images: [{ url: '/images/og/about-bg2.png', width: 1200, height: 630, alt: 'About St. Pete Music' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'About St. Pete Music | Community Music in St. Petersburg, FL',
     description:
       'St. Pete Music is a community hub for the live music scene in St. Petersburg, FL — connecting local artists, venues, and fans.',
-    images: ['https://www.stpetemusic.live/images/brand/spm-logo-palm.png'],
+    images: ['https://www.stpetemusic.live/images/og/about-bg2.png'],
   },
 };
 

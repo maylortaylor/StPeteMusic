@@ -31,12 +31,13 @@ export const metadata: Metadata = {
     description:
       'Browse upcoming concerts, live music shows, and community events in St. Petersburg, FL. Your go-to music calendar for the Tampa Bay area.',
     url: 'https://www.stpetemusic.live/events',
+    images: [{ url: '/images/og/events-bg2.png', width: 1200, height: 630, alt: 'Live Music Events — St. Pete Music' }],
   },
   twitter: {
     card: 'summary_large_image',
     site: '@StPeteMusic',
     creator: '@StPeteMusic',
-    images: ['https://www.stpetemusic.live/images/hero/SPM-hero.webp'],
+    images: ['https://www.stpetemusic.live/images/og/events-bg2.png'],
   },
 };
 
