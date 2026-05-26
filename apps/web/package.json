@@ -59,7 +59,7 @@
     "eslint": "^10.2.1",
     "eslint-config-next": "^16.2.4",
     "eslint-plugin-next": "^0.0.0",
-    "googleapis": "^171.4.0",
+    "googleapis": "^172.0.0",
     "jsdom": "^29.0.2",
     "playwright": "^1.50.0",
     "postcss": "^8.5.10",
