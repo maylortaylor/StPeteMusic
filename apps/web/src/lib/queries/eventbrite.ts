@@ -41,7 +41,7 @@ async function _getActiveEventbriteEvents(): Promise<EventbriteEventCard[]> {
       ticket_classes::text
     FROM eventbrite_events
     WHERE status IN ('live', 'started')
-      AND (end_utc IS NULL OR end_utc >= NOW() - INTERVAL '2 hours')
+      AND COALESCE(end_utc, start_utc + INTERVAL '6 hours') >= NOW() - INTERVAL '2 hours'
     ORDER BY start_utc ASC
   `);
   return rows;
@@ -49,6 +49,6 @@ async function _getActiveEventbriteEvents(): Promise<EventbriteEventCard[]> {
 
 export const getActiveEventbriteEvents = unstable_cache(
   _getActiveEventbriteEvents,
-  ['active-eventbrite-events-v2'],
+  ['active-eventbrite-events-v3'],
   { revalidate: 300, tags: ['eventbrite-events'] },
 );

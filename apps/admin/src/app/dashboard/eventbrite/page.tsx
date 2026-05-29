@@ -116,12 +116,22 @@ export default function EventbritePage() {
   const refreshCache = async () => {
     setRefreshingCache(true);
     try {
-      const res = await fetch('/api/eventbrite/revalidate', { method: 'POST' });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? 'Cache refresh failed');
-      toast.success('/tickets cache refreshed');
+      // Sync first so DB statuses are current, then bust the web cache
+      const syncRes = await fetch('/api/eventbrite/events/sync', { method: 'POST' });
+      const syncData = await syncRes.json();
+      if (!syncRes.ok) throw new Error(syncData.error ?? 'Sync failed');
+
+      const revalidateRes = await fetch('/api/eventbrite/revalidate', { method: 'POST' });
+      const revalidateData = await revalidateRes.json();
+      if (!revalidateRes.ok) throw new Error(revalidateData.error ?? 'Cache refresh failed');
+
+      toast.success(`Synced ${syncData.synced} events — /tickets cache refreshed`);
+      if (syncData.errors?.length > 0) {
+        toast.warning(`${syncData.errors.length} event(s) had errors during sync`);
+      }
+      await load();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Cache refresh failed');
+      toast.error(err instanceof Error ? err.message : 'Sync & refresh failed');
     } finally {
       setRefreshingCache(false);
     }
@@ -172,7 +182,7 @@ export default function EventbritePage() {
             disabled={refreshingCache}
             className="rounded-md border border-border bg-card px-4 py-2 text-sm font-medium hover:bg-muted disabled:opacity-50"
           >
-            {refreshingCache ? 'Refreshing…' : 'Refresh Cache'}
+            {refreshingCache ? 'Syncing & Refreshing…' : 'Sync & Refresh Cache'}
           </button>
           <button
             onClick={sync}
