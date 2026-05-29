@@ -84,6 +84,15 @@ export async function POST(request: Request) {
           synced_at: new Date(),
         };
 
+        // Eventbrite doesn't auto-transition status when end_utc passes.
+        // Correct it here so the DB reflects reality; raw_data retains the original Eventbrite value.
+        if ((row.status === 'live' || row.status === 'started') && row.end_utc instanceof Date) {
+          const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+          if (row.end_utc < twoHoursAgo) {
+            row.status = 'ended';
+          }
+        }
+
         const existing = await db
           .select({ eventbrite_id: eventbrite_events.eventbrite_id })
           .from(eventbrite_events)
