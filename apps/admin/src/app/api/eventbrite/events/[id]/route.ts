@@ -36,6 +36,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   }
 }
 
+const VALID_STATUSES = new Set(['live', 'started', 'ended', 'completed', 'canceled', 'draft', 'postponed']);
+
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { userId } = await auth();
@@ -44,30 +46,59 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     const { id } = await params;
     const body = await request.json();
 
-    // Only allow updating the admin-controlled link field
-    if (!('linked_event_id' in body)) {
-      return Response.json({ error: 'Only linked_event_id may be updated' }, { status: 400 });
+    const allowed = ['linked_event_id', 'status'] as const;
+    const updates: Record<string, unknown> = {};
+    for (const key of allowed) {
+      if (key in body) updates[key] = body[key];
     }
 
-    const linkedEventId: string | null = body.linked_event_id ?? null;
+    if (Object.keys(updates).length === 0) {
+      return Response.json({ error: 'No updatable fields provided' }, { status: 400 });
+    }
+
     const db = getDb();
 
-    // Validate the referenced event exists if a non-null value is provided
-    if (linkedEventId !== null) {
-      const target = await db
-        .select({ id: events.id })
-        .from(events)
-        .where(eq(events.id, linkedEventId))
-        .limit(1);
-      if (target.length === 0) {
-        return Response.json({ error: 'Referenced event not found' }, { status: 400 });
+    if ('linked_event_id' in updates) {
+      const linkedEventId: string | null = (updates.linked_event_id as string | null) ?? null;
+      updates.linked_event_id = linkedEventId;
+      if (linkedEventId !== null) {
+        const target = await db
+          .select({ id: events.id })
+          .from(events)
+          .where(eq(events.id, linkedEventId))
+          .limit(1);
+        if (target.length === 0) {
+          return Response.json({ error: 'Referenced event not found' }, { status: 400 });
+        }
+      }
+    }
+
+    if ('status' in updates) {
+      const s = updates.status as string;
+      if (!VALID_STATUSES.has(s)) {
+        return Response.json({ error: `Invalid status: ${s}` }, { status: 400 });
       }
     }
 
     await db
       .update(eventbrite_events)
-      .set({ linked_event_id: linkedEventId, updated_at: new Date() })
+      .set({ ...updates, updated_at: new Date() })
       .where(sql`${eventbrite_events.eventbrite_id} = ${id}`);
+
+    // Bust the web app's /tickets cache when status changes (non-fatal)
+    if ('status' in updates) {
+      const webAppUrl = process.env.WEB_APP_URL;
+      const revalidationSecret = process.env.REVALIDATION_SECRET;
+      if (webAppUrl && revalidationSecret) {
+        await fetch(`${webAppUrl}/api/revalidate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${revalidationSecret}` },
+          body: JSON.stringify({ scope: 'eventbrite' }),
+        })
+          .then((r) => { if (!r.ok) r.text().then((b) => console.warn('Revalidation non-ok:', r.status, b)); })
+          .catch((err) => console.warn('Revalidation call failed (non-fatal):', err));
+      }
+    }
 
     return Response.json({ ok: true });
   } catch (err) {
