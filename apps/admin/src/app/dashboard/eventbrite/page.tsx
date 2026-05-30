@@ -18,6 +18,8 @@ type EbEventRow = {
   synced_at: string | null;
 };
 
+const ACTIVE_STATUSES = new Set(['live', 'started']);
+
 type Stats = Record<string, number>;
 
 const STATUS_STYLES: Record<string, string> = {
@@ -156,6 +158,22 @@ export default function EventbritePage() {
       setImportError(err instanceof Error ? err.message : 'Import failed');
     } finally {
       setImporting(false);
+    }
+  };
+
+  const setEnded = async (eventbriteId: string, name: string) => {
+    try {
+      const res = await fetch(`/api/eventbrite/events/${eventbriteId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'ended' }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Update failed');
+      toast.success(`"${name}" marked as ended`);
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to update status');
     }
   };
 
@@ -359,6 +377,14 @@ export default function EventbritePage() {
                       >
                         Details →
                       </Link>
+                      {ACTIVE_STATUSES.has(event.status ?? '') && (
+                        <button
+                          onClick={() => setEnded(event.eventbrite_id, event.name)}
+                          className="text-xs text-amber-600 hover:underline dark:text-amber-400"
+                        >
+                          Mark Ended
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

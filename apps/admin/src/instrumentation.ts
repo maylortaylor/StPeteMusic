@@ -2,8 +2,7 @@ export async function register() {
   if (process.env.NEXT_RUNTIME !== 'nodejs') return;
 
   // Dynamically import to avoid pulling db code into edge runtime
-  const { getDb, MIGRATIONS } = await import('@stpetemusic/db');
-  const { sql } = await import('drizzle-orm');
+  const { getDb, MIGRATIONS, sql } = await import('@stpetemusic/db');
 
   const db = getDb();
 

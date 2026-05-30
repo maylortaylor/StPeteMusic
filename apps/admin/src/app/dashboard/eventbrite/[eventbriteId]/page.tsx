@@ -94,6 +94,7 @@ export default function EventbriteDetailPage({
   const [localEvents, setLocalEvents] = useState<LocalEvent[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [saving, setSaving] = useState(false);
+  const [markingEnded, setMarkingEnded] = useState(false);
 
   useEffect(() => {
     fetch(`/api/eventbrite/events/${eventbriteId}`)
@@ -130,6 +131,25 @@ export default function EventbriteDetailPage({
     }
   };
 
+  const markEnded = async () => {
+    setMarkingEnded(true);
+    try {
+      const res = await fetch(`/api/eventbrite/events/${eventbriteId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'ended' }),
+      });
+      if (!res.ok) throw new Error('Failed to update status');
+      toast.success('Event marked as ended');
+      const updated = await fetch(`/api/eventbrite/events/${eventbriteId}`).then((r) => r.json());
+      setEvent(updated);
+    } catch {
+      toast.error('Failed to update status');
+    } finally {
+      setMarkingEnded(false);
+    }
+  };
+
   if (loading) {
     return <div className="py-12 text-center text-muted-foreground">Loading…</div>;
   }
@@ -163,16 +183,27 @@ export default function EventbriteDetailPage({
             )}
           </div>
         </div>
-        {event.url && (
-          <a
-            href={event.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 rounded-md border border-border px-3 py-1.5 text-sm hover:bg-muted"
-          >
-            View on Eventbrite ↗
-          </a>
-        )}
+        <div className="flex items-center gap-2">
+          {(event.status === 'live' || event.status === 'started') && (
+            <button
+              onClick={markEnded}
+              disabled={markingEnded}
+              className="shrink-0 rounded-md border border-amber-300 bg-amber-50 px-3 py-1.5 text-sm text-amber-800 hover:bg-amber-100 disabled:opacity-50 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-300 dark:hover:bg-amber-900/40"
+            >
+              {markingEnded ? 'Saving…' : 'Mark as Ended'}
+            </button>
+          )}
+          {event.url && (
+            <a
+              href={event.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 rounded-md border border-border px-3 py-1.5 text-sm hover:bg-muted"
+            >
+              View on Eventbrite ↗
+            </a>
+          )}
+        </div>
       </div>
 
       {/* Stats panel */}
