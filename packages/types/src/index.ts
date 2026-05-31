@@ -1,3 +1,18 @@
+// platform values: instagram | facebook | youtube | bandcamp | spotify | soundcloud
+//                  | linktree | website | bandsintown | tiktok | twitter | threads | custom
+export interface ArtistLink {
+  id: string;
+  artist_id: string;
+  platform: string;
+  url: string;
+  label: string;
+  display_order: number;
+  is_active: boolean;
+  is_featured: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Artist {
   id: string;
   name: string;
@@ -24,6 +39,9 @@ export interface Artist {
   notes?: string;
   is_active: boolean;
   visible_on_website: boolean;
+  // enrichment_status values: null | 'pending' | 'enrichment_ready' | 'enrichment_failed' | 'enrichment_approved'
+  enrichment_status?: string | null;
+  links?: ArtistLink[];
 }
 
 export interface ArtistShow {

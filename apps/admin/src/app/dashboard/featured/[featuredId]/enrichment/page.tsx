@@ -7,6 +7,7 @@ import { ChevronLeft, RefreshCw } from 'lucide-react';
 
 interface FeaturedArtist {
   id: string;
+  artist_id: string;
   artist_name: string | null;
   status: string;
   scraped_raw: Record<string, unknown>;
@@ -130,6 +131,18 @@ export default function EnrichmentReviewPage({
           Review scraped data and approve enrichment notes
         </p>
       </div>
+
+      {record?.artist_id && (
+        <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
+          Artist enrichment is now managed on the Artist page.{' '}
+          <Link
+            href={`/dashboard/artists/${record.artist_id}/enrich`}
+            className="font-medium underline underline-offset-2 hover:opacity-80"
+          >
+            Go to Enrich {record.artist_name} →
+          </Link>
+        </div>
+      )}
 
       {error && (
         <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">

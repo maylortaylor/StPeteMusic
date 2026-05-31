@@ -6,7 +6,7 @@ const csp = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://maps.googleapis.com https://connect.facebook.net https://www.clarity.ms https://www.eventbrite.com",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://www.googletagmanager.com https://www.google-analytics.com https://i.ytimg.com https://img.youtube.com https://maps.googleapis.com https://maps.gstatic.com https://www.facebook.com https://img.evbuc.com https://cdn.evbuc.com https://eventbrite-s3.s3.amazonaws.com",
+  "img-src 'self' data: blob: https://www.googletagmanager.com https://www.google-analytics.com https://i.ytimg.com https://img.youtube.com https://maps.googleapis.com https://maps.gstatic.com https://www.facebook.com https://img.evbuc.com https://cdn.evbuc.com https://eventbrite-s3.s3.amazonaws.com https://cdn.stpetemusic.live",
   "font-src 'self'",
   "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://region1.analytics.google.com https://www.googletagmanager.com https://www.facebook.com https://*.facebook.net https://*.clarity.ms https://www.googleapis.com",
   "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://www.eventbrite.com https://eventbrite.com",
@@ -46,6 +46,7 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'img.youtube.com' },
       { protocol: 'https', hostname: 'i.ytimg.com' },
+      { protocol: 'https', hostname: 'cdn.stpetemusic.live' },
     ],
     minimumCacheTTL: 31536000,
   },
