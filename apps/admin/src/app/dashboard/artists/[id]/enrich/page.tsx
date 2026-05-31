@@ -454,17 +454,28 @@ export default function ArtistEnrichPage() {
           <p className='text-sm text-muted-foreground'>
             The page will update automatically when ready.
           </p>
-          <button
-            type='button'
-            onClick={async () => {
-              const a = await fetchArtist();
-              setArtist(a);
-            }}
-            className='inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground'
-          >
-            <RefreshCw size={14} />
-            Check Status
-          </button>
+          <div className='flex justify-center gap-4'>
+            <button
+              type='button'
+              onClick={async () => {
+                const a = await fetchArtist();
+                setArtist(a);
+              }}
+              className='inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground'
+            >
+              <RefreshCw size={14} />
+              Check Status
+            </button>
+            <button
+              type='button'
+              onClick={handleRetry}
+              disabled={enriching}
+              className='inline-flex items-center gap-2 text-sm text-red-500 hover:text-red-700 disabled:opacity-50'
+            >
+              {enriching ? <Loader2 size={14} className='animate-spin' /> : <RefreshCw size={14} />}
+              Retry
+            </button>
+          </div>
         </div>
       )}
 

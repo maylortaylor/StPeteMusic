@@ -95,6 +95,27 @@ Leave the `_ddf1b33c...` verification record as DNS only forever.
 
 ---
 
+## Subdomain Redirects (live / livestream)
+
+`live.stpetemusic.live` and `livestream.stpetemusic.live` both 301-redirect to `https://www.stpetemusic.live/live` via a Cloudflare Dynamic Redirect ruleset (managed in `infrastructure/cloudflare.tf`).
+
+Both subdomains use a **dummy A record pointing to `192.0.2.1`** (RFC 5737 documentation range) with Cloudflare proxy **enabled** (orange cloud). This lets the redirect ruleset fire before any request reaches the origin — the dummy IP is never contacted.
+
+### API token permissions required
+
+The Cloudflare API token (`CLOUDFLARE_API_TOKEN` GitHub Secret) needs **all four** of these permissions:
+
+| Resource | Permission |
+|----------|-----------|
+| Zone → DNS | Edit |
+| Zone → Transform Rules | Edit |
+| Zone → Cache Rules | Edit |
+| Zone → **Single Redirect** | **Edit** ← required for `cloudflare_ruleset` |
+
+> The "Edit zone DNS" template only grants DNS:Edit. You must manually add **Single Redirect:Edit** (found under Zone permissions in the token editor). Without it, `tofu apply` will create the DNS records but fail silently on the ruleset with `request is not authorized`.
+
+---
+
 ## Troubleshooting
 
 **"CNAME verification record not found"**
@@ -114,3 +135,8 @@ Leave the `_ddf1b33c...` verification record as DNS only forever.
 **CloudFront target changed**
 → If you ever delete and recreate the Amplify app, the CloudFront URL (`d35nc2e8nr92q9...`) will change.
 → Update all CNAME values in Cloudflare to the new target shown in Amplify's DNS records table.
+
+**live.stpetemusic.live / livestream.stpetemusic.live showing Cloudflare 522**
+→ The redirect ruleset wasn't applied. Check `tofu apply` run for `error creating ruleset ... request is not authorized`.
+→ Fix: add `Zone:Single Redirect:Edit` to the Cloudflare API token, update `CLOUDFLARE_API_TOKEN` GitHub Secret, re-run `tofu apply`.
+→ If the ruleset was partially created, import it first: `tofu import 'cloudflare_ruleset.livestream_redirects[0]' 'zone/<ZONE_ID>/<RULESET_ID>'`
