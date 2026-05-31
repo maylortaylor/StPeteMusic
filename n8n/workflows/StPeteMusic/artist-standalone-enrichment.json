@@ -1,0 +1,192 @@
+{
+  "name": "Artist Standalone Enrichment",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## artist-standalone-enrichment\n\nTriggered by the admin app when you click **\"Start Enrichment\"** on the `/dashboard/artists/[id]/enrich` page.\n\n**Flow:**\n1. Webhook receives `{ artistId, artistName, links: [{platform, url, label}] }`\n2. Scrapes each link URL (best-effort) + extracts `og:image` candidates for cover photo picker\n3. Claude synthesizes scraped text into structured enrichment notes (facts only, no fluff)\n4. POSTs callback to `ADMIN_ARTIST_ENRICHMENT_CALLBACK_URL` with `x-webhook-secret` header\n\n**Required env vars (set in n8n .env):**\n- `ADMIN_ARTIST_ENRICHMENT_CALLBACK_URL` — e.g. `https://admin.stpetemusic.live/api/webhooks/artist-standalone-enrichment-complete`\n- `N8N_WEBHOOK_SECRET` — shared secret (must match admin app)\n\n**System prompt source of truth:** `artist-standalone-enrichment-system-prompt.md`",
+        "height": 320,
+        "width": 580,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [240, -160],
+      "typeVersion": 1,
+      "id": "232632ac-cbaa-4534-98e5-9d321147a62a",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "artist-standalone-enrichment",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "799276ab-e8b0-4667-8cf7-d1b79e660fa0",
+      "name": "Webhook: Artist Standalone Enrichment",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 260],
+      "webhookId": "artist-standalone-enrichment"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate and extract fields from the webhook POST body\nconst raw = $input.first().json;\nconst body = raw.body || raw;\n\nconst { artistId, artistName, links } = body;\n\nif (!artistId) {\n  throw new Error('[artist-standalone-enrichment] artistId is required in POST body');\n}\n\nif (!Array.isArray(links) || links.length === 0) {\n  throw new Error('[artist-standalone-enrichment] links array is required and must not be empty');\n}\n\nconsole.log('[artist-standalone-enrichment] Starting enrichment for:', artistName, '| artistId:', artistId, '| links:', links.length);\n\nreturn [{\n  json: {\n    artistId,\n    artistName: artistName || 'Unknown Artist',\n    links,\n  }\n}];"
+      },
+      "id": "548c1737-ae97-4ec7-8383-6930e8872c19",
+      "name": "Parse Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 260]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Scrape each link URL concurrently.\n// Also extract og:image from <head> for the cover photo picker.\n// Returns scrapedRaw (text per platform) and coverImageCandidates (og:image URLs).\n\nconst data = $input.first().json;\n\nfunction stripHtml(html) {\n  if (!html || typeof html !== 'string') return null;\n  return html\n    .replace(/<script[\\s\\S]*?<\\/script>/gi, '')\n    .replace(/<style[\\s\\S]*?<\\/style>/gi, '')\n    .replace(/<[^>]+>/g, ' ')\n    .replace(/&nbsp;/g, ' ')\n    .replace(/&amp;/g, '&')\n    .replace(/&lt;/g, '<')\n    .replace(/&gt;/g, '>')\n    .replace(/&quot;/g, '\"')\n    .replace(/&#39;/g, \"'\")\n    .replace(/\\s+/g, ' ')\n    .trim()\n    .slice(0, 2500);\n}\n\nfunction extractOgImage(html) {\n  if (!html || typeof html !== 'string') return null;\n  const match = html.match(/<meta[^>]+property=['\"]og:image['\"][^>]+content=['\"]([^'\"]+)['\"]/) ||\n                html.match(/<meta[^>]+content=['\"]([^'\"]+)['\"][^>]+property=['\"]og:image['\"]/);\n  return match ? match[1] : null;\n}\n\nasync function safeFetch(url) {\n  if (!url) return { text: null, ogImage: null };\n  try {\n    const response = await $fetch(url, {\n      method: 'GET',\n      headers: {\n        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120 Safari/537.36',\n        'Accept': 'text/html,application/xhtml+xml,*/*;q=0.8',\n        'Accept-Language': 'en-US,en;q=0.9',\n      },\n    });\n    const raw = typeof response === 'string' ? response : JSON.stringify(response);\n    const text = stripHtml(raw);\n    const ogImage = extractOgImage(raw);\n    console.log('[artist-standalone-enrichment] Scraped', url, '—', text ? text.length + ' chars' : 'no text', ogImage ? '| og:image found' : '');\n    return { text, ogImage };\n  } catch (e) {\n    console.log('[artist-standalone-enrichment] Scrape failed for', url, '—', e.message);\n    return { text: null, ogImage: null };\n  }\n}\n\nconst results = await Promise.all(\n  data.links.map(link => safeFetch(link.url).then(r => ({ ...r, platform: link.platform, label: link.label, url: link.url })))\n);\n\nconst scrapedRaw = {};\nconst coverImageCandidates = [];\nconst seenImages = new Set();\n\nfor (const r of results) {\n  scrapedRaw[r.platform] = r.text;\n  if (r.ogImage && !seenImages.has(r.ogImage)) {\n    seenImages.add(r.ogImage);\n    coverImageCandidates.push({ url: r.ogImage, source: r.label, platform: r.platform });\n  }\n}\n\nconsole.log('[artist-standalone-enrichment] Cover image candidates:', coverImageCandidates.length);\n\nreturn [{\n  json: {\n    ...data,\n    scrapedRaw,\n    coverImageCandidates,\n  }\n}];"
+      },
+      "id": "a583cc92-51fb-4831-a7e2-ac9bf39ef40b",
+      "name": "Scrape All Links",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [760, 260],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build the Claude prompt using scraped text from each link.\n// Each platform section shows its label and scraped text (or NO DATA).\n\nconst data = $input.first().json;\nconst { artistName, links, scrapedRaw } = data;\n\nfunction fmt(label, platform, text) {\n  const header = '=== ' + label.toUpperCase() + ' (' + platform + ') ===';\n  if (!text || text.trim().length < 20) {\n    return header + '\\nNO DATA\\n';\n  }\n  return header + '\\n' + text + '\\n';\n}\n\nconst sections = links.map(link => fmt(link.label, link.platform, scrapedRaw[link.platform]));\n\nconst prompt = 'ARTIST NAME: ' + artistName + '\\n\\n' + sections.join('\\n');\n\nconsole.log('[artist-standalone-enrichment] Prompt length:', prompt.length, 'chars');\n\nreturn [{ json: { ...data, prompt } }];"
+      },
+      "id": "1d3b55c8-a2b5-4c76-8919-5ea41563aa86",
+      "name": "Build Claude Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1020, 260]
+    },
+    {
+      "parameters": {
+        "prompt": "={{ $json.prompt }}"
+      },
+      "id": "86e56d1e-2ceb-417b-8c14-a67e1b4f07c7",
+      "name": "Synthesize with Claude",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [1280, 260],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-sonnet-4-6",
+          "mode": "list",
+          "cachedResultName": "Claude Sonnet 4.6"
+        },
+        "options": {
+          "systemMessage": "You are a music researcher. Extract factual information about an artist from raw scraped web text.\n\nRules — no exceptions:\n1. Facts only. No adjectives like \"dynamic\", \"captivating\", \"talented\", \"exciting\". Quote or paraphrase the source. If the source doesn't say it, omit it.\n2. Recency: Information from the last 12 months is reliable. Any fact that appears to be older than 2 years — append [⚠ verify — may be outdated] inline.\n3. No fabrication. If a section has no data, omit the entire section including its header.\n4. Dedup. Same fact from multiple platforms = write it once.\n5. Prefer the artist's own words (bio text, about sections). Third-party descriptions are secondary.\n6. Output ONLY the markdown below. No preamble. No closing remarks.\n\n## Bio\n[1–3 paragraphs, third person, artist's own words preferred.]\n\n## Members\n[Name — Role. One per line. Only if found.]\n\n## Founded\n[Year and city. Only if found.]\n\n## Genre\n[1–3 sentences. Only if found.]\n\n## Upcoming Shows\n[Date — Venue — City. Append ⚠ to any show older than 1 year. Only if found.]\n\n## Links Found\n[Additional URLs or social handles discovered. Only if found.]"
+        }
+      },
+      "id": "c6549819-559c-43d8-9a02-35c755dee75e",
+      "name": "Claude Sonnet 4.6",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [1280, 460],
+      "credentials": {
+        "anthropicApi": {
+          "id": "GxEPu27ca9FmXxQA",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract LLM output and build the callback body for the admin app.\n\nconst llmOutput = $input.first().json.text || '';\nconst original = $('Parse Input').first().json;\nconst scraped = $('Scrape All Links').first().json;\n\nconst hasError = llmOutput.trim().length === 0;\n\nif (hasError) {\n  console.log('[artist-standalone-enrichment] LLM returned no output — marking hasError=true');\n}\n\nconst callbackBody = {\n  artistId: original.artistId,\n  scrapedRaw: scraped.scrapedRaw || {},\n  coverImageCandidates: scraped.coverImageCandidates || [],\n  synthesizedNotes: hasError ? null : llmOutput.trim(),\n  hasError,\n};\n\nconsole.log('[artist-standalone-enrichment] Callback ready — hasError:', hasError, '| notes length:', llmOutput.length, '| coverImages:', callbackBody.coverImageCandidates.length);\n\nreturn [{ json: { callbackBody, callbackBodyStr: JSON.stringify(callbackBody) } }];"
+      },
+      "id": "75505a8e-b249-4618-af27-f9134928e620",
+      "name": "Parse Claude Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, 260]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.ADMIN_ARTIST_ENRICHMENT_CALLBACK_URL }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-webhook-secret",
+              "value": "={{ $env.N8N_WEBHOOK_SECRET }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.callbackBodyStr }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "35418aee-6953-4488-9cf9-636ca9e430d9",
+      "name": "Send Callback to Admin",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1800, 260],
+      "continueOnFail": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook: Artist Standalone Enrichment": {
+      "main": [
+        [{ "node": "Parse Input", "type": "main", "index": 0 }]
+      ]
+    },
+    "Parse Input": {
+      "main": [
+        [{ "node": "Scrape All Links", "type": "main", "index": 0 }]
+      ]
+    },
+    "Scrape All Links": {
+      "main": [
+        [{ "node": "Build Claude Prompt", "type": "main", "index": 0 }]
+      ]
+    },
+    "Build Claude Prompt": {
+      "main": [
+        [{ "node": "Synthesize with Claude", "type": "main", "index": 0 }]
+      ]
+    },
+    "Claude Sonnet 4.6": {
+      "ai_languageModel": [
+        [{ "node": "Synthesize with Claude", "type": "ai_languageModel", "index": 0 }]
+      ]
+    },
+    "Synthesize with Claude": {
+      "main": [
+        [{ "node": "Parse Claude Response", "type": "main", "index": 0 }]
+      ]
+    },
+    "Parse Claude Response": {
+      "main": [
+        [{ "node": "Send Callback to Admin", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "meta": {
+    "instanceId": ""
+  }
+}
