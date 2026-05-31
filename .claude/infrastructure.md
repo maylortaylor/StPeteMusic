@@ -39,10 +39,12 @@ Route 53 hosted zone deleted. All records must be **DNS only (grey cloud — NOT
 - `www` and `@` (apex) → `d35nc2e8nr92q9.cloudfront.net`
 - `admin` → `d2ltgwfvkan5js.cloudfront.net`
 - ACM validation: `_ddf1b33c5eab2d60eddc95848a12d240` → `_bf19e363018afabe1b2e49737993dac9.jkddzztszm.acm-validations.aws`
+- `live` and `livestream` → `192.0.2.1` (dummy IP, proxy ON) — Cloudflare redirect ruleset fires before origin
 
-⚠️ Cloudflare proxy (orange cloud) must stay OFF — Amplify ACM SSL requires direct DNS resolution.
+⚠️ Cloudflare proxy (orange cloud) must stay OFF for Amplify records — ACM SSL requires direct DNS resolution.
 ⚠️ `acm_validation` record has `allow_overwrite = true` in cloudflare.tf — safe, it's static after cert issuance.
 ⚠️ If domain association is deleted+recreated, a **new CloudFront distribution** is issued. You must: delete old CNAME, recreate domain association, add new CNAME, then trigger a fresh build to wire the new distribution.
+⚠️ Cloudflare API token needs **Zone:Single Redirect:Edit** in addition to DNS:Edit — without it `tofu apply` creates DNS records but fails silently on `cloudflare_ruleset`. See `docs/infrastructure/DNS_CLOUDFLARE.md` for full token permission list.
 
 ## Database Migrations
 
