@@ -1,0 +1,18 @@
+name: Post-Deploy Cleanup
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  clear-stream-override:
+    name: Clear stream override
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clear stream override after deploy
+        env:
+          DEPLOY_SECRET: ${{ secrets.INTERNAL_DEPLOY_SECRET }}
+        run: |
+          curl -sf -X POST https://admin.stpetemusic.live/api/internal/clear-stream-override \
+            -H "X-Deploy-Secret: $DEPLOY_SECRET" \
+            || echo "Warning: Could not clear stream override (admin app may still be building)"
