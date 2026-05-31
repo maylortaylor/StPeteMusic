@@ -55,6 +55,28 @@ export const artists = pgTable('artists', {
   notes: text('notes'),
   is_active: boolean('is_active').default(true),
   visible_on_website: boolean('visible_on_website').default(false),
+  // enrichment_status values: null | 'pending' | 'enrichment_ready' | 'enrichment_failed' | 'enrichment_approved'
+  enrichment_status: varchar('enrichment_status', { length: 50 }),
+  created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updated_at: timestamp('updated_at', { withTimezone: true })
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
+// platform values: instagram | facebook | youtube | bandcamp | spotify | soundcloud
+//                  | linktree | website | bandsintown | tiktok | twitter | threads | custom
+// is_featured: max 3 per artist; featured links are shown prominently on the public artist page
+export const artist_links = pgTable('artist_links', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  artist_id: uuid('artist_id')
+    .notNull()
+    .references(() => artists.id, { onDelete: 'cascade' }),
+  platform: varchar('platform', { length: 50 }).notNull(),
+  url: varchar('url', { length: 500 }).notNull(),
+  label: varchar('label', { length: 255 }).notNull(),
+  display_order: integer('display_order').notNull().default(0),
+  is_active: boolean('is_active').notNull().default(true),
+  is_featured: boolean('is_featured').notNull().default(false),
   created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updated_at: timestamp('updated_at', { withTimezone: true })
     .defaultNow()

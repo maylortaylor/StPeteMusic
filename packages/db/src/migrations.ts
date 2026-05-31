@@ -1081,4 +1081,28 @@ CREATE INDEX IF NOT EXISTS idx_error_logs_app         ON error_logs (app);
 CREATE INDEX IF NOT EXISTS idx_error_logs_status_code ON error_logs (status_code);
 `,
   },
+  {
+    filename: '032_add_artist_links.sql',
+    sql: `
+CREATE TABLE IF NOT EXISTS artist_links (
+  id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  artist_id     UUID        NOT NULL REFERENCES artists(id) ON DELETE CASCADE,
+  platform      VARCHAR(50) NOT NULL,
+  url           VARCHAR(500) NOT NULL,
+  label         VARCHAR(255) NOT NULL,
+  display_order INTEGER     NOT NULL DEFAULT 0,
+  is_active     BOOLEAN     NOT NULL DEFAULT true,
+  is_featured   BOOLEAN     NOT NULL DEFAULT false,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_artist_links_artist_id ON artist_links (artist_id);
+`,
+  },
+  {
+    filename: '033_add_artist_enrichment_status.sql',
+    sql: `
+ALTER TABLE artists ADD COLUMN IF NOT EXISTS enrichment_status VARCHAR(50);
+`,
+  },
 ];

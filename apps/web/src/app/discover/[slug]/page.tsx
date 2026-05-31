@@ -6,7 +6,8 @@ import { Nav } from '@/components/Nav';
 import { Footer } from '@/components/Footer';
 import { ArtistDetailSidebar } from '@/components/ArtistDetailSidebar';
 import { MetaPixelViewContent } from '@/components/MetaPixelViewContent';
-import { getArtistBySlug, getArtistShows, getAllArtistSlugs } from '@/lib/queries/artists';
+import { getArtistBySlug, getArtistFeaturedLinks, getArtistShows, getAllArtistSlugs } from '@/lib/queries/artists';
+import { PlatformIcon } from '@/components/platform-icon';
 import type { Artist } from '@stpetemusic/types';
 
 export const revalidate = 86400;
@@ -99,6 +100,13 @@ export default async function ArtistPage({ params }: Props) {
     artistShows = [];
   }
 
+  let featuredLinks: Awaited<ReturnType<typeof getArtistFeaturedLinks>> = [];
+  try {
+    featuredLinks = await getArtistFeaturedLinks(artist.id);
+  } catch {
+    featuredLinks = [];
+  }
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'MusicGroup',
@@ -189,6 +197,26 @@ export default async function ArtistPage({ params }: Props) {
                 <p className="font-inter text-text-secondary text-xl leading-relaxed mb-10 max-w-2xl">
                   {artist.description}
                 </p>
+              )}
+
+              {/* Featured links */}
+              {featuredLinks.length > 0 && (
+                <div className="mb-10">
+                  <div className="flex flex-wrap gap-3">
+                    {featuredLinks.map((link) => (
+                      <a
+                        key={link.id}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                      >
+                        <PlatformIcon platform={link.platform} size={15} showExternalIndicator={false} />
+                        {link.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
               )}
 
               {/* Past shows */}

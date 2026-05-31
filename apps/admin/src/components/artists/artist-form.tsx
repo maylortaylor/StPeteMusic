@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { toast } from '@/lib/toast';
 import { TagInput } from '@/components/ui/tag-input';
+import { ImageUploadField } from '@/components/image-upload-field';
 
 const artistSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -339,6 +340,17 @@ export function ArtistForm({ artistId }: ArtistFormProps) {
           </div>
         </div>
       </div>
+
+      {artistId && (
+        <div className="space-y-4 border-t border-border pt-6">
+          <h3 className="font-medium text-foreground">Hero Photo</h3>
+          <ImageUploadField
+            value={formData.hero_photo_url ?? ''}
+            artistId={artistId}
+            onChange={(url) => setFormData((prev) => ({ ...prev, hero_photo_url: url }))}
+          />
+        </div>
+      )}
 
       <div className="space-y-4 border-t border-border pt-6">
         <h3 className="font-medium text-foreground">Visibility & Status</h3>

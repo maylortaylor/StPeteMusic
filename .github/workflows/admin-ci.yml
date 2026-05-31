@@ -1,0 +1,43 @@
+name: Admin CI
+
+on:
+  push:
+    paths:
+      - 'apps/admin/**'
+      - 'packages/**'
+      - 'package.json'
+      - 'package-lock.json'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'apps/admin/**'
+      - 'packages/**'
+      - 'package.json'
+      - 'package-lock.json'
+
+jobs:
+  admin-ci:
+    name: Lint, typecheck, and test admin app
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build shared packages
+        run: npm run build --workspace=packages/db
+
+      - name: Lint admin app
+        run: npm run lint --workspace=apps/admin
+
+      - name: Typecheck admin app
+        run: npm run typecheck --workspace=apps/admin
+
+      - name: Test admin app
+        run: npm test --workspace=apps/admin
