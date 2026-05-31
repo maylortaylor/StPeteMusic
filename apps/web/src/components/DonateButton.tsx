@@ -3,7 +3,7 @@
 import { pushEvent } from '@/lib/analytics';
 
 const DONATE_URL =
-  process.env.NEXT_PUBLIC_DONATE_URL ?? 'https://account.venmo.com/u/tangentllc';
+  process.env.NEXT_PUBLIC_DONATE_URL ?? 'https://square.link/u/MibuhN7B';
 
 interface DonateButtonProps {
   className?: string;
