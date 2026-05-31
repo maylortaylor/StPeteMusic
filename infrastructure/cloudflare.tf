@@ -134,3 +134,54 @@ resource "cloudflare_record" "bing_webmaster_verification" {
   ttl     = 1
 }
 
+# ── Livestream viewer aliases ──────────────────────────────────────────────────
+# livestream.stpetemusic.live and live.stpetemusic.live both redirect → /live
+# Uses RFC 5737 dummy IP (192.0.2.1) with Cloudflare proxy enabled so that the
+# redirect ruleset below fires before any request reaches the origin.
+
+resource "cloudflare_record" "livestream" {
+  count = local.enable_cloudflare ? 1 : 0
+
+  zone_id = var.cloudflare_zone_id
+  name    = "livestream"
+  type    = "A"
+  content = "192.0.2.1"
+  proxied = true
+  ttl     = 1
+}
+
+resource "cloudflare_record" "live_subdomain" {
+  count = local.enable_cloudflare ? 1 : 0
+
+  zone_id = var.cloudflare_zone_id
+  name    = "live"
+  type    = "A"
+  content = "192.0.2.1"
+  proxied = true
+  ttl     = 1
+}
+
+# Single ruleset with one combined rule — uses 1 of the 10 rules in the Free tier.
+resource "cloudflare_ruleset" "livestream_redirects" {
+  count = local.enable_cloudflare ? 1 : 0
+
+  zone_id = var.cloudflare_zone_id
+  name    = "Livestream subdomain redirects"
+  kind    = "zone"
+  phase   = "http_request_dynamic_redirect"
+
+  rules {
+    action     = "redirect"
+    expression = "(http.host eq \"livestream.stpetemusic.live\") or (http.host eq \"live.stpetemusic.live\")"
+    action_parameters {
+      from_value {
+        status_code = 301
+        target_url {
+          value = "https://www.stpetemusic.live/live"
+        }
+        preserve_query_string = false
+      }
+    }
+  }
+}
+

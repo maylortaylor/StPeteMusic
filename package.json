@@ -22,7 +22,7 @@
   },
   "scripts": {
     "dev": "docker-compose -f docker-compose.dev.yml up -d && npm run dev --workspace=apps/web",
-    "dev:web": "unset DATABASE_URL && npm run dev --workspace=apps/web",
+    "dev:web": "npm run dev --workspace=apps/web",
     "dev:admin": "npm run build --workspace=packages/db && npm run dev --workspace=apps/admin",
     "dev:cms": "npm run dev --workspace=apps/cms",
     "dev:services": "docker-compose -f docker-compose.dev.yml up -d",
