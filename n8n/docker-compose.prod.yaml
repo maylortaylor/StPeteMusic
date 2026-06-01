@@ -90,7 +90,7 @@ services:
     memswap_limit: 512m
 
   mediamtx:
-    image: bluenviron/mediamtx:latest
+    image: bluenviron/mediamtx:1.18.2
     container_name: stpetemusic-mediamtx
     restart: unless-stopped
     dns:

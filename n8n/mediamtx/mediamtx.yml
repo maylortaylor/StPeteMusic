@@ -5,11 +5,11 @@ rtmpAddress: :1935
 hlsAddress: :8888
 hlsAllowOrigin: '*'
 
-# Disable unused protocols to reduce attack surface
-rtspAddress: ""
-rtspsAddress: ""
-webrtcAddress: ""
-srtAddress: ""
+# Unused protocols use valid addresses so v1.x validation passes.
+# Ports 8554/8189/8890 are not open in the EC2 security group — unreachable externally.
+rtspAddress: :8554
+webrtcAddress: :8189
+srtAddress: :8890
 
 # Only allow publishing with the correct stream key (set via RTMP_STREAM_KEY env var at runtime)
 # Anonymous reads are allowed so HLS viewers and CloudFront can fetch segments/manifests.
@@ -21,7 +21,6 @@ authInternalUsers:
       - action: publish
         path: live
   - user: any
-    pass: any
     permissions:
       - action: read
         path: live
