@@ -39,6 +39,16 @@ export async function POST(request: Request) {
       return Response.json({ error: 'File size must be 15 MB or less' }, { status: 400 });
     }
 
+    const meta = await sharp(buffer).metadata();
+    if (!meta.width || meta.width < 1200) {
+      return Response.json(
+        {
+          error: `Image too small (${meta.width ?? '?'} × ${meta.height ?? '?'} px) — minimum width is 1200 px`,
+        },
+        { status: 400 },
+      );
+    }
+
     // Resize to max 1920px wide, convert to WebP quality 85, strip EXIF
     const processed = await sharp(buffer)
       .resize({ width: 1920, withoutEnlargement: true })
@@ -61,6 +71,17 @@ export async function POST(request: Request) {
     return Response.json({ url: `${cdnUrl}/${key}` });
   } catch (err) {
     console.error('Artist image upload failed:', err);
-    return Response.json({ error: 'Upload failed' }, { status: 500 });
+    const message = err instanceof Error ? err.message : '';
+    if (
+      message.includes('unsupported image format') ||
+      message.includes('Input file') ||
+      message.includes('corrupt')
+    ) {
+      return Response.json(
+        { error: 'Could not read image — file may be corrupt or in an unsupported format' },
+        { status: 400 },
+      );
+    }
+    return Response.json({ error: 'Upload failed — please try again' }, { status: 500 });
   }
 }

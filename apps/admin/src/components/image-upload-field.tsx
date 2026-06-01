@@ -12,6 +12,23 @@ interface ImageUploadFieldProps {
 }
 
 const ACCEPTED = 'image/jpeg,image/png,image/webp';
+const MIN_WIDTH = 1200;
+
+function getImageDimensions(file: File): Promise<{ width: number; height: number }> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new window.Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve({ width: img.naturalWidth, height: img.naturalHeight });
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Could not read image dimensions'));
+    };
+    img.src = url;
+  });
+}
 
 export function ImageUploadField({
   value,
@@ -28,6 +45,15 @@ export function ImageUploadField({
     setError(null);
     setUploading(true);
     try {
+      const dims = await getImageDimensions(file);
+      if (dims.width < MIN_WIDTH) {
+        setError(
+          `Image is too small (${dims.width} × ${dims.height} px) — minimum width is ${MIN_WIDTH} px.`,
+        );
+        setUploading(false);
+        return;
+      }
+
       const form = new FormData();
       form.append('file', file);
       form.append('artistId', artistId);
