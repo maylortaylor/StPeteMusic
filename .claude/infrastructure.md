@@ -1,10 +1,60 @@
 ---
 topic: infrastructure
-triggers: aws, amplify, dns, cloudflare, tofu, terraform, ec2, tailscale, hosting, deploy, branch, git, listmonk, newsletter, ssl, ci, cd, admin, monitoring, alarms, cloudwatch, sns, health, alerting, uptime
+triggers: aws, amplify, dns, cloudflare, tofu, terraform, ec2, tailscale, hosting, deploy, branch, git, listmonk, newsletter, ssl, ci, cd, admin, monitoring, alarms, cloudwatch, sns, health, alerting, uptime, gh, github-cli, aws-cli, account, profile, architecture, map, diagram
 updated: 2026-06-01
 ---
 
 # Infrastructure
+
+## AWS Architecture Overview
+
+```
+Internet
+    │
+    ▼
+[Cloudflare DNS] ──────────────────────────────────────────────────
+    │                          │                       │
+    ▼                          ▼                       ▼
+[CloudFront]            [CloudFront]            [EC2 t3.micro]
+d35nc2e8nr92q9          d2ltgwfvkan5js          54.235.171.182
+    │                          │                nginx (SSL via Let's Encrypt)
+    ▼                          ▼                       │
+[Amplify SSR]           [Amplify SSR]           ├── n8n.stpetemusic.live
+Web App                 Admin App (Clerk auth)  ├── listmonk.stpetemusic.live
+d1fjwgk99cbqor          d2n0tn0yijqxny          └── hls.stpetemusic.live
+stpetemusic.live        admin.stpetemusic.live          │
+    │                          │                   Docker containers
+    │                          │                   ├── n8n (automation engine)
+    └──────────┬───────────────┘                   ├── listmonk (newsletter)
+               │                                   └── mediamtx (RTMP:1935 → HLS)
+               ▼
+        [RDS PostgreSQL 16]
+        stpetemusic-postgres.cmnogyowgoe1.us-east-1.rds.amazonaws.com
+        DB: stpetemusic  (web app + admin data)
+
+Supporting infrastructure:
+  IaC state:    S3 stpetemusic-terraform-state + DynamoDB stpetemusic-terraform-locks
+  Assets CDN:   S3 (AWS_ASSETS_BUCKET) → CloudFront (ASSETS_CDN_URL)
+  Monitoring:   CloudWatch alarms → SNS stpetemusic-alerts → theburgmusic@gmail.com
+  Admin auth:   Clerk → SSM /stpetemusic/clerk/*
+  Newsletter:   SSM /stpetemusic/listmonk/* (creds must match Amplify env vars)
+  Streaming:    live.stpetemusic.live → Cloudflare redirect → EC2 mediamtx RTMP/HLS
+```
+
+### Service Map
+
+| Service | Public URL | Backed by |
+|---|---|---|
+| Web app | stpetemusic.live | Amplify `d1fjwgk99cbqor` → CloudFront → Next.js SSR |
+| Admin | admin.stpetemusic.live | Amplify `d2n0tn0yijqxny` → CloudFront → Next.js SSR |
+| n8n automation | n8n.stpetemusic.live | EC2 `i-03874197d725b0455` → Docker |
+| Newsletter | listmonk.stpetemusic.live | EC2 → Docker (listmonk) |
+| Live stream redirect | live.stpetemusic.live | Cloudflare redirect ruleset |
+| HLS video CDN | hls.stpetemusic.live | EC2 nginx → mediamtx HLS output |
+| Database | (internal, no public URL) | RDS PostgreSQL 16 |
+| Media assets | ASSETS_CDN_URL (env var) | S3 + CloudFront |
+
+---
 
 ## Web App (AWS Amplify SSR)
 | Item | Value |
@@ -127,3 +177,41 @@ Add these at gmail.com/settings/filters → label `StPeteMusic/Alarms`, mark imp
 | `feature/*` | Feature work | No |
 
 Never push directly to `main`. CI: lint + typecheck + test required.
+
+---
+
+## CLI Quick Reference
+
+> Verify both accounts before running any destructive command.
+
+### AWS CLI — always use `--profile personal`
+
+- IAM user: `maylortaylor` · Profile: `personal` · Region: `us-east-1`
+- `direnv` auto-sets `AWS_PROFILE=personal` when you `cd` into this project — no flag needed locally
+- In GitHub Actions, AWS creds are injected via GitHub Secrets — no profile flag needed in CI
+
+| Task | Command |
+|---|---|
+| Verify identity | `aws sts get-caller-identity --profile personal` |
+| Check direnv set it | `echo $AWS_PROFILE` (should print `personal`) |
+| Trigger Amplify build | `aws amplify start-job --app-id <APP_ID> --branch-name main --job-type RELEASE --profile personal` |
+| List Amplify builds | `aws amplify list-jobs --app-id <APP_ID> --branch-name main --profile personal` |
+| Update Amplify env var | `aws amplify update-app --app-id <APP_ID> --environment-variables KEY=VALUE --profile personal` |
+| Read SSM secret | `aws ssm get-parameter --name /stpetemusic/<key> --with-decryption --profile personal` |
+| List IaC state bucket | `aws s3 ls s3://stpetemusic-terraform-state --profile personal` |
+| Check EC2 status | `aws ec2 describe-instances --instance-ids i-03874197d725b0455 --query 'Reservations[].Instances[].State.Name' --profile personal` |
+| List CloudWatch alarms | `aws cloudwatch describe-alarms --alarm-name-prefix stpetemusic --profile personal` |
+
+Amplify app IDs: web = `d1fjwgk99cbqor` · admin = `d2n0tn0yijqxny`
+
+### GitHub CLI — `maylortaylor` account
+
+| Task | Command |
+|---|---|
+| Verify account | `gh auth status` (must show `maylortaylor`) |
+| List recent CI runs | `gh run list --repo maylortaylor/StPeteMusic` |
+| Watch a run live | `gh run watch <run-id>` |
+| View run logs | `gh run view <run-id> --log` |
+| List repo secrets | `gh secret list --repo maylortaylor/StPeteMusic` |
+| Set a secret | `gh secret set SECRET_NAME --repo maylortaylor/StPeteMusic` |
+| Open a PR | `gh pr create --base main` |

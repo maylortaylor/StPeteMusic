@@ -10,102 +10,56 @@
 
 ```
 /
-├── README.md                        # This file
-├── CLAUDE.md                        # Claude Code guidance
-├── AWS_SETUP.md                     # AWS infrastructure quick reference
-├── .env.example                     # Environment variable template (commit this)
-├── .env                             # Local secrets (DO NOT COMMIT)
-├── .gitignore
-│
-├── infrastructure/                  # Terraform IaC (manages all AWS resources)
-│   ├── main.tf                      # Provider config + S3 remote backend
-│   ├── variables.tf                 # Input variables
-│   ├── outputs.tf                   # Output values (IP, URLs, SG ID)
-│   ├── ec2.tf                       # EC2 instance, Elastic IP, Security Group
-│   ├── backup.tf                    # S3 backup bucket (disabled, ready to enable)
-│   ├── database.tf                  # RDS PostgreSQL (disabled, ready to enable)
-│   └── terraform.tfvars.example     # Example variable values (no secrets)
-│
-├── .github/
-│   └── workflows/
-│       ├── terraform-plan.yml       # Runs terraform plan on PRs
-│       └── terraform-apply.yml      # Runs terraform apply on merge to main
-│
-├── database/                        # PostgreSQL schema and seed data
-│   ├── schema.sql                   # Full table definitions + pgcrypto encryption
-│   └── seed.sql                     # Initial data from CSV contacts + templates
-│
-├── n8n/                             # n8n automation engine
-│   ├── CLAUDE.md                    # n8n-specific Claude guidance
-│   ├── docker-compose.yaml          # Local development setup
-│   ├── docker-compose.prod.yaml     # Production (AWS EC2) setup
-│   ├── local-files/                 # Read/write files for workflows (CSV, MD)
-│   └── workflows/
-│       └── StPeteMusic/             # Active workflows (source of truth)
-│           ├── obsidian-post-creator.json
-│           ├── obsidian-to-youtube-posting.json
-│           ├── youtube-shorts-tracker-creator.json
-│           └── system-prompt.md     # AI agent instructions
-│
-├── data/                            # Data archives (gitignored)
-│
-└── docs/                            # Project documentation
-    ├── plans/                       # Project planning & roadmaps
-    │   ├── ROADMAP.md               # Master roadmap (authoritative)
-    │   ├── ANALYTICS_PLAN.md         # Google Analytics GA4 + GTM setup
-    │   └── SEO_ACTION_PLAN.md        # Local SEO & content strategy
-    ├── infrastructure/              # AWS deployment & configuration
-    │   ├── EC2_SETUP.md             # Step-by-step EC2 setup
-    │   ├── DNS_CLOUDFLARE.md        # Domain setup & SSL cert
-    │   └── SERVER_OPERATIONS.md     # Production commands & troubleshooting
-    ├── workflows/                   # n8n workflow documentation
-    │   ├── YOUTUBE_SHORTS_README.md
-    │   ├── YOUTUBE_SHORTS_SETUP.md
-    │   ├── YOUTUBE_SHORTS_QUICK_REFERENCE.md
-    │   ├── YOUTUBE_SHORTS_USAGE_GUIDE.md
-    │   └── OBSIDIAN_DATAVIEW_QUERIES.md
-    ├── incidents/                   # Historical incident reports
-    │   ├── EC2_OOM_2026-04-28.md
-    │   └── LISTMONK_CREDS_2026-04-30.md
-    └── integrations/                # Third-party integrations
-        ├── WORDPRESS_LINKTREE.md
-        └── BRAND_GUIDE.md
+├── apps/
+│   ├── web/              # Next.js SSR — stpetemusic.live (Amplify d1fjwgk99cbqor)
+│   └── admin/            # Next.js SSR admin — admin.stpetemusic.live (Amplify d2n0tn0yijqxny)
+├── infrastructure/       # OpenTofu IaC (manages all AWS resources)
+├── n8n/                  # n8n automation engine + workflows
+│   ├── CLAUDE.md         # n8n-specific Claude guidance
+│   └── workflows/StPeteMusic/  # Active workflows (source of truth)
+├── database/             # PostgreSQL migrations (auto-applied on every deploy to main)
+├── docs/                 # Architecture docs, runbooks, incident reports, roadmap
+├── .github/workflows/    # CI/CD pipelines (ci, deploy, amplify-deploy, tofu-apply)
+├── .claude/              # Context files for Claude Code agents (load before any task)
+├── CLAUDE.md             # Agent entry point — load this first
+├── SETUP.md              # First-time developer setup guide
+├── AWS_SETUP.md          # Production server quick reference
+└── .env.example          # Env var template (safe to commit — no real secrets)
 ```
 
 ---
 
 ## Infrastructure
 
-All AWS resources are managed with **Terraform** — see `infrastructure/`. **Never edit AWS resources manually** — change the `.tf` files and let CI apply them.
+All AWS resources are managed with **OpenTofu** — see `infrastructure/`. **Never edit AWS resources manually** — change the `.tf` files and let CI apply them.
+
+> Full architecture map + CLI reference: `.claude/infrastructure.md`
 
 | Resource | Value |
 |---|---|
-| n8n URL | https://n8n.stpetemusic.live |
-| Server | AWS EC2 t3.small, `us-east-1`, IP `54.235.171.182` |
-| SSH Key | `~/.ssh/stpetemusic-n8n.pem` |
+| Web app | https://www.stpetemusic.live (Amplify `d1fjwgk99cbqor`) |
+| Admin app | https://admin.stpetemusic.live (Amplify `d2n0tn0yijqxny`) |
+| n8n automation | https://n8n.stpetemusic.live (EC2 `i-03874197d725b0455`) |
+| Newsletter | https://listmonk.stpetemusic.live (EC2 Docker) |
+| Server IP | `54.235.171.182` · SSH: `ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n.stpetemusic.live` |
 | DNS | Cloudflare for `stpetemusic.live` |
-| SSL | AWS ACM (auto-managed by Amplify) |
-| Database | PostgreSQL 16 (Docker on EC2) |
+| Database | RDS PostgreSQL 16 (`stpetemusic-postgres.cmnogyowgoe1.us-east-1.rds.amazonaws.com`) |
 
-> Quick reference: `docs/infrastructure/SERVER_OPERATIONS.md` | Step-by-step setup: `docs/infrastructure/EC2_SETUP.md`
+### AWS Resources
 
-### AWS Console — Quick Links
-
-All resources are in `us-east-1` (N. Virginia).
+All resources in `us-east-1` (N. Virginia). AWS account: `maylortaylor` · profile: `personal`.
 
 | Resource | ID | Console Link |
 |---|---|---|
+| Web Amplify app | `d1fjwgk99cbqor` | [Open in Console](https://us-east-1.console.aws.amazon.com/amplify/home?region=us-east-1#/d1fjwgk99cbqor) |
+| Admin Amplify app | `d2n0tn0yijqxny` | [Open in Console](https://us-east-1.console.aws.amazon.com/amplify/home?region=us-east-1#/d2n0tn0yijqxny) |
 | EC2 Instance | `i-03874197d725b0455` | [Open in Console](https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#Instances:instanceId=i-03874197d725b0455) |
 | Elastic IP | `54.235.171.182` | [Open in Console](https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#Addresses:AllocationId=eipalloc-0a2ebbeef75ce8009) |
 | Security Group | `sg-03a69e68cf7077cf3` | [Open in Console](https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#SecurityGroup:groupId=sg-03a69e68cf7077cf3) |
-| EBS Volume (20GB gp3) | — | [EC2 → Volumes](https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#Volumes) |
-| Free Tier Usage | — | [Billing → Free Tier](https://us-east-1.console.aws.amazon.com/billing/home#/freetier) |
-| Billing Budgets | — | [Billing → Budgets](https://us-east-1.console.aws.amazon.com/billing/home#/budgets) |
 | IAM User | `maylortaylor` | [IAM → Users](https://us-east-1.console.aws.amazon.com/iam/home#/users) |
+| Free Tier Usage | — | [Billing → Free Tier](https://us-east-1.console.aws.amazon.com/billing/home#/freetier) |
 
-### Terraform State Backend
-
-Terraform remote state is stored in S3, locked via DynamoDB. **Never edit AWS resources manually** — always go through Terraform.
+### OpenTofu State Backend
 
 | Resource | ID | Console Link |
 |---|---|---|
@@ -113,18 +67,11 @@ Terraform remote state is stored in S3, locked via DynamoDB. **Never edit AWS re
 | DynamoDB Lock Table | `stpetemusic-terraform-locks` | [Open in Console](https://us-east-1.console.aws.amazon.com/dynamodbv2/home?region=us-east-1#table?name=stpetemusic-terraform-locks) |
 | GitHub Actions | — | [Actions → Runs](https://github.com/maylortaylor/StPeteMusic/actions) |
 
-**Terraform workflow:**
+**OpenTofu workflow** (direnv sets `AWS_PROFILE=personal` automatically):
 ```bash
 cd infrastructure
-terraform plan    # preview changes (also runs automatically on PRs)
-terraform apply   # apply changes (also runs automatically on merge to main)
-```
-
-**Import existing resources** (already done — documented here for reference):
-```bash
-terraform import aws_security_group.n8n sg-03a69e68cf7077cf3
-terraform import aws_instance.n8n i-03874197d725b0455
-terraform import aws_eip.n8n eipalloc-0a2ebbeef75ce8009
+AWS_PROFILE=personal tofu plan    # preview changes (also runs automatically on PRs)
+AWS_PROFILE=personal tofu apply   # apply changes (also runs automatically on merge to main)
 ```
 
 ---
@@ -133,11 +80,7 @@ terraform import aws_eip.n8n eipalloc-0a2ebbeef75ce8009
 
 Only workflows in `n8n/workflows/StPeteMusic/` are considered active. All others are legacy/reference.
 
-| Workflow | Purpose | AI |
-|---|---|---|
-| `obsidian-post-creator.json` | Chat agent → generates YouTube post metadata → writes draft to Obsidian | Claude (default) |
-| `obsidian-to-youtube-posting.json` | Publishes Obsidian drafts to YouTube | Claude (default) |
-| `youtube-shorts-tracker-creator.json` | Tracks and creates YouTube Shorts | Gemini (backup) |
+See `n8n/workflows/StPeteMusic/` for the current list.
 
 **AI Configuration:**
 - **Default:** Anthropic Claude (`CLAUDE_API_KEY_N8N_STPETEMUSIC`)
@@ -238,16 +181,7 @@ https://n8n.stpetemusic.live/rest/oauth2-credential/callback
 
 ---
 
-## Current Phase
-
-**Phase 0 — Documentation Cleanup** (in progress)
-
-- [x] Infrastructure running: EC2, Terraform, n8n, PostgreSQL, GitHub Actions
-- [x] ROADMAP.md rewritten — accurate current state, Terraform IaC, cost estimates
-- [x] Workspace `package.json` added (npm workspaces)
-- [ ] Phase 1 next: Cloudflare domain + media S3 via Terraform, then Next.js frontend
-
-See **ROADMAP.md** for the full phased plan.
+See `docs/plans/ROADMAP.md` for current roadmap.
 
 ---
 
@@ -274,41 +208,11 @@ To prevent issues like credential leakage or environment contamination:
 | **direnv (.envrc)** | Auto-isolates environment when you cd into the directory — unsets problematic global vars |
 | **Pre-commit hooks** | Prevents secrets and bad configs from being committed |
 | **Setup script** | Validates all dependencies and configuration |
-| **GitHub Actions** | Runs terraform plan on PRs to catch infrastructure issues |
+| **GitHub Actions** | Runs OpenTofu plan on PRs to catch infrastructure issues |
 
 All three are now in place and active. See CLAUDE.md for setup instructions.
 
 ---
-
-## Roadmap
-
-### Now — Active
-- [x] n8n on AWS EC2 (always-on, HTTPS, free tier)
-- [x] Obsidian → YouTube posting pipeline
-- [x] YouTube Shorts tracker
-- [x] Claude as default AI, Gemini as backup
-- [x] Terraform IaC — all AWS resources version-controlled in `infrastructure/`
-- [x] Terraform remote state — S3 bucket + DynamoDB lock table
-- [x] GitHub Actions — `terraform plan` on PRs, `terraform apply` on merge to main
-- [x] GitHub Actions — JSON validation, security scanning, Dependabot
-- [x] Automated S3 backups — every 2 days at 4am, 30-day retention, IAM instance profile auth
-- [x] PostgreSQL database — Docker on EC2, full schema for contacts/stats/templates, pgcrypto encryption
-- [x] EC2 Auto Recovery — automatically restart instance if unresponsive (in progress)
-- [x] n8n smart tag tracking — auto-generate and merge tags for post status tracking (in progress)
-
-### Next
-- [ ] SSH setup + `docker-compose up` postgres on EC2 (run `database/seed.sql` to populate)
-- [ ] Instagram access token (pending Facebook app review workaround)
-- [ ] Workflow: multi-platform posting (IG + FB + YouTube from one trigger)
-- [ ] Fix AWS credential helper path issue (amver-hub reference)
-
-### Future
-- [ ] Auto-update ig_mentions via n8n scheduled workflow
-- [ ] YouTube stats import (user to provide export data)
-- [ ] Obsidian → Instagram posting pipeline
-- [ ] Event management (EventBrite API)
-- [ ] CloudWatch monitoring + SNS alerts for critical failures
-- [ ] Health check script for n8n container (restart on hang)
 
 ---
 
@@ -332,4 +236,4 @@ All three are now in place and active. See CLAUDE.md for setup instructions.
 
 ---
 
-*Last updated: March 2026 | Maintained by Matt Taylor (@maylortaylor)*
+*Last updated: June 2026 | Maintained by Matt Taylor (@maylortaylor)*
