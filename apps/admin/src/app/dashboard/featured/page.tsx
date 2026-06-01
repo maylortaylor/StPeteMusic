@@ -55,7 +55,7 @@ interface EventItem {
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string; action?: string; actionPath?: string }> = {
-  pending_enrichment: { label: 'Pending', color: 'bg-muted text-muted-foreground', action: 'Start Enrichment', actionPath: 'enrich' },
+  pending_enrichment: { label: 'Pending Enrichment', color: 'bg-muted text-muted-foreground' },
   enrichment_ready: { label: 'Ready to Review', color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400', action: 'Review Data', actionPath: 'enrichment' },
   enrichment_failed: { label: 'Enrichment Failed', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', action: 'Retry Enrichment', actionPath: 'enrichment' },
   enrichment_approved: { label: 'Enriched', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', action: 'Generate Newsletter Blurb', actionPath: 'newsletter' },
@@ -89,10 +89,6 @@ export default function FeaturedPage() {
   const [allArtists, setAllArtists] = useState<Artist[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [triggering, setTriggering] = useState<string | null>(null);
-  const [enrichingArtist, setEnrichingArtist] = useState<FeaturedArtist | null>(null);
-  const [extraUrls, setExtraUrls] = useState<string[]>([]);
-  const [extraUrlInput, setExtraUrlInput] = useState('');
   const [newSlot, setNewSlot] = useState<{ position: number; artistId: string }>({ position: 0, artistId: '' });
 
   const [featuredVenue, setFeaturedVenue] = useState<FeaturedVenue | null>(null);
@@ -229,48 +225,6 @@ export default function FeaturedPage() {
     }
   };
 
-  const openEnrichPanel = (artist: FeaturedArtist) => {
-    setEnrichingArtist(artist);
-    setExtraUrls([]);
-    setExtraUrlInput('');
-  };
-
-  const closeEnrichPanel = () => {
-    setEnrichingArtist(null);
-    setExtraUrls([]);
-    setExtraUrlInput('');
-  };
-
-  const addExtraUrl = () => {
-    const url = extraUrlInput.trim();
-    if (url && !extraUrls.includes(url)) {
-      setExtraUrls((prev) => [...prev, url]);
-    }
-    setExtraUrlInput('');
-  };
-
-  const handleTriggerEnrich = async (id: string, urls: string[]) => {
-    setTriggering(id);
-    setError(null);
-    try {
-      const res = await fetch(`/api/featured/${id}/enrich`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ extraUrls: urls }),
-      });
-      if (!res.ok) {
-        const d = await res.json();
-        throw new Error(d.error || 'Failed to trigger enrichment');
-      }
-      closeEnrichPanel();
-      fetchFeatured();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setTriggering(null);
-    }
-  };
-
   const handleRemove = async (id: string) => {
     if (!confirm('Remove this artist from featured?')) return;
     try {
@@ -359,20 +313,12 @@ export default function FeaturedPage() {
           <p className="text-sm text-muted-foreground">@{artist.artist_instagram_handle}</p>
         )}
 
-        <div className="mt-4 flex items-center gap-3">
+        <div className="mt-4 flex flex-wrap items-center gap-2">
           <span className={`inline-block rounded px-2 py-1 text-xs font-medium ${statusConfig?.color}`}>
             {statusConfig?.label}
           </span>
 
-          {statusConfig?.action && statusConfig.actionPath === 'enrich' ? (
-            <button
-              onClick={() => openEnrichPanel(artist)}
-              disabled={!!triggering}
-              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-            >
-              {statusConfig.action}
-            </button>
-          ) : statusConfig?.action && statusConfig.actionPath ? (
+          {statusConfig?.action && statusConfig.actionPath ? (
             <Link
               href={`/dashboard/featured/${artist.id}/${statusConfig.actionPath}`}
               className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
@@ -380,6 +326,14 @@ export default function FeaturedPage() {
               {statusConfig.action}
             </Link>
           ) : null}
+
+          <Link
+            href={`/dashboard/artists/${artist.artist_id}/enrich`}
+            className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+          >
+            <Star size={12} />
+            Enrich Artist
+          </Link>
         </div>
       </div>
     );
@@ -587,78 +541,6 @@ export default function FeaturedPage() {
         )}
       </div>
 
-      {enrichingArtist && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-xl border border-border bg-card shadow-2xl">
-            <div className="border-b border-border bg-muted/40 px-6 py-4 rounded-t-xl">
-              <p className="font-semibold text-foreground">Start Enrichment — {enrichingArtist.artist_name}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Sources that will be scraped by n8n</p>
-            </div>
-            <div className="px-6 py-4 space-y-3">
-              {[
-                { label: 'Instagram', url: enrichingArtist.artist_instagram_url },
-                { label: 'Facebook', url: enrichingArtist.artist_facebook_url },
-                { label: 'Linktree', url: enrichingArtist.artist_linktree_url },
-                { label: 'Website', url: enrichingArtist.artist_website },
-                { label: 'Bandcamp', url: enrichingArtist.artist_bandcamp_url },
-              ].map(({ label, url }) => url ? (
-                <div key={label} className="flex items-center gap-2 text-sm">
-                  <span className="w-20 text-xs font-medium text-muted-foreground">{label}</span>
-                  <span className="truncate text-foreground">{url}</span>
-                </div>
-              ) : null)}
-
-              {extraUrls.map((url) => (
-                <div key={url} className="flex items-center gap-2 text-sm">
-                  <span className="w-20 text-xs font-medium text-muted-foreground">Extra</span>
-                  <span className="flex-1 truncate text-foreground">{url}</span>
-                  <button
-                    onClick={() => setExtraUrls((prev) => prev.filter((u) => u !== url))}
-                    className="text-muted-foreground hover:text-destructive text-xs"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-
-              <div className="flex gap-2 pt-1">
-                <input
-                  type="url"
-                  value={extraUrlInput}
-                  onChange={(e) => setExtraUrlInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addExtraUrl(); } }}
-                  placeholder="Add extra URL…"
-                  className="flex-1 rounded-md border border-border bg-background px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-                />
-                <button
-                  type="button"
-                  onClick={addExtraUrl}
-                  disabled={!extraUrlInput.trim()}
-                  className="rounded-md border border-border px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted disabled:opacity-50"
-                >
-                  Add
-                </button>
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 border-t border-border px-6 py-4">
-              <button
-                onClick={closeEnrichPanel}
-                className="rounded-md border border-border px-4 py-2 text-sm text-muted-foreground hover:bg-muted"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleTriggerEnrich(enrichingArtist.id, extraUrls)}
-                disabled={triggering === enrichingArtist.id}
-                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-              >
-                {triggering === enrichingArtist.id && <RefreshCw className="h-3.5 w-3.5 animate-spin" />}
-                Confirm & Send to n8n
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

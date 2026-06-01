@@ -1,7 +1,7 @@
 ---
 topic: infrastructure
-triggers: aws, amplify, dns, cloudflare, tofu, terraform, ec2, tailscale, hosting, deploy, branch, git, listmonk, newsletter, ssl, ci, cd, admin
-updated: 2026-05-17
+triggers: aws, amplify, dns, cloudflare, tofu, terraform, ec2, tailscale, hosting, deploy, branch, git, listmonk, newsletter, ssl, ci, cd, admin, monitoring, alarms, cloudwatch, sns, health, alerting, uptime
+updated: 2026-06-01
 ---
 
 # Infrastructure
@@ -39,10 +39,12 @@ Route 53 hosted zone deleted. All records must be **DNS only (grey cloud — NOT
 - `www` and `@` (apex) → `d35nc2e8nr92q9.cloudfront.net`
 - `admin` → `d2ltgwfvkan5js.cloudfront.net`
 - ACM validation: `_ddf1b33c5eab2d60eddc95848a12d240` → `_bf19e363018afabe1b2e49737993dac9.jkddzztszm.acm-validations.aws`
+- `live` and `livestream` → `192.0.2.1` (dummy IP, proxy ON) — Cloudflare redirect ruleset fires before origin
 
-⚠️ Cloudflare proxy (orange cloud) must stay OFF — Amplify ACM SSL requires direct DNS resolution.
+⚠️ Cloudflare proxy (orange cloud) must stay OFF for Amplify records — ACM SSL requires direct DNS resolution.
 ⚠️ `acm_validation` record has `allow_overwrite = true` in cloudflare.tf — safe, it's static after cert issuance.
 ⚠️ If domain association is deleted+recreated, a **new CloudFront distribution** is issued. You must: delete old CNAME, recreate domain association, add new CNAME, then trigger a fresh build to wire the new distribution.
+⚠️ Cloudflare API token needs **Zone:Single Redirect:Edit** in addition to DNS:Edit — without it `tofu apply` creates DNS records but fails silently on `cloudflare_ruleset`. See `docs/infrastructure/DNS_CLOUDFLARE.md` for full token permission list.
 
 ## Database Migrations
 
@@ -72,6 +74,50 @@ Encrypted tunnel so n8n on EC2 can reach Obsidian on your Mac.
 - Mac IP: `tailscale ip -4` (do NOT hardcode in docs)
 - All Obsidian nodes use `{{ $env.OBSIDIAN_HOST }}` = `http://<TAILSCALE_IP>:27123`
 - If Obsidian nodes fail: verify Tailscale is active + Obsidian Local REST API plugin is running
+
+## Monitoring & Alerting
+
+### CloudWatch Alarms → SNS → theburgmusic@gmail.com
+Defined in `infrastructure/alarms.tf` (merged PR #199). Six alarms, all free tier:
+
+| Alarm | Threshold | Namespace |
+|---|---|---|
+| `stpetemusic-rtmp-unhealthy` | Route53 TCP:1935 status < 1 for 3 min | AWS/Route53 |
+| `stpetemusic-ec2-cpu-high` | CPU > 85% for 10 min | AWS/EC2 |
+| `stpetemusic-ec2-status-check-failed` | StatusCheckFailed > 0 for 2 min | AWS/EC2 |
+| `stpetemusic-rds-cpu-high` | CPU > 80% for 10 min | AWS/RDS |
+| `stpetemusic-rds-storage-low` | FreeStorageSpace < 2 GB | AWS/RDS |
+| `stpetemusic-cloudfront-5xx-high` | 5xxErrorRate > 5% for 10 min | AWS/CloudFront |
+
+SNS topic: `stpetemusic-alerts` — view ARN in `tofu output alerts_sns_topic_arn`.
+**After any `tofu apply` that creates the SNS subscription**: check `theburgmusic@gmail.com` for AWS confirmation email and click the link — alarms won't fire until confirmed.
+
+### Post-Deploy Smoke Tests (CI)
+- `deploy.yml` — after EC2 deploy: curls `n8n.stpetemusic.live/healthz` and `listmonk.stpetemusic.live/api/health`
+- `amplify-deploy.yml` — after Amplify builds: curls `www.stpetemusic.live/api/health`, `admin.stpetemusic.live/api/health`, `hls.stpetemusic.live`
+
+### n8n Health Monitor Workflow
+File: `n8n/workflows/StPeteMusic/health-monitor.json`
+- Runs every 15 min on the EC2 n8n instance
+- Pings all 5 HTTPS endpoints (web app, admin, n8n, listmonk, HLS CDN)
+- Emails `theburgmusic@gmail.com` via Resend if any fail
+- Subject format: `[StPeteMusic] ALERT: N endpoint(s) down` (Gmail-filterable)
+- **Must be manually activated** in the n8n UI after first deploy: https://n8n.stpetemusic.live
+- RTMP (TCP:1935) is NOT checked here — covered by Route53 + CloudWatch alarm
+
+### Health Endpoints
+| URL | What it checks |
+|---|---|
+| `https://www.stpetemusic.live/api/health` | Web app alive + env var presence |
+| `https://admin.stpetemusic.live/api/health` | Admin app alive + env var presence |
+| `https://n8n.stpetemusic.live/healthz` | n8n container healthy |
+| `https://listmonk.stpetemusic.live/api/health` | Listmonk API healthy |
+| `https://www.stpetemusic.live/api/newsletter/health` | Listmonk connectivity (deep check) |
+
+### Gmail Filter Setup (One-time)
+Add these at gmail.com/settings/filters → label `StPeteMusic/Alarms`, mark important:
+1. `from:(no-reply@sns.amazonaws.com) (stpetemusic)` — CloudWatch alarm emails
+2. `from:(hello@stpetemusic.live) subject:([StPeteMusic])` — n8n health monitor emails
 
 ## Branch Workflow
 | Branch | Purpose | Auto-deploy |

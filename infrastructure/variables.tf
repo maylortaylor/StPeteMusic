@@ -103,7 +103,7 @@ variable "clerk_publishable_key" {
 }
 
 variable "cloudflare_api_token" {
-  description = "Cloudflare API token with Zone:DNS:Edit permission for stpetemusic.live. Create at dash.cloudflare.com → My Profile → API Tokens → Create Token → Edit zone DNS template. Set via TF_VAR_cloudflare_api_token in CI."
+  description = "Cloudflare API token for stpetemusic.live. Required permissions: Zone:DNS:Edit AND Zone:Transform Rules:Edit. Create at dash.cloudflare.com → My Profile → API Tokens → Create Token. Set via TF_VAR_cloudflare_api_token in CI."
   type        = string
   sensitive   = true
   default     = ""  # empty default allows tofu validate/plan to pass without Cloudflare creds
@@ -264,4 +264,10 @@ variable "eventbrite_public_token" {
   type        = string
   sensitive   = true
   default     = ""
+}
+
+variable "alert_email" {
+  description = "Email for CloudWatch SNS alarm notifications. Set via TF_VAR_alert_email in CI."
+  type        = string
+  default     = "theburgmusic@gmail.com"
 }

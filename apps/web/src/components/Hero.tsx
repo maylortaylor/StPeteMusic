@@ -1,12 +1,51 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { motion, useTransform, useSpring } from 'framer-motion';
 import { useScrollPinned } from './AnimateIn';
 import Link from 'next/link';
 import { pushEvent } from '@/lib/analytics';
 import { trackMetaEvent } from '@/lib/meta-pixel';
+
+function HeroLiveBanner() {
+  const [status, setStatus] = useState<{ live: boolean; title: string | null }>({ live: false, title: null });
+
+  useEffect(() => {
+    fetch('/api/stream/youtube-status', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((d) => setStatus({ live: d.live, title: d.title ?? null }))
+      .catch(() => {});
+  }, []);
+
+  if (!status.live) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <Link
+        href="/live"
+        onClick={() => pushEvent('cta_click', { cta_label: 'live_now', cta_location: 'hero' })}
+        className="flex flex-col items-center gap-2 group"
+      >
+        <div className="flex items-center gap-2 bg-red-600 px-5 py-2 rounded-full group-hover:bg-red-500 transition-colors">
+          <span className="w-2 h-2 rounded-full bg-white animate-pulse" aria-hidden="true" />
+          <span className="font-inter font-bold text-sm uppercase tracking-widest text-white">
+            Live Now
+          </span>
+        </div>
+        {status.title && (
+          <p className="font-inter text-white/80 text-sm tracking-wide text-center max-w-xs">
+            {status.title}
+          </p>
+        )}
+      </Link>
+    </motion.div>
+  );
+}
 
 export function Hero() {
   const outerRef = useRef<HTMLElement>(null);
@@ -117,6 +156,8 @@ export function Hero() {
           >
             Live Music&nbsp;&nbsp;/&nbsp;&nbsp;Local Artists&nbsp;&nbsp;/&nbsp;&nbsp;Real Community
           </motion.p>
+
+          <HeroLiveBanner />
 
           <motion.div
             className="flex flex-col sm:flex-row gap-4 mt-4 mb-40"

@@ -1,0 +1,224 @@
+{
+  "name": "email-to-planning-calendar",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute",
+              "value": 15
+            }
+          ]
+        },
+        "simple": true,
+        "filters": {}
+      },
+      "id": "email-gcal-001",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1,
+      "position": [240, 260],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_AFTER_CREDENTIAL_CREATED",
+          "name": "theburgmusic-gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const today = new Date().toISOString().split('T')[0];\nconst from = $input.item.json.from ?? '';\nconst subject = $input.item.json.subject ?? '(no subject)';\nconst body = ($input.item.json.text ?? $input.item.json.snippet ?? '').slice(0, 2000);\nreturn [{ json: { userMessage: `Today is ${today}.\\n\\nFrom: ${from}\\nSubject: ${subject}\\nBody:\\n${body}`, from, subject } }];"
+      },
+      "id": "email-gcal-002",
+      "name": "Build Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 260]
+    },
+    {
+      "parameters": {
+        "prompt": "={{ $json.userMessage }}"
+      },
+      "id": "email-gcal-003",
+      "name": "Extract Date",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [680, 260]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-sonnet-4-6",
+          "mode": "list",
+          "cachedResultName": "Claude Sonnet 4.6"
+        },
+        "options": {
+          "systemMessage": "You extract dates from emails. Reply ONLY with valid JSON — no markdown fences, no explanation.\n\nIf date found: {\"dateFound\":true,\"date\":\"YYYY-MM-DD\",\"endDate\":\"YYYY-MM-DD or null\",\"senderName\":\"Name only (not email address)\"}\nIf no date: {\"dateFound\":false}\n\nRules:\n- Extract the FIRST concrete booking/show date mentioned\n- For date ranges (e.g. June 14-16), set endDate; otherwise null\n- Resolve relative dates (\"next Friday\") using the Today date in the user message\n- Do NOT invent dates — only extract explicitly stated ones\n- senderName: extract from the From field (friendly name, not the email address)"
+        }
+      },
+      "id": "email-gcal-004",
+      "name": "Claude Sonnet 4.6",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [680, 460],
+      "credentials": {
+        "anthropicApi": {
+          "id": "GxEPu27ca9FmXxQA",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let parsed;\ntry {\n  const raw = ($input.item.json.text ?? '').replace(/```json?\\n?/g, '').replace(/```/g, '').trim();\n  parsed = JSON.parse(raw);\n} catch {\n  parsed = { dateFound: false };\n}\nreturn [{ json: parsed }];"
+      },
+      "id": "email-gcal-005",
+      "name": "Parse Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 260],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-date-found",
+              "leftValue": "={{ $json.dateFound }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "email-gcal-006",
+      "name": "Date Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1120, 260]
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "b5d5f138bd68aca28a8c496a407fccefbe7c615c80b640b67699c9f85782d43c@group.calendar.google.com",
+          "mode": "id"
+        },
+        "start": "={{ $('Parse Response').item.json.date }}",
+        "end": "={{ $('Parse Response').item.json.endDate ?? $('Parse Response').item.json.date }}",
+        "additionalFields": {
+          "summary": "={{ 'RESERVED — ' + $('Parse Response').item.json.senderName }}",
+          "description": "={{ 'From: ' + $('Build Prompt').item.json.from + '\\nSubject: ' + $('Build Prompt').item.json.subject + '\\n\\nAuto-created by n8n email-to-planning-calendar workflow.' }}"
+        }
+      },
+      "id": "email-gcal-007",
+      "name": "Create Planning Event",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [1340, 160],
+      "continueOnFail": true,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "bKr3uyzb1sZZD8hj",
+          "name": "SPM-calendar-website"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Prompt": {
+      "main": [
+        [
+          {
+            "node": "Extract Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Sonnet 4.6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extract Date",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Date": {
+      "main": [
+        [
+          {
+            "node": "Parse Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Response": {
+      "main": [
+        [
+          {
+            "node": "Date Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date Found?": {
+      "main": [
+        [
+          {
+            "node": "Create Planning Event",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "tags": [
+    {
+      "name": "StPeteMusic"
+    }
+  ],
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "active": false,
+  "pinData": {}
+}

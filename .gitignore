@@ -50,6 +50,7 @@ apps/**/tsconfig.tsbuildinfo
 
 # Claude Code session files
 .claude/settings.local.json
+.claude/worktrees/
 .playwright-mcp/
 lighthouse-*.json
 

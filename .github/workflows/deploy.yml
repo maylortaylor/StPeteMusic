@@ -105,6 +105,7 @@ jobs:
           # Artist enrichment webhook security
           N8N_WEBHOOK_SECRET: ${{ secrets.N8N_WEBHOOK_SECRET }}
           ADMIN_ENRICHMENT_CALLBACK_URL: ${{ secrets.ADMIN_ENRICHMENT_CALLBACK_URL }}
+          ADMIN_ARTIST_ENRICHMENT_CALLBACK_URL: ${{ secrets.ADMIN_ARTIST_ENRICHMENT_CALLBACK_URL }}
           # Streaming
           RTMP_STREAM_KEY: ${{ secrets.RTMP_STREAM_KEY }}
           # Listmonk credentials and RDS host are read from SSM on EC2 (not injected here)
@@ -117,7 +118,7 @@ jobs:
             N8N_API_KEY,OBSIDIAN_HOST,CLAUDE_API_KEY_N8N_STPETEMUSIC,GROQ_API_KEY,
             N8N_GEMINI_API_KEY,IG_USER_ID,IG_APP_ID,IG_ACCESS_TOKEN,FB_PAGE_ID,FB_ACCESS_TOKEN,
             YOUTUBE_CLIENT_ID,YOUTUBE_CLIENT_SECRET,YOUTUBE_API_KEY,NOTION_API_KEY,
-            N8N_WEBHOOK_SECRET,ADMIN_ENRICHMENT_CALLBACK_URL,RTMP_STREAM_KEY
+            N8N_WEBHOOK_SECRET,ADMIN_ENRICHMENT_CALLBACK_URL,ADMIN_ARTIST_ENRICHMENT_CALLBACK_URL,RTMP_STREAM_KEY
           script: |
             set -e
 
@@ -195,7 +196,8 @@ jobs:
               printf 'YOUTUBE_API_KEY=%s\n'                  "${YOUTUBE_API_KEY}"
               printf 'NOTION_API_KEY=%s\n'                   "${NOTION_API_KEY}"
               printf 'N8N_WEBHOOK_SECRET=%s\n'              "${N8N_WEBHOOK_SECRET}"
-              printf 'ADMIN_ENRICHMENT_CALLBACK_URL=%s\n'   "${ADMIN_ENRICHMENT_CALLBACK_URL}"
+              printf 'ADMIN_ENRICHMENT_CALLBACK_URL=%s\n'        "${ADMIN_ENRICHMENT_CALLBACK_URL}"
+              printf 'ADMIN_ARTIST_ENRICHMENT_CALLBACK_URL=%s\n' "${ADMIN_ARTIST_ENRICHMENT_CALLBACK_URL}"
               printf 'RTMP_STREAM_KEY=%s\n'                "${RTMP_STREAM_KEY}"
               printf 'LISTMONK_USERNAME=%s\n'               "${LISTMONK_USERNAME}"
               printf 'LISTMONK_PASSWORD=%s\n'               "${LISTMONK_PASSWORD}"
@@ -389,3 +391,20 @@ jobs:
 
             echo "✓ Deploy complete"
             docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+      - name: Post-deploy health checks (EC2 services)
+        run: |
+          echo "── Waiting 30s for containers to stabilize ──"
+          sleep 30
+          FAIL=0
+          check() {
+            local label="$1" url="$2"
+            local code
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "$url" 2>/dev/null || echo "000")
+            if [ "$code" = "000" ]; then echo "✗ $label — timeout ($url)"; FAIL=1
+            else echo "✓ $label — HTTP $code"; fi
+          }
+          check "n8n"      "https://n8n.stpetemusic.live/healthz"
+          check "Listmonk" "https://listmonk.stpetemusic.live/api/health"
+          if [ "$FAIL" = "1" ]; then echo "✗ One or more EC2 health checks failed"; exit 1; fi
+          echo "✓ All EC2 health checks passed"
