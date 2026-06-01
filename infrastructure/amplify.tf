@@ -177,10 +177,16 @@ resource "aws_amplify_app" "admin" {
     EVENTBRITE_ORG_ID                   = var.eventbrite_org_id
     EVENTBRITE_PRIVATE_TOKEN            = var.eventbrite_private_token != "" ? data.aws_ssm_parameter.eventbrite_private_token[0].value : ""
     # Artist image upload — S3 bucket + CloudFront CDN
-    AWS_ASSETS_BUCKET                   = aws_s3_bucket.assets.id
+    # Note: "AWS_" prefix is reserved by Amplify; use ASSETS_BUCKET instead.
+    # Credentials are provided via iam_service_role_arn (no explicit creds needed).
+    ASSETS_BUCKET                       = aws_s3_bucket.assets.id
     ASSETS_CDN_URL                      = "https://cdn.stpetemusic.live"
-    AWS_REGION                          = var.aws_region
   }
+
+  # Grants SSR Lambda functions S3 write access via the standard credential chain.
+  # Amplify injects this role's credentials into the runtime — avoids the "AWS_*"
+  # env var restriction that blocks explicit credential injection.
+  iam_service_role_arn = aws_iam_role.amplify_admin_ssr.arn
 
   enable_auto_branch_creation = false
   enable_branch_auto_deletion = true

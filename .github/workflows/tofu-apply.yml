@@ -106,3 +106,10 @@ jobs:
 
       - name: OpenTofu Apply
         run: tofu apply -auto-approve -input=false
+
+      - name: Redeploy admin Amplify app
+        run: |
+          aws amplify start-job \
+            --app-id d2n0tn0yijqxny \
+            --branch-name main \
+            --job-type RELEASE

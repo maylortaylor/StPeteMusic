@@ -43,3 +43,36 @@ resource "aws_iam_role_policy" "ec2_ssm_listmonk" {
     }]
   })
 }
+
+# IAM role for Amplify SSR — grants server-side rendering functions S3 write access.
+# Amplify Hosting attaches this role to the SSR Lambda execution context so the
+# AWS SDK credential chain resolves without explicit env vars (which would require
+# the "AWS_" prefix that Amplify blocks).
+resource "aws_iam_role" "amplify_admin_ssr" {
+  name = "${var.project}-amplify-admin-ssr"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "amplify.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+
+  tags = { Project = var.project }
+}
+
+resource "aws_iam_role_policy" "amplify_admin_s3_assets" {
+  name = "${var.project}-amplify-admin-s3-assets"
+  role = aws_iam_role.amplify_admin_ssr.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["s3:PutObject"]
+      Resource = "${aws_s3_bucket.assets.arn}/*"
+    }]
+  })
+}
