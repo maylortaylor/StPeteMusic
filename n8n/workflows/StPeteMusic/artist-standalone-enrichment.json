@@ -61,7 +61,8 @@
     },
     {
       "parameters": {
-        "prompt": "={{ $json.prompt }}"
+        "promptType": "define",
+        "text": "={{ $json.prompt }}"
       },
       "id": "86e56d1e-2ceb-417b-8c14-a67e1b4f07c7",
       "name": "Synthesize with Claude",
