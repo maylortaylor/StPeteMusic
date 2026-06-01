@@ -4,7 +4,11 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 // Never use an allow-list approach for an admin app — a new page added
 // outside the pattern would be silently public.
 // /api/internal/* is protected by X-Deploy-Secret instead of Clerk session tokens.
-const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/api/internal/(.*)']);
+const isPublicRoute = createRouteMatcher([
+  '/sign-in(.*)',
+  '/api/internal/(.*)',
+  '/api/webhooks/(.*)',
+]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (!isPublicRoute(req)) await auth.protect();
