@@ -1,0 +1,161 @@
+{
+  "name": "Health Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "hm-0001-0000-0000-000000000001",
+      "name": "Every 15 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { json: { label: 'Web app',   url: 'https://www.stpetemusic.live/api/health',      acceptAny: false } },\n  { json: { label: 'Admin app', url: 'https://admin.stpetemusic.live/api/health',    acceptAny: false } },\n  { json: { label: 'n8n',       url: 'https://n8n.stpetemusic.live/healthz',         acceptAny: false } },\n  { json: { label: 'Listmonk',  url: 'https://listmonk.stpetemusic.live/api/health', acceptAny: false } },\n  { json: { label: 'HLS CDN',   url: 'https://hls.stpetemusic.live',                  acceptAny: true  } }\n];"
+      },
+      "id": "hm-0001-0000-0000-000000000002",
+      "name": "Define Endpoints",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          },
+          "redirect": {
+            "redirect": {
+              "followRedirects": true,
+              "maxRedirects": 3
+            }
+          },
+          "timeout": 12000
+        }
+      },
+      "id": "hm-0001-0000-0000-000000000003",
+      "name": "Ping Endpoint",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 0],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const pings = $input.all();\nconst endpoints = $('Define Endpoints').all();\n\nconst failures = pings.map((ping, i) => {\n  const endpoint = endpoints[i].json;\n  // statusCode is 0 for network/connection errors (continueOnFail path)\n  const statusCode = ping.json.statusCode || 0;\n  const ok = endpoint.acceptAny ? statusCode > 0 : (statusCode >= 200 && statusCode < 400);\n  return { label: endpoint.label, url: endpoint.url, ok, statusCode };\n}).filter(r => !r.ok);\n\nif (failures.length === 0) return [];\n\nconst lines = failures\n  .map(f => `- ${f.label}: ${f.statusCode > 0 ? 'HTTP ' + f.statusCode : 'TIMEOUT'} (${f.url})`)\n  .join('\\n');\n\nreturn [{ json: {\n  subject: `[StPeteMusic] ALERT: ${failures.length} endpoint(s) down`,\n  text: `Health check failures:\\n\\n${lines}\\n\\nTime: ${new Date().toISOString()}`\n} }];"
+      },
+      "id": "hm-0001-0000-0000-000000000004",
+      "name": "Check Failures",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.RESEND_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ from: 'hello@stpetemusic.live', to: ['theburgmusic@gmail.com'], subject: $json.subject, text: $json.text }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 8000
+        }
+      },
+      "id": "hm-0001-0000-0000-000000000005",
+      "name": "Send Alert Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 0]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Every 15 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Define Endpoints",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Define Endpoints": {
+      "main": [
+        [
+          {
+            "node": "Ping Endpoint",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ping Endpoint": {
+      "main": [
+        [
+          {
+            "node": "Check Failures",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Failures": {
+      "main": [
+        [
+          {
+            "node": "Send Alert Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

@@ -265,3 +265,9 @@ variable "eventbrite_public_token" {
   sensitive   = true
   default     = ""
 }
+
+variable "alert_email" {
+  description = "Email for CloudWatch SNS alarm notifications. Set via TF_VAR_alert_email in CI."
+  type        = string
+  default     = "theburgmusic@gmail.com"
+}

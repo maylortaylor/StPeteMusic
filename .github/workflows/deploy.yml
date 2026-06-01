@@ -391,3 +391,20 @@ jobs:
 
             echo "✓ Deploy complete"
             docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+      - name: Post-deploy health checks (EC2 services)
+        run: |
+          echo "── Waiting 30s for containers to stabilize ──"
+          sleep 30
+          FAIL=0
+          check() {
+            local label="$1" url="$2"
+            local code
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "$url" 2>/dev/null || echo "000")
+            if [ "$code" = "000" ]; then echo "✗ $label — timeout ($url)"; FAIL=1
+            else echo "✓ $label — HTTP $code"; fi
+          }
+          check "n8n"      "https://n8n.stpetemusic.live/healthz"
+          check "Listmonk" "https://listmonk.stpetemusic.live/api/health"
+          if [ "$FAIL" = "1" ]; then echo "✗ One or more EC2 health checks failed"; exit 1; fi
+          echo "✓ All EC2 health checks passed"
