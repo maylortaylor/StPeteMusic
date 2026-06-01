@@ -21,7 +21,6 @@ resource "aws_cloudwatch_metric_alarm" "ec2_cpu" {
   threshold           = 85
   comparison_operator = "GreaterThanThreshold"
   alarm_actions       = [aws_sns_topic.alerts.arn]
-  ok_actions          = [aws_sns_topic.alerts.arn]
   treat_missing_data  = "notBreaching"
   tags                = { Project = var.project }
 }
@@ -38,7 +37,6 @@ resource "aws_cloudwatch_metric_alarm" "ec2_status_check" {
   threshold           = 0
   comparison_operator = "GreaterThanThreshold"
   alarm_actions       = [aws_sns_topic.alerts.arn]
-  ok_actions          = [aws_sns_topic.alerts.arn]
   treat_missing_data  = "notBreaching"
   tags                = { Project = var.project }
 }
@@ -55,7 +53,6 @@ resource "aws_cloudwatch_metric_alarm" "rds_storage_low" {
   threshold           = 2147483648
   comparison_operator = "LessThanThreshold"
   alarm_actions       = [aws_sns_topic.alerts.arn]
-  ok_actions          = [aws_sns_topic.alerts.arn]
   treat_missing_data  = "notBreaching"
   tags                = { Project = var.project }
 }
@@ -72,7 +69,6 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
   threshold           = 80
   comparison_operator = "GreaterThanThreshold"
   alarm_actions       = [aws_sns_topic.alerts.arn]
-  ok_actions          = [aws_sns_topic.alerts.arn]
   treat_missing_data  = "notBreaching"
   tags                = { Project = var.project }
 }
@@ -93,7 +89,6 @@ resource "aws_cloudwatch_metric_alarm" "cloudfront_5xx" {
   threshold           = 5
   comparison_operator = "GreaterThanThreshold"
   alarm_actions       = [aws_sns_topic.alerts.arn]
-  ok_actions          = [aws_sns_topic.alerts.arn]
   treat_missing_data  = "notBreaching"
   tags                = { Project = var.project }
 }
@@ -112,7 +107,6 @@ resource "aws_cloudwatch_metric_alarm" "rtmp_health" {
   threshold           = 1
   comparison_operator = "LessThanThreshold"
   alarm_actions       = [aws_sns_topic.alerts.arn]
-  ok_actions          = [aws_sns_topic.alerts.arn]
   treat_missing_data  = "notBreaching"
   tags                = { Project = var.project }
 }
