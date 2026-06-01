@@ -60,6 +60,8 @@ async function getStreamStatus(): Promise<StreamStatus> {
   }
 }
 
+const DELETED_TITLES = new Set(['Private video', 'Deleted video']);
+
 async function getSuiteEPlaylistItems(): Promise<PlaylistItem[]> {
   const apiKey = process.env.YOUTUBE_API_KEY;
   if (!apiKey) return [];
@@ -79,7 +81,7 @@ async function getSuiteEPlaylistItems(): Promise<PlaylistItem[]> {
     if (!res.ok) return [];
 
     const data = await res.json();
-    return (data.items ?? [])
+    const candidates: PlaylistItem[] = (data.items ?? [])
       .filter((item: { snippet?: { resourceId?: { videoId?: string } } }) => item.snippet?.resourceId?.videoId)
       .map((item: { snippet: { resourceId: { videoId: string }; title: string; publishedAt: string | null; thumbnails?: { medium?: { url: string }; default?: { url: string } } } }) => ({
         videoId: item.snippet.resourceId.videoId,
@@ -89,7 +91,40 @@ async function getSuiteEPlaylistItems(): Promise<PlaylistItem[]> {
           item.snippet.thumbnails?.default?.url ??
           `https://i.ytimg.com/vi/${item.snippet.resourceId.videoId}/hqdefault.jpg`,
         publishedAt: item.snippet.publishedAt ?? null,
-      }));
+      }))
+      .filter((v: PlaylistItem) => !DELETED_TITLES.has(v.title));
+
+    if (candidates.length === 0) return [];
+
+    // Check privacy status — playlistItems snippet doesn't include privacyStatus,
+    // so unlisted videos are invisible to the snippet filter above.
+    const ids = candidates.map((v) => v.videoId).join(',');
+    const vUrl = new URL('https://www.googleapis.com/youtube/v3/videos');
+    vUrl.searchParams.set('part', 'status');
+    vUrl.searchParams.set('id', ids);
+    vUrl.searchParams.set('key', apiKey);
+
+    const vRes = await fetch(vUrl.toString(), {
+      next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(5000),
+    });
+
+    if (!vRes.ok) return candidates; // fail open
+
+    const vData = await vRes.json();
+    const publicIds = new Set<string>(
+      (vData.items ?? [])
+        .filter((v: { status?: { privacyStatus?: string } }) => v.status?.privacyStatus === 'public')
+        .map((v: { id: string }) => v.id),
+    );
+
+    return candidates
+      .filter((v) => publicIds.has(v.videoId))
+      .sort((a, b) => {
+        if (!a.publishedAt) return 1;
+        if (!b.publishedAt) return -1;
+        return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+      });
   } catch {
     return [];
   }
