@@ -176,6 +176,10 @@ resource "aws_amplify_app" "admin" {
     # Eventbrite integration (admin only — never exposed to web app)
     EVENTBRITE_ORG_ID                   = var.eventbrite_org_id
     EVENTBRITE_PRIVATE_TOKEN            = var.eventbrite_private_token != "" ? data.aws_ssm_parameter.eventbrite_private_token[0].value : ""
+    # Artist image upload — S3 bucket + CloudFront CDN
+    AWS_ASSETS_BUCKET                   = aws_s3_bucket.assets.id
+    ASSETS_CDN_URL                      = "https://cdn.stpetemusic.live"
+    AWS_REGION                          = var.aws_region
   }
 
   enable_auto_branch_creation = false
