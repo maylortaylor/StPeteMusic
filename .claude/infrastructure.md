@@ -117,7 +117,7 @@ File: `n8n/workflows/StPeteMusic/health-monitor.json`
 ### Gmail Filter Setup (One-time)
 Add these at gmail.com/settings/filters → label `StPeteMusic/Alarms`, mark important:
 1. `from:(no-reply@sns.amazonaws.com) (stpetemusic)` — CloudWatch alarm emails
-2. `from:(hello@stpetemusic.live) subject:([StPeteMusic])` — n8n health monitor emails
+2. `from:(hello@stpetemusic.live) subject:(🚨 StPeteMusic)` — n8n health monitor emails
 
 ## Branch Workflow
 | Branch | Purpose | Auto-deploy |
