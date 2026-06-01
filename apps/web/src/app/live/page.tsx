@@ -9,6 +9,8 @@ import { AnimateIn } from '@/components/AnimateIn';
 
 export const dynamic = 'force-dynamic';
 
+const SUITE_E_PLAYLIST_ID = 'PL5gTeopOibQREpXSSqHwVaZTWv1EdUuki';
+
 export const metadata: Metadata = {
   title: 'Watch Live | St. Pete Music',
   description:
@@ -29,6 +31,13 @@ export const metadata: Metadata = {
   },
 };
 
+interface PlaylistItem {
+  videoId: string;
+  title: string;
+  thumbnail: string;
+  publishedAt: string | null;
+}
+
 interface StreamStatus {
   live: boolean;
   videoId: string | null;
@@ -48,6 +57,41 @@ async function getStreamStatus(): Promise<StreamStatus> {
     return res.json();
   } catch {
     return { live: false, videoId: null, platform: null, title: null };
+  }
+}
+
+async function getSuiteEPlaylistItems(): Promise<PlaylistItem[]> {
+  const apiKey = process.env.YOUTUBE_API_KEY;
+  if (!apiKey) return [];
+
+  try {
+    const url = new URL('https://www.googleapis.com/youtube/v3/playlistItems');
+    url.searchParams.set('part', 'snippet');
+    url.searchParams.set('playlistId', SUITE_E_PLAYLIST_ID);
+    url.searchParams.set('maxResults', '50');
+    url.searchParams.set('key', apiKey);
+
+    const res = await fetch(url.toString(), {
+      next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(5000),
+    });
+
+    if (!res.ok) return [];
+
+    const data = await res.json();
+    return (data.items ?? [])
+      .filter((item: { snippet?: { resourceId?: { videoId?: string } } }) => item.snippet?.resourceId?.videoId)
+      .map((item: { snippet: { resourceId: { videoId: string }; title: string; publishedAt: string | null; thumbnails?: { medium?: { url: string }; default?: { url: string } } } }) => ({
+        videoId: item.snippet.resourceId.videoId,
+        title: item.snippet.title,
+        thumbnail:
+          item.snippet.thumbnails?.medium?.url ??
+          item.snippet.thumbnails?.default?.url ??
+          `https://i.ytimg.com/vi/${item.snippet.resourceId.videoId}/hqdefault.jpg`,
+        publishedAt: item.snippet.publishedAt ?? null,
+      }));
+  } catch {
+    return [];
   }
 }
 
@@ -104,9 +148,10 @@ function StreamCard({ stream }: { stream: PastLivestream }) {
 }
 
 export default async function LivePage() {
-  const [streamStatus, pastStreams] = await Promise.all([
+  const [streamStatus, pastStreams, suiteEVideos] = await Promise.all([
     getStreamStatus(),
     getPastLivestreams().catch(() => [] as PastLivestream[]),
+    getSuiteEPlaylistItems().catch(() => [] as PlaylistItem[]),
   ]);
 
   const { live, videoId, platform, title, error } = streamStatus;
@@ -203,6 +248,60 @@ export default async function LivePage() {
             )}
           </div>
         </section>
+
+        {/* ── Suite E Studios Playlist ─────────────────────────── */}
+        {suiteEVideos.length > 0 && (
+          <section className="px-6 pb-20">
+            <div className="max-w-5xl mx-auto">
+              <div className="border-t border-black/10 pt-10 mb-8">
+                <AnimateIn
+                  as="p"
+                  className="font-inter font-medium text-sm tracking-[0.5em] uppercase mb-2"
+                  style={{ color: '#B57048' }}
+                >
+                  Suite E Studios
+                </AnimateIn>
+                <AnimateIn delay={0.05}>
+                  <h2 className="font-inter font-black uppercase text-2xl text-black">
+                    Studio Sessions
+                  </h2>
+                </AnimateIn>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {suiteEVideos.map((video, i) => (
+                  <AnimateIn key={video.videoId} delay={i * 0.04}>
+                    <a
+                      href={`https://www.youtube.com/watch?v=${video.videoId}&list=${SUITE_E_PLAYLIST_ID}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex flex-col gap-3 hover:opacity-90 transition-opacity"
+                    >
+                      <div className="relative aspect-video bg-black overflow-hidden">
+                        <Image
+                          src={video.thumbnail}
+                          alt={video.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <p className="font-inter font-bold text-sm leading-snug text-black line-clamp-2">
+                          {video.title}
+                        </p>
+                        {video.publishedAt && (
+                          <p className="font-inter text-xs text-text-muted mt-0.5">
+                            {formatDate(video.publishedAt)}
+                          </p>
+                        )}
+                      </div>
+                    </a>
+                  </AnimateIn>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* ── Past Streams ─────────────────────────────────────── */}
         {pastStreams.length > 0 && (
