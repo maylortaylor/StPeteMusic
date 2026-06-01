@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ImageUploadField } from './image-upload-field';
 
 // next/image needs a mock in tests
@@ -7,7 +7,34 @@ vi.mock('next/image', () => ({
   default: ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />,
 }));
 
+// jsdom doesn't implement these Blob/File URL APIs
+global.URL.createObjectURL = vi.fn(() => 'blob:fake-url');
+global.URL.revokeObjectURL = vi.fn();
+
+function stubImageDimensions(width: number, height: number) {
+  vi.stubGlobal(
+    'Image',
+    class {
+      naturalWidth = width;
+      naturalHeight = height;
+      onload: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      set src(_: string) {
+        queueMicrotask(() => this.onload?.());
+      }
+    },
+  );
+}
+
 describe('ImageUploadField', () => {
+  beforeEach(() => {
+    stubImageDimensions(1920, 1080);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it('renders recommended size helper text', () => {
     render(<ImageUploadField value='' artistId='test-id' onChange={vi.fn()} />);
     expect(screen.getByText(/1920 × 1080 px/)).toBeTruthy();
@@ -68,6 +95,21 @@ describe('ImageUploadField', () => {
     await waitFor(() => {
       expect(screen.getByRole('alert')).toBeTruthy();
       expect(screen.getByText('File too large')).toBeTruthy();
+    });
+  });
+
+  it('shows dimension error when image is too small', async () => {
+    stubImageDimensions(800, 600);
+
+    render(<ImageUploadField value='' artistId='123' onChange={vi.fn()} />);
+
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['content'], 'small.jpg', { type: 'image/jpeg' });
+    fireEvent.change(input, { target: { files: [file] } });
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeTruthy();
+      expect(screen.getByText(/Image is too small \(800 × 600 px\)/)).toBeTruthy();
     });
   });
 
