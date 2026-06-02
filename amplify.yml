@@ -69,6 +69,8 @@ applications:
               echo "SYNC_SECRET=$SYNC_SECRET" >> .env.production
               echo "ASSETS_BUCKET=$ASSETS_BUCKET" >> .env.production
               echo "ASSETS_CDN_URL=$ASSETS_CDN_URL" >> .env.production
+              echo "S3_KEY_ID=$S3_KEY_ID" >> .env.production
+              echo "S3_KEY_SECRET=$S3_KEY_SECRET" >> .env.production
         build:
           commands:
             - npm run build
