@@ -25,17 +25,7 @@ const nextConfig = {
   async headers() {
     return [{ source: '/(.*)', headers: securityHeaders }];
   },
-  serverExternalPackages: ['pg', 'drizzle-orm', 'sharp'],
-  experimental: {
-    // Ensure sharp's linux-x64 native binary is traced into the deployment bundle.
-    // Without this, Amplify WEB_COMPUTE omits the .node file and sharp fails at runtime.
-    outputFileTracingIncludes: {
-      '/api/upload/artist-image': [
-        './node_modules/@img/sharp-linux-x64/**/*',
-        './node_modules/@img/sharp-libvips-linux-x64/**/*',
-      ],
-    },
-  },
+  serverExternalPackages: ['pg', 'drizzle-orm'],
   images: {
     remotePatterns: [
       {

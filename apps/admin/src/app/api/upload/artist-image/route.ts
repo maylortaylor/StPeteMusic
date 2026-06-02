@@ -1,9 +1,12 @@
 import { auth } from '@clerk/nextjs/server';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import sharp from 'sharp';
 import { randomUUID } from 'crypto';
 
-const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+const ALLOWED_TYPES: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+};
 const MAX_BYTES = 15 * 1024 * 1024; // 15 MB
 
 export async function POST(request: Request) {
@@ -27,7 +30,8 @@ export async function POST(request: Request) {
       return Response.json({ error: 'file and artistId are required' }, { status: 400 });
     }
 
-    if (!ALLOWED_TYPES.has(file.type)) {
+    const ext = ALLOWED_TYPES[file.type];
+    if (!ext) {
       return Response.json(
         { error: 'Only JPEG, PNG, and WebP images are allowed' },
         { status: 400 },
@@ -39,31 +43,14 @@ export async function POST(request: Request) {
       return Response.json({ error: 'File size must be 15 MB or less' }, { status: 400 });
     }
 
-    const meta = await sharp(buffer).metadata();
-    if (!meta.width || meta.width < 1200) {
-      return Response.json(
-        {
-          error: `Image too small (${meta.width ?? '?'} × ${meta.height ?? '?'} px) — minimum width is 1200 px`,
-        },
-        { status: 400 },
-      );
-    }
-
-    // Resize to max 1920px wide, convert to WebP quality 85, strip EXIF
-    const processed = await sharp(buffer)
-      .resize({ width: 1920, withoutEnlargement: true })
-      .webp({ quality: 85 })
-      .withMetadata({}) // strip EXIF by not carrying it over
-      .toBuffer();
-
-    const key = `artists/${artistId}/${randomUUID()}.webp`;
+    const key = `artists/${artistId}/${randomUUID()}.${ext}`;
     const s3 = new S3Client({ region: 'us-east-1' });
     await s3.send(
       new PutObjectCommand({
         Bucket: bucket,
         Key: key,
-        Body: processed,
-        ContentType: 'image/webp',
+        Body: buffer,
+        ContentType: file.type,
         CacheControl: 'public, max-age=31536000, immutable',
       }),
     );
@@ -71,17 +58,7 @@ export async function POST(request: Request) {
     return Response.json({ url: `${cdnUrl}/${key}` });
   } catch (err) {
     console.error('Artist image upload failed:', err);
-    const message = err instanceof Error ? err.message : '';
-    if (
-      message.includes('unsupported image format') ||
-      message.includes('Input file') ||
-      message.includes('corrupt')
-    ) {
-      return Response.json(
-        { error: 'Could not read image — file may be corrupt or in an unsupported format' },
-        { status: 400 },
-      );
-    }
+    const message = err instanceof Error ? err.message : String(err);
     return Response.json({ error: 'Upload failed — please try again', details: message }, { status: 500 });
   }
 }
