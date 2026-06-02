@@ -78,7 +78,9 @@ applications:
             # @aws-sdk/client-s3-ecbef8e33fd0b8f0 -> @aws-sdk/client-s3). Amplify's Lambda
             # packaging skips .next/node_modules/ but deploys .next/server/ in full, so copy
             # the aliases there so Node.js module resolution finds them from the chunk files.
-            - '[ -d .next/node_modules ] && cp -r .next/node_modules .next/server/node_modules || true'
+            # -L dereferences symlinks so Amplify's bundler gets real files, not broken symlinks
+            # pointing outside the appRoot (which Amplify rejects during Lambda packaging).
+            - '[ -d .next/node_modules ] && cp -rL .next/node_modules .next/server/node_modules || true'
             - cp .env.production .next/.env.production
       artifacts:
         baseDirectory: .next
