@@ -60,3 +60,6 @@ apps/web/demo-recordings/
 # Agent-generated content (keep directories, ignore generated files)
 production_artifacts/**/*.md
 !production_artifacts/**/.gitkeep
+
+# Google OAuth tokens for one-time setup scripts (contain refresh tokens)
+scripts/.form-tokens.json

@@ -56,3 +56,13 @@ resource "google_project_service" "sheets" {
   disable_on_destroy         = false
   disable_dependent_services = false
 }
+
+# Google Forms API — setup script configures the artist info submission form
+resource "google_project_service" "forms" {
+  count = local.enable_gcp ? 1 : 0
+
+  project                    = google_project.n8n_workflows[0].project_id
+  service                    = "forms.googleapis.com"
+  disable_on_destroy         = false
+  disable_dependent_services = false
+}

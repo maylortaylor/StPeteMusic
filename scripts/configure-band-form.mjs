@@ -1,33 +1,32 @@
 /**
  * Configures the existing StPeteMusic Google Form and Sheet for the artist info sync system.
  *
- * Prerequisites (run once before this script):
- *   gcloud auth application-default login \
- *     --scopes=https://www.googleapis.com/auth/forms,https://www.googleapis.com/auth/spreadsheets
+ * First run: performs an OAuth consent flow in your browser to authorize Forms + Sheets access.
+ * Tokens are saved to scripts/.form-tokens.json so subsequent runs skip the browser step.
+ *
+ * Prerequisites:
+ *   1. In GCP Console → spm-n8n-workflows → Credentials, create a Desktop app OAuth client
+ *      and add its ID + secret to .env as GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.
+ *   2. Both GOOGLE_FORM_ID and GOOGLE_SHEET_ID must be set in .env.
  *
  * Usage:
  *   node scripts/configure-band-form.mjs
- *     → Replaces Form questions with the canonical 17-question set
- *     → Prints the Sheet column mapping needed to configure n8n
- *
- *   node scripts/configure-band-form.mjs --add-admin-columns
- *     → Appends Approved/Processed/etc. columns to the Sheet
- *     → Run AFTER submitting one test form entry (Google creates form columns on first response)
- *
- * Required in .env (local only — never add to Amplify):
- *   GOOGLE_FORM_ID   — from Form edit URL: /forms/d/{ID}/edit
- *   GOOGLE_SHEET_ID  — 1TlCiXriCaVxcWIvax-ec5shMbhNLcE78p2jnyQhwRu8
+ *   node scripts/configure-band-form.mjs --add-admin-columns  (run after first test submission)
  */
 
+import http from 'http';
 import { google } from 'googleapis';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
+const TOKEN_PATH = resolve(__dirname, '.form-tokens.json');
+const REDIRECT_URI = 'http://localhost:9876/oauth/callback';
+const SCOPES = ['https://www.googleapis.com/auth/forms', 'https://www.googleapis.com/auth/spreadsheets'];
 
-// Load root .env into process.env (skip already-set vars)
+// Load root .env
 try {
   const envContent = readFileSync(resolve(ROOT, '.env'), 'utf8');
   for (const line of envContent.split('\n')) {
@@ -39,50 +38,27 @@ try {
     const value = trimmed.slice(eqIndex + 1).trim();
     if (!process.env[key]) process.env[key] = value;
   }
-} catch {
-  // rely on already-exported env vars
-}
+} catch { /* rely on exported env vars */ }
 
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const FORM_ID = process.env.GOOGLE_FORM_ID;
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 
-if (!FORM_ID || !SHEET_ID) {
-  console.error('Missing required env vars: GOOGLE_FORM_ID and/or GOOGLE_SHEET_ID');
-  console.error('Add them to .env (local only — not needed at runtime).');
-  console.error('  GOOGLE_FORM_ID   — from Form edit URL: /forms/d/{ID}/edit');
-  console.error('  GOOGLE_SHEET_ID  — 1TlCiXriCaVxcWIvax-ec5shMbhNLcE78p2jnyQhwRu8');
+if (!CLIENT_ID || !CLIENT_SECRET) {
+  console.error('Missing GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET in .env');
+  console.error('  Create a Desktop app OAuth client at https://console.cloud.google.com/apis/credentials?project=spm-n8n-workflows');
   process.exit(1);
 }
-
-// ---------------------------------------------------------------------------
-// Form configuration
-// ---------------------------------------------------------------------------
+if (!FORM_ID || !SHEET_ID) { console.error('Missing GOOGLE_FORM_ID or GOOGLE_SHEET_ID in .env'); process.exit(1); }
 
 const FORM_TITLE = 'StPeteMusic — Artist Info Submission';
-const FORM_DESCRIPTION =
-  'Fill this out to get your artist profile listed on www.stpetemusic.live. ' +
-  "We'll review your submission and update your page within a few days. " +
-  'Instagram handle is required — we use it to find your existing profile in our system.';
+const FORM_DESCRIPTION = "Fill this out to get your artist profile listed on www.stpetemusic.live. We'll review your submission and update your page within a few days. Instagram handle is required — we use it to find your existing profile in our system.";
 
-// Canonical question list — order matters (drives Sheet column order)
 const QUESTIONS = [
-  {
-    title: 'Band / Artist Name',
-    type: 'SHORT_ANSWER',
-    required: true,
-  },
-  {
-    title: 'Artist Type',
-    type: 'RADIO',
-    required: true,
-    options: ['Band', 'Solo Artist', 'DJ', 'Event Producer', 'Creative', 'Other'],
-  },
-  {
-    title: 'Instagram Handle',
-    type: 'SHORT_ANSWER',
-    required: true,
-    description: 'e.g. @yourbandname — we use this to find your profile in our system',
-  },
+  { title: 'Band / Artist Name', type: 'SHORT_ANSWER', required: true },
+  { title: 'Artist Type', type: 'RADIO', required: true, options: ['Band', 'Solo Artist', 'DJ', 'Event Producer', 'Creative', 'Other'] },
+  { title: 'Instagram Handle', type: 'SHORT_ANSWER', required: true, description: 'e.g. @yourbandname — we use this to find your profile in our system' },
   { title: 'Email', type: 'SHORT_ANSWER', required: false },
   { title: 'Bio / Description', type: 'PARAGRAPH', required: false },
   { title: 'City / Home Base', type: 'SHORT_ANSWER', required: false },
@@ -95,265 +71,124 @@ const QUESTIONS = [
   { title: 'Linktree URL', type: 'SHORT_ANSWER', required: false },
   { title: 'Bandsintown URL', type: 'SHORT_ANSWER', required: false },
   { title: 'Website URL', type: 'SHORT_ANSWER', required: false },
-  {
-    title: 'Custom Link — Label',
-    type: 'SHORT_ANSWER',
-    required: false,
-    description: 'e.g. Merch, Press Kit, Tickets',
-  },
+  { title: 'Custom Link — Label', type: 'SHORT_ANSWER', required: false, description: 'e.g. Merch, Press Kit, Tickets' },
   { title: 'Custom Link — URL', type: 'SHORT_ANSWER', required: false },
 ];
 
-// Admin columns appended to Sheet after first test submission
-const ADMIN_COLUMNS = [
-  'Approved',
-  'Processed',
-  'Matched Artist ID',
-  'Match Method',
-  'Error Notes',
-];
+const ADMIN_COLUMNS = ['Approved', 'Processed', 'Matched Artist ID', 'Match Method', 'Error Notes'];
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
+function columnLetter(index) {
+  let letter = '', n = index + 1;
+  while (n > 0) { const rem = (n - 1) % 26; letter = String.fromCharCode(65 + rem) + letter; n = Math.floor((n - 1) / 26); }
+  return letter;
+}
 
 function buildQuestionItem(q, index) {
   const item = { title: q.title };
   if (q.description) item.description = q.description;
-
   if (q.type === 'RADIO') {
-    item.questionItem = {
-      question: {
-        required: q.required,
-        choiceQuestion: {
-          type: 'RADIO',
-          options: q.options.map((v) => ({ value: v })),
-        },
-      },
-    };
+    item.questionItem = { question: { required: q.required, choiceQuestion: { type: 'RADIO', options: q.options.map(v => ({ value: v })) } } };
   } else {
-    item.questionItem = {
-      question: {
-        required: q.required,
-        textQuestion: { paragraph: q.type === 'PARAGRAPH' },
-      },
-    };
+    item.questionItem = { question: { required: q.required, textQuestion: { paragraph: q.type === 'PARAGRAPH' } } };
   }
-
-  return {
-    createItem: {
-      item,
-      location: { index },
-    },
-  };
+  return { createItem: { item, location: { index } } };
 }
 
-// Column index → letter(s), 0-based (0 → 'A', 25 → 'Z', 26 → 'AA')
-function columnLetter(index) {
-  let letter = '';
-  let n = index + 1;
-  while (n > 0) {
-    const rem = (n - 1) % 26;
-    letter = String.fromCharCode(65 + rem) + letter;
-    n = Math.floor((n - 1) / 26);
+async function authorize() {
+  const oauth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
+  if (existsSync(TOKEN_PATH)) {
+    const tokens = JSON.parse(readFileSync(TOKEN_PATH, 'utf8'));
+    oauth2Client.setCredentials(tokens);
+    if (tokens.expiry_date && Date.now() > tokens.expiry_date - 60000) {
+      const { credentials } = await oauth2Client.refreshAccessToken();
+      writeFileSync(TOKEN_PATH, JSON.stringify(credentials, null, 2));
+      oauth2Client.setCredentials(credentials);
+    }
+    return oauth2Client;
   }
-  return letter;
+
+  const authUrl = oauth2Client.generateAuthUrl({ access_type: 'offline', scope: SCOPES, prompt: 'consent' });
+  console.log('\n=== Google Authorization Required ===\n');
+  console.log('Open this URL in your browser:\n');
+  console.log(authUrl);
+  console.log('\nWaiting for callback on http://localhost:9876 ...\n');
+
+  const tokens = await new Promise((resolve, reject) => {
+    const server = http.createServer(async (req, res) => {
+      if (!req.url?.startsWith('/oauth/callback')) { res.writeHead(404); res.end(); return; }
+      const url = new URL(req.url, 'http://localhost:9876');
+      const code = url.searchParams.get('code');
+      const error = url.searchParams.get('error');
+      if (error) { res.writeHead(400, { 'Content-Type': 'text/html' }); res.end(`<p>OAuth error: ${error}</p>`); server.close(); reject(new Error(error)); return; }
+      try {
+        const { tokens } = await oauth2Client.getToken(code);
+        res.writeHead(200, { 'Content-Type': 'text/html' }); res.end('<p>Authorization successful! Return to the terminal.</p>');
+        server.close(); resolve(tokens);
+      } catch (err) { res.writeHead(500, { 'Content-Type': 'text/html' }); res.end('<p>Failed.</p>'); server.close(); reject(err); }
+    });
+    server.listen(9876);
+  });
+
+  writeFileSync(TOKEN_PATH, JSON.stringify(tokens, null, 2));
+  console.log('✅ Authorized — tokens saved to scripts/.form-tokens.json\n');
+  oauth2Client.setCredentials(tokens);
+  return oauth2Client;
 }
 
-// ---------------------------------------------------------------------------
-// Main: configure Form questions
-// ---------------------------------------------------------------------------
-
-async function configureForm(forms) {
-  console.log('\n📋 Fetching existing form...');
+async function configureForm(auth) {
+  const forms = google.forms({ version: 'v1', auth });
+  console.log('📋 Fetching existing form...');
   const { data: form } = await forms.forms.get({ formId: FORM_ID });
-
   const existingItems = form.items ?? [];
   console.log(`   Found ${existingItems.length} existing question(s) — will replace all.`);
 
-  const requests = [];
+  const requests = [
+    { updateFormInfo: { info: { title: FORM_TITLE, description: FORM_DESCRIPTION }, updateMask: 'title,description' } },
+    ...Array.from({ length: existingItems.length }, (_, i) => ({ deleteItem: { location: { index: existingItems.length - 1 - i } } })),
+    ...QUESTIONS.map((q, i) => buildQuestionItem(q, i)),
+  ];
 
-  // 1. Update form title + description
-  requests.push({
-    updateFormInfo: {
-      info: { title: FORM_TITLE, description: FORM_DESCRIPTION },
-      updateMask: 'title,description',
-    },
-  });
+  console.log('📝 Applying batchUpdate...');
+  await forms.forms.batchUpdate({ formId: FORM_ID, requestBody: { requests } });
 
-  // 2. Delete existing items (highest index first to avoid shifting)
-  for (let i = existingItems.length - 1; i >= 0; i--) {
-    requests.push({ deleteItem: { location: { index: i } } });
-  }
-
-  // 3. Create all questions in order
-  QUESTIONS.forEach((q, i) => requests.push(buildQuestionItem(q, i)));
-
-  console.log('📝 Applying batchUpdate to Form...');
-  await forms.forms.batchUpdate({
-    formId: FORM_ID,
-    requestBody: { requests },
-  });
-
-  console.log('\n✅ Form configured successfully!');
-  console.log(`   Title:    ${FORM_TITLE}`);
-  console.log(`   Questions: ${QUESTIONS.length}`);
-  console.log(`   Form URL: https://docs.google.com/forms/d/${FORM_ID}/viewform`);
-  console.log(`   Edit URL: https://docs.google.com/forms/d/${FORM_ID}/edit`);
-
-  // Print the expected Sheet column mapping (Timestamp is col A, questions follow)
-  console.log('\n📊 Expected Sheet column mapping (for n8n):');
-  console.log('   A  — Timestamp (auto-generated by Google)');
-  QUESTIONS.forEach((q, i) => {
-    const col = columnLetter(i + 1); // offset by 1 for Timestamp in col A
-    console.log(`   ${col.padEnd(2)} — ${q.title}`);
-  });
-
-  const adminStartCol = columnLetter(QUESTIONS.length + 1);
-  console.log(`\n⚠️  NEXT STEPS:`);
-  console.log(
-    '   1. Submit one test form entry: https://docs.google.com/forms/d/' + FORM_ID + '/viewform',
-  );
-  console.log('      This triggers Google to create the Sheet column headers.');
-  console.log(
-    `   2. Then run:  node scripts/configure-band-form.mjs --add-admin-columns`,
-  );
-  console.log(
-    `      Admin columns (Approved, Processed, etc.) will be added starting at column ${adminStartCol}.`,
-  );
+  console.log('\n✅ Form configured!');
+  console.log(`   View: https://docs.google.com/forms/d/${FORM_ID}/viewform`);
+  console.log(`   Edit: https://docs.google.com/forms/d/${FORM_ID}/edit`);
+  console.log('\n📊 Sheet column mapping (for n8n):');
+  console.log('   A  — Timestamp');
+  QUESTIONS.forEach((q, i) => console.log(`   ${columnLetter(i + 1).padEnd(2)} — ${q.title}`));
+  console.log(`\n⚠️  NEXT: Submit one test entry, then run: node scripts/configure-band-form.mjs --add-admin-columns`);
 }
 
-// ---------------------------------------------------------------------------
-// Main: add admin columns to Sheet
-// ---------------------------------------------------------------------------
-
-async function addAdminColumns(sheets) {
-  console.log('\n📊 Reading Sheet headers...');
-
-  const { data } = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: '1:1', // first row only
-  });
-
+async function addAdminColumns(auth) {
+  const sheets = google.sheets({ version: 'v4', auth });
+  console.log('📊 Reading Sheet headers...');
+  const { data } = await sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: '1:1' });
   const existingHeaders = data.values?.[0] ?? [];
-  if (existingHeaders.length === 0) {
-    console.error(
-      '❌ Sheet row 1 is empty. Submit a test form entry first so Google creates the column headers.',
-    );
-    process.exit(1);
-  }
+  if (existingHeaders.length === 0) { console.error('❌ Sheet is empty. Submit a test form entry first.'); process.exit(1); }
+  if (ADMIN_COLUMNS.some(col => existingHeaders.includes(col))) { console.warn('⚠️  Admin columns already exist — skipping.'); process.exit(0); }
 
-  console.log(`   Found ${existingHeaders.length} existing column(s).`);
+  const startColIndex = existingHeaders.length;
+  const range = `${columnLetter(startColIndex)}1:${columnLetter(startColIndex + ADMIN_COLUMNS.length - 1)}1`;
+  await sheets.spreadsheets.values.update({ spreadsheetId: SHEET_ID, range, valueInputOption: 'RAW', requestBody: { values: [ADMIN_COLUMNS] } });
 
-  // Check if admin columns already exist
-  const existingAdminCols = ADMIN_COLUMNS.filter((col) => existingHeaders.includes(col));
-  if (existingAdminCols.length > 0) {
-    console.warn(`⚠️  Some admin columns already exist: ${existingAdminCols.join(', ')}`);
-    console.warn('   Skipping to avoid duplicates.');
-    process.exit(0);
-  }
-
-  // Append admin column headers in row 1
-  const startColIndex = existingHeaders.length; // 0-based
-  const startColLetter = columnLetter(startColIndex);
-  const endColLetter = columnLetter(startColIndex + ADMIN_COLUMNS.length - 1);
-  const range = `${startColLetter}1:${endColLetter}1`;
-
-  console.log(`📝 Writing admin headers to range ${range}...`);
-  await sheets.spreadsheets.values.update({
-    spreadsheetId: SHEET_ID,
-    range,
-    valueInputOption: 'RAW',
-    requestBody: { values: [ADMIN_COLUMNS] },
-  });
-
-  // Add checkbox data validation to Approved and Processed columns
-  const { data: spreadsheet } = await sheets.spreadsheets.get({
-    spreadsheetId: SHEET_ID,
-    fields: 'sheets.properties',
-  });
-
-  const sheetTab = spreadsheet.sheets?.[0];
-  const sheetTabId = sheetTab?.properties?.sheetId ?? 0;
-  const approvedColIndex = startColIndex;     // first admin column
-  const processedColIndex = startColIndex + 1; // second admin column
-
-  const checkboxRule = {
-    condition: { type: 'BOOLEAN' },
-    showCustomUi: true,
-    strict: false,
-  };
-
+  const { data: ss } = await sheets.spreadsheets.get({ spreadsheetId: SHEET_ID, fields: 'sheets.properties' });
+  const sheetTabId = ss.sheets?.[0]?.properties?.sheetId ?? 0;
+  const checkboxRule = { condition: { type: 'BOOLEAN' }, showCustomUi: true, strict: false };
   await sheets.spreadsheets.batchUpdate({
     spreadsheetId: SHEET_ID,
-    requestBody: {
-      requests: [approvedColIndex, processedColIndex].map((colIndex) => ({
-        setDataValidation: {
-          range: {
-            sheetId: sheetTabId,
-            startRowIndex: 1,   // skip header row
-            endRowIndex: 1000,
-            startColumnIndex: colIndex,
-            endColumnIndex: colIndex + 1,
-          },
-          rule: checkboxRule,
-        },
-      })),
-    },
+    requestBody: { requests: [startColIndex, startColIndex + 1].map(colIndex => ({ setDataValidation: { range: { sheetId: sheetTabId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: colIndex, endColumnIndex: colIndex + 1 }, rule: checkboxRule } })) },
   });
 
   console.log('\n✅ Admin columns added!');
-  ADMIN_COLUMNS.forEach((col, i) => {
-    console.log(`   ${columnLetter(startColIndex + i)} — ${col}${i < 2 ? ' (checkbox)' : ''}`);
-  });
-
-  console.log('\n📌 n8n workflow — column summary:');
+  console.log('\n📌 Complete column map (for n8n):');
   console.log('   A  — Timestamp');
-  QUESTIONS.forEach((q, i) => {
-    const col = columnLetter(i + 1);
-    console.log(`   ${col.padEnd(2)} — ${q.title}`);
-  });
-  ADMIN_COLUMNS.forEach((col, i) => {
-    const letter = columnLetter(startColIndex + i);
-    console.log(`   ${letter.padEnd(2)} — ${col} [ADMIN]`);
-  });
+  QUESTIONS.forEach((q, i) => console.log(`   ${columnLetter(i + 1).padEnd(2)} — ${q.title}`));
+  ADMIN_COLUMNS.forEach((col, i) => console.log(`   ${columnLetter(startColIndex + i).padEnd(2)} — ${col} [ADMIN]`));
 }
-
-// ---------------------------------------------------------------------------
-// Entry point
-// ---------------------------------------------------------------------------
 
 const isAddAdminColumns = process.argv.includes('--add-admin-columns');
-
 try {
-  const auth = new google.auth.GoogleAuth({
-    scopes: [
-      'https://www.googleapis.com/auth/forms',
-      'https://www.googleapis.com/auth/spreadsheets',
-    ],
-  });
-  const client = await auth.getClient();
-  google.options({ auth: client });
-
-  if (isAddAdminColumns) {
-    const sheets = google.sheets({ version: 'v4' });
-    await addAdminColumns(sheets);
-  } else {
-    const forms = google.forms({ version: 'v1' });
-    await configureForm(forms);
-  }
-} catch (err) {
-  if (err.message?.includes('Could not load the default credentials')) {
-    console.error('\n❌ No Google credentials found.');
-    console.error('   Run this first:');
-    console.error(
-      '   gcloud auth application-default login \\',
-    );
-    console.error(
-      '     --scopes=https://www.googleapis.com/auth/forms,https://www.googleapis.com/auth/spreadsheets',
-    );
-    process.exit(1);
-  }
-  console.error('\n❌ Error:', err.message ?? err);
-  process.exit(1);
-}
+  const auth = await authorize();
+  if (isAddAdminColumns) { await addAdminColumns(auth); } else { await configureForm(auth); }
+} catch (err) { console.error('\n❌ Error:', err.message ?? err); process.exit(1); }
