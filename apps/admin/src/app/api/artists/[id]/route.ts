@@ -82,6 +82,7 @@ export async function PUT(
         website: data.website,
         linktree_url: data.linktree_url,
         home_base: data.home_base,
+        hero_photo_url: data.hero_photo_url,
         genres: data.genres,
         tags: data.tags,
         notes: data.notes,
