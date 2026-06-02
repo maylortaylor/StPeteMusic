@@ -85,6 +85,20 @@ jobs:
       - name: OpenTofu Init
         run: tofu init -backend-config="profile="
 
+      # Import AWS resources that exist in AWS but may not yet be in Terraform state.
+      # The IAM user can be created by a failed/manual run and left out of state.
+      # Idempotent: skips resources already tracked.
+      - name: Import unmanaged AWS resources into state
+        continue-on-error: true
+        run: |
+          tofu state list | grep -qF 'aws_iam_user.admin_s3_upload' || \
+            tofu import -input=false 'aws_iam_user.admin_s3_upload' \
+              stpetemusic-admin-s3-upload
+
+          tofu state list | grep -qF 'aws_iam_user_policy.admin_s3_upload' || \
+            tofu import -input=false 'aws_iam_user_policy.admin_s3_upload' \
+              'stpetemusic-admin-s3-upload:stpetemusic-admin-s3-upload-policy'
+
       # Import GCP resources that exist in GCP but may not yet be in Terraform state.
       # Idempotent: skips resources already tracked. continue-on-error so a permission
       # miss during bootstrap doesn't block the apply from attempting.
