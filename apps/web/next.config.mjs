@@ -29,6 +29,7 @@ const securityHeaders = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   devIndicators: false,
+  trailingSlash: false,
   async headers() {
     return [
       { source: '/(.*)', headers: securityHeaders },
