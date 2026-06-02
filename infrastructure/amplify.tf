@@ -184,11 +184,14 @@ resource "aws_amplify_app" "admin" {
     # Eventbrite integration (admin only — never exposed to web app)
     EVENTBRITE_ORG_ID                   = var.eventbrite_org_id
     EVENTBRITE_PRIVATE_TOKEN            = var.eventbrite_private_token != "" ? data.aws_ssm_parameter.eventbrite_private_token[0].value : ""
-    # Artist image upload — S3 bucket + CloudFront CDN
-    # Note: "AWS_" prefix is reserved by Amplify; use ASSETS_BUCKET instead.
-    # Credentials are provided via iam_service_role_arn (no explicit creds needed).
+    # Artist image upload — S3 bucket + CloudFront CDN.
+    # "AWS_" prefix is reserved by Amplify; S3_KEY_* avoids that restriction.
+    # Amplify WEB_COMPUTE SSR Lambdas use an internally-managed execution role that
+    # cannot be configured externally, so explicit IAM user credentials are required.
     ASSETS_BUCKET                       = aws_s3_bucket.assets.id
     ASSETS_CDN_URL                      = "https://cdn.stpetemusic.live"
+    S3_KEY_ID                           = aws_iam_access_key.admin_s3_upload.id
+    S3_KEY_SECRET                       = aws_iam_access_key.admin_s3_upload.secret
   }
 
   # Grants SSR Lambda functions S3 write access via the standard credential chain.
