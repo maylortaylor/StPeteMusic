@@ -74,13 +74,14 @@ applications:
         build:
           commands:
             - npm run build
-            # Standalone output includes all required node_modules for Turbopack external modules.
-            # Static and public assets must be copied in manually.
-            - cp -r .next/static .next/standalone/apps/admin/.next/static
-            - '[ -d public ] && cp -r public .next/standalone/apps/admin/public || true'
-            - cp .env.production .next/standalone/apps/admin/.env.production
+            # Turbopack creates external module aliases in .next/node_modules/ (e.g.
+            # @aws-sdk/client-s3-ecbef8e33fd0b8f0 -> @aws-sdk/client-s3). Amplify's Lambda
+            # packaging skips .next/node_modules/ but deploys .next/server/ in full, so copy
+            # the aliases there so Node.js module resolution finds them from the chunk files.
+            - '[ -d .next/node_modules ] && cp -r .next/node_modules .next/server/node_modules || true'
+            - cp .env.production .next/.env.production
       artifacts:
-        baseDirectory: .next/standalone
+        baseDirectory: .next
         files:
           - '**/*'
       cache:

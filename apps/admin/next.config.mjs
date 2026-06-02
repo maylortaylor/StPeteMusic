@@ -9,7 +9,6 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
   reactStrictMode: true,
   devIndicators: false,
   // Turbopack rule for .md imports (Next.js 16+ uses Turbopack by default).
