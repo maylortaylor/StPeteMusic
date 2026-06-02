@@ -10,6 +10,12 @@ data "aws_ssm_parameter" "revalidation_secret" {
   with_decryption = true
 }
 
+data "aws_ssm_parameter" "cron_secret" {
+  count           = var.cron_secret != "" ? 1 : 0
+  name            = aws_ssm_parameter.cron_secret[0].name
+  with_decryption = true
+}
+
 data "aws_ssm_parameter" "clerk_secret_key" {
   name            = aws_ssm_parameter.clerk_secret_key.name
   with_decryption = true
@@ -173,6 +179,8 @@ resource "aws_amplify_app" "admin" {
     # Revalidation — admin calls web app's /api/revalidate after syncs
     WEB_APP_URL                         = "https://www.stpetemusic.live"
     REVALIDATION_SECRET                 = var.revalidation_secret != "" ? data.aws_ssm_parameter.revalidation_secret[0].value : ""
+    # Artist sheet sync — n8n cron secret
+    CRON_SECRET                         = var.cron_secret != "" ? data.aws_ssm_parameter.cron_secret[0].value : ""
     # Eventbrite integration (admin only — never exposed to web app)
     EVENTBRITE_ORG_ID                   = var.eventbrite_org_id
     EVENTBRITE_PRIVATE_TOKEN            = var.eventbrite_private_token != "" ? data.aws_ssm_parameter.eventbrite_private_token[0].value : ""

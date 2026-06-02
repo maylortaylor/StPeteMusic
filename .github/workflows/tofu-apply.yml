@@ -58,6 +58,7 @@ jobs:
       TF_VAR_eventbrite_client_secret:           ${{ secrets.EVENTBRITE_CLIENT_SECRET }}
       TF_VAR_eventbrite_public_token:            ${{ secrets.EVENTBRITE_PUBLIC_TOKEN }}
       TF_VAR_alert_email:                        ${{ secrets.ALERT_EMAIL }}
+      TF_VAR_cron_secret:                        ${{ secrets.CRON_SECRET }}
 
     steps:
       - name: Checkout
