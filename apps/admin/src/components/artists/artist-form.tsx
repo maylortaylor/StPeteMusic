@@ -3,9 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
+import { ChevronDown, ChevronUp, ExternalLink, Star, Trash2 } from 'lucide-react';
+import type { ArtistLink } from '@stpetemusic/types';
 import { toast } from '@/lib/toast';
 import { TagInput } from '@/components/ui/tag-input';
 import { ImageUploadField } from '@/components/image-upload-field';
+import { PlatformIcon } from '@/components/platform-icon';
+import { canSetFeatured, KNOWN_PLATFORMS } from '@/lib/artist-links';
 
 const artistSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -14,11 +18,6 @@ const artistSchema = z.object({
   username: z.string().optional(),
   description: z.string().optional(),
   instagram_handle: z.string().optional(),
-  instagram_url: z.string().url().optional().or(z.literal('')),
-  facebook_url: z.string().url().optional().or(z.literal('')),
-  youtube_url: z.string().url().optional().or(z.literal('')),
-  website: z.string().url().optional().or(z.literal('')),
-  linktree_url: z.string().url().optional().or(z.literal('')),
   home_base: z.string().optional(),
   hero_photo_url: z.string().url().optional().or(z.literal('')),
   genres: z.array(z.string()).default([]),
@@ -30,6 +29,8 @@ const artistSchema = z.object({
 
 type ArtistFormData = z.infer<typeof artistSchema>;
 
+type StagedLink = ArtistLink & { _tempId?: string };
+
 interface ArtistFormProps {
   artistId?: string;
 }
@@ -38,6 +39,8 @@ const inputClass =
   'mt-2 block w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring';
 
 const labelClass = 'block text-sm font-medium text-foreground';
+
+const MAX_LINKS = 10;
 
 export function ArtistForm({ artistId }: ArtistFormProps) {
   const router = useRouter();
@@ -55,6 +58,12 @@ export function ArtistForm({ artistId }: ArtistFormProps) {
     visible_on_website: false,
   });
 
+  // Links state (edit mode only)
+  const [links, setLinks] = useState<StagedLink[]>([]);
+  const [addPlatform, setAddPlatform] = useState('website');
+  const [addUrl, setAddUrl] = useState('');
+  const [addLabel, setAddLabel] = useState('Website');
+
   useEffect(() => {
     fetch('/api/tags')
       .then((r) => r.ok ? r.json() : null)
@@ -67,41 +76,42 @@ export function ArtistForm({ artistId }: ArtistFormProps) {
   }, []);
 
   useEffect(() => {
-    if (artistId) {
-      async function fetchArtist() {
-        try {
-          const response = await fetch(`/api/artists/${artistId}`);
-          if (!response.ok) throw new Error('Failed to fetch artist');
-          const data = await response.json();
-          const nullToEmpty = (v: unknown) => (v === null ? '' : v);
-          setFormData({
-            name: data.name ?? '',
-            type: data.type ?? 'Band',
-            slug: nullToEmpty(data.slug) as string,
-            username: nullToEmpty(data.username) as string,
-            description: nullToEmpty(data.description) as string,
-            instagram_handle: nullToEmpty(data.instagram_handle) as string,
-            instagram_url: nullToEmpty(data.instagram_url) as string,
-            facebook_url: nullToEmpty(data.facebook_url) as string,
-            youtube_url: nullToEmpty(data.youtube_url) as string,
-            website: nullToEmpty(data.website) as string,
-            linktree_url: nullToEmpty(data.linktree_url) as string,
-            home_base: nullToEmpty(data.home_base) as string,
-            hero_photo_url: nullToEmpty(data.hero_photo_url) as string,
-            notes: nullToEmpty(data.notes) as string,
-            is_active: data.is_active ?? true,
-            visible_on_website: data.visible_on_website ?? false,
-            genres: Array.isArray(data.genres) ? data.genres : [],
-            tags: Array.isArray(data.tags) ? data.tags : [],
-          });
-        } catch (err) {
-          setError(err instanceof Error ? err.message : 'An error occurred');
-        } finally {
-          setLoading(false);
-        }
+    if (!artistId) return;
+
+    async function fetchAll() {
+      try {
+        const [artistRes, linksRes] = await Promise.all([
+          fetch(`/api/artists/${artistId}`),
+          fetch(`/api/artists/${artistId}/links`),
+        ]);
+        if (!artistRes.ok) throw new Error('Failed to fetch artist');
+        const data = await artistRes.json();
+        const linksData = linksRes.ok ? await linksRes.json() : { links: [] };
+
+        const nullToEmpty = (v: unknown) => (v === null ? '' : v);
+        setFormData({
+          name: data.name ?? '',
+          type: data.type ?? 'Band',
+          slug: nullToEmpty(data.slug) as string,
+          username: nullToEmpty(data.username) as string,
+          description: nullToEmpty(data.description) as string,
+          instagram_handle: nullToEmpty(data.instagram_handle) as string,
+          home_base: nullToEmpty(data.home_base) as string,
+          hero_photo_url: nullToEmpty(data.hero_photo_url) as string,
+          notes: nullToEmpty(data.notes) as string,
+          is_active: data.is_active ?? true,
+          visible_on_website: data.visible_on_website ?? false,
+          genres: Array.isArray(data.genres) ? data.genres : [],
+          tags: Array.isArray(data.tags) ? data.tags : [],
+        });
+        setLinks(linksData.links ?? []);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
       }
-      fetchArtist();
     }
+    fetchAll();
   }, [artistId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -120,6 +130,50 @@ export function ArtistForm({ artistId }: ArtistFormProps) {
     }));
   };
 
+  // Links operations (all local until Save)
+  function handleAddLink(e: React.FormEvent) {
+    e.preventDefault();
+    if (!addUrl || !addLabel) return;
+    if (links.length >= MAX_LINKS) return;
+    const tempLink: StagedLink = {
+      id: '',
+      _tempId: crypto.randomUUID(),
+      artist_id: artistId ?? '',
+      platform: addPlatform,
+      url: addUrl,
+      label: addLabel,
+      display_order: links.length,
+      is_active: true,
+      is_featured: false,
+      created_at: '',
+      updated_at: '',
+    };
+    setLinks(prev => [...prev, tempLink]);
+    setAddUrl('');
+    setAddLabel(KNOWN_PLATFORMS.find(p => p.value === addPlatform)?.label ?? 'Website');
+  }
+
+  function handleDeleteLink(index: number) {
+    setLinks(prev => prev.filter((_, i) => i !== index).map((l, i) => ({ ...l, display_order: i })));
+  }
+
+  function handleMoveLink(index: number, direction: 'up' | 'down') {
+    const swapIdx = direction === 'up' ? index - 1 : index + 1;
+    if (swapIdx < 0 || swapIdx >= links.length) return;
+    const next = [...links];
+    [next[index], next[swapIdx]] = [next[swapIdx], next[index]];
+    setLinks(next.map((l, i) => ({ ...l, display_order: i })));
+  }
+
+  function handleToggleFeatured(index: number) {
+    const link = links[index];
+    if (!link.is_featured && !canSetFeatured(links)) {
+      alert('Maximum 3 featured links. Remove a starred link first.');
+      return;
+    }
+    setLinks(prev => prev.map((l, i) => i === index ? { ...l, is_featured: !l.is_featured } : l));
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -132,10 +186,31 @@ export function ArtistForm({ artistId }: ArtistFormProps) {
         return;
       }
 
-      const payload = {
-        ...validation.data,
-        slug: validation.data.slug || validation.data.name.toLowerCase().replace(/\s+/g, '-'),
+      const values = validation.data;
+
+      // Force "@" prefix on username and instagram_handle
+      if (values.username && !values.username.startsWith('@')) {
+        values.username = '@' + values.username;
+      }
+      if (values.instagram_handle && !values.instagram_handle.startsWith('@')) {
+        values.instagram_handle = '@' + values.instagram_handle;
+      }
+
+      const payload: Record<string, unknown> = {
+        ...values,
+        slug: values.slug || values.name.toLowerCase().replace(/\s+/g, '-'),
       };
+
+      if (artistId) {
+        payload.links = links.map((l, i) => ({
+          id: l.id || undefined,
+          platform: l.platform,
+          url: l.url,
+          label: l.label,
+          display_order: i,
+          is_featured: l.is_featured,
+        }));
+      }
 
       const url = artistId ? `/api/artists/${artistId}` : '/api/artists';
       const method = artistId ? 'PUT' : 'POST';
@@ -264,8 +339,9 @@ export function ArtistForm({ artistId }: ArtistFormProps) {
         </div>
       </div>
 
+      {/* Social Handles */}
       <div className="space-y-4 border-t border-border pt-6">
-        <h3 className="font-medium text-foreground">Social Media & Links</h3>
+        <h3 className="font-medium text-foreground">Social Handles</h3>
         <div className="grid gap-6 md:grid-cols-2">
           <div>
             <label className={labelClass}>Instagram Handle</label>
@@ -278,68 +354,131 @@ export function ArtistForm({ artistId }: ArtistFormProps) {
               placeholder="@handle"
             />
           </div>
-
-          <div>
-            <label className={labelClass}>Instagram URL</label>
-            <input
-              type="url"
-              name="instagram_url"
-              value={formData.instagram_url || ''}
-              onChange={handleChange}
-              className={inputClass}
-              placeholder="https://instagram.com/..."
-            />
-          </div>
-
-          <div>
-            <label className={labelClass}>Facebook URL</label>
-            <input
-              type="url"
-              name="facebook_url"
-              value={formData.facebook_url || ''}
-              onChange={handleChange}
-              className={inputClass}
-              placeholder="https://facebook.com/..."
-            />
-          </div>
-
-          <div>
-            <label className={labelClass}>YouTube URL</label>
-            <input
-              type="url"
-              name="youtube_url"
-              value={formData.youtube_url || ''}
-              onChange={handleChange}
-              className={inputClass}
-              placeholder="https://youtube.com/..."
-            />
-          </div>
-
-          <div>
-            <label className={labelClass}>Website</label>
-            <input
-              type="url"
-              name="website"
-              value={formData.website || ''}
-              onChange={handleChange}
-              className={inputClass}
-              placeholder="https://..."
-            />
-          </div>
-
-          <div>
-            <label className={labelClass}>Linktree URL</label>
-            <input
-              type="url"
-              name="linktree_url"
-              value={formData.linktree_url || ''}
-              onChange={handleChange}
-              className={inputClass}
-              placeholder="https://linktree.com/..."
-            />
-          </div>
         </div>
       </div>
+
+      {/* Links (edit mode only) */}
+      {artistId && (
+        <div className="space-y-4 border-t border-border pt-6">
+          <div className="flex items-center justify-between">
+            <h3 className="font-medium text-foreground">Links</h3>
+            <span className="text-xs text-muted-foreground">{links.length} / {MAX_LINKS}</span>
+          </div>
+
+          {links.length === 0 && (
+            <p className="text-sm text-muted-foreground">No links yet. Add one below.</p>
+          )}
+
+          <ul className="space-y-2">
+            {links.map((link, idx) => (
+              <li
+                key={link.id || link._tempId}
+                className="flex items-center gap-3 rounded-lg border border-border bg-background px-3 py-2"
+              >
+                <PlatformIcon platform={link.platform} size={16} showExternalIndicator={false} />
+                <div className="min-w-0 flex-1">
+                  <span className="text-sm font-medium text-foreground">{link.label}</span>
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-2 inline-flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    {link.url.length > 50 ? link.url.slice(0, 50) + '…' : link.url}
+                    <ExternalLink size={10} />
+                  </a>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleToggleFeatured(idx)}
+                  title={
+                    link.is_featured
+                      ? 'Remove from featured'
+                      : canSetFeatured(links)
+                        ? 'Feature this link (max 3)'
+                        : 'Remove a starred link first (max 3)'
+                  }
+                  className="text-amber-400 hover:text-amber-500"
+                >
+                  <Star size={16} fill={link.is_featured ? 'currentColor' : 'none'} />
+                </button>
+
+                <div className="flex flex-col gap-0.5">
+                  <button
+                    type="button"
+                    disabled={idx === 0}
+                    onClick={() => handleMoveLink(idx, 'up')}
+                    className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                  >
+                    <ChevronUp size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={idx === links.length - 1}
+                    onClick={() => handleMoveLink(idx, 'down')}
+                    className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                  >
+                    <ChevronDown size={14} />
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleDeleteLink(idx)}
+                  className="text-muted-foreground hover:text-red-500"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          {links.length < MAX_LINKS ? (
+            <form onSubmit={handleAddLink} className="flex flex-wrap gap-3 border-t border-border pt-4">
+              <select
+                value={addPlatform}
+                onChange={(e) => {
+                  setAddPlatform(e.target.value);
+                  const p = KNOWN_PLATFORMS.find((p) => p.value === e.target.value);
+                  if (p) setAddLabel(p.label);
+                }}
+                className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+              >
+                {KNOWN_PLATFORMS.map((p) => (
+                  <option key={p.value} value={p.value}>{p.label}</option>
+                ))}
+              </select>
+              <input
+                type="url"
+                placeholder="https://..."
+                value={addUrl}
+                onChange={(e) => setAddUrl(e.target.value)}
+                required
+                className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+              />
+              <input
+                type="text"
+                placeholder="Label"
+                value={addLabel}
+                onChange={(e) => setAddLabel(e.target.value)}
+                required
+                className="w-36 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+              />
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              >
+                Add
+              </button>
+            </form>
+          ) : (
+            <p className="border-t border-border pt-4 text-xs text-muted-foreground">
+              Maximum {MAX_LINKS} links reached.
+            </p>
+          )}
+        </div>
+      )}
 
       {artistId && (
         <div className="space-y-4 border-t border-border pt-6">

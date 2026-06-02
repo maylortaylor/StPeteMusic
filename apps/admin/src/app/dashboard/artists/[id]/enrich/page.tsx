@@ -17,23 +17,7 @@ import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ArtistLink } from '@stpetemusic/types';
 import { PlatformIcon } from '@/components/platform-icon';
-import { canSetFeatured } from '@/lib/artist-links';
-
-const KNOWN_PLATFORMS = [
-  { value: 'instagram', label: 'Instagram' },
-  { value: 'facebook', label: 'Facebook' },
-  { value: 'youtube', label: 'YouTube' },
-  { value: 'bandcamp', label: 'Bandcamp' },
-  { value: 'spotify', label: 'Spotify' },
-  { value: 'soundcloud', label: 'SoundCloud' },
-  { value: 'linktree', label: 'Linktree' },
-  { value: 'website', label: 'Website' },
-  { value: 'bandsintown', label: 'Bandsintown' },
-  { value: 'tiktok', label: 'TikTok' },
-  { value: 'twitter', label: 'Twitter / X' },
-  { value: 'threads', label: 'Threads' },
-  { value: 'custom', label: 'Custom' },
-];
+import { canSetFeatured, KNOWN_PLATFORMS } from '@/lib/artist-links';
 
 interface CoverImageCandidate {
   url: string;
