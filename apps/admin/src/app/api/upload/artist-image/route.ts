@@ -45,7 +45,13 @@ export async function POST(request: Request) {
     }
 
     const key = `artists/${artistId}/${randomUUID()}.${ext}`;
-    const s3 = new S3Client({ region: 'us-east-1' });
+    const s3 = new S3Client({
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: process.env.S3_KEY_ID!,
+        secretAccessKey: process.env.S3_KEY_SECRET!,
+      },
+    });
     await s3.send(
       new PutObjectCommand({
         Bucket: bucket,
