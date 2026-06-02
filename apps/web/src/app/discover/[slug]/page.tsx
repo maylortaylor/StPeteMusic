@@ -139,7 +139,7 @@ export default async function ArtistPage({ params }: Props) {
       <main className="min-h-screen bg-surface">
 
         {/* Hero */}
-        <div className="relative w-full bg-black overflow-hidden" style={{ minHeight: '40vh' }}>
+        <div className="relative w-full bg-black overflow-hidden" style={{ minHeight: artist.hero_photo_url ? '65vh' : '40vh' }}>
           {artist.hero_photo_url ? (
             <Image
               src={artist.hero_photo_url}
@@ -153,7 +153,7 @@ export default async function ArtistPage({ params }: Props) {
             className="absolute inset-0"
             style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.75) 100%)' }}
           />
-          <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 flex flex-col justify-end" style={{ minHeight: '40vh' }}>
+          <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 flex flex-col justify-end" style={{ minHeight: artist.hero_photo_url ? '65vh' : '40vh' }}>
             <p className="font-inter font-medium text-sm tracking-[0.45em] uppercase mb-3" style={{ color: '#B57048' }}>
               {artist.type}
             </p>
