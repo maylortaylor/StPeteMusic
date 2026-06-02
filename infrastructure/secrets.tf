@@ -149,6 +149,17 @@ resource "aws_ssm_parameter" "n8n_webhook_secret" {
   tags  = { Project = var.project }
 }
 
+# ── Artist sheet sync ─────────────────────────────────────────────────────────
+
+resource "aws_ssm_parameter" "cron_secret" {
+  count = var.cron_secret != "" ? 1 : 0
+
+  name  = "/${var.project}/cron_secret"
+  type  = "SecureString"
+  value = var.cron_secret
+  tags  = { Project = var.project }
+}
+
 # ── Eventbrite (theburgmusic@gmail.com) ──────────────────────────────────────
 
 resource "aws_ssm_parameter" "eventbrite_private_token" {

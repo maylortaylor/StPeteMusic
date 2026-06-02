@@ -232,6 +232,13 @@ variable "revalidation_secret" {
   default     = ""
 }
 
+variable "cron_secret" {
+  description = "Shared secret for n8n → admin artist sheet sync (x-cron-secret header). Set via TF_VAR_cron_secret in CI."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 variable "eventbrite_org_id" {
   description = "Eventbrite API organization ID (from /users/me/organizations/ — NOT the profile URL number). Set via TF_VAR_eventbrite_org_id in CI."
   type        = string
