@@ -6,7 +6,7 @@
  *
  * Prerequisites:
  *   1. In GCP Console → spm-n8n-workflows → Credentials, create a Desktop app OAuth client
- *      and add its ID + secret to .env as GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.
+ *      and add its ID + secret to .env as GOOGLE_FORMS_CLIENT_ID and GOOGLE_FORMS_CLIENT_SECRET.
  *   2. Both GOOGLE_FORM_ID and GOOGLE_SHEET_ID must be set in .env.
  *
  * Usage:
@@ -23,8 +23,8 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const TOKEN_PATH = resolve(__dirname, '.form-tokens.json');
-const REDIRECT_URI = 'http://localhost:9876/oauth/callback';
-const SCOPES = ['https://www.googleapis.com/auth/forms', 'https://www.googleapis.com/auth/spreadsheets'];
+const REDIRECT_URI = 'http://localhost:9876';
+const SCOPES = ['https://www.googleapis.com/auth/forms.body', 'https://www.googleapis.com/auth/spreadsheets'];
 
 // Load root .env
 try {
@@ -40,13 +40,13 @@ try {
   }
 } catch { /* rely on exported env vars */ }
 
-const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const CLIENT_ID = process.env.GOOGLE_FORMS_CLIENT_ID;
+const CLIENT_SECRET = process.env.GOOGLE_FORMS_CLIENT_SECRET;
 const FORM_ID = process.env.GOOGLE_FORM_ID;
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 
 if (!CLIENT_ID || !CLIENT_SECRET) {
-  console.error('Missing GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET in .env');
+  console.error('Missing GOOGLE_FORMS_CLIENT_ID or GOOGLE_FORMS_CLIENT_SECRET in .env');
   console.error('  Create a Desktop app OAuth client at https://console.cloud.google.com/apis/credentials?project=spm-n8n-workflows');
   process.exit(1);
 }
@@ -115,7 +115,7 @@ async function authorize() {
 
   const tokens = await new Promise((resolve, reject) => {
     const server = http.createServer(async (req, res) => {
-      if (!req.url?.startsWith('/oauth/callback')) { res.writeHead(404); res.end(); return; }
+      if (!req.url?.startsWith('/?')) { res.writeHead(404); res.end(); return; }
       const url = new URL(req.url, 'http://localhost:9876');
       const code = url.searchParams.get('code');
       const error = url.searchParams.get('error');
