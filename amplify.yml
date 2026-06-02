@@ -74,9 +74,13 @@ applications:
         build:
           commands:
             - npm run build
-            - cp .env.production .next/.env.production
+            # Standalone output includes all required node_modules for Turbopack external modules.
+            # Static and public assets must be copied in manually.
+            - cp -r .next/static .next/standalone/apps/admin/.next/static
+            - '[ -d public ] && cp -r public .next/standalone/apps/admin/public || true'
+            - cp .env.production .next/standalone/apps/admin/.env.production
       artifacts:
-        baseDirectory: .next
+        baseDirectory: .next/standalone
         files:
           - '**/*'
       cache:

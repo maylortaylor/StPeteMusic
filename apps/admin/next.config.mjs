@@ -9,6 +9,7 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   reactStrictMode: true,
   devIndicators: false,
   // Turbopack rule for .md imports (Next.js 16+ uses Turbopack by default).
@@ -25,7 +26,7 @@ const nextConfig = {
   async headers() {
     return [{ source: '/(.*)', headers: securityHeaders }];
   },
-  serverExternalPackages: ['pg', 'drizzle-orm', '@aws-sdk/client-s3'],
+  serverExternalPackages: ['pg', 'drizzle-orm'],
   images: {
     remotePatterns: [
       {
