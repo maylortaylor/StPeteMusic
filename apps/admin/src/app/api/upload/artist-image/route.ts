@@ -82,6 +82,6 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
-    return Response.json({ error: 'Upload failed — please try again' }, { status: 500 });
+    return Response.json({ error: 'Upload failed — please try again', details: message }, { status: 500 });
   }
 }
