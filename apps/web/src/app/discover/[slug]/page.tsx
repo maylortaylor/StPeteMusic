@@ -6,23 +6,12 @@ import { Nav } from '@/components/Nav';
 import { Footer } from '@/components/Footer';
 import { ArtistDetailSidebar } from '@/components/ArtistDetailSidebar';
 import { MetaPixelViewContent } from '@/components/MetaPixelViewContent';
-import { getArtistBySlug, getArtistFeaturedLinks, getArtistShows, getAllArtistSlugs } from '@/lib/queries/artists';
+import { getArtistBySlug, getArtistFeaturedLinks, getArtistShows } from '@/lib/queries/artists';
 import { PlatformIcon } from '@/components/platform-icon';
 import type { Artist } from '@stpetemusic/types';
 
-export const revalidate = 86400;
-
 interface Props {
   params: Promise<{ slug: string }>;
-}
-
-export async function generateStaticParams() {
-  try {
-    const slugs = await getAllArtistSlugs();
-    return slugs.map(slug => ({ slug }));
-  } catch {
-    return [];
-  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
