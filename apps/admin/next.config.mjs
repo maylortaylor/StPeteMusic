@@ -25,7 +25,7 @@ const nextConfig = {
   async headers() {
     return [{ source: '/(.*)', headers: securityHeaders }];
   },
-  serverExternalPackages: ['pg', 'drizzle-orm'],
+  serverExternalPackages: ['pg', 'drizzle-orm', '@aws-sdk/client-s3'],
   images: {
     remotePatterns: [
       {
