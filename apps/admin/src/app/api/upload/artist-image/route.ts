@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { randomUUID } from 'crypto';
+import { logError } from '@stpetemusic/db';
 
 const ALLOWED_TYPES: Record<string, string> = {
   'image/jpeg': 'jpg',
@@ -10,18 +11,18 @@ const ALLOWED_TYPES: Record<string, string> = {
 const MAX_BYTES = 15 * 1024 * 1024; // 15 MB
 
 export async function POST(request: Request) {
-  const { userId } = await auth();
-  if (!userId) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const bucket = process.env.ASSETS_BUCKET;
-  const cdnUrl = process.env.ASSETS_CDN_URL;
-  if (!bucket || !cdnUrl) {
-    return Response.json({ error: 'Storage not configured' }, { status: 500 });
-  }
-
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const bucket = process.env.ASSETS_BUCKET;
+    const cdnUrl = process.env.ASSETS_CDN_URL;
+    if (!bucket || !cdnUrl) {
+      return Response.json({ error: 'Storage not configured' }, { status: 500 });
+    }
+
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
     const artistId = formData.get('artistId') as string | null;
@@ -57,8 +58,15 @@ export async function POST(request: Request) {
 
     return Response.json({ url: `${cdnUrl}/${key}` });
   } catch (err) {
-    console.error('Artist image upload failed:', err);
     const message = err instanceof Error ? err.message : String(err);
-    return Response.json({ error: 'Upload failed — please try again', details: message }, { status: 500 });
+    const stack = err instanceof Error ? (err.stack ?? '') : '';
+    console.error('Artist image upload failed:', err);
+    await logError({
+      source: 'admin',
+      endpoint: '/api/upload/artist-image',
+      error_message: message,
+      stack_trace: stack,
+    }).catch(() => {});
+    return Response.json({ error: 'Upload failed', details: message }, { status: 500 });
   }
 }
