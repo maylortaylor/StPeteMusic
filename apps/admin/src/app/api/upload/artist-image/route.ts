@@ -61,12 +61,14 @@ export async function POST(request: Request) {
     const message = err instanceof Error ? err.message : String(err);
     const stack = err instanceof Error ? (err.stack ?? '') : '';
     console.error('Artist image upload failed:', err);
-    await logError({
-      source: 'admin',
-      endpoint: '/api/upload/artist-image',
-      error_message: message,
-      stack_trace: stack,
-    }).catch(() => {});
+    logError({
+      app: 'admin',
+      path: '/api/upload/artist-image',
+      method: 'POST',
+      message,
+      stack,
+      status_code: 500,
+    });
     return Response.json({ error: 'Upload failed', details: message }, { status: 500 });
   }
 }
