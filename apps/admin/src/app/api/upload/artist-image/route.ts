@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const bucket = process.env.AWS_ASSETS_BUCKET;
+  const bucket = process.env.ASSETS_BUCKET;
   const cdnUrl = process.env.ASSETS_CDN_URL;
   if (!bucket || !cdnUrl) {
     return Response.json({ error: 'Storage not configured' }, { status: 500 });
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
       .toBuffer();
 
     const key = `artists/${artistId}/${randomUUID()}.webp`;
-    const s3 = new S3Client({ region: process.env.AWS_REGION ?? 'us-east-1' });
+    const s3 = new S3Client({ region: 'us-east-1' });
     await s3.send(
       new PutObjectCommand({
         Bucket: bucket,

@@ -67,7 +67,7 @@ applications:
               echo "EVENTBRITE_PRIVATE_TOKEN=$EVENTBRITE_PRIVATE_TOKEN" >> .env.production
               echo "EVENTBRITE_ORG_ID=$EVENTBRITE_ORG_ID" >> .env.production
               echo "SYNC_SECRET=$SYNC_SECRET" >> .env.production
-              echo "AWS_ASSETS_BUCKET=$AWS_ASSETS_BUCKET" >> .env.production
+              echo "ASSETS_BUCKET=$ASSETS_BUCKET" >> .env.production
               echo "ASSETS_CDN_URL=$ASSETS_CDN_URL" >> .env.production
         build:
           commands:
