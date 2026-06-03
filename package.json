@@ -17,8 +17,8 @@
     "not ie 11"
   ],
   "overrides": {
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
   },
   "scripts": {
     "dev": "docker-compose -f docker-compose.dev.yml up -d && npm run dev --workspace=apps/web",
@@ -33,8 +33,8 @@
     "reinstall": "rm -rf node_modules apps/*/node_modules packages/*/node_modules apps/web/.next && npm install"
   },
   "devDependencies": {
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
   },
   "optionalDependencies": {
     "@esbuild/linux-x64": "0.28.0",
