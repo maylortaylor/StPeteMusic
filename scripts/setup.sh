@@ -102,6 +102,23 @@ else
 fi
 echo ""
 
+# 9. GitHub repo settings
+echo "9️⃣  Configuring GitHub repo settings..."
+if ! command -v gh &> /dev/null; then
+  echo "⚠️  gh CLI not found — skipping GitHub repo config"
+elif ! gh auth status &> /dev/null; then
+  echo "⚠️  gh not authenticated — skipping GitHub repo config"
+else
+  current=$(gh api repos/maylortaylor/StPeteMusic --jq '.delete_branch_on_merge')
+  if [ "$current" = "true" ]; then
+    echo "✅ delete_branch_on_merge already enabled"
+  else
+    gh api repos/maylortaylor/StPeteMusic -X PATCH -f delete_branch_on_merge=true > /dev/null
+    echo "✅ Enabled delete_branch_on_merge (branches auto-deleted on PR merge)"
+  fi
+fi
+echo ""
+
 echo "✅ Setup complete!"
 echo ""
 echo "Next steps:"
