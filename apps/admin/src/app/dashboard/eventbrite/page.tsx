@@ -16,6 +16,7 @@ type EbEventRow = {
   url: string | null;
   linked_event_id: string | null;
   synced_at: string | null;
+  visible_on_tickets: boolean;
 };
 
 const ACTIVE_STATUSES = new Set(['live', 'started']);
@@ -315,6 +316,7 @@ export default function EventbritePage() {
                 <th className="px-3 py-2 text-left font-medium text-muted-foreground">Name</th>
                 <th className="px-3 py-2 text-left font-medium text-muted-foreground">Date</th>
                 <th className="px-3 py-2 text-left font-medium text-muted-foreground">Status</th>
+                <th className="px-3 py-2 text-center font-medium text-muted-foreground" title="Visible on /tickets right now">On Site</th>
                 <th className="px-3 py-2 text-left font-medium text-muted-foreground">Venue</th>
                 <th className="px-3 py-2 text-right font-medium text-muted-foreground">Cap.</th>
                 <th className="px-3 py-2 text-right font-medium text-muted-foreground">Sold</th>
@@ -340,6 +342,11 @@ export default function EventbritePage() {
                   </td>
                   <td className="px-3 py-2">
                     <StatusBadge status={event.status} />
+                  </td>
+                  <td className="px-3 py-2 text-center" title={event.visible_on_tickets ? 'Visible on /tickets' : 'Not shown on /tickets'}>
+                    {event.visible_on_tickets
+                      ? <span className="text-green-600 dark:text-green-400">✓</span>
+                      : <span className="text-muted-foreground">–</span>}
                   </td>
                   <td className="px-3 py-2 text-muted-foreground max-w-[120px] truncate" title={event.venue_name ?? ''}>
                     {event.venue_name ?? '—'}
