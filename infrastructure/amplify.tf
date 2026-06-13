@@ -97,6 +97,15 @@ resource "aws_amplify_app" "web" {
     REVALIDATION_SECRET       = var.revalidation_secret != "" ? data.aws_ssm_parameter.revalidation_secret[0].value : ""
   }
 
+  # Edge-level redirect — evaluated by CloudFront before the Lambda is invoked.
+  # Moves the apex→www redirect out of Next.js middleware (~330ms Lambda overhead)
+  # and into the CDN (~10–50ms). Path is preserved via <*> wildcard.
+  custom_rule {
+    source = "https://stpetemusic.live/<*>"
+    target = "https://www.stpetemusic.live/<*>"
+    status = "301"
+  }
+
   enable_auto_branch_creation = false
   enable_branch_auto_deletion = true
 
