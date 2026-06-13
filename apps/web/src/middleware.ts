@@ -5,9 +5,8 @@ export function middleware(request: NextRequest) {
   const host = request.headers.get('host') ?? '';
 
   if (host === 'stpetemusic.live') {
-    const url = request.nextUrl.clone();
-    url.host = 'www.stpetemusic.live';
-    return NextResponse.redirect(url, { status: 301 });
+    const path = request.nextUrl.pathname + request.nextUrl.search;
+    return NextResponse.redirect(`https://www.stpetemusic.live${path}`, { status: 301 });
   }
 
   return NextResponse.next();

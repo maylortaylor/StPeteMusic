@@ -50,6 +50,22 @@ export async function GET(request: Request) {
 
     const rows = await query;
 
+    // Mirrors the /tickets SQL filter exactly:
+    // COALESCE(end_utc, start_utc + 6h) >= NOW() - 2h AND status IN ('live', 'started')
+    const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+    const events = rows.map((row) => {
+      const endOrFallback = row.end_utc
+        ? row.end_utc
+        : row.start_utc
+          ? new Date(row.start_utc.getTime() + 6 * 60 * 60 * 1000)
+          : null;
+      const visible_on_tickets =
+        (row.status === 'live' || row.status === 'started') &&
+        endOrFallback !== null &&
+        endOrFallback >= twoHoursAgo;
+      return { ...row, visible_on_tickets };
+    });
+
     // Filtered total when status filter is applied
     const filteredTotal = statusParam
       ? statsRows
@@ -58,7 +74,7 @@ export async function GET(request: Request) {
       : total;
 
     return Response.json({
-      events: rows,
+      events,
       total: filteredTotal,
       page,
       limit,
