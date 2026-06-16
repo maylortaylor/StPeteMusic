@@ -5,6 +5,11 @@ import { GoogleTagManager } from '@next/third-parties/google';
 import { CookieBanner } from '@/components/CookieBanner';
 import './globals.css';
 
+// next/script removed dangerouslySetInnerHTML from its public types in Next 16 but still supports it at runtime
+const InlineScript = Script as React.ComponentType<
+  React.ComponentProps<typeof Script> & { dangerouslySetInnerHTML?: { __html: string } }
+>;
+
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '700', '900'],
@@ -105,7 +110,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
       </head>
-      <Script
+      <InlineScript
         id="gtm-consent-default"
         strategy="beforeInteractive"
         dangerouslySetInnerHTML={{
@@ -128,7 +133,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID} />
       )}
       {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
-        <Script
+        <InlineScript
           id="meta-pixel"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
@@ -148,7 +153,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       )}
       {process.env.NEXT_PUBLIC_CLARITY_ID && (
-        <Script
+        <InlineScript
           id="ms-clarity"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{

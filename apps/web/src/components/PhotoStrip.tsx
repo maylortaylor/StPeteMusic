@@ -130,8 +130,8 @@ export function PhotoStrip() {
               whileTap={{ scale: 0.95 }}
               className="w-9 h-9 flex items-center justify-center border transition-colors duration-200"
               style={{ borderColor: '#E5E5E5', color: '#B57048' }}
-              onMouseEnter={e => (e.currentTarget.style.borderColor = '#B57048')}
-              onMouseLeave={e => (e.currentTarget.style.borderColor = '#E5E5E5')}
+              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.borderColor = '#B57048')}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => (e.currentTarget.style.borderColor = '#E5E5E5')}
               aria-label={`Scroll ${dir}`}
             >
               {dir === 'left' ? '←' : '→'}

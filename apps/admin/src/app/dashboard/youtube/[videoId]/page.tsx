@@ -274,7 +274,7 @@ export default function YouTubeReviewPage() {
             <Link
               href={`/api/youtube/videos/${videoId}/publish`}
               className="rounded-md bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700 transition-colors"
-              onClick={(e) => {
+              onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
                 e.preventDefault();
                 fetch(`/api/youtube/videos/${videoId}/publish`, { method: 'POST' })
                   .then((r) => r.json())
