@@ -7,13 +7,13 @@
           "interval": [
             {
               "field": "cronExpression",
-              "expression": "0 10 * * *"
+              "expression": "0 6 * * *"
             }
           ]
         }
       },
       "id": "schedule-trigger",
-      "name": "Daily at 10:00 UTC",
+      "name": "Daily at 06:00 UTC",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.1,
       "position": [0, 0]
@@ -91,7 +91,7 @@
     }
   ],
   "connections": {
-    "Daily at 10:00 UTC": {
+    "Daily at 06:00 UTC": {
       "main": [[{ "node": "POST Sync Endpoint", "type": "main", "index": 0 }]]
     },
     "POST Sync Endpoint": {
