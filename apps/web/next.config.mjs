@@ -8,7 +8,10 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://www.googletagmanager.com https://www.google-analytics.com https://i.ytimg.com https://img.youtube.com https://maps.googleapis.com https://maps.gstatic.com https://www.facebook.com https://img.evbuc.com https://cdn.evbuc.com https://eventbrite-s3.s3.amazonaws.com https://cdn.stpetemusic.live",
   "font-src 'self'",
-  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://region1.analytics.google.com https://www.googletagmanager.com https://www.facebook.com https://*.facebook.net https://*.clarity.ms https://www.googleapis.com",
+  // hls.stpetemusic.live serves the live HLS stream — media-src for the native <video>
+  // element, connect-src for hls.js's XHR/fetch-based manifest and segment loading.
+  "media-src 'self' https://hls.stpetemusic.live",
+  "connect-src 'self' https://hls.stpetemusic.live https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://region1.analytics.google.com https://www.googletagmanager.com https://www.facebook.com https://*.facebook.net https://*.clarity.ms https://www.googleapis.com",
   "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://www.eventbrite.com https://eventbrite.com",
   "frame-ancestors 'self'",
   "base-uri 'self'",
