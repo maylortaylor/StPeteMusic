@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.TF_VAR_github_token }}
+          token: ${{ secrets.GH_TOKEN_AMPLIFY }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
