@@ -24,6 +24,9 @@ jobs:
           done
           exit $fail
 
+      - name: Check for hardcoded internal hostnames
+        run: node scripts/validate-n8n-hostnames.js
+
   # ── 2. Validate Docker Compose file syntax ───────────────────────────────
   validate-compose:
     name: Validate Docker Compose

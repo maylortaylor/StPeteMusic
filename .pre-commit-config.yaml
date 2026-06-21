@@ -77,6 +77,14 @@ repos:
         stages: [commit]
         pass_filenames: false
 
+      - id: validate-n8n-hostnames
+        name: Check n8n workflows for hardcoded internal hostnames
+        entry: node scripts/validate-n8n-hostnames.js
+        language: system
+        files: "n8n/workflows/StPeteMusic/.*\\.json$"
+        stages: [commit]
+        pass_filenames: false
+
       - id: commitlint
         name: Lint commit message (Conventional Commits)
         language: node

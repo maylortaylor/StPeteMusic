@@ -3,8 +3,11 @@ import { getDb, youtube_config, eq } from '@stpetemusic/db';
 
 // force-dynamic: must run on every request so the DB override and cache are always current.
 // Quota is protected by storing the YouTube API result in the DB with a TTL that lands on
-// the next :10 or :40 mark (roughly every 30 min, predictable schedule).
+// the next scheduled CACHE_REFRESH_MINUTES mark (roughly every 30 min, predictable schedule).
 export const dynamic = 'force-dynamic';
+
+/** Minute marks (past the hour) when the YouTube live-status cache is refreshed. */
+const CACHE_REFRESH_MINUTES = [10, 40];
 
 /**
  * MediaMTX's HLS server issues a "cookieCheck" cookie on first request and 302s until
@@ -38,19 +41,18 @@ async function isHlsLive(url: string): Promise<boolean> {
   }
 }
 
-/** Returns the next cache expiry time — either :10 or :40 past the hour. */
+/** Returns the next cache expiry time from CACHE_REFRESH_MINUTES. */
 function nextScheduledCheck(): Date {
   const now = new Date();
   const result = new Date(now);
   result.setSeconds(0, 0);
   const m = now.getMinutes();
-  if (m < 10) {
-    result.setMinutes(10);
-  } else if (m < 40) {
-    result.setMinutes(40);
-  } else {
+  const nextMinute = CACHE_REFRESH_MINUTES.find((minute) => m < minute);
+  if (nextMinute === undefined) {
     result.setHours(result.getHours() + 1);
-    result.setMinutes(10);
+    result.setMinutes(CACHE_REFRESH_MINUTES[0]);
+  } else {
+    result.setMinutes(nextMinute);
   }
   return result;
 }
@@ -143,7 +145,7 @@ export async function GET() {
       title: item?.snippet?.title ?? null,
     };
 
-    // Cache until next :10 or :40 mark — predictable schedule, stays well under 10k quota units/day
+    // Cache until next scheduled mark — predictable schedule, stays well under 10k quota units/day
     try {
       const db = getDb();
       const [existing] = await db

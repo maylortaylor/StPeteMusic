@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Event } from '@stpetemusic/types';
 import { pushEvent } from '@/lib/analytics';
-import { trackMetaEvent } from '@/lib/meta-pixel';
+import { trackEvent } from '@/lib/track-event';
 import { EVENT_TAGS, isEventTagSlug } from '@/lib/eventTags';
 import { VENUES, isVenueSlug } from '@/lib/venues';
 import { icalDate } from '@/lib/icalDate';
@@ -188,19 +188,15 @@ export function EventModal({ event, onClose }: EventModalProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => {
-                    pushEvent('ticket_link_click', {
-                      event_title: event.title,
-                      event_venue: event.venue ?? '',
-                      link_url: event.ticket_url!,
-                    });
+                    trackEvent(
+                      'ticket_link_click',
+                      { event_title: event.title, event_venue: event.venue ?? '', link_url: event.ticket_url! },
+                      { event: 'InitiateCheckout', data: { content_name: event.title, content_category: 'event_ticket' } }
+                    );
                     pushEvent('outbound_link_click', {
                       link_url: event.ticket_url,
                       link_text: 'Get Tickets',
                       link_category: 'ticket',
-                    });
-                    trackMetaEvent('InitiateCheckout', {
-                      content_name: event.title,
-                      content_category: 'event_ticket',
                     });
                   }}
                   className="block w-full text-center font-inter font-bold text-sm uppercase tracking-widest text-white py-4 rounded-lg hover:opacity-90 transition-opacity"

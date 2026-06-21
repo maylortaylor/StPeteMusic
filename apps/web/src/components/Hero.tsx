@@ -6,7 +6,7 @@ import { motion, useTransform, useSpring } from 'framer-motion';
 import { useScrollPinned } from './AnimateIn';
 import Link from 'next/link';
 import { pushEvent } from '@/lib/analytics';
-import { trackMetaEvent } from '@/lib/meta-pixel';
+import { trackEvent } from '@/lib/track-event';
 
 function HeroLiveBanner() {
   const [status, setStatus] = useState<{ live: boolean; title: string | null }>({ live: false, title: null });
@@ -186,10 +186,13 @@ export function Hero() {
             </a>
             <Link
               href="/tickets"
-              onClick={() => {
-                pushEvent('cta_click', { cta_label: 'get_tickets', cta_location: 'hero' });
-                trackMetaEvent('InitiateCheckout', { content_name: 'Final Friday', content_category: 'event_ticket' });
-              }}
+              onClick={() =>
+                trackEvent(
+                  'cta_click',
+                  { cta_label: 'get_tickets', cta_location: 'hero' },
+                  { event: 'InitiateCheckout', data: { content_name: 'Final Friday', content_category: 'event_ticket' } }
+                )
+              }
               className="text-white font-inter font-bold text-base uppercase tracking-widest px-10 py-4 bg-brand-orange hover:opacity-85 transition-opacity"
             >
               Get Tickets
