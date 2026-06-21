@@ -1,0 +1,34 @@
+name: Fallow
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'apps/web/**'
+      - 'apps/admin/**'
+      - 'packages/**'
+      - 'package.json'
+      - 'package-lock.json'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  fallow:
+    name: Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6.0.3
+        with:
+          fetch-depth: 0
+
+      - name: Run fallow audit
+        uses: fallow-rs/fallow@5da5e73aba1b06bebe51be17f1d65c30c5a36ee7  # v2.101.0
+        with:
+          command: audit
+          comment: true
+          review-comments: true
+          # fail-on-issues defaults to true: fails the job only on verdict
+          # "fail" — "warn"-tier findings are posted but never block the PR.
