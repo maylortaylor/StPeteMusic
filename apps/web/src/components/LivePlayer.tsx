@@ -176,16 +176,25 @@ const HLS_STREAM_URL = process.env.NEXT_PUBLIC_HLS_STREAM_URL ?? 'https://hls.st
 
 function HlsPlayer() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [muted, setMuted] = useState(true);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
+    // Browsers only autoplay unmuted on a user gesture — set this explicitly rather than
+    // relying on the JSX `muted` attribute, since it can race with the dynamically-attached
+    // source below and silently fail the initial autoplay attempt.
+    video.muted = true;
+    const onVolumeChange = () => setMuted(video.muted);
+    video.addEventListener('volumechange', onVolumeChange);
+
     if (video.canPlayType('application/vnd.apple.mpegurl')) {
       // Safari has native HLS — no library needed. crossOrigin="use-credentials" (set as
       // a prop below) makes this send the same session cookie hls.js is configured for.
       video.src = HLS_STREAM_URL;
-      return;
+      void video.play().catch(() => {});
+      return () => video.removeEventListener('volumechange', onVolumeChange);
     }
 
     // Chrome/Firefox: load hls.js dynamically to keep it out of the initial bundle
@@ -198,26 +207,47 @@ function HlsPlayer() {
       hls.on(Hls.Events.ERROR, (_event, data) => {
         if (data.fatal) hls.destroy();
       });
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        void videoRef.current?.play().catch(() => {});
+      });
       hls.loadSource(HLS_STREAM_URL);
       hls.attachMedia(videoRef.current);
       hlsInstance = hls;
     });
 
     return () => {
+      video.removeEventListener('volumechange', onVolumeChange);
       hlsInstance?.destroy();
     };
   }, []);
 
   return (
-    <video
-      ref={videoRef}
-      autoPlay
-      controls
-      playsInline
-      crossOrigin="use-credentials"
-      className="absolute inset-0 w-full h-full"
-      title="St. Pete Music Live Stream"
-    />
+    <>
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        controls
+        playsInline
+        crossOrigin="use-credentials"
+        className="absolute inset-0 w-full h-full"
+        title="St. Pete Music Live Stream"
+      />
+      {muted && (
+        <button
+          type="button"
+          onClick={() => {
+            const video = videoRef.current;
+            if (!video) return;
+            video.muted = false;
+            void video.play().catch(() => {});
+          }}
+          className="absolute bottom-4 right-4 z-10 rounded-full bg-black/70 px-4 py-2 text-sm font-medium text-white hover:bg-black/85 transition-colors"
+        >
+          🔇 Unmute the stream
+        </button>
+      )}
+    </>
   );
 }
 
