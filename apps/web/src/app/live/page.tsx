@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { socialImages } from '@/config/social-images';
 import Image from 'next/image';
 import { Nav } from '@/components/Nav';
 import { Footer } from '@/components/Footer';
@@ -21,13 +22,13 @@ export const metadata: Metadata = {
     url: 'https://www.stpetemusic.live/live',
     siteName: 'St. Pete Music',
     type: 'website',
-    images: [{ url: '/images/og/live-bg2.png', width: 1200, height: 630, alt: 'Watch Live — St. Pete Music' }],
+    images: [{ url: socialImages.live, width: 1200, height: 630, alt: 'Watch Live — St. Pete Music' }],
   },
   twitter: {
     card: 'summary_large_image',
     site: '@StPeteMusic',
     creator: '@StPeteMusic',
-    images: ['https://www.stpetemusic.live/images/og/live-bg2.png'],
+    images: [socialImages.live],
   },
 };
 

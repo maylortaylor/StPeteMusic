@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { socialImages } from '@/config/social-images';
 import Script from 'next/script';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { CookieBanner } from '@/components/CookieBanner';
@@ -87,9 +88,9 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/images/hero/SPM-hero.webp',
-        width: 1456,
-        height: 816,
+        url: socialImages.homepage,
+        width: 1200,
+        height: 630,
         alt: 'Live music at Suite E Studios — St. Pete Music',
       },
     ],
@@ -98,7 +99,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@StPeteMusic',
     creator: '@StPeteMusic',
-    images: ['https://www.stpetemusic.live/images/hero/SPM-hero.webp'],
+    images: [socialImages.homepage],
   },
 };
 

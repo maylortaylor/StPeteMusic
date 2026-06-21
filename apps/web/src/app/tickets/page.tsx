@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { socialImages } from '@/config/social-images';
 import { Nav } from '@/components/Nav';
 import { Footer } from '@/components/Footer';
 import { EventbriteCard } from '@/components/EventbriteCard';
@@ -16,13 +17,13 @@ export const metadata: Metadata = {
     description:
       'Get tickets to upcoming live music events in St. Pete, FL.',
     url: 'https://www.stpetemusic.live/tickets',
-    images: [{ url: '/images/og/tickets-bg2.png', width: 1200, height: 630, alt: 'Get Tickets — St. Pete Music' }],
+    images: [{ url: socialImages.tickets, width: 1200, height: 630, alt: 'Get Tickets — St. Pete Music' }],
   },
   twitter: {
     card: 'summary_large_image',
     site: '@StPeteMusic',
     creator: '@StPeteMusic',
-    images: ['https://www.stpetemusic.live/images/og/tickets-bg2.png'],
+    images: [socialImages.tickets],
   },
 };
 

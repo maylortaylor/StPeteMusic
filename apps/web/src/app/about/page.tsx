@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { socialImages } from '@/config/social-images';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Nav } from '@/components/Nav';
@@ -15,14 +16,14 @@ export const metadata: Metadata = {
     url: 'https://www.stpetemusic.live/about',
     siteName: 'St. Pete Music',
     type: 'website',
-    images: [{ url: '/images/og/about-bg2.png', width: 1200, height: 630, alt: 'About St. Pete Music' }],
+    images: [{ url: socialImages.about, width: 1200, height: 630, alt: 'About St. Pete Music' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'About St. Pete Music | Community Music in St. Petersburg, FL',
     description:
       'St. Pete Music is a community hub for the live music scene in St. Petersburg, FL — connecting local artists, venues, and fans.',
-    images: ['https://www.stpetemusic.live/images/og/about-bg2.png'],
+    images: [socialImages.about],
   },
 };
 

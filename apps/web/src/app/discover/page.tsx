@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { socialImages } from '@/config/social-images';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,13 +35,13 @@ export const metadata: Metadata = {
     description:
       'Explore local bands, DJs, solo artists, and creatives from St. Petersburg, FL — indie, hip-hop, jazz, reggae, and more. Discover the Tampa Bay music scene.',
     url: 'https://www.stpetemusic.live/discover',
-    images: [{ url: '/images/og/discover-bg2.png', width: 1200, height: 630, alt: 'Discover Local Artists — St. Pete Music' }],
+    images: [{ url: socialImages.discover, width: 1200, height: 630, alt: 'Discover Local Artists — St. Pete Music' }],
   },
   twitter: {
     card: 'summary_large_image',
     site: '@StPeteMusic',
     creator: '@StPeteMusic',
-    images: ['https://www.stpetemusic.live/images/og/discover-bg2.png'],
+    images: [socialImages.discover],
   },
 };
 
