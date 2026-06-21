@@ -182,7 +182,8 @@ function HlsPlayer() {
     if (!video) return;
 
     if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      // Safari has native HLS — no library needed
+      // Safari has native HLS — no library needed. crossOrigin="use-credentials" (set as
+      // a prop below) makes this send the same session cookie hls.js is configured for.
       video.src = HLS_STREAM_URL;
       return;
     }
@@ -191,7 +192,9 @@ function HlsPlayer() {
     let hlsInstance: { destroy: () => void } | null = null;
     void import('hls.js').then(({ default: Hls }) => {
       if (!Hls.isSupported() || !videoRef.current) return;
-      const hls = new Hls();
+      // MediaMTX's HLS server requires a session cookie (cross-origin: hls.stpetemusic.live
+      // vs www.stpetemusic.live) — the default loader won't send cookies without this.
+      const hls = new Hls({ xhrSetup: (xhr) => { xhr.withCredentials = true; } });
       hls.on(Hls.Events.ERROR, (_event, data) => {
         if (data.fatal) hls.destroy();
       });
@@ -211,6 +214,7 @@ function HlsPlayer() {
       autoPlay
       controls
       playsInline
+      crossOrigin="use-credentials"
       className="absolute inset-0 w-full h-full"
       title="St. Pete Music Live Stream"
     />
