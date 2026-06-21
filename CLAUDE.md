@@ -27,6 +27,7 @@ Parent company: Tangent LLC. Partner venue: Suite E Studios.
 | YouTube feature (review queue, admin UI, publish workflow, quota, OAuth, sync, proposals, calendar match) | [youtube.md](.claude/youtube.md) |
 | Database & schema (db, schema, migration, drizzle, postgres, table, query, model, uuid, column) | [database.md](.claude/database.md) |
 | Admin auth & Clerk (protected routes, middleware, session, login, sign-in, clerk, dashboard) | [clerk.md](.claude/clerk.md) |
+| Social & OG images (og:image, share image, facebook preview, twitter card, cdn upload, social-images, hash) | [social-images/README.md](apps/web/social-images/README.md) |
 
 ## Key Files
 | File | Purpose |
