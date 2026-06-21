@@ -6,6 +6,34 @@ import { getDb, youtube_config, eq } from '@stpetemusic/db';
 // the next :10 or :40 mark (roughly every 30 min, predictable schedule).
 export const dynamic = 'force-dynamic';
 
+/**
+ * MediaMTX's HLS server issues a "cookieCheck" cookie on first request and 302s until
+ * it sees that cookie come back. fetch() has no automatic cookie jar across redirects
+ * (unlike browsers or curl -L -b/-c), so a plain HEAD request loops/fails even when the
+ * stream is live. Follow the one redirect hop manually, replaying the Set-Cookie value.
+ */
+async function isHlsLive(url: string): Promise<boolean> {
+  try {
+    const first = await fetch(url, { method: 'HEAD', redirect: 'manual', signal: AbortSignal.timeout(2000) });
+    if (first.status === 200) return true;
+    if (first.status !== 302) return false;
+
+    const location = first.headers.get('location');
+    const setCookie = first.headers.getSetCookie?.()[0] ?? first.headers.get('set-cookie');
+    if (!location || !setCookie) return false;
+
+    const second = await fetch(new URL(location, url), {
+      method: 'HEAD',
+      redirect: 'manual',
+      headers: { Cookie: setCookie.split(';')[0] },
+      signal: AbortSignal.timeout(2000),
+    });
+    return second.status === 200;
+  } catch {
+    return false;
+  }
+}
+
 /** Returns the next cache expiry time — either :10 or :40 past the hour. */
 function nextScheduledCheck(): Date {
   const now = new Date();
@@ -27,9 +55,7 @@ export async function GET() {
   // Fire HLS check immediately so it overlaps with the DB query — no serial wait.
   // CloudFront returns 200 when MediaMTX has an active stream; 404 when offline.
   const hlsManifest = process.env.HLS_STREAM_URL ?? 'https://hls.stpetemusic.live/live/index.m3u8';
-  const hlsPromise = fetch(hlsManifest, { method: 'HEAD', signal: AbortSignal.timeout(2000) })
-    .then(r => r.ok)
-    .catch(() => false);
+  const hlsPromise = isHlsLive(hlsManifest);
 
   try {
     const db = getDb();
