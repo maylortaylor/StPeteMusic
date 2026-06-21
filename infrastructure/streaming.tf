@@ -130,7 +130,13 @@ resource "aws_cloudfront_distribution" "hls_stream" {
 
     forwarded_values {
       query_string = false
-      cookies { forward = "none" }
+      # MediaMTX's HLS server sets a "cookieCheck" cookie to track viewer sessions and
+      # redirects in a loop until it sees the cookie come back. Forwarding "none" strips
+      # Set-Cookie on the way out, so the cookie never reaches the client — whitelist it.
+      cookies {
+        forward           = "whitelist"
+        whitelisted_names = ["cookieCheck"]
+      }
     }
 
     min_ttl     = 0
@@ -149,7 +155,11 @@ resource "aws_cloudfront_distribution" "hls_stream" {
 
     forwarded_values {
       query_string = false
-      cookies { forward = "none" }
+      # See cookieCheck comment in default_cache_behavior above.
+      cookies {
+        forward           = "whitelist"
+        whitelisted_names = ["cookieCheck"]
+      }
     }
 
     min_ttl     = 0
