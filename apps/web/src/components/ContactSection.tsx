@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { AnimateIn } from './AnimateIn';
-import { pushEvent } from '@/lib/analytics';
-import { trackMetaEvent } from '@/lib/meta-pixel';
+import { trackEvent } from '@/lib/track-event';
 
 export function ContactSection() {
   const [name, setName] = useState('');
@@ -33,8 +32,7 @@ export function ContactSection() {
       });
 
       if (res.ok) {
-        pushEvent('contact_form_submit');
-        trackMetaEvent('Contact', { content_name: 'contact_form' });
+        trackEvent('contact_form_submit', undefined, { event: 'Contact', data: { content_name: 'contact_form' } });
         setStatus('success');
         setName('');
         setEmail('');
