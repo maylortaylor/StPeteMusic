@@ -27,7 +27,9 @@ jobs:
           for FILE in apps/web/social-images/*-header.png; do
             [ -f "$FILE" ] || continue
             BEFORE=$(du -sh "$FILE" | cut -f1)
-            pngquant --quality 80-95 --speed 1 --strip --force --ext .png "$FILE"
+            TMP=$(mktemp /tmp/opt-XXXXXX.png)
+            pngquant --quality 80-95 --speed 1 --strip --force --output "$TMP" "$FILE"
+            mv "$TMP" "$FILE"
             AFTER=$(du -sh "$FILE" | cut -f1)
             echo "  $(basename "$FILE"): ${BEFORE} → ${AFTER}"
           done
