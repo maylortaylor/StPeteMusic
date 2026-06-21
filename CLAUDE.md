@@ -17,12 +17,12 @@ Parent company: Tangent LLC. Partner venue: Suite E Studios.
 |--------------|------|
 | Brand & social accounts (@stpetemusic, suite e, team, IG, FB, YouTube, EventBrite) | [brand.md](.claude/brand.md) |
 | Events & content (final friday, instant noodles, art walk, captions, posts, shows, bands) | [events.md](.claude/events.md) |
-| Infrastructure & deployment (aws, amplify, ec2, dns, tofu, terraform, ssl, cloudflare, listmonk, CI) | [infrastructure.md](.claude/infrastructure.md) |
+| Infrastructure & deployment (aws, amplify, ec2, dns, tofu, terraform, ssl, cloudflare, listmonk, CI, streaming, rtmp, obs, mediamtx, hls, live page) | [infrastructure.md](.claude/infrastructure.md) |
 | n8n & automation (workflows, obsidian, posting, youtube, instagram, google drive, video, reel) | [n8n.md](.claude/n8n.md) |
 | Facebook & Instagram webhooks (fb automation, ig automation, page webhook, comment, message, mention) | [FACEBOOK_INSTAGRAM_AUTOMATION.md](docs/plans/FACEBOOK_INSTAGRAM_AUTOMATION.md) |
 | Secrets & credentials (tokens, github secrets, env vars, rotate, listmonk, credential management) | [secrets.md](.claude/secrets.md) |
 | Local setup (direnv, envrc, pre-commit, install, first-time, hooks) | [SETUP.md](SETUP.md) |
-| Debugging & troubleshooting (errors, down, ssh, 403, 500, not responding, connection refused, error logs, production errors, logError, what broke, site down, check logs) | [troubleshooting.md](.claude/troubleshooting.md) |
+| Debugging & troubleshooting (errors, down, ssh, 403, 500, not responding, connection refused, error logs, production errors, logError, what broke, site down, check logs, streaming, rtmp, obs not connecting, live page broken) | [troubleshooting.md](.claude/troubleshooting.md) |
 | Ads & analytics (google ads, microsoft ads, bing, meta pixel, GTM, clarity, paid, advertising) | [ads-accounts-todo.md](.claude/ads-accounts-todo.md) |
 | YouTube feature (review queue, admin UI, publish workflow, quota, OAuth, sync, proposals, calendar match) | [youtube.md](.claude/youtube.md) |
 | Database & schema (db, schema, migration, drizzle, postgres, table, query, model, uuid, column) | [database.md](.claude/database.md) |

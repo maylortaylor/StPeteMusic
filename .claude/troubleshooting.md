@@ -1,7 +1,7 @@
 ---
 topic: troubleshooting
-triggers: error, down, debug, troubleshoot, ssh, terraform issue, connection refused, 403, 500, not responding, credentials issue, env leakage, contamination, error logs, production errors
-updated: 2026-05-17
+triggers: error, down, debug, troubleshoot, ssh, terraform issue, connection refused, 403, 500, not responding, credentials issue, env leakage, contamination, error logs, production errors, streaming, rtmp, obs, mediamtx, live page, unable to connect
+updated: 2026-06-21
 ---
 
 # Troubleshooting
@@ -113,6 +113,31 @@ AWS_PROFILE=personal tofu plan
    sleep 30
    AWS_PROFILE=personal aws ec2 start-instances --instance-ids i-03874197d725b0455 --region us-east-1
    ```
+
+## Live Streaming Not Working (OBS / RTMP / /live page)
+
+Full architecture + the 7 root causes already found and fixed (2026-06-21, PRs #236-#242) are in `.claude/infrastructure.md` under "Live Streaming". Check that section first — most repeat failures will be one of those same root causes resurfacing. Quick diagnostic order:
+
+1. **OBS says "unable to connect"** → check network first, not auth:
+   ```bash
+   AWS_PROFILE=personal aws ec2 describe-instances --instance-ids i-03874197d725b0455 --query 'Reservations[].Instances[].State.Name' --profile personal
+   nc -vz -G 5 stream.stpetemusic.live 1935
+   ```
+   If both are fine, it's almost certainly the OBS Stream Key format — must be `live?user=stream&pass=<key>`, not a bare key, not `rtmp://user:pass@host`, and not OBS's separate "Use Authentication" checkbox.
+2. **OBS connects but auth fails repeatedly** → SSH in and check MediaMTX actually has the real key substituted (not the literal `${RTMP_STREAM_KEY}` string):
+   ```bash
+   ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@54.235.171.182 "docker logs --tail 50 stpetemusic-mediamtx"
+   ```
+3. **OBS streams fine but `/live` shows "Off Air"** → check the manifest directly with cookies, since `curl` without `-L -b/-c` will always show a redirect loop even when the stream is live (this is normal MediaMTX behavior, not a bug):
+   ```bash
+   curl -s https://www.stpetemusic.live/api/stream/youtube-status   # should be {"live":true,...,"platform":"hls"}
+   ```
+4. **`/live` shows the player but the video is blank** → almost certainly CORS or CSP, not RTMP/MediaMTX. Check browser console for `Content-Security-Policy` violations or CORS errors — `curl` cannot reproduce these, use a headless browser (Playwright is already a devDependency):
+   ```bash
+   curl -s -D - -H "Origin: https://www.stpetemusic.live" https://hls.stpetemusic.live/live/index.m3u8 | grep -i access-control-allow-origin
+   # should be exactly ONE line, matching the origin — not "*", not two lines
+   ```
+5. **Video plays but doesn't autostart** → browsers block unmuted autoplay without a user gesture; this is expected, see `LivePlayer.tsx`'s muted-autoplay + unmute-button handling.
 
 ## SSH Access Denied
 
