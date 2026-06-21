@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { socialImages } from '@/config/social-images';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,13 +31,13 @@ export const metadata: Metadata = {
     description:
       'Discover live music venues in St. Petersburg, FL — from intimate studios to local breweries and rooftop bars. The stages that make the St. Pete scene.',
     url: 'https://www.stpetemusic.live/venues',
-    images: [{ url: '/images/og/venues-bg2.png', width: 1200, height: 630, alt: 'Live Music Venues — St. Pete Music' }],
+    images: [{ url: socialImages.venues, width: 1200, height: 630, alt: 'Live Music Venues — St. Pete Music' }],
   },
   twitter: {
     card: 'summary_large_image',
     site: '@StPeteMusic',
     creator: '@StPeteMusic',
-    images: ['https://www.stpetemusic.live/images/og/venues-bg2.png'],
+    images: [socialImages.venues],
   },
 };
 

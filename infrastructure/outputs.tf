@@ -112,3 +112,8 @@ output "alerts_sns_topic_arn" {
   description = "SNS topic ARN for CloudWatch alarms — subscribe additional emails via AWS console"
   value       = aws_sns_topic.alerts.arn
 }
+
+output "assets_cdn_distribution_id" {
+  description = "CloudFront distribution ID for cdn.stpetemusic.live — add as CDN_DISTRIBUTION_ID GitHub Actions variable"
+  value       = aws_cloudfront_distribution.assets.id
+}
