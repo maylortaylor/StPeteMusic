@@ -11,7 +11,9 @@ rtspAddress: :8554
 webrtcAddress: :8189
 srtAddress: :8890
 
-# Only allow publishing with the correct stream key (set via RTMP_STREAM_KEY env var at runtime)
+# Only allow publishing with the correct stream key. MediaMTX does not expand ${VAR}
+# syntax in this file itself — deploy.yml substitutes the real RTMP_STREAM_KEY value
+# into the line below after copying this file to the EC2 host, before the container starts.
 # Anonymous reads are allowed so HLS viewers and CloudFront can fetch segments/manifests.
 authMethod: internal
 authInternalUsers:
