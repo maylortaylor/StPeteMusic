@@ -129,13 +129,16 @@ resource "aws_cloudfront_distribution" "hls_stream" {
     compress               = true
 
     forwarded_values {
-      query_string = false
-      # MediaMTX's HLS server sets a "cookieCheck" cookie to track viewer sessions and
-      # redirects in a loop until it sees the cookie come back. Forwarding "none" strips
-      # Set-Cookie on the way out, so the cookie never reaches the client — whitelist it.
+      # MediaMTX's HLS server requires the "?cookieCheck=1" query param on the redirect
+      # target request (not just the cookie) before it'll return content — CloudFront
+      # was stripping it, so the origin never saw it and kept redirecting forever.
+      query_string = true
+      # MediaMTX issues a "cookieCheck" cookie on first request (redirects until it sees
+      # it come back), then an "hlsSession" cookie that variant playlists/segments require
+      # (401 without it). Forwarding "none" strips both on the way out to the viewer.
       cookies {
         forward           = "whitelist"
-        whitelisted_names = ["cookieCheck"]
+        whitelisted_names = ["cookieCheck", "hlsSession"]
       }
     }
 
@@ -154,11 +157,11 @@ resource "aws_cloudfront_distribution" "hls_stream" {
     compress               = false
 
     forwarded_values {
-      query_string = false
-      # See cookieCheck comment in default_cache_behavior above.
+      # See query_string/cookies comment in default_cache_behavior above.
+      query_string = true
       cookies {
         forward           = "whitelist"
-        whitelisted_names = ["cookieCheck"]
+        whitelisted_names = ["cookieCheck", "hlsSession"]
       }
     }
 
