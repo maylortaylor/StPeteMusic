@@ -9,12 +9,15 @@ export const dynamic = 'force-dynamic';
 /**
  * MediaMTX's HLS server issues a "cookieCheck" cookie on first request and 302s until
  * it sees that cookie come back. fetch() has no automatic cookie jar across redirects
- * (unlike browsers or curl -L -b/-c), so a plain HEAD request loops/fails even when the
+ * (unlike browsers or curl -L -b/-c), so a plain request loops/fails even when the
  * stream is live. Follow the one redirect hop manually, replaying the Set-Cookie value.
+ * Must use GET — MediaMTX doesn't support HEAD on this endpoint and always 404s on it,
+ * regardless of live status.
  */
 async function isHlsLive(url: string): Promise<boolean> {
   try {
-    const first = await fetch(url, { method: 'HEAD', redirect: 'manual', signal: AbortSignal.timeout(2000) });
+    const first = await fetch(url, { method: 'GET', redirect: 'manual', signal: AbortSignal.timeout(3000) });
+    await first.body?.cancel();
     if (first.status === 200) return true;
     if (first.status !== 302) return false;
 
@@ -23,11 +26,12 @@ async function isHlsLive(url: string): Promise<boolean> {
     if (!location || !setCookie) return false;
 
     const second = await fetch(new URL(location, url), {
-      method: 'HEAD',
+      method: 'GET',
       redirect: 'manual',
       headers: { Cookie: setCookie.split(';')[0] },
-      signal: AbortSignal.timeout(2000),
+      signal: AbortSignal.timeout(3000),
     });
+    await second.body?.cancel();
     return second.status === 200;
   } catch {
     return false;
