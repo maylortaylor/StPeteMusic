@@ -1,7 +1,7 @@
 ---
 topic: infrastructure
-triggers: aws, amplify, dns, cloudflare, tofu, terraform, ec2, tailscale, hosting, deploy, branch, git, listmonk, newsletter, ssl, ci, cd, admin, monitoring, alarms, cloudwatch, sns, health, alerting, uptime, gh, github-cli, aws-cli, account, profile, architecture, map, diagram
-updated: 2026-06-01
+triggers: aws, amplify, dns, cloudflare, tofu, terraform, ec2, tailscale, hosting, deploy, branch, git, listmonk, newsletter, ssl, ci, cd, admin, monitoring, alarms, cloudwatch, sns, health, alerting, uptime, gh, github-cli, aws-cli, account, profile, architecture, map, diagram, streaming, rtmp, obs, mediamtx, hls, live, cors, csp, cookies
+updated: 2026-06-21
 ---
 
 # Infrastructure
@@ -110,6 +110,35 @@ Migrations run **automatically on every deploy to `main`** via `deploy.yml` → 
 - Server: EC2 t3.micro (`us-east-1`, free tier)
 - SSH: `ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n.stpetemusic.live`
 - Quick reference: `AWS_SETUP.md` · Full guide: `docs/AWS_DEPLOYMENT.md`
+
+## Live Streaming (OBS → MediaMTX → CloudFront → /live)
+
+OBS publishes RTMP directly to the EC2 box; MediaMTX ingests it, records it, and serves HLS; CloudFront fronts the HLS for the public `/live` page.
+
+| Item | Value |
+|---|---|
+| RTMP ingest | `rtmp://stream.stpetemusic.live` (→ EC2 EIP `54.235.171.182:1935`) |
+| HLS playback (CDN) | `https://hls.stpetemusic.live/live/index.m3u8` |
+| HLS origin (direct, bypasses CDN) | `https://n8n.stpetemusic.live/hls/live/index.m3u8` |
+| RTMP server | MediaMTX (`bluenviron/mediamtx`), `n8n/docker-compose.prod.yaml` + `n8n/mediamtx/mediamtx.yml` |
+| Stream key source of truth | SSM `/stpetemusic/streaming/rtmp_stream_key` + GitHub secret `RTMP_STREAM_KEY` (kept in sync — both written together by `infrastructure/streaming.tf` / deploy) |
+| CloudFront distribution | `infrastructure/streaming.tf` → `aws_cloudfront_distribution.hls_stream` |
+
+**Correct OBS settings**: Server `rtmp://stream.stpetemusic.live` · Stream Key `live?user=stream&pass=<RTMP_STREAM_KEY value>`. MediaMTX's internal RTMP auth takes credentials as a query string on the path (`user`/`pass`), **not** the `rtmp://user:pass@host` userinfo form, and **not** OBS's separate "Use Authentication" username/password fields (unconfirmed/unsupported by MediaMTX — leave that checkbox off).
+
+**7 bugs fixed 2026-06-21 (PRs #236-#242) — read before touching this pipeline again:**
+
+1. **MediaMTX does not expand `${VAR}` syntax inside its own `mediamtx.yml`.** `pass: "${RTMP_STREAM_KEY}"` in the file is a *literal string* unless something substitutes it first — Docker Compose's `environment:` block only sets the var inside the container process, not inside this mounted file. `deploy.yml`'s "Injecting RTMP_STREAM_KEY into MediaMTX config" step does a real string-replace on the EC2 host after syncing the file, before `docker-compose up`. If you ever see auth fail with a correct key, check this step actually ran (`gh run view <id> --log | grep Injecting`) and that the placeholder wasn't reverted into the live config by mistake.
+2. **CloudFront must whitelist the `cookieCheck` and `hlsSession` cookies** (`forwarded_values.cookies` in `streaming.tf`, both cache behaviors) — MediaMTX's HLS server round-trips these to track viewer sessions; `forward = "none"` silently strips `Set-Cookie` and the manifest 302-redirect-loops forever.
+3. **CloudFront must also forward the query string** (`query_string = true`, not `false`) — MediaMTX's redirect target is `?cookieCheck=1`, and the origin requires *both* the cookie and that query param together to return `200`.
+4. **`n8n/nginx/n8n.conf`'s `/hls/` location must NOT add its own `Access-Control-Allow-Origin` header.** MediaMTX (configured `hlsAllowOrigin: '*'`) already correctly reflects the request's specific `Origin` for credentialed requests; nginx adding a second static `*` header produces two ACAO headers, which browsers hard-reject for cookie-bearing (credentialed) requests.
+5. **MediaMTX does not support `HEAD` requests on the HLS manifest endpoint — always `404`s, regardless of live status.** Any health/liveness check against `.../live/index.m3u8` must use `GET` (and replay the cookie-redirect manually if not using a real browser/`curl -L -b/-c`, since plain `fetch()` has no auto cookie jar across redirects).
+6. **The site's CSP needs `media-src` and `connect-src` to include `https://hls.stpetemusic.live`** (`apps/web/next.config.mjs`) — without it the browser blocks the cross-origin media load at the security-policy layer, before CORS/cookies are even evaluated. Symptom: player renders but shows nothing; console shows `Media load rejected by URL safety check`.
+7. **Browsers only allow unmuted autoplay after a user gesture.** `apps/web/src/components/LivePlayer.tsx` explicitly sets `video.muted = true` in JS (not just the JSX attribute, which races against the dynamically-attached source) and calls `.play()` once the source is ready, with an "Unmute the stream" overlay button.
+
+Full root-cause writeup: see Claude memory `project_live_streaming_fixes.md` (cross-session, not in this repo).
+
+**Debugging approach that worked**: test each layer independently with `curl` — origin (`n8n.stpetemusic.live/hls/...`) vs. CDN (`hls.stpetemusic.live/...`) separately to isolate CloudFront-only issues — then use a headless browser (Playwright is already a devDependency) for anything `curl` can't see: CORS, CSP, cookie credentials, autoplay policy. Several of these bugs were invisible to `curl` and only manifested in real browser enforcement.
 
 ## OpenTofu (IaC)
 - State: S3 bucket `stpetemusic-terraform-state` · Lock: DynamoDB `stpetemusic-terraform-locks`
