@@ -181,6 +181,7 @@ export const events = pgTable('events', {
   image_url: varchar('image_url', { length: 500 }),
   extra_data: jsonb('extra_data').default({}),
   is_active: boolean('is_active').default(true),
+  show_on_tickets: boolean('show_on_tickets').notNull().default(false),
   review_status: text('review_status').notNull().default('approved'),
   source: text('source'),
   reviewed_by: text('reviewed_by'),

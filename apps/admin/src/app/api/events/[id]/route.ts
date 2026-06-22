@@ -1,5 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 import { getDb, events, eq } from '@stpetemusic/db';
+import { revalidateWebApp } from '@/lib/revalidate';
 
 export async function GET(
   _request: Request,
@@ -43,7 +44,7 @@ export async function PATCH(
     const updateData: Record<string, unknown> = {};
     const allowed = [
       'title', 'description', 'start_time', 'end_time',
-      'location', 'tag', 'ticket_url', 'venue', 'image_url', 'is_active',
+      'location', 'tag', 'ticket_url', 'venue', 'image_url', 'is_active', 'show_on_tickets',
     ];
     for (const key of allowed) {
       if (key in data) updateData[key] = data[key] === '' ? null : data[key];
@@ -57,6 +58,15 @@ export async function PATCH(
 
     if (result.length === 0) {
       return Response.json({ error: 'Event not found' }, { status: 404 });
+    }
+
+    // Bust /tickets' cache whenever a tickets-relevant field changed, or the
+    // row is (or was just flagged as) shown there — covers inline edits to
+    // an already-flagged row as well as the flag toggle itself.
+    if ('show_on_tickets' in updateData || result[0].show_on_tickets) {
+      await revalidateWebApp('tickets');
+    } else {
+      await revalidateWebApp();
     }
 
     return Response.json(result[0]);

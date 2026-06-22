@@ -37,7 +37,7 @@ const navItems = [
   { label: 'Templates',       href: '/dashboard/templates',      icon: Zap },
   { label: 'Live Stream',      href: '/dashboard/live',           icon: Radio },
   { label: 'YouTube',          href: '/dashboard/youtube',        icon: Youtube, reviewQueue: false },
-  { label: 'Eventbrite',      href: '/dashboard/eventbrite',     icon: Ticket },
+  { label: 'Tickets Manager', href: '/dashboard/eventbrite',     icon: Ticket },
   { label: 'Newsletter',      href: '/dashboard/newsletter',     icon: Mail },
   { label: 'Playbook',        href: '/dashboard/playbook',       icon: BookOpen },
 ];

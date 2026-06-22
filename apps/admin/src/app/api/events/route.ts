@@ -1,6 +1,15 @@
 import { auth } from '@clerk/nextjs/server';
-import { getDb, events, event_performers, sql, asc, eq, and, logError } from '@stpetemusic/db';
+import { getDb, events, event_performers, sql, asc, eq, and, ilike, logError } from '@stpetemusic/db';
 import type { SQL } from 'drizzle-orm';
+import { revalidateWebApp } from '@/lib/revalidate';
+
+// Drizzle's DrizzleQueryError.message is just "Failed query: ...\nparams: ..." —
+// the actual Postgres reason (e.g. a constraint violation) lives in .cause.
+function errorMessage(error: unknown): string {
+  if (!(error instanceof Error)) return String(error);
+  const cause = error.cause instanceof Error ? error.cause.message : undefined;
+  return cause ? `${error.message} — cause: ${cause}` : error.message;
+}
 
 export async function GET(request: Request) {
   try {
@@ -14,6 +23,9 @@ export async function GET(request: Request) {
     const venueParam = searchParams.get('venue');
     const tagParam = searchParams.get('tag');
     const reviewStatusParam = searchParams.get('review_status');
+    const sourceParam = searchParams.get('source');
+    const qParam = searchParams.get('q');
+    const showOnTicketsParam = searchParams.get('show_on_tickets');
 
     const db = getDb();
     const conditions: SQL[] = [];
@@ -34,6 +46,18 @@ export async function GET(request: Request) {
 
     if (tagParam) {
       conditions.push(eq(events.tag, tagParam));
+    }
+
+    if (sourceParam) {
+      conditions.push(eq(events.source, sourceParam));
+    }
+
+    if (qParam) {
+      conditions.push(ilike(events.title, `%${qParam}%`));
+    }
+
+    if (showOnTicketsParam !== null) {
+      conditions.push(eq(events.show_on_tickets, showOnTicketsParam === 'true'));
     }
 
     if (reviewStatusParam) {
@@ -57,6 +81,7 @@ export async function GET(request: Request) {
         ticket_url: events.ticket_url,
         image_url: events.image_url,
         is_active: events.is_active,
+        show_on_tickets: events.show_on_tickets,
         review_status: events.review_status,
         source: events.source,
         extra_data: events.extra_data,
@@ -76,7 +101,7 @@ export async function GET(request: Request) {
       status_code: 500,
       path: '/api/events',
       method: 'GET',
-      message: error instanceof Error ? error.message : String(error),
+      message: errorMessage(error),
       stack: error instanceof Error ? error.stack : undefined,
     });
     return Response.json({ error: 'Failed to fetch events' }, { status: 500 });
@@ -91,6 +116,14 @@ export async function POST(request: Request) {
     }
 
     const data = await request.json();
+
+    if (!data.title || !data.start_time) {
+      return Response.json({ error: 'title and start_time are required' }, { status: 400 });
+    }
+
+    const ALLOWED_SOURCES = new Set(['manual', 'facebook', 'eventbrite']);
+    const source = ALLOWED_SOURCES.has(data.source) ? data.source : 'manual';
+
     const db = getDb();
 
     const result = await db
@@ -105,11 +138,15 @@ export async function POST(request: Request) {
         ticket_url: data.ticket_url,
         venue: data.venue,
         image_url: data.image_url,
+        extra_data: data.extra_data ?? {},
         is_active: data.is_active ?? true,
+        show_on_tickets: data.show_on_tickets ?? false,
         review_status: 'approved', // manually created events are pre-approved
-        source: 'manual',
+        source,
       })
       .returning();
+
+    await revalidateWebApp(result[0].show_on_tickets ? 'tickets' : undefined);
 
     return Response.json(result[0], { status: 201 });
   } catch (error) {
@@ -118,7 +155,7 @@ export async function POST(request: Request) {
       status_code: 500,
       path: '/api/events',
       method: 'POST',
-      message: error instanceof Error ? error.message : String(error),
+      message: errorMessage(error),
       stack: error instanceof Error ? error.stack : undefined,
     });
     return Response.json({ error: 'Failed to create event' }, { status: 500 });

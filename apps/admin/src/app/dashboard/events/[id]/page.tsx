@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, X } from 'lucide-react';
 import { toast } from '@/lib/toast';
 import { use } from 'react';
+import { toDatetimeLocal, easternToUtcIso } from '@/lib/eastern-time';
 
 const VENUE_OPTIONS = [
   { value: 'suite-e-studios', label: 'Suite E Studios' },
@@ -37,6 +38,7 @@ interface EventDetail {
   venue: string | null;
   image_url: string | null;
   is_active: boolean;
+  show_on_tickets: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -54,23 +56,6 @@ interface ArtistOption {
   name: string;
   type: string;
   instagram_handle: string | null;
-}
-
-function toDatetimeLocal(iso: string | null): string {
-  if (!iso) return '';
-  const d = new Date(iso);
-  const eastern = new Date(d.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${eastern.getFullYear()}-${pad(eastern.getMonth() + 1)}-${pad(eastern.getDate())}T${pad(eastern.getHours())}:${pad(eastern.getMinutes())}`;
-}
-
-// Interprets a datetime-local string as Eastern time and returns UTC ISO.
-// Uses the sv-SE locale trick to derive the current ET→UTC offset, which handles DST correctly.
-function easternToUtcIso(dtLocal: string): string {
-  const asUtc = new Date(dtLocal + 'Z');
-  const etStr = asUtc.toLocaleString('sv-SE', { timeZone: 'America/New_York' }).replace(' ', 'T');
-  const offsetMs = asUtc.getTime() - new Date(etStr + 'Z').getTime();
-  return new Date(asUtc.getTime() + offsetMs).toISOString();
 }
 
 export default function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
@@ -97,6 +82,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
     venue: '',
     image_url: '',
     is_active: true,
+    show_on_tickets: false,
   });
 
   const loadData = useCallback(async () => {
@@ -128,6 +114,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
         venue: eventData.venue ?? '',
         image_url: eventData.image_url ?? '',
         is_active: eventData.is_active,
+        show_on_tickets: eventData.show_on_tickets,
       });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to load event');
@@ -343,6 +330,19 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
           />
           <label htmlFor="is_active" className="text-sm font-medium text-foreground">
             Active (shown on website)
+          </label>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <input
+            id="show_on_tickets"
+            type="checkbox"
+            checked={form.show_on_tickets}
+            onChange={e => setForm(f => ({ ...f, show_on_tickets: e.target.checked }))}
+            className="h-4 w-4 rounded border-border"
+          />
+          <label htmlFor="show_on_tickets" className="text-sm font-medium text-foreground">
+            Show on /tickets page
           </label>
         </div>
 

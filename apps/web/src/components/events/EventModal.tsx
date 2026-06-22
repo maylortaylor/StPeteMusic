@@ -8,6 +8,7 @@ import { trackEvent } from '@/lib/track-event';
 import { EVENT_TAGS, isEventTagSlug } from '@/lib/eventTags';
 import { VENUES, isVenueSlug } from '@/lib/venues';
 import { icalDate } from '@/lib/icalDate';
+import { SourceIcon } from './SourceIcon';
 
 interface EventModalProps {
   event: Event | null;
@@ -125,8 +126,12 @@ export function EventModal({ event, onClose }: EventModalProps) {
               </div>
 
               {/* Title */}
-              <h2 className="font-inter font-black text-2xl uppercase text-black leading-tight mb-4">
-                {event.title}
+              <h2 className="font-inter font-black text-2xl uppercase text-black leading-tight mb-4 flex items-center gap-2">
+                <SourceIcon
+                  source={typeof event.extra_data?.source === 'string' ? event.extra_data.source : undefined}
+                  className="h-5 w-5 text-[#1877F2] flex-shrink-0"
+                />
+                <span>{event.title}</span>
               </h2>
 
               {/* Date & time */}

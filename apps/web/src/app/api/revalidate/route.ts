@@ -17,6 +17,15 @@ export async function POST(request: Request) {
     return Response.json({ revalidated: true, scope: 'eventbrite' });
   }
 
+  if (scope === 'tickets') {
+    // Anything that can change what's shown on /tickets — Eventbrite-sourced
+    // or the show_on_tickets-flagged events (Facebook, Google Calendar, etc.)
+    revalidateTag('eventbrite-events', {});
+    revalidateTag('featured-tickets', {});
+    revalidatePath('/tickets', 'page');
+    return Response.json({ revalidated: true, scope: 'tickets' });
+  }
+
   if (slug) {
     revalidatePath(`/discover/${slug}`, 'page');
     revalidatePath(`/venues/${slug}`, 'page');
