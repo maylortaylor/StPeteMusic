@@ -1,7 +1,7 @@
 ---
 topic: infrastructure
 triggers: aws, amplify, dns, cloudflare, tofu, terraform, ec2, tailscale, hosting, deploy, branch, git, listmonk, newsletter, ssl, ci, cd, admin, monitoring, alarms, cloudwatch, sns, health, alerting, uptime, gh, github-cli, aws-cli, account, profile, architecture, map, diagram, streaming, rtmp, obs, mediamtx, hls, live, cors, csp, cookies
-updated: 2026-06-21
+updated: 2026-06-22
 ---
 
 # Infrastructure
@@ -15,7 +15,7 @@ Internet
 [Cloudflare DNS] ──────────────────────────────────────────────────
     │                          │                       │
     ▼                          ▼                       ▼
-[CloudFront]            [CloudFront]            [EC2 t3.micro]
+[CloudFront]            [CloudFront]            [EC2 t3.small]
 d35nc2e8nr92q9          d2ltgwfvkan5js          54.235.171.182
     │                          │                nginx (SSL via Let's Encrypt)
     ▼                          ▼                       │
@@ -107,7 +107,8 @@ Migrations run **automatically on every deploy to `main`** via `deploy.yml` → 
 
 ## n8n Production Server (AWS EC2)
 - URL: https://n8n.stpetemusic.live
-- Server: EC2 t3.micro (`us-east-1`, free tier)
+- Server: EC2 `t3.small` (`i-03874197d725b0455`, `us-east-1`, **not free-tier eligible** — only `t2.micro`/`t3.micro` qualify; resized up from `t3.micro` at some point without this doc being updated)
+- Root volume: 20GB `gp3` — keep an eye on usage; recordings pile up locally if `vod-watcher.service` ever stops uploading (see VOD pipeline note below)
 - SSH: `ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n.stpetemusic.live`
 - Quick reference: `AWS_SETUP.md` · Full guide: `docs/AWS_DEPLOYMENT.md`
 
@@ -126,7 +127,7 @@ OBS publishes RTMP directly to the EC2 box; MediaMTX ingests it, records it, and
 
 **Correct OBS settings**: Server `rtmp://stream.stpetemusic.live` · Stream Key `live?user=stream&pass=<RTMP_STREAM_KEY value>`. MediaMTX's internal RTMP auth takes credentials as a query string on the path (`user`/`pass`), **not** the `rtmp://user:pass@host` userinfo form, and **not** OBS's separate "Use Authentication" username/password fields (unconfirmed/unsupported by MediaMTX — leave that checkbox off).
 
-**7 bugs fixed 2026-06-21 (PRs #236-#242) — read before touching this pipeline again:**
+**8 bugs fixed 2026-06-21 to 2026-06-22 (PRs #236-#242, #254) — read before touching this pipeline again:**
 
 1. **MediaMTX does not expand `${VAR}` syntax inside its own `mediamtx.yml`.** `pass: "${RTMP_STREAM_KEY}"` in the file is a *literal string* unless something substitutes it first — Docker Compose's `environment:` block only sets the var inside the container process, not inside this mounted file. `deploy.yml`'s "Injecting RTMP_STREAM_KEY into MediaMTX config" step does a real string-replace on the EC2 host after syncing the file, before `docker-compose up`. If you ever see auth fail with a correct key, check this step actually ran (`gh run view <id> --log | grep Injecting`) and that the placeholder wasn't reverted into the live config by mistake.
 2. **CloudFront must whitelist the `cookieCheck` and `hlsSession` cookies** (`forwarded_values.cookies` in `streaming.tf`, both cache behaviors) — MediaMTX's HLS server round-trips these to track viewer sessions; `forward = "none"` silently strips `Set-Cookie` and the manifest 302-redirect-loops forever.
@@ -135,6 +136,7 @@ OBS publishes RTMP directly to the EC2 box; MediaMTX ingests it, records it, and
 5. **MediaMTX does not support `HEAD` requests on the HLS manifest endpoint — always `404`s, regardless of live status.** Any health/liveness check against `.../live/index.m3u8` must use `GET` (and replay the cookie-redirect manually if not using a real browser/`curl -L -b/-c`, since plain `fetch()` has no auto cookie jar across redirects).
 6. **The site's CSP needs `media-src` and `connect-src` to include `https://hls.stpetemusic.live`** (`apps/web/next.config.mjs`) — without it the browser blocks the cross-origin media load at the security-policy layer, before CORS/cookies are even evaluated. Symptom: player renders but shows nothing; console shows `Media load rejected by URL safety check`.
 7. **Browsers only allow unmuted autoplay after a user gesture.** `apps/web/src/components/LivePlayer.tsx` explicitly sets `video.muted = true` in JS (not just the JSX attribute, which races against the dynamically-attached source) and calls `.play()` once the source is ready, with an "Unmute the stream" overlay button.
+8. **`vod-watcher.service` (uploads recordings to S3) crash-looped for ~5 weeks (~307k restarts) on `Permission denied` watching `/var/lib/docker/volumes/n8n_recordings/_data`.** Root cause was **not** SELinux (it's in permissive/non-enforcing mode on this host — checked `getenforce`, it logs AVC denials but doesn't block anything). The real cause: `/var/lib/docker` itself is mode `710` root:root, so `ec2-user` (who the service runs as) has zero permission to traverse into it, regardless of permissions deeper in the tree. Fixed with a targeted ACL: `setfacl -m u:ec2-user:x /var/lib/docker` (doesn't touch Docker's own permission bits or affect other users). Separately, `vod-watcher.sh` never deleted the local file after a successful upload or checked the upload actually succeeded — fixed in PR #254 to delete on confirmed success and keep the file for retry on failure. Until that PR is deployed, every stream's recordings (especially flaky-connection streams that fragment into many small files) will keep accumulating on the 20GB root volume — watch disk usage (`df -h /` was at 76% after one ~2hr stream).
 
 Full root-cause writeup: see Claude memory `project_live_streaming_fixes.md` (cross-session, not in this repo).
 
