@@ -96,6 +96,9 @@ jobs:
           # Facebook
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_ACCESS_TOKEN: ${{ secrets.FB_ACCESS_TOKEN }}
+          # go-live-notify
+          GO_LIVE_ASSET_URL: ${{ secrets.GO_LIVE_ASSET_URL }}
+          GO_LIVE_LINK_URL: ${{ secrets.GO_LIVE_LINK_URL }}
           # YouTube — GOOGLE_CLIENT_ID/SECRET secrets reused for YouTube OAuth
           YOUTUBE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
@@ -117,6 +120,7 @@ jobs:
             DEPLOY_RUN_ID,POSTGRES_USER,POSTGRES_PASSWORD,DB_ENCRYPTION_KEY,N8N_ENCRYPTION_KEY,
             N8N_API_KEY,OBSIDIAN_HOST,CLAUDE_API_KEY_N8N_STPETEMUSIC,GROQ_API_KEY,
             N8N_GEMINI_API_KEY,IG_USER_ID,IG_APP_ID,IG_ACCESS_TOKEN,FB_PAGE_ID,FB_ACCESS_TOKEN,
+            GO_LIVE_ASSET_URL,GO_LIVE_LINK_URL,
             YOUTUBE_CLIENT_ID,YOUTUBE_CLIENT_SECRET,YOUTUBE_API_KEY,NOTION_API_KEY,
             N8N_WEBHOOK_SECRET,ADMIN_ENRICHMENT_CALLBACK_URL,ADMIN_ARTIST_ENRICHMENT_CALLBACK_URL,RTMP_STREAM_KEY
           script: |
@@ -191,6 +195,8 @@ jobs:
               printf 'IG_ACCESS_TOKEN=%s\n'                  "${IG_ACCESS_TOKEN}"
               printf 'FB_PAGE_ID=%s\n'                       "${FB_PAGE_ID}"
               printf 'FB_ACCESS_TOKEN=%s\n'                  "${FB_ACCESS_TOKEN}"
+              printf 'GO_LIVE_ASSET_URL=%s\n'                "${GO_LIVE_ASSET_URL}"
+              printf 'GO_LIVE_LINK_URL=%s\n'                 "${GO_LIVE_LINK_URL}"
               printf 'YOUTUBE_CLIENT_ID=%s\n'                "${YOUTUBE_CLIENT_ID}"
               printf 'YOUTUBE_CLIENT_SECRET=%s\n'            "${YOUTUBE_CLIENT_SECRET}"
               printf 'YOUTUBE_API_KEY=%s\n'                  "${YOUTUBE_API_KEY}"
@@ -278,21 +284,23 @@ jobs:
             cp -r "${DEPLOY_DIR}/mediamtx/." ~/stpetemusic/n8n/mediamtx/
             echo "✓ MediaMTX config synced"
 
-            echo "── Injecting RTMP_STREAM_KEY into MediaMTX config ──"
+            echo "── Injecting RTMP_STREAM_KEY and N8N_WEBHOOK_SECRET into MediaMTX config ──"
             # MediaMTX reads mediamtx.yml directly and does not expand \${VAR} syntax
             # inside it — docker-compose's env substitution only affects the container's
-            # process environment, not this mounted file. Replace the placeholder with
-            # the real secret here so MediaMTX's internal auth actually checks against it.
+            # process environment, not this mounted file. Replace the placeholders with
+            # the real secrets here so MediaMTX's internal auth and the go-live webhook
+            # call actually use real values.
             python3 -c "
             import os
             path = os.path.expanduser('~/stpetemusic/n8n/mediamtx/mediamtx.yml')
             with open(path) as f:
                 content = f.read()
             content = content.replace('\${RTMP_STREAM_KEY}', os.environ['RTMP_STREAM_KEY'])
+            content = content.replace('\${N8N_WEBHOOK_SECRET}', os.environ['N8N_WEBHOOK_SECRET'])
             with open(path, 'w') as f:
                 f.write(content)
             "
-            echo "✓ MediaMTX config updated with real stream key"
+            echo "✓ MediaMTX config updated with real stream key and webhook secret"
 
             echo "── Applying compose config (restarts changed containers) ──"
             cd ~/stpetemusic/n8n
