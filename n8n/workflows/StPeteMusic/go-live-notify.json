@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## go-live-notify\n\nTriggered by MediaMTX's `runOnReady` hook (see `n8n/mediamtx/mediamtx.yml`) the instant OBS/Restream starts publishing to the EC2 RTMP server — fires for every real stream start, no manual step needed.\n\n**Flow:**\n1. Webhook receives `{ event: 'stream_started', path: 'live' }`\n2. Validates `X-N8N-Webhook-Secret` header\n3. Resolves the go-live asset (a 5-second vertical mp4 hosted on `cdn.stpetemusic.live`) + the public link (`stpetemusic.live/live`)\n4. Fans out in parallel: Facebook Page feed video post, Facebook Video Story, Instagram Video Story (link sticker) — each fails independently (`continueOnFail`) so one platform outage doesn't block the others\n\n**Required env vars (set in n8n .env):**\n- `N8N_WEBHOOK_SECRET` — shared secret, must match the value deploy.yml substitutes into mediamtx.yml\n- `GO_LIVE_ASSET_URL` — public CDN URL of the 5s mp4; swap this to change the video without touching the workflow\n- `GO_LIVE_LINK_URL` — defaults to https://www.stpetemusic.live/live\n- `FB_PAGE_ID` / `FB_ACCESS_TOKEN`, `IG_USER_ID` / `IG_ACCESS_TOKEN` — already configured\n\n**Not built yet (deferred, see plan):**\n- Threads branch — needs a separate Meta API app product + `THREADS_USER_ID` / `THREADS_ACCESS_TOKEN`\n- Facebook Group posting — dropped, `publish_to_groups` isn't realistically obtainable for this app\n\n**Verify at deploy time:** the Facebook video Stories flow here (`/videos` unpublished → `/video_stories` with `video_id`) and the `link` param on both the FB video story and IG Stories `/media` call — confirm current Graph API behavior for video Stories + link stickers at v24.0 (same version the existing Reels flow uses). This is the least proven part of the workflow; the IG container/wait/status-check/publish chain mirrors the already-working Reels flow in `obsidian-to-youtube-posting.json` closely, the FB video-story side does not have an existing precedent in this codebase to copy.",
+        "content": "## go-live-notify\n\nTriggered by MediaMTX's `runOnReady` hook (see `n8n/mediamtx/mediamtx.yml`) the instant OBS/Restream starts publishing to the EC2 RTMP server — fires for every real stream start, no manual step needed.\n\n**Flow:**\n1. Webhook receives `{ event: 'stream_started', path: 'live' }`\n2. Validates `X-N8N-Webhook-Secret` header\n3. Resolves the go-live asset (a 5-second vertical mp4 hosted on `cdn.stpetemusic.live`) + the public link (`stpetemusic.live/live`)\n4. Fans out in parallel: Facebook Page feed video post, Facebook Video Story, Instagram Video Story (link sticker) — each fails independently (`continueOnFail`) so one platform outage doesn't block the others\n\n**Facebook Video Story protocol (confirmed against Meta's docs, 2026-06-22):** NOT the same resumable upload as the regular `/videos` endpoint. It's `/video_stories` with `upload_phase=start` (returns `video_id` + `upload_url`) → POST to that `upload_url` with header `Authorization: OAuth {token}` and header `file_url: {cdn url}` (Facebook fetches the video itself, no binary transfer through n8n needed) → wait → `/video_stories` with `upload_phase=finish` + `video_id` to publish. The earlier version of this workflow incorrectly reused the simple `/videos` file_url method and got `(#100) The parameter upload_phase is required`.\n\n**Required env vars (set in n8n .env):**\n- `N8N_WEBHOOK_SECRET` — shared secret, must match the value deploy.yml substitutes into mediamtx.yml\n- `GO_LIVE_ASSET_URL` — public CDN URL of the 5s mp4; swap this to change the video without touching the workflow\n- `GO_LIVE_LINK_URL` — defaults to https://www.stpetemusic.live/live\n- `FB_PAGE_ID` / `FB_ACCESS_TOKEN`, `IG_USER_ID` / `IG_ACCESS_TOKEN` — already configured\n\n**Not built yet (deferred, see plan):**\n- Threads branch — needs a separate Meta API app product + `THREADS_USER_ID` / `THREADS_ACCESS_TOKEN`\n- Facebook Group posting — dropped, `publish_to_groups` isn't realistically obtainable for this app\n\n**Still unverified:** whether the `link` param on the FB Story `finish` call actually attaches a CTA/link sticker — Meta's own docs don't document this parameter for video stories (per Ayrshare's writeup, which covers only the happy path). If it's silently ignored, that's a known gap, not a bug.",
         "height": 560,
         "width": 660,
         "color": 7
@@ -85,19 +85,18 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ 'https://graph.facebook.com/v24.0/' + $env.FB_PAGE_ID + '/videos' }}",
+        "url": "={{ 'https://graph.facebook.com/v24.0/' + $env.FB_PAGE_ID + '/video_stories' }}",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
-            { "name": "file_url", "value": "={{ $json.assetUrl }}" },
-            { "name": "published", "value": "false" },
+            { "name": "upload_phase", "value": "start" },
             { "name": "access_token", "value": "={{ $env.FB_ACCESS_TOKEN }}" }
           ]
         },
         "options": {}
       },
       "id": "a1f3c1a0-1000-4000-8000-000000000005",
-      "name": "Create FB Story Video",
+      "name": "FB Story: Start Upload",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [1020, 280],
@@ -105,13 +104,33 @@
     },
     {
       "parameters": {
-        "amount": 15
+        "method": "POST",
+        "url": "={{ $json.upload_url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "={{ 'OAuth ' + $env.FB_ACCESS_TOKEN }}" },
+            { "name": "file_url", "value": "={{ $('Resolve Asset and Link').item.json.assetUrl }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1f3c1a0-1000-4000-8000-000000000015",
+      "name": "FB Story: Upload Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [1280, 280],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "amount": 20
       },
       "id": "a1f3c1a0-1000-4000-8000-000000000012",
-      "name": "Wait for FB Story Processing",
+      "name": "Wait for FB Story Upload",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
-      "position": [1280, 280],
+      "position": [1540, 280],
       "webhookId": "a1f3c1a0-1000-4000-8000-000000000012"
     },
     {
@@ -121,7 +140,8 @@
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
-            { "name": "video_id", "value": "={{ $json.id }}" },
+            { "name": "upload_phase", "value": "finish" },
+            { "name": "video_id", "value": "={{ $('FB Story: Start Upload').item.json.video_id }}" },
             { "name": "link", "value": "={{ $('Resolve Asset and Link').item.json.linkUrl }}" },
             { "name": "access_token", "value": "={{ $env.FB_ACCESS_TOKEN }}" }
           ]
@@ -129,10 +149,10 @@
         "options": {}
       },
       "id": "a1f3c1a0-1000-4000-8000-000000000006",
-      "name": "Publish FB Story",
+      "name": "FB Story: Finish & Publish",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
-      "position": [1540, 280],
+      "position": [1800, 280],
       "continueOnFail": true
     },
     {
@@ -159,7 +179,7 @@
     },
     {
       "parameters": {
-        "amount": 15
+        "amount": 30
       },
       "id": "a1f3c1a0-1000-4000-8000-000000000008",
       "name": "Wait for IG Story Processing",
@@ -243,19 +263,24 @@
       "main": [
         [
           { "node": "Post to FB Page Feed", "type": "main", "index": 0 },
-          { "node": "Create FB Story Video", "type": "main", "index": 0 },
+          { "node": "FB Story: Start Upload", "type": "main", "index": 0 },
           { "node": "Create IG Story Container", "type": "main", "index": 0 }
         ]
       ]
     },
-    "Create FB Story Video": {
+    "FB Story: Start Upload": {
       "main": [
-        [{ "node": "Wait for FB Story Processing", "type": "main", "index": 0 }]
+        [{ "node": "FB Story: Upload Video", "type": "main", "index": 0 }]
       ]
     },
-    "Wait for FB Story Processing": {
+    "FB Story: Upload Video": {
       "main": [
-        [{ "node": "Publish FB Story", "type": "main", "index": 0 }]
+        [{ "node": "Wait for FB Story Upload", "type": "main", "index": 0 }]
+      ]
+    },
+    "Wait for FB Story Upload": {
+      "main": [
+        [{ "node": "FB Story: Finish & Publish", "type": "main", "index": 0 }]
       ]
     },
     "Create IG Story Container": {
