@@ -36,3 +36,11 @@ recordDeleteAfter: 0s   # vod-watcher.service uploads to S3 and handles cleanup
 paths:
   live:
     source: publisher
+    # Fires the instant OBS/Restream starts publishing — triggers the go-live social
+    # notification workflow in n8n. deploy.yml substitutes ${N8N_WEBHOOK_SECRET} the
+    # same way it already does for ${RTMP_STREAM_KEY} above.
+    runOnReady: >
+      curl -s -X POST https://n8n.stpetemusic.live/webhook/go-live
+      -H "Content-Type: application/json"
+      -H "X-N8N-Webhook-Secret: ${N8N_WEBHOOK_SECRET}"
+      -d "{\"event\": \"stream_started\", \"path\": \"$MTX_PATH\"}"

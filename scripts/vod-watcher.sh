@@ -24,17 +24,24 @@ inotifywait -m -r -e close_write,moved_to "${RECORDINGS_BASE}" \
 
       echo "[vod-watcher] New recording detected: ${FILENAME}"
 
-      aws s3 cp "${FILEPATH}" "s3://${VOD_BUCKET}/${S3_KEY}" \
+      if aws s3 cp "${FILEPATH}" "s3://${VOD_BUCKET}/${S3_KEY}" \
         --region us-east-1 \
-        --no-progress
+        --no-progress; then
+        echo "[vod-watcher] Uploaded: s3://${VOD_BUCKET}/${S3_KEY}"
 
-      echo "[vod-watcher] Uploaded: s3://${VOD_BUCKET}/${S3_KEY}"
+        # Local copy is now safely in S3 — remove it so disk doesn't fill up,
+        # especially during streams with many small fragments from connection drops.
+        rm -f "${FILEPATH}"
+        echo "[vod-watcher] Removed local copy: ${FILEPATH}"
 
-      # Trigger n8n — future workflow will edit, trim, process, and publish to YouTube unlisted
-      curl -s -X POST "${N8N_WEBHOOK_URL}" \
-        -H "Content-Type: application/json" \
-        -H "X-N8N-Webhook-Secret: ${N8N_WEBHOOK_SECRET}" \
-        -d "{\"s3_key\": \"${S3_KEY}\", \"filename\": \"${FILENAME}\", \"date\": \"${DATE_PREFIX}\"}" \
-        && echo "[vod-watcher] n8n webhook triggered" \
-        || echo "[vod-watcher] WARNING: n8n webhook failed — recording is still safely in S3"
+        # Trigger n8n — future workflow will edit, trim, process, and publish to YouTube unlisted
+        curl -s -X POST "${N8N_WEBHOOK_URL}" \
+          -H "Content-Type: application/json" \
+          -H "X-N8N-Webhook-Secret: ${N8N_WEBHOOK_SECRET}" \
+          -d "{\"s3_key\": \"${S3_KEY}\", \"filename\": \"${FILENAME}\", \"date\": \"${DATE_PREFIX}\"}" \
+          && echo "[vod-watcher] n8n webhook triggered" \
+          || echo "[vod-watcher] WARNING: n8n webhook failed — recording is still safely in S3"
+      else
+        echo "[vod-watcher] ERROR: upload failed for ${FILENAME} — keeping local copy for retry"
+      fi
   done
