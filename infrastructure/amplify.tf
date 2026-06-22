@@ -79,7 +79,7 @@ resource "aws_amplify_app" "web" {
   # This means build spec changes never require a terraform apply.
 
   environment_variables = {
-    AMPLIFY_MONOREPO_APP_ROOT = "apps/web"  # tells Amplify where to find package.json for framework detection
+    AMPLIFY_MONOREPO_APP_ROOT = "apps/web" # tells Amplify where to find package.json for framework detection
     NEXT_PUBLIC_SITE_URL      = "https://www.stpetemusic.live"
     NEXT_PUBLIC_GTM_ID        = "GTM-WW7MSP3L"
     RESEND_API_KEY            = data.aws_ssm_parameter.resend_api_key.value
@@ -89,12 +89,14 @@ resource "aws_amplify_app" "web" {
     LISTMONK_PASSWORD         = data.aws_ssm_parameter.listmonk_password.value
     # Constructed from existing POSTGRES_USER / POSTGRES_PASSWORD GitHub Secrets.
     # SSL handled by db.ts (rejectUnauthorized:false for non-localhost connections).
-    DATABASE_URL              = "postgresql://${var.db_username}:${var.db_password}@${aws_db_instance.main.address}:5432/n8n"
-    NEXT_PUBLIC_META_PIXEL_ID = var.meta_pixel_id
-    NEXT_PUBLIC_CLARITY_ID    = var.clarity_project_id
-    YOUTUBE_API_KEY           = var.youtube_api_key
-    YOUTUBE_CHANNEL_ID        = var.youtube_channel_id
-    REVALIDATION_SECRET       = var.revalidation_secret != "" ? data.aws_ssm_parameter.revalidation_secret[0].value : ""
+    DATABASE_URL               = "postgresql://${var.db_username}:${var.db_password}@${aws_db_instance.main.address}:5432/n8n"
+    NEXT_PUBLIC_META_PIXEL_ID  = var.meta_pixel_id
+    FACEBOOK_PIXEL_ID          = var.meta_pixel_id
+    FACEBOOK_SYSTEM_USER_TOKEN = var.facebook_system_user_token
+    NEXT_PUBLIC_CLARITY_ID     = var.clarity_project_id
+    YOUTUBE_API_KEY            = var.youtube_api_key
+    YOUTUBE_CHANNEL_ID         = var.youtube_channel_id
+    REVALIDATION_SECRET        = var.revalidation_secret != "" ? data.aws_ssm_parameter.revalidation_secret[0].value : ""
   }
 
   # Edge-level redirect — evaluated by CloudFront before the Lambda is invoked.
@@ -172,35 +174,35 @@ resource "aws_amplify_app" "admin" {
     NEXT_PUBLIC_CLERK_SIGN_IN_URL       = "/sign-in"
     NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL = "/dashboard"
     # Listmonk — newsletter page + subscriber stat card
-    LISTMONK_API_URL                    = "https://listmonk.stpetemusic.live"
-    LISTMONK_USERNAME                   = data.aws_ssm_parameter.listmonk_username.value
-    LISTMONK_PASSWORD                   = data.aws_ssm_parameter.listmonk_password.value
+    LISTMONK_API_URL  = "https://listmonk.stpetemusic.live"
+    LISTMONK_USERNAME = data.aws_ssm_parameter.listmonk_username.value
+    LISTMONK_PASSWORD = data.aws_ssm_parameter.listmonk_password.value
     # Social stat cards — optional, degrade to "—" if empty
-    IG_USER_ID                          = var.ig_user_id
-    IG_ACCESS_TOKEN                     = var.ig_access_token
-    FB_PAGE_ID                          = var.fb_page_id
-    FB_ACCESS_TOKEN                     = var.fb_access_token
-    YOUTUBE_API_KEY                     = var.youtube_api_key
+    IG_USER_ID      = var.ig_user_id
+    IG_ACCESS_TOKEN = var.ig_access_token
+    FB_PAGE_ID      = var.fb_page_id
+    FB_ACCESS_TOKEN = var.fb_access_token
+    YOUTUBE_API_KEY = var.youtube_api_key
     # Featured artists pipeline
-    ANTHROPIC_API_KEY                   = var.anthropic_api_key != "" ? data.aws_ssm_parameter.anthropic_api_key[0].value : ""
-    N8N_ARTIST_ENRICHMENT_WEBHOOK_URL   = var.n8n_artist_enrichment_webhook_url != "" ? data.aws_ssm_parameter.n8n_artist_enrichment_webhook_url[0].value : ""
-    N8N_WEBHOOK_SECRET                  = var.n8n_webhook_secret != "" ? data.aws_ssm_parameter.n8n_webhook_secret[0].value : ""
+    ANTHROPIC_API_KEY                 = var.anthropic_api_key != "" ? data.aws_ssm_parameter.anthropic_api_key[0].value : ""
+    N8N_ARTIST_ENRICHMENT_WEBHOOK_URL = var.n8n_artist_enrichment_webhook_url != "" ? data.aws_ssm_parameter.n8n_artist_enrichment_webhook_url[0].value : ""
+    N8N_WEBHOOK_SECRET                = var.n8n_webhook_secret != "" ? data.aws_ssm_parameter.n8n_webhook_secret[0].value : ""
     # Revalidation — admin calls web app's /api/revalidate after syncs
-    WEB_APP_URL                         = "https://www.stpetemusic.live"
-    REVALIDATION_SECRET                 = var.revalidation_secret != "" ? data.aws_ssm_parameter.revalidation_secret[0].value : ""
+    WEB_APP_URL         = "https://www.stpetemusic.live"
+    REVALIDATION_SECRET = var.revalidation_secret != "" ? data.aws_ssm_parameter.revalidation_secret[0].value : ""
     # Artist sheet sync — n8n cron secret
-    CRON_SECRET                         = var.cron_secret != "" ? data.aws_ssm_parameter.cron_secret[0].value : ""
+    CRON_SECRET = var.cron_secret != "" ? data.aws_ssm_parameter.cron_secret[0].value : ""
     # Eventbrite integration (admin only — never exposed to web app)
-    EVENTBRITE_ORG_ID                   = var.eventbrite_org_id
-    EVENTBRITE_PRIVATE_TOKEN            = var.eventbrite_private_token != "" ? data.aws_ssm_parameter.eventbrite_private_token[0].value : ""
+    EVENTBRITE_ORG_ID        = var.eventbrite_org_id
+    EVENTBRITE_PRIVATE_TOKEN = var.eventbrite_private_token != "" ? data.aws_ssm_parameter.eventbrite_private_token[0].value : ""
     # Artist image upload — S3 bucket + CloudFront CDN.
     # "AWS_" prefix is reserved by Amplify; S3_KEY_* avoids that restriction.
     # Amplify WEB_COMPUTE SSR Lambdas use an internally-managed execution role that
     # cannot be configured externally, so explicit IAM user credentials are required.
-    ASSETS_BUCKET                       = aws_s3_bucket.assets.id
-    ASSETS_CDN_URL                      = "https://cdn.stpetemusic.live"
-    S3_KEY_ID                           = aws_iam_access_key.admin_s3_upload.id
-    S3_KEY_SECRET                       = aws_iam_access_key.admin_s3_upload.secret
+    ASSETS_BUCKET  = aws_s3_bucket.assets.id
+    ASSETS_CDN_URL = "https://cdn.stpetemusic.live"
+    S3_KEY_ID      = aws_iam_access_key.admin_s3_upload.id
+    S3_KEY_SECRET  = aws_iam_access_key.admin_s3_upload.secret
   }
 
   # Grants SSR Lambda functions S3 write access via the standard credential chain.
@@ -252,9 +254,9 @@ resource "aws_amplify_branch" "admin_develop" {
 }
 
 resource "aws_amplify_domain_association" "admin" {
-  app_id                 = aws_amplify_app.admin.id
-  domain_name            = "stpetemusic.live"
-  wait_for_verification  = false  # DNS managed via cloudflare.tf; Amplify validates async
+  app_id                = aws_amplify_app.admin.id
+  domain_name           = "stpetemusic.live"
+  wait_for_verification = false # DNS managed via cloudflare.tf; Amplify validates async
 
   sub_domain {
     branch_name = aws_amplify_branch.admin_main.branch_name
@@ -265,9 +267,9 @@ resource "aws_amplify_domain_association" "admin" {
 # ── Web app custom domain ────────────────────────────────────────────────────
 
 resource "aws_amplify_domain_association" "web" {
-  app_id                 = aws_amplify_app.web.id
-  domain_name            = "stpetemusic.live"
-  wait_for_verification  = false  # DNS managed via cloudflare.tf; Amplify validates async
+  app_id                = aws_amplify_app.web.id
+  domain_name           = "stpetemusic.live"
+  wait_for_verification = false # DNS managed via cloudflare.tf; Amplify validates async
 
   sub_domain {
     branch_name = aws_amplify_branch.main.branch_name

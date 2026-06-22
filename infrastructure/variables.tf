@@ -22,7 +22,7 @@ variable "github_token" {
   description = "GitHub PAT (repo scope) for Amplify → GitHub repo connection. Set via TF_VAR_github_token in CI."
   type        = string
   sensitive   = true
-  default     = ""  # empty default allows terraform validate to pass in CI without the secret
+  default     = "" # empty default allows terraform validate to pass in CI without the secret
 }
 
 variable "db_username" {
@@ -106,13 +106,13 @@ variable "cloudflare_api_token" {
   description = "Cloudflare API token for stpetemusic.live. Required permissions: Zone:DNS:Edit AND Zone:Transform Rules:Edit. Create at dash.cloudflare.com → My Profile → API Tokens → Create Token. Set via TF_VAR_cloudflare_api_token in CI."
   type        = string
   sensitive   = true
-  default     = ""  # empty default allows tofu validate/plan to pass without Cloudflare creds
+  default     = "" # empty default allows tofu validate/plan to pass without Cloudflare creds
 }
 
 variable "cloudflare_zone_id" {
   description = "Cloudflare Zone ID for stpetemusic.live. Found in Cloudflare dashboard → stpetemusic.live → right sidebar → Zone ID. Set via TF_VAR_cloudflare_zone_id in CI."
   type        = string
-  default     = ""  # empty default allows tofu validate/plan to pass without Cloudflare creds
+  default     = "" # empty default allows tofu validate/plan to pass without Cloudflare creds
 }
 
 # ── Google Cloud ──────────────────────────────────────────────────────────────
@@ -120,17 +120,24 @@ variable "cloudflare_zone_id" {
 variable "google_project_id" {
   description = "GCP project ID for the main StPeteMusic project. Set via TF_VAR_google_project_id in CI."
   type        = string
-  default     = ""  # empty default allows tofu validate/plan to pass without GCP creds
+  default     = "" # empty default allows tofu validate/plan to pass without GCP creds
 }
 
 variable "google_org_id" {
   description = "GCP organization ID for theburgmusic-org. Get via: gcloud organizations list. Set via TF_VAR_google_org_id in CI."
   type        = string
-  default     = ""  # empty default allows tofu validate/plan to pass without GCP creds
+  default     = "" # empty default allows tofu validate/plan to pass without GCP creds
 }
 
 variable "meta_pixel_id" {
   description = "Meta Pixel ID for Facebook/Instagram conversion tracking"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "facebook_system_user_token" {
+  description = "Meta Conversions API access token (Conversions API System User), used by apps/web/src/app/api/meta-events/route.ts"
   type        = string
   sensitive   = true
   default     = ""
