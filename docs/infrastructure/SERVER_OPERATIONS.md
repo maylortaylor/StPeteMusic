@@ -57,8 +57,8 @@ Current infrastructure for the StPeteMusic n8n automation server.
 | **Elastic IP** | `54.235.171.182` |
 | **Security Group** | `sg-03a69e68cf7077cf3` |
 | **SSH Key** | `~/.ssh/stpetemusic-n8n.pem` |
-| **DuckDNS Domain** | `n8n-stpetemusic.duckdns.org` |
-| **n8n URL** | https://n8n-stpetemusic.duckdns.org |
+| **DNS Provider** | Cloudflare (DNS only, not proxied) |
+| **n8n URL** | https://n8n.stpetemusic.live |
 | **SSL Cert** | Let's Encrypt via Certbot (expires June 7, 2026, auto-renews) |
 
 ---
@@ -81,7 +81,7 @@ EC2 t3.micro (Amazon Linux 2023)
 ## SSH Access
 
 ```bash
-ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n-stpetemusic.duckdns.org
+ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n.stpetemusic.live
 ```
 
 > Key file must have permissions `400`: `chmod 400 ~/.ssh/stpetemusic-n8n.pem`
@@ -180,7 +180,7 @@ docker run --rm \
 
 # From your Mac — copy backup down
 scp -i ~/.ssh/stpetemusic-n8n.pem \
-  ec2-user@n8n-stpetemusic.duckdns.org:~/backups/n8n-backup-*.tar.gz \
+  ec2-user@n8n.stpetemusic.live:~/backups/n8n-backup-*.tar.gz \
   ~/Downloads/
 ```
 
@@ -192,23 +192,16 @@ scp -i ~/.ssh/stpetemusic-n8n.pem \
 # From your Mac — copy local workflows to server
 scp -i ~/.ssh/stpetemusic-n8n.pem -r \
   /Users/matttaylor/Documents/_dev/maylortaylor/StPeteMusic/n8n/workflows/StPeteMusic/ \
-  ec2-user@n8n-stpetemusic.duckdns.org:~/stpetemusic/n8n/workflows/
+  ec2-user@n8n.stpetemusic.live:~/stpetemusic/n8n/workflows/
 
-# Then import in n8n UI at https://n8n-stpetemusic.duckdns.org
+# Then import in n8n UI at https://n8n.stpetemusic.live
 ```
 
 ---
 
-## DuckDNS Update
+## DNS Update
 
-If the Elastic IP ever changes (shouldn't happen, but just in case):
-
-1. Go to https://www.duckdns.org
-2. Update `n8n-stpetemusic` → new IP
-3. Or via curl (get your token from duckdns.org after login):
-```bash
-curl "https://www.duckdns.org/update?domains=n8n-stpetemusic&token=YOUR_TOKEN&ip=NEW_IP"
-```
+The Elastic IP is static and shouldn't change. If it ever does, update the Cloudflare `A`/`CNAME` record at dash.cloudflare.com → stpetemusic.live → DNS → Records to point at the new IP — no dynamic-update mechanism needed since Cloudflare DNS isn't tied to the instance lifecycle the way DuckDNS was.
 
 ---
 
@@ -248,7 +241,7 @@ aws ce get-cost-and-usage \
 | EC2 t3.micro | Free (750 hrs/mo) | ~$8.35/mo |
 | EBS 20GB gp3 | Free (30GB included) | Free |
 | Elastic IP | Free (while attached) | Free |
-| DuckDNS | Free forever | Free |
+| Cloudflare DNS | Free | Free |
 | Let's Encrypt SSL | Free forever | Free |
 | **Total** | **$0** | **~$8-10/mo** |
 
@@ -263,7 +256,7 @@ aws ce get-cost-and-usage \
 | 502 Bad Gateway | n8n not running — `docker ps`, then `docker restart n8n` |
 | Can't SSH | Check `.pem` permissions (`chmod 400`); verify Security Group has port 22 open |
 | SSL cert error | `sudo certbot renew`; check expiry with `sudo certbot certificates` |
-| Webhook not firing | Verify `WEBHOOK_URL=https://n8n-stpetemusic.duckdns.org/` in `.env` |
+| Webhook not firing | Verify `WEBHOOK_URL=https://n8n.stpetemusic.live/` in `.env` |
 | n8n won't start | `docker logs n8n` to see errors; check `.env` has `N8N_ENCRYPTION_KEY` set |
 
 ---
@@ -303,7 +296,7 @@ Workflows use `{{ $env.OBSIDIAN_HOST }}` for all Obsidian API calls.
 To update the production value:
 ```bash
 # SSH in and edit .env
-ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n-stpetemusic.duckdns.org
+ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n.stpetemusic.live
 nano ~/stpetemusic/.env  # update OBSIDIAN_HOST=
 docker restart n8n
 ```
