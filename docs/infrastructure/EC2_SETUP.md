@@ -3,7 +3,7 @@
 > **Goal:** Deploy n8n on a free AWS EC2 instance with a public HTTPS URL so your workflows
 > can receive webhooks from Instagram, Facebook, YouTube, and Obsidian — accessible from anywhere.
 >
-> **URL:** `https://n8n-stpetemusic.duckdns.org`
+> **URL:** `https://n8n.stpetemusic.live`
 > **Cost:** $0 for the first 12 months (AWS Free Tier)
 > **Skill level:** Beginner-friendly — every step is explained
 
@@ -15,7 +15,7 @@
 Your Browser / Obsidian / IG / FB / YouTube
          │
          ▼
-https://n8n-stpetemusic.duckdns.org   ← Free DuckDNS subdomain
+https://n8n.stpetemusic.live   ← Cloudflare DNS record (DNS only, not proxied)
          │
          ▼
 AWS Elastic IP (stable public IP, free while attached)
@@ -51,7 +51,7 @@ EC2 t3.micro — Amazon Linux 2023 (free tier)
 Before starting, make sure you have:
 - [ ] AWS account at https://aws.amazon.com (personal, not PSD)
 - [ ] AWS CLI configured: `aws configure --profile personal`
-- [ ] A DuckDNS account at https://www.duckdns.org (free, sign in with Google)
+- [ ] Access to the `stpetemusic.live` zone in Cloudflare (dash.cloudflare.com)
 - [ ] This repo cloned locally
 
 Verify your AWS profile is correct:
@@ -161,7 +161,7 @@ aws ec2 run-instances \
 ### 1.5 — Allocate and Attach an Elastic IP
 
 An Elastic IP is a static public IP address. Without it, your server's IP changes every
-time you stop and start it — which would break your DuckDNS URL. It's free as long as
+time you stop and start it — which would break your DNS record. It's free as long as
 it's attached to a running instance.
 
 ```bash
@@ -180,31 +180,25 @@ aws ec2 associate-address \
   --region us-east-1
 ```
 
-> **Write down your Elastic IP** — you'll need it for DuckDNS in the next phase.
+> **Write down your Elastic IP** — you'll need it for the DNS record in the next phase.
 
 ---
 
-## Phase 2 — DuckDNS Free Domain Setup
+## Phase 2 — Point DNS at the Elastic IP (Cloudflare)
 
-DuckDNS gives you a free subdomain (like `n8n-stpetemusic.duckdns.org`) that points to
-your server's Elastic IP. It's free forever and works with Let's Encrypt for HTTPS.
+The domain is `n8n.stpetemusic.live`, managed in Cloudflare (DNS only — never enable the orange-cloud proxy here, since it doesn't pass through raw TCP the way nginx/Certbot need).
 
-### 2.1 — Register the Subdomain
+### 2.1 — Add the DNS Record
 
-1. Go to https://www.duckdns.org
-2. Sign in with your Google account (use TheBurgMusic@gmail.com or personal)
-3. In the "sub domain" field, type: `n8n-stpetemusic`
-4. Click **"add domain"**
-5. In the **current ip** field, enter your **Elastic IP** from Phase 1
-6. Click **"update ip"**
-
-Your domain is now live: `n8n-stpetemusic.duckdns.org` → your server IP.
+1. Go to dash.cloudflare.com → `stpetemusic.live` → DNS → Records
+2. Add an `A` record: name `n8n`, content = your **Elastic IP** from Phase 1
+3. Proxy status: **DNS only** (grey cloud)
 
 ### 2.2 — Verify It Works
 
 ```bash
 # From your Mac terminal — should return your Elastic IP
-nslookup n8n-stpetemusic.duckdns.org
+nslookup n8n.stpetemusic.live
 ```
 
 ---
@@ -213,7 +207,7 @@ nslookup n8n-stpetemusic.duckdns.org
 
 ```bash
 # SSH into the EC2 instance
-ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n-stpetemusic.duckdns.org
+ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n.stpetemusic.live
 
 # Or using the Elastic IP directly:
 ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@YOUR_ELASTIC_IP
@@ -311,7 +305,7 @@ Paste this initial config (HTTP only — for cert validation):
 ```nginx
 server {
     listen 80;
-    server_name n8n-stpetemusic.duckdns.org;
+    server_name n8n.stpetemusic.live;
 
     location / {
         proxy_pass http://localhost:5678;
@@ -336,7 +330,7 @@ sudo systemctl reload nginx
 ### 5.2 — Get the SSL Certificate
 
 ```bash
-sudo certbot --nginx -d n8n-stpetemusic.duckdns.org \
+sudo certbot --nginx -d n8n.stpetemusic.live \
   --non-interactive \
   --agree-tos \
   --email TheBurgMusic@gmail.com
@@ -360,17 +354,17 @@ sudo nano /etc/nginx/conf.d/n8n.conf
 # Redirect HTTP to HTTPS
 server {
     listen 80;
-    server_name n8n-stpetemusic.duckdns.org;
+    server_name n8n.stpetemusic.live;
     return 301 https://$host$request_uri;
 }
 
 # HTTPS + proxy to n8n
 server {
     listen 443 ssl;
-    server_name n8n-stpetemusic.duckdns.org;
+    server_name n8n.stpetemusic.live;
 
-    ssl_certificate /etc/letsencrypt/live/n8n-stpetemusic.duckdns.org/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/n8n-stpetemusic.duckdns.org/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/n8n.stpetemusic.live/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/n8n.stpetemusic.live/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
@@ -480,10 +474,10 @@ services:
     # No port 5678 exposed externally — nginx handles all traffic
     environment:
       # Core
-      - N8N_HOST=n8n-stpetemusic.duckdns.org
+      - N8N_HOST=n8n.stpetemusic.live
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
-      - WEBHOOK_URL=https://n8n-stpetemusic.duckdns.org/
+      - WEBHOOK_URL=https://n8n.stpetemusic.live/
       - GENERIC_TIMEZONE=America/New_York
 
       # Security
@@ -532,7 +526,7 @@ From your **local Mac** (not inside SSH):
 # Copy workflow files to the server
 scp -i ~/.ssh/stpetemusic-n8n.pem -r \
   /Users/matttaylor/Documents/_dev/maylortaylor/StPeteMusic/n8n/workflows/StPeteMusic/ \
-  ec2-user@n8n-stpetemusic.duckdns.org:~/stpetemusic/n8n/workflows/
+  ec2-user@n8n.stpetemusic.live:~/stpetemusic/n8n/workflows/
 ```
 
 ### 6.5 — Start n8n
@@ -552,7 +546,7 @@ Look for: `n8n ready on 0.0.0.0, port 5678`
 
 ### 6.6 — First Login + Owner Account Setup
 
-1. Open your browser: `https://n8n-stpetemusic.duckdns.org`
+1. Open your browser: `https://n8n.stpetemusic.live`
 2. n8n will prompt you to create an **owner account**
    - Use `TheBurgMusic@gmail.com` or your preferred email
    - Set a strong password
@@ -595,7 +589,7 @@ Repeat the process for each platform using the values from your `.env` file.
 1. In n8n: **Workflows → Import from File**
 2. Import each `.json` file from `~/stpetemusic/n8n/workflows/StPeteMusic/`
 3. Open each workflow and:
-   - Update any hardcoded URLs to use `https://n8n-stpetemusic.duckdns.org`
+   - Update any hardcoded URLs to use `https://n8n.stpetemusic.live`
    - Verify credentials are connected (look for green dots on nodes)
    - Activate the workflow (toggle at top right)
 
@@ -605,7 +599,7 @@ Repeat the process for each platform using the values from your `.env` file.
 
 ### SSH into the server
 ```bash
-ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n-stpetemusic.duckdns.org
+ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n.stpetemusic.live
 ```
 
 ### Common Docker commands
@@ -630,12 +624,8 @@ docker pull n8nio/n8n:latest
 docker-compose -f docker-compose.prod.yaml up -d
 ```
 
-### Update DuckDNS IP (if Elastic IP ever changes)
-```bash
-curl "https://www.duckdns.org/update?domains=n8n-stpetemusic&token=YOUR_DUCKDNS_TOKEN&ip="
-```
-
-> Get your DuckDNS token from https://www.duckdns.org after logging in.
+### Update DNS (if Elastic IP ever changes)
+Update the Cloudflare `A` record for `n8n` at dash.cloudflare.com → stpetemusic.live → DNS → Records to point at the new IP.
 
 ### Backup n8n data
 ```bash
@@ -647,7 +637,7 @@ docker run --rm \
 
 # Copy backup to your Mac
 scp -i ~/.ssh/stpetemusic-n8n.pem \
-  ec2-user@n8n-stpetemusic.duckdns.org:~/backups/n8n-backup-*.tar.gz \
+  ec2-user@n8n.stpetemusic.live:~/backups/n8n-backup-*.tar.gz \
   ~/Downloads/
 ```
 
@@ -679,7 +669,7 @@ Recommended: Alert at $5/month while on free tier.
 | SSL cert errors | Run `sudo certbot renew`; check cert expiry: `sudo certbot certificates` |
 | Webhook not receiving | Verify `WEBHOOK_URL` env var is set correctly; check n8n logs |
 | "Connection refused" | n8n may not be running: `docker ps` to check |
-| DuckDNS not resolving | Update IP at duckdns.org; wait 1-2 min for DNS propagation |
+| Domain not resolving | Check the Cloudflare `A` record for `n8n` points at the current Elastic IP and proxy is **off** (grey cloud); allow a few minutes for propagation |
 
 ---
 
