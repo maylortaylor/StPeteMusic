@@ -24,7 +24,7 @@ Manage all AWS infrastructure, CI/CD, DNS, and server operations using infrastru
 | Web App | Amplify SSR · app ID: `d1fjwgk99cbqor` → `stpetemusic.live` |
 | Admin App | Amplify SSR · app ID: `d2n0tn0yijqxny` → `admin.stpetemusic.live` |
 | Database | RDS PostgreSQL 16 · `stpetemusic-postgres.cmnogyowgoe1.us-east-1.rds.amazonaws.com` |
-| n8n Server | EC2 t3.micro · `54.235.171.182` → `n8n.stpetemusic.live` |
+| n8n Server | EC2 t3.small (`i-03874197d725b0455`, not free-tier eligible) · `54.235.171.182` → `n8n.stpetemusic.live` |
 | DNS | Cloudflare (DNS only — never proxy) |
 | State | S3 `stpetemusic-terraform-state` + DynamoDB lock table |
 

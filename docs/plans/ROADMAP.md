@@ -53,7 +53,7 @@
 | Component | Status | Details |
 |---|---|---|
 | **Next.js Web App** | ✅ Live | https://www.stpetemusic.live (AWS Amplify SSR, prod + staging) |
-| **EC2 t3.micro** | ✅ Running | `us-east-1`, Elastic IP `54.235.171.182`, instance `i-03874197d725b0455` |
+| **EC2 t3.small** | ✅ Running | `us-east-1`, Elastic IP `54.235.171.182`, instance `i-03874197d725b0455` (upgraded from t3.micro to fix the 2026-04-28 OOM incident — not free-tier eligible) |
 | **RDS PostgreSQL 16** | ✅ Running | `db.t4g.micro`, databases: `n8n` + `listmonk_stpetemusic` (SSL required) |
 | **OpenTofu IaC** | ✅ Active | S3 state backend (`stpetemusic-terraform-state`) + DynamoDB lock table |
 | **GitHub Actions CI/CD** | ✅ Active | `tofu-plan.yml`, `tofu-apply.yml`, `ci.yml`, `deploy.yml`, `web-ci.yml` |
@@ -306,7 +306,7 @@ Also: uncomment `aws_s3_bucket.listmonk_media` in `infrastructure/backup.tf` to 
 
 ## 7. Memory Budget
 
-**t3.micro = 1GB RAM + 2GB swap**
+**t3.small = 2GB RAM + 2GB swap** (upgraded from t3.micro after the 2026-04-28 OOM incident — see `docs/incidents/EC2_OOM_2026-04-28.md`)
 
 PostgreSQL is now on RDS — off-instance. EC2 only runs Docker containers.
 
@@ -315,11 +315,9 @@ PostgreSQL is now on RDS — off-instance. EC2 only runs Docker containers.
 | n8n | ~1,024MB limit | `mem_limit: 1024m` in docker-compose.prod.yaml |
 | Listmonk | ~50MB | Docker container, lean binary |
 | nginx | ~20MB | Proxy for n8n + Listmonk |
-| **Phase 1 total** | **~1.1GB** | Relies on swap — monitor |
+| **Phase 1 total** | **~1.1GB** | Comfortable headroom on 2GB RAM + 2GB swap |
 | Payload CMS (Phase 2) | +300MB | `--max-old-space-size=256` in PM2 |
-| **Phase 2 total** | **~1.4GB** | Monitor closely; upgrade to t3.small if needed |
-
-If memory pressure: upgrade to t3.small (~$17/mo, 2GB RAM).
+| **Phase 2 total** | **~1.4GB** | Still within budget on t3.small |
 
 ---
 
@@ -451,7 +449,7 @@ CREATE TABLE media_uploads (
 
 | Service | Year 1 (Free Tier) | Year 2+ | Notes |
 |---|---|---|---|
-| EC2 t3.micro | **$0** | **~$8.50/mo** | n8n + Listmonk + nginx (Docker) |
+| EC2 t3.small | **~$15-18/mo** (not free-tier eligible) | **~$15-18/mo** | n8n + Listmonk + MediaMTX + nginx (Docker) |
 | EBS 20GB gp3 | **$0** | **~$1.60/mo** | Already provisioned |
 | Elastic IP | **$0** | **$0** | Attached to running instance |
 | RDS db.t4g.micro | **$0** (free tier) | **~$13/mo** | PostgreSQL — n8n + Listmonk databases |
