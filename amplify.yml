@@ -15,6 +15,8 @@ applications:
               echo "REVALIDATION_SECRET=$REVALIDATION_SECRET" >> .env.production
               echo "YOUTUBE_CHANNEL_ID=$YOUTUBE_CHANNEL_ID" >> .env.production
               echo "YOUTUBE_API_KEY=$YOUTUBE_API_KEY" >> .env.production
+              echo "FACEBOOK_PIXEL_ID=$FACEBOOK_PIXEL_ID" >> .env.production
+              echo "FACEBOOK_SYSTEM_USER_TOKEN=$FACEBOOK_SYSTEM_USER_TOKEN" >> .env.production
         build:
           commands:
             - npm run build
