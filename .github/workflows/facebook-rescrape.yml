@@ -1,0 +1,56 @@
+name: Re-scrape OG Images on Facebook
+
+# Runs after Deploy to Amplify finishes — that workflow already polls until
+# the Amplify build status is SUCCEED and runs post-deploy health checks, so
+# its completion is the first point at which production is confirmed to be
+# serving the new social-images.ts. Re-scraping any earlier (e.g. right after
+# uploading images, before the commit-back PR merges and deploys) tells
+# Facebook to cache whatever og:image the page was still serving at that
+# moment — which is the old one.
+
+on:
+  workflow_run:
+    workflows: ["Deploy to Amplify"]
+    types: [completed]
+
+jobs:
+  rescrape:
+    name: Trigger Facebook re-scrape
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 2
+
+      - name: Check if social-images.ts changed in this deploy
+        id: check
+        run: |
+          if git diff --name-only HEAD^ HEAD | grep -qx 'apps/web/src/config/social-images.ts'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Trigger Facebook re-scrape
+        if: steps.check.outputs.changed == 'true'
+        env:
+          FB_ACCESS_TOKEN: ${{ secrets.FB_ACCESS_TOKEN }}
+        run: |
+          PAGES=(
+            "https://www.stpetemusic.live"
+            "https://www.stpetemusic.live/about"
+            "https://www.stpetemusic.live/events"
+            "https://www.stpetemusic.live/discover"
+            "https://www.stpetemusic.live/live"
+            "https://www.stpetemusic.live/venues"
+            "https://www.stpetemusic.live/tickets"
+          )
+          for PAGE in "${PAGES[@]}"; do
+            ENCODED=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$PAGE', safe=''))")
+            echo "Scraping: $PAGE"
+            curl -s -X POST \
+              "https://graph.facebook.com/?id=${ENCODED}&scrape=true&access_token=${FB_ACCESS_TOKEN}" \
+              | python3 -m json.tool || true
+          done
