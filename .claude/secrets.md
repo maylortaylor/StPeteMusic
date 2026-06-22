@@ -1,7 +1,7 @@
 ---
 topic: secrets
 triggers: secret, token, env, github secret, rotate, credential, password, api key, ig_access_token, env var, listmonk, environment variable
-updated: 2026-04-30
+updated: 2026-06-21
 ---
 
 # Secrets Management
@@ -33,6 +33,8 @@ GitHub Secrets → deploy.yml (on push to main) → writes ~/stpetemusic/.env �
 | `GROQ_API_KEY` / `N8N_GEMINI_API_KEY` | same | Groq + Gemini |
 | `IG_USER_ID` / `IG_APP_ID` / `IG_ACCESS_TOKEN` | same | Instagram |
 | `FB_PAGE_ID` / `FB_ACCESS_TOKEN` | same | Facebook |
+| `FACEBOOK_PIXEL_ID` | same + `NEXT_PUBLIC_META_PIXEL_ID` (via `meta_pixel_id` TF var) | Meta Pixel / Conversions API — read by `apps/web/src/app/api/meta-events/route.ts` |
+| `FACEBOOK_SYSTEM_USER_TOKEN` | same | Meta Conversions API token (Meta's auto-created "Conversions API System User") |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` / `YOUTUBE_API_KEY` | YouTube vars | YouTube |
 | `LISTMONK_USERNAME` / `LISTMONK_PASSWORD` | same | Listmonk API user (NOT admin login) |
 
