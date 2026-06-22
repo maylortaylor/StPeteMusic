@@ -183,19 +183,27 @@
     {
       "parameters": {
         "conditions": {
-          "string": [
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
             {
-              "value1": "={{ $json.status_code }}",
-              "operation": "equals",
-              "value2": "FINISHED"
+              "id": "9c1f1a00-0000-4000-8000-00000000ig01",
+              "leftValue": "={{ $json.status_code }}",
+              "rightValue": "FINISHED",
+              "operator": { "type": "string", "operation": "equals" }
             }
-          ]
-        }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
       "id": "a1f3c1a0-1000-4000-8000-000000000014",
       "name": "Is IG Ready?",
       "type": "n8n-nodes-base.if",
-      "typeVersion": 1,
+      "typeVersion": 2,
       "position": [1800, 520]
     },
     {
