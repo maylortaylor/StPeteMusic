@@ -26,6 +26,7 @@ Only `workflows/StPeteMusic/` is active. All other workflow directories are lega
 | `obsidian-post-creator.json` | Chat agent → YouTube post metadata → Obsidian draft | Claude (default) |
 | `obsidian-to-youtube-posting.json` | Obsidian draft → YouTube publish | Claude (default) |
 | `youtube-shorts-tracker-creator.json` | YouTube Shorts tracking and creation | Gemini (backup) |
+| `go-live-notify.json` | MediaMTX `runOnReady` webhook → FB Page post + FB/IG Stories with link back to `/live` | — (no AI, pure fan-out) |
 | `system-prompt.md` | Source of truth for obsidian-post-creator AI prompt | — |
 | `newsletter-system-prompt.md` | Source of truth for newsletter-draft-creator AI prompt | — |
 
