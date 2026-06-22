@@ -14,6 +14,9 @@ useDefault = true
     '''docs/AWS_DEPLOYMENT\.md$''',
     '''AWS_SETUP\.md$''',
     '''README\.md$''',
+    # Third-party n8n-skills pack (czlonkowski/n8n-skills, MIT) — example storage keys
+    # like "sess12-9f3c1a.png" trip the generic-api-key heuristic but aren't secrets.
+    '''\.claude/skills/n8n-binary-and-data/AGENT_TOOL_BINARY\.md$''',
   ]
   regexes = [
     # Ignore placeholder patterns used in docs
