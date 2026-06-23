@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { toast } from '@/lib/toast';
 import { toDatetimeLocal, easternToUtcIso } from '@/lib/eastern-time';
+import { buildManualEntryPayload } from '@/lib/manual-entry';
+import { importEventViaApi } from '@/lib/import-event';
 
 type EbEventRow = {
   eventbrite_id: string;
@@ -163,16 +165,10 @@ export default function EventbritePage() {
     setFbError(null);
     setFbNeedsManualEntry(null);
     try {
-      const res = await fetch('/api/events/import', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: fbUrl, showOnTickets: true }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? 'Import failed');
+      const data = await importEventViaApi(fbUrl, { showOnTickets: true });
 
       if (data.needsManualEntry) {
-        setFbNeedsManualEntry({ url: data.url });
+        setFbNeedsManualEntry({ url: data.url ?? fbUrl });
         return;
       }
 
@@ -198,17 +194,9 @@ export default function EventbritePage() {
       const res = await fetch('/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: fbManualForm.title,
-          start_time: easternToUtcIso(fbManualForm.start_time),
-          end_time: fbManualForm.end_time ? easternToUtcIso(fbManualForm.end_time) : undefined,
-          location: fbManualForm.location || undefined,
-          image_url: fbManualForm.image_url || undefined,
-          ticket_url: fbManualForm.ticket_url || undefined,
-          source: 'facebook',
-          show_on_tickets: true,
-          extra_data: { source: 'facebook', fb_event_url: fbNeedsManualEntry.url },
-        }),
+        body: JSON.stringify(
+          buildManualEntryPayload(fbManualForm, fbNeedsManualEntry.url, { showOnTickets: true }),
+        ),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Save failed');

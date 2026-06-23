@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, Ticket } from 'lucide-react';
 import { toast } from '@/lib/toast';
-import { easternToUtcIso } from '@/lib/eastern-time';
+import { buildManualEntryPayload } from '@/lib/manual-entry';
+import { importEventViaApi } from '@/lib/import-event';
 
 const VENUE_LABELS: Record<string, string> = {
   'suite-e-studios': 'Suite E Studios',
@@ -139,20 +140,14 @@ export default function EventsPage() {
     setImportResult(null);
     setNeedsManualEntry(null);
     try {
-      const res = await fetch('/api/events/import', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: importUrl }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? 'Import failed');
+      const data = await importEventViaApi(importUrl);
 
       if (data.needsManualEntry) {
-        setNeedsManualEntry({ url: data.url, fbEventId: data.fbEventId });
+        setNeedsManualEntry({ url: data.url ?? importUrl, fbEventId: data.fbEventId ?? '' });
         return;
       }
 
-      setImportResult({ name: data.name, source: data.source });
+      setImportResult({ name: data.name ?? '', source: data.source ?? '' });
       setImportUrl('');
       await fetchEvents();
     } catch (err) {
@@ -174,16 +169,7 @@ export default function EventsPage() {
       const res = await fetch('/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: manualForm.title,
-          start_time: easternToUtcIso(manualForm.start_time),
-          end_time: manualForm.end_time ? easternToUtcIso(manualForm.end_time) : undefined,
-          location: manualForm.location || undefined,
-          image_url: manualForm.image_url || undefined,
-          ticket_url: manualForm.ticket_url || undefined,
-          source: 'facebook',
-          extra_data: { source: 'facebook', fb_event_url: needsManualEntry.url },
-        }),
+        body: JSON.stringify(buildManualEntryPayload(manualForm, needsManualEntry.url)),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Save failed');
