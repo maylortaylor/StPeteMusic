@@ -6,6 +6,8 @@ import { toast } from '@/lib/toast';
 import { toDatetimeLocal, easternToUtcIso } from '@/lib/eastern-time';
 import { buildManualEntryPayload } from '@/lib/manual-entry';
 import { importEventViaApi } from '@/lib/import-event';
+import { DateHourRangeFields } from '@/components/DateHourRangeFields';
+import { DateHourField } from '@/components/DateHourField';
 
 type EbEventRow = {
   eventbrite_id: string;
@@ -619,20 +621,12 @@ export default function EventbritePage() {
                   placeholder="Title *"
                   className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 />
-                <div className="grid grid-cols-2 gap-2">
-                  <input
-                    type="datetime-local"
-                    value={fbManualForm.start_time}
-                    onChange={(e) => setFbManualForm({ ...fbManualForm, start_time: e.target.value })}
-                    className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  />
-                  <input
-                    type="datetime-local"
-                    value={fbManualForm.end_time}
-                    onChange={(e) => setFbManualForm({ ...fbManualForm, end_time: e.target.value })}
-                    className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  />
-                </div>
+                <DateHourRangeFields
+                  startValue={fbManualForm.start_time}
+                  endValue={fbManualForm.end_time}
+                  onStartChange={(value) => setFbManualForm((prev) => ({ ...prev, start_time: value }))}
+                  onEndChange={(value) => setFbManualForm((prev) => ({ ...prev, end_time: value }))}
+                />
                 <input
                   type="text"
                   value={fbManualForm.location}
@@ -739,7 +733,7 @@ export default function EventbritePage() {
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">Location</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">Image URL</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">Ticket URL</th>
-                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Actions</th>
+                  <th className="sticky right-0 border-l border-border bg-muted/50 px-3 py-2 text-left font-medium text-muted-foreground">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -757,11 +751,9 @@ export default function EventbritePage() {
                       />
                     </td>
                     <td className="px-3 py-2">
-                      <input
-                        type="datetime-local"
-                        defaultValue={toDatetimeLocal(ev.start_time)}
-                        onBlur={(e) => e.target.value && updateFeaturedField(ev.id, 'start_time', easternToUtcIso(e.target.value))}
-                        className="rounded-md border border-transparent bg-transparent px-2 py-1 hover:border-input focus:border-input focus:outline-none"
+                      <DateHourField
+                        value={toDatetimeLocal(ev.start_time)}
+                        onChange={(value) => value && updateFeaturedField(ev.id, 'start_time', easternToUtcIso(value))}
                       />
                     </td>
                     <td className="px-3 py-2">
@@ -788,7 +780,7 @@ export default function EventbritePage() {
                         className="w-full min-w-[140px] rounded-md border border-transparent bg-transparent px-2 py-1 hover:border-input focus:border-input focus:outline-none"
                       />
                     </td>
-                    <td className="px-3 py-2 whitespace-nowrap">
+                    <td className="sticky right-0 whitespace-nowrap border-l border-border bg-card px-3 py-2">
                       <button
                         onClick={() => removeFromTickets(ev.id, ev.title)}
                         className="text-xs text-red-500 hover:text-red-700"

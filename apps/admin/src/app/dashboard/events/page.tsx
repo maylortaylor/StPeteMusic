@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, Ticket } from 'lucide-react';
 import { toast } from '@/lib/toast';
 import { buildManualEntryPayload } from '@/lib/manual-entry';
 import { importEventViaApi } from '@/lib/import-event';
+import { DateHourRangeFields } from '@/components/DateHourRangeFields';
 
 const VENUE_LABELS: Record<string, string> = {
   'suite-e-studios': 'Suite E Studios',
@@ -245,18 +246,14 @@ export default function EventsPage() {
                 placeholder="Title *"
                 className="rounded-md border border-input bg-background px-3 py-2 text-sm sm:col-span-2"
               />
-              <input
-                type="datetime-local"
-                value={manualForm.start_time}
-                onChange={(e) => setManualForm({ ...manualForm, start_time: e.target.value })}
-                className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-              />
-              <input
-                type="datetime-local"
-                value={manualForm.end_time}
-                onChange={(e) => setManualForm({ ...manualForm, end_time: e.target.value })}
-                className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-              />
+              <div className="sm:col-span-2">
+                <DateHourRangeFields
+                  startValue={manualForm.start_time}
+                  endValue={manualForm.end_time}
+                  onStartChange={(value) => setManualForm((prev) => ({ ...prev, start_time: value }))}
+                  onEndChange={(value) => setManualForm((prev) => ({ ...prev, end_time: value }))}
+                />
+              </div>
               <input
                 type="text"
                 value={manualForm.location}
