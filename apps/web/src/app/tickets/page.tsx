@@ -8,7 +8,7 @@ import { getActiveEventbriteEvents } from '@/lib/queries/eventbrite';
 import { getFeaturedTicketEvents, type FeaturedTicketEvent } from '@/lib/queries/tickets-extras';
 
 const SOURCE_SECTIONS: { key: string; label: string }[] = [
-  { key: 'facebook', label: 'Facebook' },
+  { key: 'facebook', label: 'Facebook Events' },
   { key: 'google', label: 'Google Calendar' },
 ];
 
@@ -103,7 +103,7 @@ export default async function TicketsPage() {
             <div className="space-y-12">
               {eventbriteEvents.length > 0 && (
                 <section>
-                  <h2 className="text-xl font-bold text-foreground mb-4">Eventbrite</h2>
+                  <h2 className="text-xl font-bold text-foreground mb-4">Eventbrite Events</h2>
 
                   {/* Eventbrite attribution */}
                   <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border border-border bg-card px-5 py-4 max-w-2xl">
@@ -112,7 +112,7 @@ export default async function TicketsPage() {
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
                       </svg>
                       <span>
-                        Events are powered by{' '}
+                        St. Pete Music approved events, powered by{' '}
                         <span className="font-semibold text-foreground">Eventbrite</span>
                         {' '}— browse and purchase tickets directly on our Eventbrite page.
                       </span>
@@ -137,7 +137,10 @@ export default async function TicketsPage() {
 
               {otherSections.map((section) => (
                 <section key={section.label}>
-                  <h2 className="text-xl font-bold text-foreground mb-4">{section.label}</h2>
+                  <h2 className="text-xl font-bold text-foreground mb-1">{section.label}</h2>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    St. Pete Music approved events
+                  </p>
                   <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {section.events.map((event) => (
                       <ExternalEventCard key={event.id} event={event} />

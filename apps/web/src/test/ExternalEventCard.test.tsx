@@ -23,18 +23,18 @@ describe('ExternalEventCard', () => {
     expect(screen.getByText(/Get Tickets/)).toBeInTheDocument();
   });
 
-  it('falls back to fb_event_url from extra_data and shows "View Event"', () => {
+  it('falls back to fb_event_url from extra_data and shows "See Event"', () => {
     render(
       <ExternalEventCard
         event={{ ...baseEvent, extra_data: JSON.stringify({ fb_event_url: 'https://facebook.com/events/123' }) }}
       />,
     );
-    expect(screen.getByText(/View Event/)).toBeInTheDocument();
+    expect(screen.getByText(/See Event/)).toBeInTheDocument();
   });
 
   it('renders with no link when neither ticket_url nor fb_event_url is present', () => {
     render(<ExternalEventCard event={baseEvent} />);
-    expect(screen.queryByText(/Get Tickets|View Event/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Get Tickets|See Event/)).not.toBeInTheDocument();
   });
 
   it('tolerates malformed extra_data JSON', () => {
