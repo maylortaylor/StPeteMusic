@@ -78,8 +78,8 @@ describe('EventsPage', () => {
 
     const titleInput = await screen.findByPlaceholderText('Title *');
     fireEvent.change(titleInput, { target: { value: 'Manual Show' } });
-    const [startInput] = document.querySelectorAll('input[type="datetime-local"]');
-    fireEvent.change(startInput, { target: { value: '2026-08-01T20:00' } });
+    const dateInput = document.querySelector('input[type="date"]') as HTMLInputElement;
+    fireEvent.change(dateInput, { target: { value: '2026-08-01' } });
 
     fireEvent.click(screen.getByText('Save Event'));
 

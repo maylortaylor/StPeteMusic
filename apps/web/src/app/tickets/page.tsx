@@ -26,6 +26,13 @@ function groupBySource(events: FeaturedTicketEvent[]): { label: string; events: 
   return groups;
 }
 
+// AWS Amplify's Next.js SSR hosting doesn't reliably persist on-demand ISR
+// revalidation (revalidatePath/revalidateTag) across Lambda invocations, so a
+// statically-prerendered version of this page can get stuck serving a stale
+// snapshot indefinitely. Render fresh on every request instead — the
+// underlying queries still have their own unstable_cache data-layer cache.
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Tickets | St. Pete Music',
   description:
