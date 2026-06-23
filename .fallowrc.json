@@ -13,5 +13,9 @@
     "@unrs/resolver-binding-linux-x64-gnu",
     "lightningcss-darwin-arm64",
     "lightningcss-linux-x64-gnu"
-  ]
+  ],
+  "duplicates": {
+    "minLines": 15,
+    "minTokens": 80
+  }
 }

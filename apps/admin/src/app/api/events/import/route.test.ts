@@ -89,6 +89,32 @@ describe('POST /api/events/import', () => {
       expect(res.status).toBe(400);
     });
 
+    it('returns 502 when the Eventbrite API call fails', async () => {
+      vi.mocked(parseEventbriteEventId).mockReturnValue('123');
+      vi.mocked(fetchEventById).mockRejectedValue(new Error('Eventbrite API timeout'));
+
+      const res = await POST(makeRequest({ url: 'https://www.eventbrite.com/e/123' }));
+      const data = await res.json();
+
+      expect(res.status).toBe(502);
+      expect(data.error).toBe('Eventbrite API timeout');
+    });
+
+    it('returns 502 when the event is missing a name or start time', async () => {
+      vi.mocked(parseEventbriteEventId).mockReturnValue('123');
+      vi.mocked(fetchEventById).mockResolvedValue({
+        eventbriteId: '123',
+        name: '',
+        startUtc: null,
+      } as never);
+
+      const res = await POST(makeRequest({ url: 'https://www.eventbrite.com/e/123' }));
+      const data = await res.json();
+
+      expect(res.status).toBe(502);
+      expect(data.error).toMatch(/missing a name or start time/);
+    });
+
     it('updates the linked events row instead of inserting a duplicate', async () => {
       vi.mocked(parseEventbriteEventId).mockReturnValue('123');
       vi.mocked(fetchEventById).mockResolvedValue({
