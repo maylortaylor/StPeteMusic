@@ -59,7 +59,7 @@ export function ExternalEventCard({ event }: { event: FeaturedTicketEvent }) {
               rel="noopener noreferrer"
               className="block w-full rounded-lg bg-[#f05537] py-2.5 text-center text-sm font-semibold text-white hover:bg-[#d94a2e] transition-colors"
             >
-              {event.ticket_url ? 'Get Tickets' : 'View Event'} →
+              {event.ticket_url ? 'Get Tickets' : 'See Event'} →
             </a>
           </div>
         )}
