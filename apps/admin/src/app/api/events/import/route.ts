@@ -43,6 +43,24 @@ async function upsertEventByExtraDataField(
   return inserted[0].id;
 }
 
+// An admin may have already linked this Eventbrite event to a calendar
+// row from the /dashboard/eventbrite ticketing page — update that row
+// instead of creating a duplicate.
+async function saveEventbriteValues(db: Db, eventId: string, values: EventValues): Promise<string> {
+  const linked = await db
+    .select({ linked_event_id: eventbrite_events.linked_event_id })
+    .from(eventbrite_events)
+    .where(eq(eventbrite_events.eventbrite_id, eventId))
+    .limit(1);
+  const linkedEventId = linked[0]?.linked_event_id ?? null;
+
+  if (linkedEventId) {
+    await db.update(events).set(values).where(eq(events.id, linkedEventId));
+    return linkedEventId;
+  }
+  return upsertEventByExtraDataField(db, 'eventbrite_id', eventId, values);
+}
+
 async function importEventbrite(db: Db, url: string, showOnTickets?: boolean): Promise<Response> {
   const eventId = parseEventbriteEventId(url);
   if (!eventId) {
@@ -84,23 +102,7 @@ async function importEventbrite(db: Db, url: string, showOnTickets?: boolean): P
     ...(showOnTickets ? { show_on_tickets: true } : {}),
   };
 
-  // An admin may have already linked this Eventbrite event to a calendar
-  // row from the /dashboard/eventbrite ticketing page — update that row
-  // instead of creating a duplicate.
-  const linked = await db
-    .select({ linked_event_id: eventbrite_events.linked_event_id })
-    .from(eventbrite_events)
-    .where(eq(eventbrite_events.eventbrite_id, eventId))
-    .limit(1);
-  const linkedEventId = linked[0]?.linked_event_id ?? null;
-
-  let savedId: string;
-  if (linkedEventId) {
-    await db.update(events).set(values).where(eq(events.id, linkedEventId));
-    savedId = linkedEventId;
-  } else {
-    savedId = await upsertEventByExtraDataField(db, 'eventbrite_id', eventId, values);
-  }
+  const savedId = await saveEventbriteValues(db, eventId, values);
 
   await revalidateWebApp(showOnTickets ? 'tickets' : undefined);
   return Response.json({ imported: true, id: savedId, name: ebEvent.name, source: 'eventbrite' });
