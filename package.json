@@ -33,8 +33,7 @@
     "reinstall": "rm -rf node_modules apps/*/node_modules packages/*/node_modules apps/web/.next && npm install"
   },
   "devDependencies": {
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react": "^19.2.7"
   },
   "optionalDependencies": {
     "@esbuild/linux-x64": "0.28.0",

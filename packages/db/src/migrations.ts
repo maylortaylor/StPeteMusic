@@ -1181,4 +1181,22 @@ WHERE a.soundcloud_url IS NOT NULL AND a.soundcloud_url != ''
   AND NOT EXISTS (SELECT 1 FROM artist_links al WHERE al.artist_id = a.id AND al.platform = 'soundcloud');
 `,
   },
+  {
+    filename: '035_add_show_on_tickets.sql',
+    sql: `
+ALTER TABLE events ADD COLUMN IF NOT EXISTS show_on_tickets BOOLEAN NOT NULL DEFAULT false;
+CREATE INDEX IF NOT EXISTS idx_events_show_on_tickets ON events (show_on_tickets) WHERE show_on_tickets = true;
+`,
+  },
+  {
+    filename: '036_make_google_event_id_nullable.sql',
+    sql: `
+-- google_event_id was NOT NULL from the original Google-Calendar-only design
+-- (015_add_events_table.sql). Manual/Facebook/Eventbrite-sourced rows have no
+-- Google Calendar counterpart, so it must be nullable. Postgres UNIQUE already
+-- allows multiple NULLs, so the uniqueness guarantee for real Google event IDs
+-- is unaffected.
+ALTER TABLE events ALTER COLUMN google_event_id DROP NOT NULL;
+`,
+  },
 ];

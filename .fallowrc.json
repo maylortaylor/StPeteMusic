@@ -1,0 +1,21 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "ignoreDependencies": [
+    "sharp",
+    "raw-loader",
+    "@esbuild/linux-x64",
+    "@img/sharp-libvips-linux-x64",
+    "@img/sharp-linux-x64",
+    "@next/swc-linux-x64-gnu",
+    "@rolldown/binding-linux-x64-gnu",
+    "@rollup/rollup-linux-x64-gnu",
+    "@tailwindcss/oxide-linux-x64-gnu",
+    "@unrs/resolver-binding-linux-x64-gnu",
+    "lightningcss-darwin-arm64",
+    "lightningcss-linux-x64-gnu"
+  ],
+  "duplicates": {
+    "minLines": 15,
+    "minTokens": 80
+  }
+}

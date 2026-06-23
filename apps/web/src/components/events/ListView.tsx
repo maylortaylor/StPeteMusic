@@ -5,6 +5,7 @@ import { EVENT_TAGS, isEventTagSlug } from '@/lib/eventTags';
 import { VENUES, isVenueSlug } from '@/lib/venues';
 import { pushEvent } from '@/lib/analytics';
 import { trackEvent } from '@/lib/track-event';
+import { SourceIcon } from './SourceIcon';
 
 function formatDateHeader(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', {
@@ -111,8 +112,11 @@ export function ListView({ events, onEventClick }: ListViewProps) {
                         )}
                       </div>
                       {/* Title */}
-                      <h4 className="font-inter font-black text-base uppercase text-black group-hover:opacity-70 transition-opacity mb-1 truncate">
-                        {event.title}
+                      <h4 className="font-inter font-black text-base uppercase text-black group-hover:opacity-70 transition-opacity mb-1 truncate flex items-center gap-1.5">
+                        <SourceIcon
+                          source={typeof event.extra_data?.source === 'string' ? event.extra_data.source : undefined}
+                        />
+                        <span className="truncate">{event.title}</span>
                       </h4>
                       {/* Time + location */}
                       <p className="font-inter text-sm text-text-muted">

@@ -3,6 +3,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { toast } from '@/lib/toast';
+import { toDatetimeLocal, easternToUtcIso } from '@/lib/eastern-time';
+import { buildManualEntryPayload } from '@/lib/manual-entry';
+import { importEventViaApi } from '@/lib/import-event';
 
 type EbEventRow = {
   eventbrite_id: string;
@@ -57,6 +60,33 @@ function fillPct(sold: number | null, total: number | null) {
   return `${Math.round((sold / total) * 100)}%`;
 }
 
+type FeaturedEvent = {
+  id: string;
+  title: string;
+  start_time: string;
+  end_time: string | null;
+  location: string | null;
+  image_url: string | null;
+  ticket_url: string | null;
+  source: string | null;
+};
+
+type GcalSearchResult = {
+  id: string;
+  title: string;
+  start_time: string;
+  venue: string | null;
+};
+
+const FB_MANUAL_FORM_DEFAULTS = {
+  title: '',
+  start_time: '',
+  end_time: '',
+  location: '',
+  image_url: '',
+  ticket_url: '',
+};
+
 export default function EventbritePage() {
   const [events, setEvents] = useState<EbEventRow[]>([]);
   const [stats, setStats] = useState<Stats>({});
@@ -71,6 +101,21 @@ export default function EventbritePage() {
   const [importResult, setImportResult] = useState<{ name: string; status: string | null } | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
   const [refreshingCache, setRefreshingCache] = useState(false);
+
+  // Other Tickets Page Events (Facebook, Google Calendar, etc.)
+  const [featured, setFeatured] = useState<FeaturedEvent[]>([]);
+  const [featuredLoading, setFeaturedLoading] = useState(true);
+
+  const [fbUrl, setFbUrl] = useState('');
+  const [fbImporting, setFbImporting] = useState(false);
+  const [fbError, setFbError] = useState<string | null>(null);
+  const [fbNeedsManualEntry, setFbNeedsManualEntry] = useState<{ url: string } | null>(null);
+  const [fbManualForm, setFbManualForm] = useState(FB_MANUAL_FORM_DEFAULTS);
+  const [fbManualSaving, setFbManualSaving] = useState(false);
+
+  const [gcalSearch, setGcalSearch] = useState('');
+  const [gcalResults, setGcalResults] = useState<GcalSearchResult[]>([]);
+  const [gcalSearching, setGcalSearching] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -97,6 +142,134 @@ export default function EventbritePage() {
   }, [activeOnly, statusFilter]);
 
   useEffect(() => { load(); }, [load]);
+
+  const fetchFeatured = useCallback(async () => {
+    setFeaturedLoading(true);
+    try {
+      const res = await fetch('/api/events?show_on_tickets=true');
+      const data = await res.json();
+      // Eventbrite-sourced rows are already represented in the table above
+      // (linked via eventbrite_events) — don't list them twice here.
+      setFeatured((data.events ?? []).filter((e: FeaturedEvent) => e.source !== 'eventbrite'));
+    } catch {
+      toast.error('Failed to load tickets-page events');
+    } finally {
+      setFeaturedLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchFeatured(); }, [fetchFeatured]);
+
+  const importFacebookEvent = async () => {
+    setFbImporting(true);
+    setFbError(null);
+    setFbNeedsManualEntry(null);
+    try {
+      const data = await importEventViaApi(fbUrl, { showOnTickets: true });
+
+      if (data.needsManualEntry) {
+        setFbNeedsManualEntry({ url: data.url ?? fbUrl });
+        return;
+      }
+
+      toast.success(`Added "${data.name}" to /tickets`);
+      setFbUrl('');
+      await fetchFeatured();
+    } catch (err) {
+      setFbError(err instanceof Error ? err.message : 'Import failed');
+    } finally {
+      setFbImporting(false);
+    }
+  };
+
+  const cancelFbManualEntry = () => {
+    setFbNeedsManualEntry(null);
+    setFbManualForm(FB_MANUAL_FORM_DEFAULTS);
+  };
+
+  const saveFbManualEntry = async () => {
+    if (!fbNeedsManualEntry || !fbManualForm.title || !fbManualForm.start_time) return;
+    setFbManualSaving(true);
+    try {
+      const res = await fetch('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(
+          buildManualEntryPayload(fbManualForm, fbNeedsManualEntry.url, { showOnTickets: true }),
+        ),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Save failed');
+
+      toast.success(`Added "${fbManualForm.title}" to /tickets`);
+      setFbUrl('');
+      cancelFbManualEntry();
+      await fetchFeatured();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to save event');
+    } finally {
+      setFbManualSaving(false);
+    }
+  };
+
+  const searchGcalEvents = async () => {
+    if (!gcalSearch.trim()) { setGcalResults([]); return; }
+    setGcalSearching(true);
+    try {
+      const res = await fetch(`/api/events?source=google&q=${encodeURIComponent(gcalSearch)}`);
+      const data = await res.json();
+      setGcalResults(data.events ?? []);
+    } catch {
+      toast.error('Search failed');
+    } finally {
+      setGcalSearching(false);
+    }
+  };
+
+  const addGcalEventToTickets = async (eventId: string, title: string) => {
+    try {
+      const res = await fetch(`/api/events/${eventId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ show_on_tickets: true }),
+      });
+      if (!res.ok) throw new Error('Failed');
+      toast.success(`Added "${title}" to /tickets`);
+      setGcalSearch('');
+      setGcalResults([]);
+      await fetchFeatured();
+    } catch {
+      toast.error('Failed to add event to /tickets');
+    }
+  };
+
+  const updateFeaturedField = async (id: string, field: string, value: string) => {
+    try {
+      const res = await fetch(`/api/events/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [field]: value }),
+      });
+      if (!res.ok) throw new Error('Save failed');
+    } catch {
+      toast.error('Failed to save change');
+    }
+  };
+
+  const removeFromTickets = async (id: string, title: string) => {
+    try {
+      const res = await fetch(`/api/events/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ show_on_tickets: false }),
+      });
+      if (!res.ok) throw new Error('Failed');
+      toast.success(`Removed "${title}" from /tickets`);
+      setFeatured(prev => prev.filter(e => e.id !== id));
+    } catch {
+      toast.error('Failed to remove from /tickets');
+    }
+  };
 
   const sync = async () => {
     setSyncing(true);
@@ -400,6 +573,236 @@ export default function EventbritePage() {
           </table>
         </div>
       )}
+
+      {/* Other Tickets Page Events */}
+      <div className="space-y-4 border-t border-border pt-6">
+        <div>
+          <h2 className="text-lg font-bold">Other Tickets Page Events</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Events shown on /tickets that aren&apos;t synced from your Eventbrite org — Facebook,
+            Google Calendar, or other event links. More sources coming soon.
+          </p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {/* Add via Facebook URL */}
+          <div className="rounded-lg border border-border bg-card p-4">
+            <h3 className="text-sm font-semibold mb-2">Add a Facebook Event</h3>
+            <div className="flex gap-2">
+              <input
+                type="url"
+                value={fbUrl}
+                onChange={(e) => { setFbUrl(e.target.value); setFbError(null); setFbNeedsManualEntry(null); }}
+                onKeyDown={(e) => { if (e.key === 'Enter' && fbUrl && !fbImporting) importFacebookEvent(); }}
+                placeholder="https://www.facebook.com/events/…"
+                className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+              <button
+                onClick={importFacebookEvent}
+                disabled={fbImporting || !fbUrl.trim()}
+                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 whitespace-nowrap"
+              >
+                {fbImporting ? 'Adding…' : 'Add →'}
+              </button>
+            </div>
+            {fbError && <p className="mt-2 text-xs text-red-600 dark:text-red-400">✗ {fbError}</p>}
+
+            {fbNeedsManualEntry && (
+              <div className="mt-3 rounded-md border border-border bg-muted/30 p-3 space-y-3">
+                <p className="text-xs text-muted-foreground">
+                  Couldn&apos;t auto-fetch details from Facebook — fill in what you know.
+                </p>
+                <input
+                  type="text"
+                  value={fbManualForm.title}
+                  onChange={(e) => setFbManualForm({ ...fbManualForm, title: e.target.value })}
+                  placeholder="Title *"
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                />
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="datetime-local"
+                    value={fbManualForm.start_time}
+                    onChange={(e) => setFbManualForm({ ...fbManualForm, start_time: e.target.value })}
+                    className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  />
+                  <input
+                    type="datetime-local"
+                    value={fbManualForm.end_time}
+                    onChange={(e) => setFbManualForm({ ...fbManualForm, end_time: e.target.value })}
+                    className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  />
+                </div>
+                <input
+                  type="text"
+                  value={fbManualForm.location}
+                  onChange={(e) => setFbManualForm({ ...fbManualForm, location: e.target.value })}
+                  placeholder="Location"
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                />
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="url"
+                    value={fbManualForm.image_url}
+                    onChange={(e) => setFbManualForm({ ...fbManualForm, image_url: e.target.value })}
+                    placeholder="Image URL"
+                    className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  />
+                  <input
+                    type="url"
+                    value={fbManualForm.ticket_url}
+                    onChange={(e) => setFbManualForm({ ...fbManualForm, ticket_url: e.target.value })}
+                    placeholder="Ticket URL"
+                    className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={saveFbManualEntry}
+                    disabled={fbManualSaving || !fbManualForm.title || !fbManualForm.start_time}
+                    className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                  >
+                    {fbManualSaving ? 'Saving…' : 'Save Event'}
+                  </button>
+                  <button
+                    onClick={cancelFbManualEntry}
+                    className="rounded-md border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Add from Google Calendar */}
+          <div className="rounded-lg border border-border bg-card p-4">
+            <h3 className="text-sm font-semibold mb-2">Add from Google Calendar</h3>
+            <p className="text-xs text-muted-foreground mb-2">
+              Search events already synced from the St Pete Music calendar.
+            </p>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={gcalSearch}
+                onChange={(e) => setGcalSearch(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter' && gcalSearch && !gcalSearching) searchGcalEvents(); }}
+                placeholder="Search calendar events…"
+                className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+              <button
+                onClick={searchGcalEvents}
+                disabled={gcalSearching || !gcalSearch.trim()}
+                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 whitespace-nowrap"
+              >
+                {gcalSearching ? 'Searching…' : 'Search'}
+              </button>
+            </div>
+            {gcalResults.length > 0 && (
+              <ul className="mt-2 max-h-48 overflow-y-auto rounded-md border border-border divide-y divide-border">
+                {gcalResults.map((r) => (
+                  <li key={r.id} className="flex items-center justify-between gap-2 px-3 py-2 text-sm">
+                    <span className="truncate">
+                      {r.title}
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        {new Date(r.start_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </span>
+                    </span>
+                    <button
+                      onClick={() => addGcalEventToTickets(r.id, r.title)}
+                      className="shrink-0 text-xs font-medium text-primary hover:underline"
+                    >
+                      Add →
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
+        {/* Table of current tickets-page entries */}
+        {featuredLoading ? (
+          <div className="py-8 text-center text-muted-foreground text-sm">Loading…</div>
+        ) : featured.length === 0 ? (
+          <div className="rounded-lg border border-border bg-card py-8 text-center text-muted-foreground text-sm">
+            No Facebook or Google Calendar events on /tickets yet.
+          </div>
+        ) : (
+          <div className="overflow-x-auto rounded-lg border border-border">
+            <table className="w-full text-sm">
+              <thead className="border-b border-border bg-muted/50">
+                <tr>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Source</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Title</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Date/Time (ET)</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Location</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Image URL</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Ticket URL</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {featured.map((ev) => (
+                  <tr key={ev.id}>
+                    <td className="px-3 py-2 text-xs text-muted-foreground capitalize whitespace-nowrap">
+                      {ev.source ?? '—'}
+                    </td>
+                    <td className="px-3 py-2">
+                      <input
+                        type="text"
+                        defaultValue={ev.title}
+                        onBlur={(e) => updateFeaturedField(ev.id, 'title', e.target.value)}
+                        className="w-full min-w-[140px] rounded-md border border-transparent bg-transparent px-2 py-1 hover:border-input focus:border-input focus:outline-none"
+                      />
+                    </td>
+                    <td className="px-3 py-2">
+                      <input
+                        type="datetime-local"
+                        defaultValue={toDatetimeLocal(ev.start_time)}
+                        onBlur={(e) => e.target.value && updateFeaturedField(ev.id, 'start_time', easternToUtcIso(e.target.value))}
+                        className="rounded-md border border-transparent bg-transparent px-2 py-1 hover:border-input focus:border-input focus:outline-none"
+                      />
+                    </td>
+                    <td className="px-3 py-2">
+                      <input
+                        type="text"
+                        defaultValue={ev.location ?? ''}
+                        onBlur={(e) => updateFeaturedField(ev.id, 'location', e.target.value)}
+                        className="w-full min-w-[120px] rounded-md border border-transparent bg-transparent px-2 py-1 hover:border-input focus:border-input focus:outline-none"
+                      />
+                    </td>
+                    <td className="px-3 py-2">
+                      <input
+                        type="url"
+                        defaultValue={ev.image_url ?? ''}
+                        onBlur={(e) => updateFeaturedField(ev.id, 'image_url', e.target.value)}
+                        className="w-full min-w-[140px] rounded-md border border-transparent bg-transparent px-2 py-1 hover:border-input focus:border-input focus:outline-none"
+                      />
+                    </td>
+                    <td className="px-3 py-2">
+                      <input
+                        type="url"
+                        defaultValue={ev.ticket_url ?? ''}
+                        onBlur={(e) => updateFeaturedField(ev.id, 'ticket_url', e.target.value)}
+                        className="w-full min-w-[140px] rounded-md border border-transparent bg-transparent px-2 py-1 hover:border-input focus:border-input focus:outline-none"
+                      />
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap">
+                      <button
+                        onClick={() => removeFromTickets(ev.id, ev.title)}
+                        className="text-xs text-red-500 hover:text-red-700"
+                      >
+                        Remove from /tickets
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

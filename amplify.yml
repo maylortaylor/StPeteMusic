@@ -57,6 +57,8 @@ applications:
               echo "IG_ACCESS_TOKEN=$IG_ACCESS_TOKEN" >> .env.production
               echo "FB_PAGE_ID=$FB_PAGE_ID" >> .env.production
               echo "FB_ACCESS_TOKEN=$FB_ACCESS_TOKEN" >> .env.production
+              echo "FB_APP_ID=$FB_APP_ID" >> .env.production
+              echo "FB_APP_SECRET=$FB_APP_SECRET" >> .env.production
               echo "YOUTUBE_API_KEY=$YOUTUBE_API_KEY" >> .env.production
               echo "YOUTUBE_OAUTH_CLIENT_ID=$YOUTUBE_OAUTH_CLIENT_ID" >> .env.production
               echo "YOUTUBE_OAUTH_CLIENT_SECRET=$YOUTUBE_OAUTH_CLIENT_SECRET" >> .env.production
