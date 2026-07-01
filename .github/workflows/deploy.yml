@@ -126,6 +126,21 @@ jobs:
           script: |
             set -e
 
+            echo "── Disk usage before cleanup ──"
+            df -h /
+
+            # Docker image layers and build cache accumulate on every deploy and are
+            # never cleaned up on their own. This does NOT touch named volumes (recordings,
+            # n8n_data, listmonk_uploads) — only dangling images, stopped containers, and
+            # build cache, none of which hold user data.
+            echo "── Pruning unused Docker images/containers/build cache ──"
+            docker system prune -f || true
+
+            echo "── Disk usage after prune ──"
+            df -h /
+            echo "── Largest Docker volumes (for follow-up investigation, not deleted) ──"
+            sudo du -sh /var/lib/docker/volumes/*/_data 2>/dev/null | sort -rh | head -10 || true
+
             # Use a run-specific directory so concurrent deploys cannot stomp each other.
             # DEPLOY_RUN_ID is injected via the envs: list above.
             DEPLOY_DIR="/tmp/deploy-pkg-${DEPLOY_RUN_ID}"
