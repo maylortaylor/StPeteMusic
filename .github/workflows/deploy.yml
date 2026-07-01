@@ -402,7 +402,7 @@ jobs:
             echo "✓ vod-watcher.service installed and started"
 
             echo "── Installing mediamtx watchdog timer ──"
-            printf '[Unit]\nDescription=MediaMTX RTMP Health Watchdog\n\n[Service]\nType=oneshot\nUser=ec2-user\nWorkingDirectory=/home/ec2-user/stpetemusic/n8n\nExecStart=/bin/bash -c "nc -z localhost 1935 || docker compose -f docker-compose.prod.yaml --env-file ../.env up -d mediamtx"\n' \
+            printf '[Unit]\nDescription=MediaMTX RTMP Health Watchdog\n\n[Service]\nType=oneshot\nUser=ec2-user\nWorkingDirectory=/home/ec2-user/stpetemusic/n8n\nExecStart=/bin/bash -c "nc -z localhost 1935 || /usr/bin/docker-compose -f docker-compose.prod.yaml --env-file ../.env up -d mediamtx"\n' \
               | sudo tee /etc/systemd/system/mediamtx-watchdog.service > /dev/null
             printf '[Unit]\nDescription=MediaMTX Watchdog Timer\n\n[Timer]\nOnBootSec=3min\nOnUnitActiveSec=2min\n\n[Install]\nWantedBy=timers.target\n' \
               | sudo tee /etc/systemd/system/mediamtx-watchdog.timer > /dev/null
