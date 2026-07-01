@@ -12,7 +12,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.52.0",
+    "@anthropic-ai/sdk": "^0.109.1",
     "@aws-sdk/client-s3": "^3.1057.0",
     "@clerk/nextjs": "^6.5.0",
     "@stpetemusic/db": "*",
