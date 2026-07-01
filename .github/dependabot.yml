@@ -11,9 +11,14 @@ updates:
       - "dependencies"
       - "docker"
 
-  # Keep apps/web npm packages up to date
+  # Keep npm packages up to date. This is an npm-workspaces monorepo with a
+  # single root package-lock.json (apps/*, packages/*) — directory must be
+  # "/" so Dependabot updates the shared lockfile correctly. Pointing this at
+  # a workspace subdirectory (e.g. "/apps/web") leaves package-lock.json out
+  # of sync with the bumped package.json, which fails `npm ci` in CI for
+  # every PR Dependabot opens.
   - package-ecosystem: "npm"
-    directory: "/apps/web"
+    directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
