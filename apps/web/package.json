@@ -45,7 +45,7 @@
   "devDependencies": {
     "@anthropic-ai/sdk": "^0.109.1",
     "@google-analytics/admin": "^9.1.0",
-    "@google-analytics/data": "^6.0.0",
+    "@google-analytics/data": "^6.1.0",
     "@tailwindcss/postcss": "^4.3.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
