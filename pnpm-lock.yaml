@@ -22,8 +22,8 @@ importers:
         specifier: 0.34.5
         version: 0.34.5
       '@next/swc-linux-x64-gnu':
-        specifier: 16.2.4
-        version: 16.2.4
+        specifier: 16.2.10
+        version: 16.2.10
       '@rolldown/binding-linux-x64-gnu':
         specifier: 1.0.0-rc.17
         version: 1.0.0-rc.17
@@ -62,8 +62,8 @@ packages:
     cpu: [x64]
     os: [linux]
 
-  '@next/swc-linux-x64-gnu@16.2.4':
-    resolution: {integrity: sha512-EZOvm1aQWgnI/N/xcWOlnS3RQBk0VtVav5Zo7n4p0A7UKyTDx047k8opDbXgBpHl4CulRqRfbw3QrX2w5UOXMQ==}
+  '@next/swc-linux-x64-gnu@16.2.10':
+    resolution: {integrity: sha512-iCVJnwvrPYECvA6WM/7+oo+OiTvedIKLxtCLAZP4xZR3nXa1zmzZyLPbYCmWvpd4CvMYF1EMTafd0ii3DygLvA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
@@ -119,7 +119,7 @@ snapshots:
       '@img/sharp-libvips-linux-x64': 1.2.4
     optional: true
 
-  '@next/swc-linux-x64-gnu@16.2.4':
+  '@next/swc-linux-x64-gnu@16.2.10':
     optional: true
 
   '@rolldown/binding-linux-x64-gnu@1.0.0-rc.17':

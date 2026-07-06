@@ -39,7 +39,7 @@
     "@esbuild/linux-x64": "0.28.0",
     "@img/sharp-libvips-linux-x64": "1.2.4",
     "@img/sharp-linux-x64": "0.34.5",
-    "@next/swc-linux-x64-gnu": "16.2.4",
+    "@next/swc-linux-x64-gnu": "16.2.10",
     "@rolldown/binding-linux-x64-gnu": "1.0.0-rc.17",
     "@rollup/rollup-linux-x64-gnu": "4.62.2",
     "@tailwindcss/oxide-linux-x64-gnu": "4.2.4",
