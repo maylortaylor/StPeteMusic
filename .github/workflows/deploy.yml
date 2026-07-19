@@ -56,6 +56,7 @@ jobs:
           cp -r n8n/mediamtx/.             deploy-pkg/mediamtx/
           cp -r database/                  deploy-pkg/database
           cp scripts/vod-watcher.sh        deploy-pkg/scripts/vod-watcher.sh
+          cp scripts/disk-watchdog.sh      deploy-pkg/scripts/disk-watchdog.sh
           tar czf deploy.tar.gz -C deploy-pkg .
           echo "✓ deploy.tar.gz built ($(du -sh deploy.tar.gz | cut -f1))"
 
@@ -408,13 +409,22 @@ jobs:
             sudo dnf install -y inotify-tools 2>/dev/null \
               && echo "✓ inotify-tools installed" \
               || echo "⚠ inotify-tools install failed — vod-watcher may not work"
+            # 'acl' provides setfacl, used below to grant ec2-user traversal into /var/lib/docker.
+            sudo dnf install -y acl 2>/dev/null \
+              && echo "✓ acl installed" \
+              || echo "⚠ acl install failed — vod-watcher ACL pre-step may not apply"
             mkdir -p ~/stpetemusic/scripts
             cp "${DEPLOY_DIR}/scripts/vod-watcher.sh" ~/stpetemusic/scripts/vod-watcher.sh
             chmod +x ~/stpetemusic/scripts/vod-watcher.sh
-            printf '[Unit]\nDescription=StPeteMusic VOD Upload Watcher\nAfter=docker.service\n\n[Service]\nType=simple\nUser=ec2-user\nEnvironmentFile=/home/ec2-user/stpetemusic/.env\nExecStart=/home/ec2-user/stpetemusic/scripts/vod-watcher.sh\nRestart=always\nRestartSec=10\n\n[Install]\nWantedBy=multi-user.target\n' | sudo tee /etc/systemd/system/vod-watcher.service > /dev/null
+            # vod-watcher runs as ec2-user but must traverse /var/lib/docker (mode 710 root:root) to reach
+            # the recordings volume. The ExecStartPre '+' prefix runs setfacl as root before the unprivileged
+            # main process, re-applying the ACL on every start/reboot — otherwise the watcher silently
+            # crash-loops on 'Permission denied', recordings pile up, and a single long stream fills the disk.
+            printf '[Unit]\nDescription=StPeteMusic VOD Upload Watcher\nAfter=docker.service\n\n[Service]\nType=simple\nUser=ec2-user\nEnvironmentFile=/home/ec2-user/stpetemusic/.env\nExecStartPre=+/usr/bin/setfacl -m u:ec2-user:x /var/lib/docker\nExecStart=/home/ec2-user/stpetemusic/scripts/vod-watcher.sh\nRestart=always\nRestartSec=10\n\n[Install]\nWantedBy=multi-user.target\n' | sudo tee /etc/systemd/system/vod-watcher.service > /dev/null
             sudo systemctl daemon-reload
             sudo systemctl enable --now vod-watcher.service
-            echo "✓ vod-watcher.service installed and started"
+            sudo systemctl restart vod-watcher.service
+            echo "✓ vod-watcher.service installed and started (ACL pre-step applies u:ec2-user:x on /var/lib/docker)"
 
             echo "── Installing mediamtx watchdog timer ──"
             printf '[Unit]\nDescription=MediaMTX RTMP Health Watchdog\n\n[Service]\nType=oneshot\nUser=ec2-user\nWorkingDirectory=/home/ec2-user/stpetemusic/n8n\nExecStart=/bin/bash -c "nc -z localhost 1935 || /usr/bin/docker-compose -f docker-compose.prod.yaml --env-file ../.env up -d mediamtx"\n' \
@@ -424,6 +434,19 @@ jobs:
             sudo systemctl daemon-reload
             sudo systemctl enable --now mediamtx-watchdog.timer
             echo "✓ mediamtx-watchdog.timer installed (checks port 1935 every 2 min)"
+
+            echo "── Installing disk watchdog timer ──"
+            # Backstop against the root volume filling with recordings if vod-watcher ever fails again.
+            # Runs as root (oneshot) so it can rm files under /var/lib/docker and publish a CloudWatch metric.
+            cp "${DEPLOY_DIR}/scripts/disk-watchdog.sh" ~/stpetemusic/scripts/disk-watchdog.sh
+            chmod +x ~/stpetemusic/scripts/disk-watchdog.sh
+            printf '[Unit]\nDescription=StPeteMusic Disk Usage Watchdog\nAfter=docker.service\n\n[Service]\nType=oneshot\nExecStart=/home/ec2-user/stpetemusic/scripts/disk-watchdog.sh\n' \
+              | sudo tee /etc/systemd/system/disk-watchdog.service > /dev/null
+            printf '[Unit]\nDescription=Disk Watchdog Timer\n\n[Timer]\nOnBootSec=5min\nOnUnitActiveSec=10min\n\n[Install]\nWantedBy=timers.target\n' \
+              | sudo tee /etc/systemd/system/disk-watchdog.timer > /dev/null
+            sudo systemctl daemon-reload
+            sudo systemctl enable --now disk-watchdog.timer
+            echo "✓ disk-watchdog.timer installed (purges old recordings + publishes DiskUsedPercent every 10 min)"
 
             echo "── Cleanup ──"
             rm -rf "${DEPLOY_DIR}" "${TARBALL}"

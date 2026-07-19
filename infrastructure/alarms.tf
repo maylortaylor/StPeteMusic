@@ -75,10 +75,10 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
 
 # CloudFront metrics require Region = "Global" dimension even in us-east-1
 resource "aws_cloudwatch_metric_alarm" "cloudfront_5xx" {
-  alarm_name          = "${var.project}-cloudfront-5xx-high"
-  alarm_description   = "HLS CDN 5xx error rate > 5% — MediaMTX or nginx origin issue"
-  namespace           = "AWS/CloudFront"
-  metric_name         = "5xxErrorRate"
+  alarm_name        = "${var.project}-cloudfront-5xx-high"
+  alarm_description = "HLS CDN 5xx error rate > 5% — MediaMTX or nginx origin issue"
+  namespace         = "AWS/CloudFront"
+  metric_name       = "5xxErrorRate"
   dimensions = {
     DistributionId = aws_cloudfront_distribution.hls_stream.id
     Region         = "Global"
@@ -108,5 +108,25 @@ resource "aws_cloudwatch_metric_alarm" "rtmp_health" {
   comparison_operator = "LessThanThreshold"
   alarm_actions       = [aws_sns_topic.alerts.arn]
   treat_missing_data  = "notBreaching"
+  tags                = { Project = var.project }
+}
+
+# EC2 root-disk usage. Default EC2 metrics do NOT include disk, so disk-watchdog.sh publishes the custom
+# StPeteMusic/Host DiskUsedPercent metric every 10 min. Fires at 85% — before the 100%-full wedge that
+# takes down RTMP/HLS (2026-07-19 outage). treat_missing_data = "breaching": if the watchdog stops
+# publishing, the disk is unmonitored and that itself warrants a page.
+resource "aws_cloudwatch_metric_alarm" "ec2_disk_high" {
+  alarm_name          = "${var.project}-ec2-disk-high"
+  alarm_description   = "EC2 root disk > 85% — stream recordings may fill the volume and take down RTMP/HLS"
+  namespace           = "StPeteMusic/Host"
+  metric_name         = "DiskUsedPercent"
+  dimensions          = { InstanceId = aws_instance.n8n.id }
+  statistic           = "Maximum"
+  period              = 300
+  evaluation_periods  = 2
+  threshold           = 85
+  comparison_operator = "GreaterThanThreshold"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  treat_missing_data  = "breaching"
   tags                = { Project = var.project }
 }

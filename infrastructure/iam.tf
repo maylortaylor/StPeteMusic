@@ -44,6 +44,28 @@ resource "aws_iam_role_policy" "ec2_ssm_listmonk" {
   })
 }
 
+# Allow EC2 to publish the DiskUsedPercent custom metric (disk-watchdog.sh). Default EC2 metrics do not
+# include disk usage, so this custom metric is what the ec2-disk-high alarm watches. PutMetricData does not
+# support resource-level ARNs; scope it to our namespace via the cloudwatch:namespace condition instead.
+resource "aws_iam_role_policy" "ec2_cloudwatch_metrics" {
+  name = "${var.project}-ec2-cloudwatch-metrics-policy"
+  role = aws_iam_role.ec2_backup.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["cloudwatch:PutMetricData"]
+      Resource = "*"
+      Condition = {
+        StringEquals = {
+          "cloudwatch:namespace" = "StPeteMusic/Host"
+        }
+      }
+    }]
+  })
+}
+
 # IAM role for Amplify SSR — grants server-side rendering functions S3 write access.
 # Amplify Hosting attaches this role to the SSR Lambda execution context so the
 # AWS SDK credential chain resolves without explicit env vars (which would require

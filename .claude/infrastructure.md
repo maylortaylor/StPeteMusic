@@ -1,7 +1,7 @@
 ---
 topic: infrastructure
-triggers: aws, amplify, dns, cloudflare, tofu, terraform, ec2, tailscale, hosting, deploy, branch, git, listmonk, newsletter, ssl, ci, cd, admin, monitoring, alarms, cloudwatch, sns, health, alerting, uptime, gh, github-cli, aws-cli, account, profile, architecture, map, diagram, streaming, rtmp, obs, mediamtx, hls, live, cors, csp, cookies
-updated: 2026-06-22
+triggers: aws, amplify, dns, cloudflare, tofu, terraform, ec2, tailscale, hosting, deploy, branch, git, listmonk, newsletter, ssl, ci, cd, admin, monitoring, alarms, cloudwatch, sns, health, alerting, uptime, gh, github-cli, aws-cli, account, profile, architecture, map, diagram, streaming, rtmp, obs, mediamtx, hls, live, cors, csp, cookies, disk, disk full, no space left, vod-watcher, watchdog
+updated: 2026-07-19
 ---
 
 # Infrastructure
@@ -139,6 +139,20 @@ OBS publishes RTMP directly to the EC2 box; MediaMTX ingests it, records it, and
 8. **`vod-watcher.service` (uploads recordings to S3) crash-looped for ~5 weeks (~307k restarts) on `Permission denied` watching `/var/lib/docker/volumes/n8n_recordings/_data`.** Root cause was **not** SELinux (it's in permissive/non-enforcing mode on this host — checked `getenforce`, it logs AVC denials but doesn't block anything). The real cause: `/var/lib/docker` itself is mode `710` root:root, so `ec2-user` (who the service runs as) has zero permission to traverse into it, regardless of permissions deeper in the tree. Fixed with a targeted ACL: `setfacl -m u:ec2-user:x /var/lib/docker` (doesn't touch Docker's own permission bits or affect other users). Separately, `vod-watcher.sh` never deleted the local file after a successful upload or checked the upload actually succeeded — fixed in PR #254 to delete on confirmed success and keep the file for retry on failure. Until that PR is deployed, every stream's recordings (especially flaky-connection streams that fragment into many small files) will keep accumulating on the 20GB root volume — watch disk usage (`df -h /` was at 76% after one ~2hr stream).
 
 Full root-cause writeup: see Claude memory `project_live_streaming_fixes.md` (cross-session, not in this repo).
+
+**Disk-full outage 2026-07-19 + durable auto-cleanup (feature/ec2-disk-cleanup-hardening):** the 20 GB root
+volume hit 100% from accumulated recordings → RTMP `:1935` refused, HLS 502, `/live` blank. Root cause of the
+recurrence: `deploy.yml` set up `vod-watcher.service` (uploads recordings to S3 then deletes) but **never granted
+the `setfacl -m u:ec2-user:x /var/lib/docker` ACL** it needs to traverse into the recordings volume (dir is
+`710 root:root`), so it silently crash-looped. Fixes: (1) `vod-watcher.service` now has
+`ExecStartPre=+/usr/bin/setfacl …` so the ACL self-heals on every start/reboot; (2) new `scripts/disk-watchdog.sh`
+on a 10-min systemd timer purges recordings >6 h (emergency purge of finished recordings when disk >80%, never
+touching an in-progress one) and publishes a `StPeteMusic/Host DiskUsedPercent` custom metric; (3) new
+`stpetemusic-ec2-disk-high` CloudWatch alarm (85%, `treat_missing_data=breaching`) pages before the wedge. Recovery
+runbook when it's already 100% full (SSH + SSM output both hang): use SSM `AWS-RunShellScript` and encode the
+resulting `df` percent in the script's `exit` code (`exit $(df --output=pcent / | tail -1 | tr -dc 0-9)`) since
+`ResponseCode` propagates even when output capture can't write — then purge `*.mp4`/`*.ts` under
+`/var/lib/docker/volumes`, `docker-compose … up -d`, reapply the ACL, restart `vod-watcher`.
 
 **Debugging approach that worked**: test each layer independently with `curl` — origin (`n8n.stpetemusic.live/hls/...`) vs. CDN (`hls.stpetemusic.live/...`) separately to isolate CloudFront-only issues — then use a headless browser (Playwright is already a devDependency) for anything `curl` can't see: CORS, CSP, cookie credentials, autoplay policy. Several of these bugs were invisible to `curl` and only manifested in real browser enforcement.
 
