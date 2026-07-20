@@ -1,3 +1,18 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# FREE-TIER ALARM CEILING — keep total CloudWatch alarms ≤ 10
+#
+# AWS Free Tier includes 10 alarms/month free (account-wide, all regions). Each alarm beyond 10 costs
+# $0.10/month (us-east-1, standard resolution). We deliberately stay within the free tier.
+#
+# Current managed alarms = 7 (headroom: 3):
+#   1. ec2_cpu                2. ec2_status_check     3. rds_storage_low     4. rds_cpu
+#   5. cloudfront_5xx         6. rtmp_health          7. ec2_disk_high
+#
+# Rule: before adding an 11th alarm, retire a lower-value one or consolidate. First candidate to cut is
+# ec2_status_check — EC2 auto-recovers, and rtmp_health + cloudfront_5xx already catch a real outage.
+# When you add/remove an alarm, update the census list above so the count stays auditable in one place.
+# ─────────────────────────────────────────────────────────────────────────────
+
 resource "aws_sns_topic" "alerts" {
   name = "${var.project}-alerts"
   tags = { Project = var.project }
