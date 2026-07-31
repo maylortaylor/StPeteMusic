@@ -26,6 +26,11 @@ services:
       - N8N_RESTRICT_FILE_ACCESS_TO=/files
       - N8N_LOG_LEVEL=info
       - N8N_API_KEY=${N8N_API_KEY}
+      # Alerting workflows (Health Monitor, Stream Watchdog) read these. Without them
+      # `$env.RESEND_API_KEY` is undefined, the Resend call sends `Bearer undefined`, and every
+      # alert is detected but never delivered -- which is exactly what was happening.
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - ALERT_EMAIL=${ALERT_EMAIL}
       - ADMIN_ENRICHMENT_CALLBACK_URL=${ADMIN_ENRICHMENT_CALLBACK_URL}
       - ADMIN_ARTIST_ENRICHMENT_CALLBACK_URL=${ADMIN_ARTIST_ENRICHMENT_CALLBACK_URL}
       - N8N_WEBHOOK_SECRET=${N8N_WEBHOOK_SECRET}
