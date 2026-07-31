@@ -29,10 +29,17 @@ inotifywait -m -r -e close_write,moved_to "${RECORDINGS_BASE}" \
         --no-progress; then
         echo "[vod-watcher] Uploaded: s3://${VOD_BUCKET}/${S3_KEY}"
 
-        # Local copy is now safely in S3 — remove it so disk doesn't fill up,
-        # especially during streams with many small fragments from connection drops.
-        rm -f "${FILEPATH}"
-        echo "[vod-watcher] Removed local copy: ${FILEPATH}"
+        # Local copy is now safely in S3 — remove it so disk doesn't fill up.
+        # `rm -f` exits 0 for a missing file but non-zero when the parent directory denies
+        # write, which is exactly what happens here: the recordings dir is root-owned, and
+        # the setfacl on /var/lib/docker only grants traverse. This used to log success
+        # unconditionally, so the delete had been failing silently and disk-watchdog.sh was
+        # quietly doing all the cleanup. Report the truth so the ACL gap stays visible.
+        if rm -f "${FILEPATH}"; then
+          echo "[vod-watcher] Removed local copy: ${FILEPATH}"
+        else
+          echo "[vod-watcher] WARNING: could not delete ${FILEPATH} (check write permission on $(dirname "${FILEPATH}")) — disk-watchdog will sweep it"
+        fi
 
         # Trigger n8n — future workflow will edit, trim, process, and publish to YouTube unlisted
         curl -s -X POST "${N8N_WEBHOOK_URL}" \
