@@ -420,7 +420,13 @@ jobs:
             # the recordings volume. The ExecStartPre '+' prefix runs setfacl as root before the unprivileged
             # main process, re-applying the ACL on every start/reboot — otherwise the watcher silently
             # crash-loops on 'Permission denied', recordings pile up, and a single long stream fills the disk.
-            printf '[Unit]\nDescription=StPeteMusic VOD Upload Watcher\nAfter=docker.service\n\n[Service]\nType=simple\nUser=ec2-user\nEnvironmentFile=/home/ec2-user/stpetemusic/.env\nExecStartPre=+/usr/bin/setfacl -m u:ec2-user:x /var/lib/docker\nExecStart=/home/ec2-user/stpetemusic/scripts/vod-watcher.sh\nRestart=always\nRestartSec=10\n\n[Install]\nWantedBy=multi-user.target\n' | sudo tee /etc/systemd/system/vod-watcher.service > /dev/null
+            # Traverse alone is not enough to DELETE a recording: unlink needs write+execute on the
+            # containing directory, which mediamtx creates root-owned. Without it the upload succeeded
+            # but the local file stayed behind, and disk-watchdog.sh silently did all the cleanup.
+            # The default ACL (-d) makes new per-path dirs (e.g. live/) inherit the grant as mediamtx
+            # creates them. Both recording ACL steps use '+-' (run as root, tolerate failure) because
+            # the volume does not exist yet on a first-ever deploy.
+            printf '[Unit]\nDescription=StPeteMusic VOD Upload Watcher\nAfter=docker.service\n\n[Service]\nType=simple\nUser=ec2-user\nEnvironmentFile=/home/ec2-user/stpetemusic/.env\nExecStartPre=+/usr/bin/setfacl -m u:ec2-user:x /var/lib/docker\nExecStartPre=+-/usr/bin/setfacl -R -m u:ec2-user:rwx /var/lib/docker/volumes/n8n_recordings/_data\nExecStartPre=+-/usr/bin/setfacl -d -m u:ec2-user:rwx /var/lib/docker/volumes/n8n_recordings/_data\nExecStart=/home/ec2-user/stpetemusic/scripts/vod-watcher.sh\nRestart=always\nRestartSec=10\n\n[Install]\nWantedBy=multi-user.target\n' | sudo tee /etc/systemd/system/vod-watcher.service > /dev/null
             sudo systemctl daemon-reload
             sudo systemctl enable --now vod-watcher.service
             sudo systemctl restart vod-watcher.service

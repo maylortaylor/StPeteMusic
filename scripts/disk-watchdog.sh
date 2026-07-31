@@ -49,7 +49,14 @@ fi
 
 # 3) Publish the current disk usage as a custom CloudWatch metric so an alarm can fire before 100%.
 #    Default EC2 metrics do not include disk usage — this is the only signal available without the agent.
-INSTANCE_ID=$(curl -s --max-time 3 http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null)
+# This instance has MetadataOptions.HttpTokens=required, so IMDSv1 (a bare GET) returns an empty
+# body. That silently blanked INSTANCE_ID and skipped every publish, leaving the ec2-disk-high alarm
+# with zero datapoints — it sat in ALARM on "missing data treated as breaching" while reporting
+# nothing about the actual disk. Always take the IMDSv2 token first.
+IMDS_TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" \
+  -H "X-aws-ec2-metadata-token-ttl-seconds: 60" --max-time 3 2>/dev/null)
+INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: ${IMDS_TOKEN}" \
+  --max-time 3 http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null)
 FINAL_PCT=$(disk_pct)
 if [ -n "${INSTANCE_ID}" ] && [ -n "${FINAL_PCT}" ]; then
   aws cloudwatch put-metric-data \
