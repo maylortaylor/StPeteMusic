@@ -125,6 +125,17 @@ OBS publishes RTMP directly to the EC2 box; MediaMTX ingests it, records it, and
 | Stream key source of truth | SSM `/stpetemusic/streaming/rtmp_stream_key` + GitHub secret `RTMP_STREAM_KEY` (kept in sync — both written together by `infrastructure/streaming.tf` / deploy) |
 | CloudFront distribution | `infrastructure/streaming.tf` → `aws_cloudfront_distribution.hls_stream` |
 
+⚠️ **Server-side recording is OFF** (`record: no` in `mediamtx.yml`, set 2026-07-31). The 20 GB
+root volume cannot safely hold a long stream: a recording is only closed — and only then
+uploadable/deletable by `vod-watcher` — at `recordSegmentDuration`, which defaults to **1h**. An
+in-progress hour accumulates with nothing able to reclaim it (`disk-watchdog` deliberately never
+purges an in-progress recording), so at ~20 GB/h the ~12 GB free is gone in ~30 min and RTMP/HLS
+drop mid-show. OBS records locally and Restream keeps a copy, so the EC2 copy was a redundant
+third. `recordSegmentDuration: 5m` is pre-set so re-enabling (`record: yes`) is bounded from the
+start — **do not fall back to the 1h default**. Before re-enabling for a multi-hour stream, check
+`df -h /` has room for several segments. HLS itself is served from RAM (no `hlsDirectory`), so
+viewers never consume disk.
+
 **Correct OBS settings**: Server `rtmp://stream.stpetemusic.live` · Stream Key `live?user=stream&pass=<RTMP_STREAM_KEY value>`. MediaMTX's internal RTMP auth takes credentials as a query string on the path (`user`/`pass`), **not** the `rtmp://user:pass@host` userinfo form, and **not** OBS's separate "Use Authentication" username/password fields (unconfirmed/unsupported by MediaMTX — leave that checkbox off).
 
 **9 bugs fixed 2026-06-21 onward (PRs #236-#242, #254, + healthcheck fix 2026-07-31) — read before touching this pipeline again:**
