@@ -7,26 +7,32 @@
           "interval": [
             {
               "field": "minutes",
-              "minutesInterval": 60
+              "minutesInterval": 5
             }
           ]
         }
       },
       "id": "hm-0001-0000-0000-000000000001",
-      "name": "Every 15 Minutes",
+      "name": "Every 5 Minutes",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [0, 0]
+      "position": [
+        0,
+        0
+      ]
     },
     {
       "parameters": {
-        "jsCode": "return [\n  { json: { label: 'Web app',   url: 'https://www.stpetemusic.live/api/health',      acceptAny: false } },\n  { json: { label: 'Admin app', url: 'https://admin.stpetemusic.live/api/health',    acceptAny: false } },\n  { json: { label: 'n8n',       url: 'https://n8n.stpetemusic.live/healthz',         acceptAny: false } },\n  { json: { label: 'Listmonk',  url: 'https://listmonk.stpetemusic.live/api/health', acceptAny: false } },\n  { json: { label: 'HLS CDN',   url: 'https://hls.stpetemusic.live',                  acceptAny: true  } }\n];"
+        "jsCode": "return [\n  { json: { label: 'Web app',   url: 'https://www.stpetemusic.live/api/health',      acceptAny: false } },\n  { json: { label: 'Admin app', url: 'https://admin.stpetemusic.live/api/health',    acceptAny: false } },\n  { json: { label: 'n8n',       url: 'https://n8n.stpetemusic.live/healthz',         acceptAny: false } },\n  { json: { label: 'Listmonk',  url: 'https://listmonk.stpetemusic.live/health', acceptAny: false } },\n  { json: { label: 'HLS CDN',   url: 'https://hls.stpetemusic.live',                  acceptAny: true  } }\n];"
       },
       "id": "hm-0001-0000-0000-000000000002",
       "name": "Define Endpoints",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [220, 0]
+      "position": [
+        220,
+        0
+      ]
     },
     {
       "parameters": {
@@ -52,7 +58,10 @@
       "name": "Ping Endpoint",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [440, 0],
+      "position": [
+        440,
+        0
+      ],
       "continueOnFail": true
     },
     {
@@ -64,7 +73,10 @@
       "name": "Check Failures",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [660, 0]
+      "position": [
+        660,
+        0
+      ]
     },
     {
       "parameters": {
@@ -86,7 +98,7 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({ from: 'hello@stpetemusic.live', to: ['theburgmusic@gmail.com'], subject: $json.subject, text: $json.text }) }}",
+        "body": "={{ JSON.stringify({ from: 'hello@stpetemusic.live', to: [$env.ALERT_EMAIL || 'theburgmusic@gmail.com'], subject: $json.subject, text: $json.text }) }}",
         "options": {
           "response": {
             "response": {
@@ -100,12 +112,15 @@
       "name": "Send Alert Email",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [880, 0]
+      "position": [
+        880,
+        0
+      ]
     }
   ],
   "pinData": {},
   "connections": {
-    "Every 15 Minutes": {
+    "Every 5 Minutes": {
       "main": [
         [
           {
