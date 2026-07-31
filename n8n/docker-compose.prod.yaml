@@ -83,7 +83,9 @@ services:
     volumes:
       - listmonk_uploads:/listmonk/uploads
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:9000/api/health"]
+      # /api/health now requires auth and returns 403, which kept this container marked
+      # unhealthy and in an autoheal restart loop. /health is the unauthenticated probe.
+      test: ["CMD", "wget", "-qO-", "http://localhost:9000/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -111,11 +113,15 @@ services:
     networks:
       - n8n-net
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:9997/v3/paths/list"]
+      # The mediamtx image is distroless — it has no wget/curl/sh. Probing with an absent
+      # binary made this check fail forever, so autoheal restarted the container every ~2min
+      # and chopped every stream into fragments. Probe with the shipped binary instead, and
+      # do not reintroduce a fetch tool here without first confirming it exists in the image.
+      test: ["CMD", "/mediamtx", "--version"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 30s
     mem_limit: 256m    # HLS segment buffering requires extra headroom
     memswap_limit: 512m
 
