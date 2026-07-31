@@ -75,6 +75,21 @@ jobs:
           TF_VAR_anthropic_api_key:                  ${{ secrets.ANTHROPIC_API_KEY }}
           TF_VAR_n8n_artist_enrichment_webhook_url:  ${{ secrets.N8N_ARTIST_ENRICHMENT_WEBHOOK_URL }}
           TF_VAR_n8n_webhook_secret:                 ${{ secrets.N8N_WEBHOOK_SECRET }}
+          # These must stay in sync with tofu-apply.yml. When plan is missing a var that apply
+          # passes, the var falls back to "" here only, so `count = var.x != "" ? 1 : 0` resources
+          # read as destroyed and Amplify env vars read as blanked — a plan that reported
+          # "5 to destroy" for changes that touched none of them. A plan that cries wolf on every
+          # infra PR is worse than no plan: it trains reviewers to scroll past a real destroy.
+          TF_VAR_alert_email:                        ${{ secrets.ALERT_EMAIL }}
+          TF_VAR_cron_secret:                        ${{ secrets.CRON_SECRET }}
+          TF_VAR_revalidation_secret:                ${{ secrets.REVALIDATION_SECRET }}
+          TF_VAR_rtmp_stream_key:                    ${{ secrets.RTMP_STREAM_KEY }}
+          TF_VAR_youtube_channel_id:                 ${{ secrets.YOUTUBE_CHANNEL_ID }}
+          TF_VAR_eventbrite_org_id:                  ${{ secrets.EVENTBRITE_ORG_ID }}
+          TF_VAR_eventbrite_private_token:           ${{ secrets.EVENTBRITE_PRIVATE_TOKEN }}
+          TF_VAR_eventbrite_api_key:                 ${{ secrets.EVENTBRITE_API_KEY }}
+          TF_VAR_eventbrite_client_secret:           ${{ secrets.EVENTBRITE_CLIENT_SECRET }}
+          TF_VAR_eventbrite_public_token:            ${{ secrets.EVENTBRITE_PUBLIC_TOKEN }}
 
       - name: Post Plan to PR
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3  # v9.0.0
