@@ -27,10 +27,30 @@ authInternalUsers:
       - action: read
         path: live
 
-# Record every published stream as a single .mp4 (OBS encodes; we just remux)
-record: yes
+# Server-side recording is OFF. The 20 GB root volume cannot safely hold a long stream, and
+# stream uptime beats having a third copy of the video: OBS records locally and Restream keeps
+# its own copy, so this one was redundant.
+#
+# Why it is genuinely unsafe to leave on for a long stream: a recording file is only closed --
+# and therefore only uploadable and deletable by vod-watcher -- at recordSegmentDuration. That
+# defaults to 1h and was never overridden here, so an in-progress hour of video accumulates on
+# disk with nothing able to reclaim it (disk-watchdog deliberately never purges an in-progress
+# recording). At ~20 GB/h that exhausts the ~12 GB free in roughly half an hour and takes RTMP
+# and HLS down mid-show -- the 2026-07-19 outage.
+#
+# This was masked until now: a broken healthcheck had autoheal restarting mediamtx every ~2 min
+# (fixed in #296), which closed the file constantly and let vod-watcher drain the disk by
+# accident. Fixing the restart loop removed that unintended safety net.
+#
+# To re-enable, set `record: yes`. recordSegmentDuration is pre-set to 5m below so recording is
+# bounded from the moment it is switched back on -- do NOT remove it and fall back to the 1h
+# default. At 20 GB/h a 5m segment is ~1.7 GB, which vod-watcher uploads and deletes well inside
+# the next segment. Before re-enabling for a multi-hour stream, confirm `df -h /` has headroom
+# for several segments, not just one.
+record: no
 recordPath: /recordings/%path/%Y-%m-%dT%H-%M-%S.mp4
 recordFormat: fmp4
+recordSegmentDuration: 5m
 recordDeleteAfter: 0s   # vod-watcher.service uploads to S3 and handles cleanup
 
 paths:
