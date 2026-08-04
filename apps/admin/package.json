@@ -39,7 +39,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.4",
     "@types/sharp": "^0.32.0",
-    "@vitejs/plugin-react": "^4.3.1",
+    "@vitejs/plugin-react": "^6.0.5",
     "eslint": "^10.8.0",
     "jsdom": "^24.1.0",
     "postcss": "^8.5.25",
