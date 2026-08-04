@@ -14,7 +14,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.115.0",
     "@aws-sdk/client-s3": "^3.1101.0",
-    "@clerk/nextjs": "^6.5.0",
+    "@clerk/nextjs": "^7.6.4",
     "@stpetemusic/db": "*",
     "@stpetemusic/types": "*",
     "clsx": "^2.1.1",
