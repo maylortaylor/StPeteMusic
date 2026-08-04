@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - name: Package deployment files
         # Build tarball inside GITHUB_WORKSPACE — scp-action runs in a Docker
@@ -112,6 +112,12 @@ jobs:
           ADMIN_ARTIST_ENRICHMENT_CALLBACK_URL: ${{ secrets.ADMIN_ARTIST_ENRICHMENT_CALLBACK_URL }}
           # Streaming
           RTMP_STREAM_KEY: ${{ secrets.RTMP_STREAM_KEY }}
+          # Alerting. n8n workflows send mail via `$env.RESEND_API_KEY` and address it with
+          # `$env.ALERT_EMAIL`; without these the Health Monitor detects outages on every run
+          # and then silently fails to report them. Both already existed as repo secrets and
+          # were simply never plumbed through to the container.
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
           # Listmonk credentials and RDS host are read from SSM on EC2 (not injected here)
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -123,7 +129,8 @@ jobs:
             N8N_GEMINI_API_KEY,IG_USER_ID,IG_APP_ID,IG_ACCESS_TOKEN,FB_PAGE_ID,FB_ACCESS_TOKEN,
             GO_LIVE_ASSET_URL,GO_LIVE_LINK_URL,
             YOUTUBE_CLIENT_ID,YOUTUBE_CLIENT_SECRET,YOUTUBE_API_KEY,NOTION_API_KEY,
-            N8N_WEBHOOK_SECRET,ADMIN_ENRICHMENT_CALLBACK_URL,ADMIN_ARTIST_ENRICHMENT_CALLBACK_URL,RTMP_STREAM_KEY
+            N8N_WEBHOOK_SECRET,ADMIN_ENRICHMENT_CALLBACK_URL,ADMIN_ARTIST_ENRICHMENT_CALLBACK_URL,RTMP_STREAM_KEY,
+            RESEND_API_KEY,ALERT_EMAIL
           script: |
             set -e
 
@@ -224,6 +231,8 @@ jobs:
               printf 'LISTMONK_USERNAME=%s\n'               "${LISTMONK_USERNAME}"
               printf 'LISTMONK_PASSWORD=%s\n'               "${LISTMONK_PASSWORD}"
               printf 'RDS_HOST=%s\n'                        "${RDS_HOST}"
+              printf 'RESEND_API_KEY=%s\n'                  "${RESEND_API_KEY}"
+              printf 'ALERT_EMAIL=%s\n'                     "${ALERT_EMAIL}"
             } > ~/stpetemusic/.env
             chmod 600 ~/stpetemusic/.env
             echo "✓ .env written ($(wc -l < ~/stpetemusic/.env) vars)"

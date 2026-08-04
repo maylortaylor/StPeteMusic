@@ -26,6 +26,18 @@ updates:
     labels:
       - "dependencies"
       - "npm"
+    # Collapse routine minor/patch bumps into one PR per week. Ungrouped, these
+    # arrive as up to 5 separate PRs that each rewrite the shared lockfile, so
+    # they conflict with each other and — with strict branch protection on main —
+    # force a rebase and a full CI run per merge. Majors stay ungrouped so a
+    # breaking bump still gets looked at on its own.
+    groups:
+      npm-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
 
   # Keep GitHub Actions up to date
   - package-ecosystem: "github-actions"
@@ -37,3 +49,12 @@ updates:
     labels:
       - "dependencies"
       - "github-actions"
+    # Same reasoning as npm: action bumps are almost always one-line SHA changes
+    # and are far easier to review as a single PR. Majors stay ungrouped.
+    groups:
+      github-actions-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
