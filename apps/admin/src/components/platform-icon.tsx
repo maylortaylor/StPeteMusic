@@ -1,21 +1,6 @@
 'use client';
 
-import {
-  ExternalLink,
-  Facebook,
-  Instagram,
-  Link,
-  Twitter,
-  Youtube,
-  type LucideIcon,
-} from 'lucide-react';
-
-const PLATFORM_ICONS: Record<string, LucideIcon> = {
-  instagram: Instagram,
-  facebook: Facebook,
-  youtube: Youtube,
-  twitter: Twitter,
-};
+import { ExternalLink, Link } from 'lucide-react';
 
 interface PlatformIconProps {
   platform: string;
@@ -24,17 +9,19 @@ interface PlatformIconProps {
   showExternalIndicator?: boolean;
 }
 
+// lucide-react v1 removed all brand icons (Facebook/Instagram/Twitter/Youtube) for trademark
+// reasons, so there is no per-platform glyph to map to any more. apps/web hit this first and
+// settled on a generic link icon; admin now matches it rather than inventing a second answer.
+// `platform` is kept in the props so callers and the component API are unchanged.
 export function PlatformIcon({
-  platform,
+  platform: _platform,
   size = 16,
   className,
   showExternalIndicator = true,
 }: PlatformIconProps) {
-  const Icon = PLATFORM_ICONS[platform.toLowerCase()] ?? Link;
-
   return (
     <span className={`inline-flex items-center gap-0.5 ${className ?? ''}`}>
-      <Icon size={size} />
+      <Link size={size} />
       {showExternalIndicator && <ExternalLink size={size * 0.75} className='opacity-50' />}
     </span>
   );

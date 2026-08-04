@@ -12,13 +12,13 @@ import {
   Mail,
   MapPin,
   Mic2,
+  MonitorPlay,
   Radio,
   Star,
   Tag,
   Ticket,
   Users,
   Users2,
-  Youtube,
   Zap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -36,7 +36,7 @@ const navItems = [
   { label: 'Brand Voice',     href: '/dashboard/brand-voice',    icon: Mic2 },
   { label: 'Templates',       href: '/dashboard/templates',      icon: Zap },
   { label: 'Live Stream',      href: '/dashboard/live',           icon: Radio },
-  { label: 'YouTube',          href: '/dashboard/youtube',        icon: Youtube, reviewQueue: false },
+  { label: 'YouTube',          href: '/dashboard/youtube',        icon: MonitorPlay, reviewQueue: false },
   { label: 'Tickets Manager', href: '/dashboard/eventbrite',     icon: Ticket },
   { label: 'Newsletter',      href: '/dashboard/newsletter',     icon: Mail },
   { label: 'Playbook',        href: '/dashboard/playbook',       icon: BookOpen },
