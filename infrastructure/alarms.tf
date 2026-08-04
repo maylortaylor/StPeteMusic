@@ -131,13 +131,19 @@ resource "aws_cloudwatch_metric_alarm" "rtmp_health" {
 # takes down RTMP/HLS (2026-07-19 outage). treat_missing_data = "breaching": if the watchdog stops
 # publishing, the disk is unmonitored and that itself warrants a page.
 resource "aws_cloudwatch_metric_alarm" "ec2_disk_high" {
-  alarm_name          = "${var.project}-ec2-disk-high"
-  alarm_description   = "EC2 root disk > 85% — stream recordings may fill the volume and take down RTMP/HLS"
-  namespace           = "StPeteMusic/Host"
-  metric_name         = "DiskUsedPercent"
-  dimensions          = { InstanceId = aws_instance.n8n.id }
-  statistic           = "Maximum"
-  period              = 300
+  alarm_name        = "${var.project}-ec2-disk-high"
+  alarm_description = "EC2 root disk > 85% — stream recordings may fill the volume and take down RTMP/HLS"
+  namespace         = "StPeteMusic/Host"
+  metric_name       = "DiskUsedPercent"
+  dimensions        = { InstanceId = aws_instance.n8n.id }
+  statistic         = "Maximum"
+  # period MUST match disk-watchdog.timer's OnUnitActiveSec (10 min). At the previous 300s, every
+  # evaluation window contained one real datapoint and one structurally empty period, and with
+  # treat_missing_data = "breaching" that empty period counted as a breach. It only stayed OK
+  # because 2-of-2 periods must breach — so any timer jitter or one slow run put two empty periods
+  # back-to-back and false-alarmed. Matching the publish cadence makes "missing" mean what it is
+  # supposed to mean: the watchdog has actually stopped, which is worth a page.
+  period              = 600
   evaluation_periods  = 2
   threshold           = 85
   comparison_operator = "GreaterThanThreshold"
