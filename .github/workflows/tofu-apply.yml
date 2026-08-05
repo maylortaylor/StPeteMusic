@@ -126,7 +126,31 @@ jobs:
 
       - name: Redeploy admin Amplify app
         run: |
-          aws amplify start-job \
+          # tofu may have changed the app's environment variables, and Amplify only picks those up
+          # on a new build. If a build is already pending or running for this branch, StartJob
+          # returns LimitExceededException -- but that in-flight build reads the same env vars, so
+          # the redeploy is already covered. Treat it as success.
+          #
+          # Previously this step failed the whole job on that race, so `OpenTofu Apply` showed red
+          # even when the apply itself had completed (#291 and #299 both did this). A red run that
+          # actually succeeded trains you to ignore the signal and would mask a genuine failure.
+          set +e
+          out=$(aws amplify start-job \
             --app-id d2n0tn0yijqxny \
             --branch-name main \
-            --job-type RELEASE
+            --job-type RELEASE 2>&1)
+          rc=$?
+          set -e
+
+          if [ "$rc" -eq 0 ]; then
+            echo "Started Amplify release job for admin."
+            exit 0
+          fi
+
+          if printf '%s' "$out" | grep -q 'LimitExceededException'; then
+            echo "::notice::Amplify build already pending/running for main; it will pick up the new env vars. Skipping redeploy."
+            exit 0
+          fi
+
+          echo "$out" >&2
+          exit "$rc"
