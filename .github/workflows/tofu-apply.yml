@@ -101,6 +101,17 @@ jobs:
             tofu import -input=false 'aws_iam_user_policy.admin_s3_upload' \
               'stpetemusic-admin-s3-upload:stpetemusic-admin-s3-upload-policy'
 
+          # aws_ssm_parameter.revalidation_secret is count-gated on var.revalidation_secret being
+          # non-empty. While the GitHub secret REVALIDATION_SECRET was empty the resource evaluated
+          # to count = 0 and left Terraform state -- but the SSM parameter itself still existed in
+          # AWS (created 2026-06-16). Setting the secret again flips count back to 1, so the apply
+          # tries to *create* a parameter that is already there and dies with
+          # ParameterAlreadyExists, taking the whole apply with it. Importing first makes the
+          # round-trip self-healing instead of a manual recovery.
+          tofu state list | grep -qF 'aws_ssm_parameter.revalidation_secret[0]' || \
+            tofu import -input=false 'aws_ssm_parameter.revalidation_secret[0]' \
+              /stpetemusic/revalidation_secret
+
       # Import GCP resources that exist in GCP but may not yet be in Terraform state.
       # Idempotent: skips resources already tracked. continue-on-error so a permission
       # miss during bootstrap doesn't block the apply from attempting.
