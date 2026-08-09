@@ -5,6 +5,14 @@ rtmpAddress: :1935
 hlsAddress: :8888
 hlsAllowOrigin: '*'
 
+# Raised from the 10s default on 2026-08-08. A venue with a weak uplink stalls mid-stream;
+# at 10s MediaMTX kills the publisher session on a brief stall, and the reconnect tears down
+# and rebuilds the HLS muxer -- which every viewer sees as the stream dying. 30s rides out
+# short stalls and keeps one continuous session instead. This only helps stalls (the
+# `i/o timeout` close reason); a connection torn down outright closes with `EOF` and
+# reconnects regardless, so encoder bitrate remains the real lever for a bad uplink.
+readTimeout: 30s
+
 # Unused protocols use valid addresses so v1.x validation passes.
 # Ports 8554/8189/8890 are not open in the EC2 security group — unreachable externally.
 rtspAddress: :8554
