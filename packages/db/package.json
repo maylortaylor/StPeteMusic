@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
-    "@types/pg": "^8.20.1",
+    "@types/pg": "^8.21.0",
     "drizzle-kit": "^0.31.10",
     "typescript": "^6"
   }
