@@ -25,7 +25,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run fallow audit
-        uses: fallow-rs/fallow@28810138faa8fdbc830b8d585d0c15d65c39c3fd  # v3.10.0
+        uses: fallow-rs/fallow@79a0e8d8dbcaa408dce348b3df14fc1e824f988b  # v3.22.0
         with:
           command: audit
           comment: true
