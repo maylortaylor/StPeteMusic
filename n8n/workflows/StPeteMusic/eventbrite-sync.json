@@ -1,5 +1,11 @@
 {
+  "updatedAt": "2026-06-16T13:56:47.791Z",
+  "createdAt": "2026-05-18T03:46:31.777Z",
+  "id": "XzoDhtRyqYMIYbcp",
   "name": "eventbrite-sync",
+  "description": null,
+  "active": true,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -12,11 +18,14 @@
           ]
         }
       },
-      "id": "schedule-trigger",
+      "id": "9cb1b63e-1af8-4495-af74-001437342ad9",
       "name": "Daily at 06:00 UTC",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.1,
-      "position": [0, 0]
+      "position": [
+        -240,
+        -112
+      ]
     },
     {
       "parameters": {
@@ -35,11 +44,14 @@
           "timeout": 60000
         }
       },
-      "id": "sync-request",
+      "id": "becbb3b2-0eba-4786-a3f5-6e2f4791e642",
       "name": "POST Sync Endpoint",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [200, 0]
+      "position": [
+        -32,
+        -112
+      ]
     },
     {
       "parameters": {
@@ -61,53 +73,135 @@
             }
           ],
           "combinator": "and"
-        }
+        },
+        "options": {}
       },
-      "id": "check-errors",
+      "id": "3d8aa468-c3dc-4ee9-a3c2-d477d05032aa",
       "name": "Has Errors?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [400, 0]
+      "position": [
+        176,
+        -112
+      ]
     },
     {
       "parameters": {
         "jsCode": "const result = $input.first().json;\nconsole.error('Eventbrite sync errors:', JSON.stringify(result.errors, null, 2));\nreturn [{ json: { message: `Sync completed with ${result.errors.length} error(s)`, ...result } }];\n"
       },
-      "id": "log-errors",
+      "id": "fb199616-ec85-4afa-9112-2563e7b8d82c",
       "name": "Log Errors",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [600, -100]
+      "position": [
+        368,
+        -208
+      ]
     },
     {
       "parameters": {
         "jsCode": "const result = $input.first().json;\nconsole.log(`Eventbrite sync OK: synced=${result.synced} added=${result.added} updated=${result.updated}`);\nreturn [{ json: result }];\n"
       },
-      "id": "log-success",
+      "id": "2d3dcce7-4f06-425e-86d9-d71193107700",
       "name": "Log Success",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [600, 100]
+      "position": [
+        368,
+        -16
+      ]
     }
   ],
   "connections": {
     "Daily at 06:00 UTC": {
-      "main": [[{ "node": "POST Sync Endpoint", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "POST Sync Endpoint",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "POST Sync Endpoint": {
-      "main": [[{ "node": "Has Errors?", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Has Errors?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Has Errors?": {
       "main": [
-        [{ "node": "Log Errors", "type": "main", "index": 0 }],
-        [{ "node": "Log Success", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Log Errors",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
   },
+  "staticData": {
+    "node:Daily at 10:00 UTC": {
+      "recurrenceRules": []
+    },
+    "node:Daily at 06:00 UTC": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "04e3b4c0-ac6c-43d0-8ee0-213e243d98fc",
+  "activeVersionId": "04e3b4c0-ac6c-43d0-8ee0-213e243d98fc",
+  "versionCounter": 19,
+  "triggerCount": 1,
   "tags": [
-    { "name": "StPeteMusic" }
-  ]
+    {
+      "updatedAt": "2026-03-09T19:53:42.176Z",
+      "createdAt": "2026-03-09T19:53:42.176Z",
+      "id": "CSGanN665nXyhf1A",
+      "name": "StPeteMusic"
+    }
+  ],
+  "shared": [
+    {
+      "updatedAt": "2026-05-18T03:46:31.783Z",
+      "createdAt": "2026-05-18T03:46:31.783Z",
+      "role": "workflow:owner",
+      "workflowId": "XzoDhtRyqYMIYbcp",
+      "projectId": "9hoLIXSDUw0Dgem2",
+      "project": {
+        "updatedAt": "2026-03-09T19:50:22.065Z",
+        "createdAt": "2026-03-09T19:42:35.601Z",
+        "id": "9hoLIXSDUw0Dgem2",
+        "name": "Matt Taylor <maylortaylor@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "53bffac6-ca7b-415e-be04-a34d28ab196b"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": "Version 04e3b4c0",
+    "description": ""
+  }
 }

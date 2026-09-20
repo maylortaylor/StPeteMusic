@@ -1,5 +1,11 @@
 {
+  "updatedAt": "2026-06-22T20:23:09.928Z",
+  "createdAt": "2026-06-22T13:49:12.123Z",
+  "id": "FpOgv0yFiMlwbC2z",
   "name": "Go Live Notify",
+  "description": null,
+  "active": true,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -9,9 +15,12 @@
         "color": 7
       },
       "type": "n8n-nodes-base.stickyNote",
-      "position": [240, -380],
+      "position": [
+        2736,
+        352
+      ],
       "typeVersion": 1,
-      "id": "a1f3c1a0-1000-4000-8000-000000000010",
+      "id": "979ead89-9eb2-4b34-9e0f-a0d4e0a5a604",
       "name": "Sticky Note"
     },
     {
@@ -22,44 +31,55 @@
         "color": 5
       },
       "type": "n8n-nodes-base.stickyNote",
-      "position": [1300, 900],
+      "position": [
+        3808,
+        1632
+      ],
       "typeVersion": 1,
-      "id": "a1f3c1a0-1000-4000-8000-000000000011",
+      "id": "93f3fcaf-ec81-424a-af5e-6893f6497968",
       "name": "Sticky Note (Threads — future)"
     },
     {
       "parameters": {
         "httpMethod": "POST",
         "path": "go-live",
-        "responseMode": "onReceived",
         "options": {}
       },
-      "id": "a1f3c1a0-1000-4000-8000-000000000001",
+      "id": "99fcad32-1a45-4170-be71-a492cb544e0c",
       "name": "Webhook: Go Live",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [240, 260],
+      "position": [
+        2736,
+        992
+      ],
       "webhookId": "go-live"
     },
     {
       "parameters": {
         "jsCode": "// Validate the shared secret sent by MediaMTX's runOnReady hook (and any other caller).\n// Header lookup is case-insensitive since n8n's webhook node may not normalize keys.\nconst raw = $input.first().json;\nconst headers = raw.headers || {};\nconst headerKey = Object.keys(headers).find((k) => k.toLowerCase() === 'x-n8n-webhook-secret');\nconst provided = headerKey ? headers[headerKey] : undefined;\nconst expected = $env.N8N_WEBHOOK_SECRET;\n\nif (!expected || provided !== expected) {\n  throw new Error('[go-live-notify] Invalid or missing X-N8N-Webhook-Secret header');\n}\n\nreturn [{ json: raw.body || raw }];"
       },
-      "id": "a1f3c1a0-1000-4000-8000-000000000002",
+      "id": "ecff3d3a-2445-4d6d-b071-cc1b189f5c67",
       "name": "Verify Webhook Secret",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [500, 260]
+      "position": [
+        3008,
+        992
+      ]
     },
     {
       "parameters": {
         "jsCode": "// Asset and link are env-driven on purpose — swapping the mp4 for a new cut later is a\n// config change (re-upload + update GO_LIVE_ASSET_URL), not a workflow edit.\nconst assetUrl = $env.GO_LIVE_ASSET_URL;\nconst linkUrl = $env.GO_LIVE_LINK_URL || 'https://www.stpetemusic.live/live';\n\nif (!assetUrl) {\n  throw new Error('[go-live-notify] GO_LIVE_ASSET_URL is not set');\n}\n\nconst caption = \"We're live right now! Watch at \" + linkUrl;\n\nreturn [{ json: { assetUrl, linkUrl, caption } }];"
       },
-      "id": "a1f3c1a0-1000-4000-8000-000000000003",
+      "id": "9482e356-0442-4b39-958a-b2ddec9d29f4",
       "name": "Resolve Asset and Link",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [760, 260]
+      "position": [
+        3264,
+        992
+      ]
     },
     {
       "parameters": {
@@ -68,18 +88,30 @@
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
-            { "name": "file_url", "value": "={{ $json.assetUrl }}" },
-            { "name": "description", "value": "={{ $json.caption }}" },
-            { "name": "access_token", "value": "={{ $env.FB_ACCESS_TOKEN }}" }
+            {
+              "name": "file_url",
+              "value": "={{ $json.assetUrl }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ $json.caption }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $env.FB_ACCESS_TOKEN }}"
+            }
           ]
         },
         "options": {}
       },
-      "id": "a1f3c1a0-1000-4000-8000-000000000004",
+      "id": "d64008e0-02b9-4d5e-a461-6c976a178496",
       "name": "Post to FB Page Feed",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
-      "position": [1020, 60],
+      "position": [
+        3520,
+        800
+      ],
       "continueOnFail": true
     },
     {
@@ -89,17 +121,26 @@
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
-            { "name": "upload_phase", "value": "start" },
-            { "name": "access_token", "value": "={{ $env.FB_ACCESS_TOKEN }}" }
+            {
+              "name": "upload_phase",
+              "value": "start"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $env.FB_ACCESS_TOKEN }}"
+            }
           ]
         },
         "options": {}
       },
-      "id": "a1f3c1a0-1000-4000-8000-000000000005",
+      "id": "9793c0af-4e37-411c-a93d-0a9a3dbc6df0",
       "name": "FB Story: Start Upload",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
-      "position": [1020, 280],
+      "position": [
+        3520,
+        1024
+      ],
       "continueOnFail": true
     },
     {
@@ -109,28 +150,40 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "={{ 'OAuth ' + $env.FB_ACCESS_TOKEN }}" },
-            { "name": "file_url", "value": "={{ $('Resolve Asset and Link').item.json.assetUrl }}" }
+            {
+              "name": "Authorization",
+              "value": "={{ 'OAuth ' + $env.FB_ACCESS_TOKEN }}"
+            },
+            {
+              "name": "file_url",
+              "value": "={{ $('Resolve Asset and Link').item.json.assetUrl }}"
+            }
           ]
         },
         "options": {}
       },
-      "id": "a1f3c1a0-1000-4000-8000-000000000015",
+      "id": "22374530-bd1b-4938-9ff7-5f9fb17ad297",
       "name": "FB Story: Upload Video",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
-      "position": [1280, 280],
+      "position": [
+        3776,
+        1024
+      ],
       "continueOnFail": true
     },
     {
       "parameters": {
         "amount": 20
       },
-      "id": "a1f3c1a0-1000-4000-8000-000000000012",
+      "id": "fa2b5058-333b-4a80-a8ce-00e0d7a35960",
       "name": "Wait for FB Story Upload",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
-      "position": [1540, 280],
+      "position": [
+        4048,
+        1024
+      ],
       "webhookId": "a1f3c1a0-1000-4000-8000-000000000012"
     },
     {
@@ -140,19 +193,34 @@
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
-            { "name": "upload_phase", "value": "finish" },
-            { "name": "video_id", "value": "={{ $('FB Story: Start Upload').item.json.video_id }}" },
-            { "name": "link", "value": "={{ $('Resolve Asset and Link').item.json.linkUrl }}" },
-            { "name": "access_token", "value": "={{ $env.FB_ACCESS_TOKEN }}" }
+            {
+              "name": "upload_phase",
+              "value": "finish"
+            },
+            {
+              "name": "video_id",
+              "value": "={{ $('FB Story: Start Upload').item.json.video_id }}"
+            },
+            {
+              "name": "link",
+              "value": "={{ $('Resolve Asset and Link').item.json.linkUrl }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $env.FB_ACCESS_TOKEN }}"
+            }
           ]
         },
         "options": {}
       },
-      "id": "a1f3c1a0-1000-4000-8000-000000000006",
+      "id": "1ceaf145-1025-4464-b573-db3d91c39f3d",
       "name": "FB Story: Finish & Publish",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
-      "position": [1800, 280],
+      "position": [
+        4304,
+        1024
+      ],
       "continueOnFail": true
     },
     {
@@ -162,30 +230,48 @@
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
-            { "name": "media_type", "value": "STORIES" },
-            { "name": "video_url", "value": "={{ $json.assetUrl }}" },
-            { "name": "link", "value": "={{ $json.linkUrl }}" },
-            { "name": "access_token", "value": "={{ $env.IG_ACCESS_TOKEN }}" }
+            {
+              "name": "media_type",
+              "value": "STORIES"
+            },
+            {
+              "name": "video_url",
+              "value": "={{ $json.assetUrl }}"
+            },
+            {
+              "name": "link",
+              "value": "={{ $json.linkUrl }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $env.IG_ACCESS_TOKEN }}"
+            }
           ]
         },
         "options": {}
       },
-      "id": "a1f3c1a0-1000-4000-8000-000000000007",
+      "id": "8b5f0ae4-0465-4bf6-b2d8-478df41778d5",
       "name": "Create IG Story Container",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
-      "position": [1020, 520],
+      "position": [
+        3520,
+        1264
+      ],
       "continueOnFail": true
     },
     {
       "parameters": {
         "amount": 30
       },
-      "id": "a1f3c1a0-1000-4000-8000-000000000008",
+      "id": "783e1aab-8c56-4c19-9f1c-f348bd745a50",
       "name": "Wait for IG Story Processing",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
-      "position": [1280, 520],
+      "position": [
+        3776,
+        1264
+      ],
       "webhookId": "a1f3c1a0-1000-4000-8000-000000000008"
     },
     {
@@ -193,11 +279,14 @@
         "url": "={{ 'https://graph.facebook.com/v24.0/' + $('Create IG Story Container').item.json.id + '?fields=status_code,status&access_token=' + $env.IG_ACCESS_TOKEN }}",
         "options": {}
       },
-      "id": "a1f3c1a0-1000-4000-8000-000000000013",
+      "id": "8c068bf6-97e1-4576-9ac9-d5b9d730c291",
       "name": "Check IG Status",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
-      "position": [1540, 520],
+      "position": [
+        4048,
+        1264
+      ],
       "continueOnFail": true
     },
     {
@@ -213,28 +302,37 @@
               "id": "9c1f1a00-0000-4000-8000-00000000ig01",
               "leftValue": "={{ $json.status_code }}",
               "rightValue": "FINISHED",
-              "operator": { "type": "string", "operation": "equals" }
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
             }
           ],
           "combinator": "and"
         },
         "options": {}
       },
-      "id": "a1f3c1a0-1000-4000-8000-000000000014",
+      "id": "1c61645f-2aab-4591-a396-1b430f325dfe",
       "name": "Is IG Ready?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [1800, 520]
+      "position": [
+        4304,
+        1264
+      ]
     },
     {
       "parameters": {
         "amount": 30
       },
-      "id": "a1f3c1a0-1000-4000-8000-000000000016",
+      "id": "1aa31671-b2bb-4de9-83fc-34007a227804",
       "name": "IG Retry Wait",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
-      "position": [1800, 720],
+      "position": [
+        4304,
+        1456
+      ],
       "webhookId": "a1f3c1a0-1000-4000-8000-000000000016"
     },
     {
@@ -244,91 +342,205 @@
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
-            { "name": "creation_id", "value": "={{ $('Create IG Story Container').item.json.id }}" },
-            { "name": "access_token", "value": "={{ $env.IG_ACCESS_TOKEN }}" }
+            {
+              "name": "creation_id",
+              "value": "={{ $('Create IG Story Container').item.json.id }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $env.IG_ACCESS_TOKEN }}"
+            }
           ]
         },
         "options": {}
       },
-      "id": "a1f3c1a0-1000-4000-8000-000000000009",
+      "id": "bbe16c93-92ed-4171-97d8-a50ec8842940",
       "name": "Publish IG Story",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
-      "position": [2060, 460],
+      "position": [
+        4560,
+        1200
+      ],
       "continueOnFail": true
     }
   ],
-  "pinData": {},
   "connections": {
     "Webhook: Go Live": {
       "main": [
-        [{ "node": "Verify Webhook Secret", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Verify Webhook Secret",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Verify Webhook Secret": {
       "main": [
-        [{ "node": "Resolve Asset and Link", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Resolve Asset and Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Resolve Asset and Link": {
       "main": [
         [
-          { "node": "Post to FB Page Feed", "type": "main", "index": 0 },
-          { "node": "FB Story: Start Upload", "type": "main", "index": 0 },
-          { "node": "Create IG Story Container", "type": "main", "index": 0 }
+          {
+            "node": "Post to FB Page Feed",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "FB Story: Start Upload",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create IG Story Container",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "FB Story: Start Upload": {
       "main": [
-        [{ "node": "FB Story: Upload Video", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "FB Story: Upload Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "FB Story: Upload Video": {
       "main": [
-        [{ "node": "Wait for FB Story Upload", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Wait for FB Story Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Wait for FB Story Upload": {
       "main": [
-        [{ "node": "FB Story: Finish & Publish", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "FB Story: Finish & Publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Create IG Story Container": {
       "main": [
-        [{ "node": "Wait for IG Story Processing", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Wait for IG Story Processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Wait for IG Story Processing": {
       "main": [
-        [{ "node": "Check IG Status", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Check IG Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Check IG Status": {
       "main": [
-        [{ "node": "Is IG Ready?", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Is IG Ready?",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Is IG Ready?": {
       "main": [
-        [{ "node": "Publish IG Story", "type": "main", "index": 0 }],
-        [{ "node": "IG Retry Wait", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Publish IG Story",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IG Retry Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "IG Retry Wait": {
       "main": [
-        [{ "node": "Check IG Status", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Check IG Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
-  "active": false,
   "settings": {
     "executionOrder": "v1",
-    "saveManualExecutions": true,
-    "callerPolicy": "workflowsFromSameOwner",
-    "errorWorkflow": ""
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
   },
-  "meta": {
-    "instanceId": ""
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "875dc1b0-60d6-4ca0-b08c-a184de43fcbd",
+  "activeVersionId": "875dc1b0-60d6-4ca0-b08c-a184de43fcbd",
+  "versionCounter": 25,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-06-22T13:49:12.129Z",
+      "createdAt": "2026-06-22T13:49:12.129Z",
+      "role": "workflow:owner",
+      "workflowId": "FpOgv0yFiMlwbC2z",
+      "projectId": "9hoLIXSDUw0Dgem2",
+      "project": {
+        "updatedAt": "2026-03-09T19:50:22.065Z",
+        "createdAt": "2026-03-09T19:42:35.601Z",
+        "id": "9hoLIXSDUw0Dgem2",
+        "name": "Matt Taylor <maylortaylor@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "53bffac6-ca7b-415e-be04-a34d28ab196b"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": "go-live-notify",
+    "description": ""
   }
 }

@@ -1,28 +1,35 @@
 {
+  "updatedAt": "2026-05-23T02:19:36.158Z",
+  "createdAt": "2026-05-23T02:18:27.385Z",
+  "id": "JaFsJwC7X2gsvxmI",
   "name": "email-to-planning-calendar",
+  "description": null,
+  "active": false,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {
         "pollTimes": {
           "item": [
             {
-              "mode": "everyMinute",
-              "value": 15
+              "mode": "everyMinute"
             }
           ]
         },
-        "simple": true,
         "filters": {}
       },
-      "id": "email-gcal-001",
+      "id": "2588af2c-3f65-4c6f-86e7-0ba436359d42",
       "name": "Gmail Trigger",
       "type": "n8n-nodes-base.gmailTrigger",
       "typeVersion": 1,
-      "position": [240, 260],
+      "position": [
+        -1008,
+        112
+      ],
       "credentials": {
         "gmailOAuth2": {
-          "id": "REPLACE_AFTER_CREDENTIAL_CREATED",
-          "name": "theburgmusic-gmail"
+          "id": "7c8q7ejfihHbO7b8",
+          "name": "Gmail account"
         }
       }
     },
@@ -30,21 +37,25 @@
       "parameters": {
         "jsCode": "const today = new Date().toISOString().split('T')[0];\nconst from = $input.item.json.from ?? '';\nconst subject = $input.item.json.subject ?? '(no subject)';\nconst body = ($input.item.json.text ?? $input.item.json.snippet ?? '').slice(0, 2000);\nreturn [{ json: { userMessage: `Today is ${today}.\\n\\nFrom: ${from}\\nSubject: ${subject}\\nBody:\\n${body}`, from, subject } }];"
       },
-      "id": "email-gcal-002",
+      "id": "d4e91a4f-b445-4112-8c0b-4df515a2e32f",
       "name": "Build Prompt",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [460, 260]
+      "position": [
+        -784,
+        112
+      ]
     },
     {
-      "parameters": {
-        "prompt": "={{ $json.userMessage }}"
-      },
-      "id": "email-gcal-003",
+      "parameters": {},
+      "id": "00a6bca0-7866-4885-bd68-fbb302d447b8",
       "name": "Extract Date",
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.5,
-      "position": [680, 260]
+      "position": [
+        -560,
+        112
+      ]
     },
     {
       "parameters": {
@@ -54,15 +65,16 @@
           "mode": "list",
           "cachedResultName": "Claude Sonnet 4.6"
         },
-        "options": {
-          "systemMessage": "You extract dates from emails. Reply ONLY with valid JSON — no markdown fences, no explanation.\n\nIf date found: {\"dateFound\":true,\"date\":\"YYYY-MM-DD\",\"endDate\":\"YYYY-MM-DD or null\",\"senderName\":\"Name only (not email address)\"}\nIf no date: {\"dateFound\":false}\n\nRules:\n- Extract the FIRST concrete booking/show date mentioned\n- For date ranges (e.g. June 14-16), set endDate; otherwise null\n- Resolve relative dates (\"next Friday\") using the Today date in the user message\n- Do NOT invent dates — only extract explicitly stated ones\n- senderName: extract from the From field (friendly name, not the email address)"
-        }
+        "options": {}
       },
-      "id": "email-gcal-004",
+      "id": "dd3687c9-e0a5-48de-94f5-9e0170be5ef9",
       "name": "Claude Sonnet 4.6",
       "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
       "typeVersion": 1.3,
-      "position": [680, 460],
+      "position": [
+        -560,
+        304
+      ],
       "credentials": {
         "anthropicApi": {
           "id": "GxEPu27ca9FmXxQA",
@@ -74,11 +86,14 @@
       "parameters": {
         "jsCode": "let parsed;\ntry {\n  const raw = ($input.item.json.text ?? '').replace(/```json?\\n?/g, '').replace(/```/g, '').trim();\n  parsed = JSON.parse(raw);\n} catch {\n  parsed = { dateFound: false };\n}\nreturn [{ json: parsed }];"
       },
-      "id": "email-gcal-005",
+      "id": "f3f248b3-bee8-409e-a5a8-b94afddca047",
       "name": "Parse Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [900, 260],
+      "position": [
+        -256,
+        128
+      ],
       "continueOnFail": true
     },
     {
@@ -104,11 +119,14 @@
         },
         "options": {}
       },
-      "id": "email-gcal-006",
+      "id": "fbe4880c-eac4-4228-ae23-daf39eb6b162",
       "name": "Date Found?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [1120, 260]
+      "position": [
+        -48,
+        144
+      ]
     },
     {
       "parameters": {
@@ -120,22 +138,25 @@
         "start": "={{ $('Parse Response').item.json.date }}",
         "end": "={{ $('Parse Response').item.json.endDate ?? $('Parse Response').item.json.date }}",
         "additionalFields": {
-          "summary": "={{ 'RESERVED — ' + $('Parse Response').item.json.senderName }}",
-          "description": "={{ 'From: ' + $('Build Prompt').item.json.from + '\\nSubject: ' + $('Build Prompt').item.json.subject + '\\n\\nAuto-created by n8n email-to-planning-calendar workflow.' }}"
+          "description": "={{ 'From: ' + $('Build Prompt').item.json.from + '\\nSubject: ' + $('Build Prompt').item.json.subject + '\\n\\nAuto-created by n8n email-to-planning-calendar workflow.' }}",
+          "summary": "={{ 'RESERVED — ' + $('Parse Response').item.json.senderName }}"
         }
       },
-      "id": "email-gcal-007",
+      "id": "2c65e3c1-e23a-4bdb-9af8-912b90d6e16f",
       "name": "Create Planning Event",
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1,
-      "position": [1340, 160],
-      "continueOnFail": true,
+      "position": [
+        128,
+        0
+      ],
       "credentials": {
         "googleCalendarOAuth2Api": {
-          "id": "bKr3uyzb1sZZD8hj",
-          "name": "SPM-calendar-website"
+          "id": "bsYCJ9AtPKlBbmSs",
+          "name": "SPM-Google OAuth"
         }
-      }
+      },
+      "continueOnFail": true
     }
   ],
   "connections": {
@@ -202,23 +223,53 @@
             "type": "main",
             "index": 0
           }
-        ],
-        []
+        ]
       ]
     }
   },
   "settings": {
     "executionOrder": "v1",
-    "saveManualExecutions": true
+    "binaryMode": "separate",
+    "availableInMCP": false
   },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "5cd90251-4b0b-452a-bd16-2ddc47774dbb",
+  "activeVersionId": null,
+  "versionCounter": 6,
+  "triggerCount": 0,
   "tags": [
     {
+      "updatedAt": "2026-03-09T19:53:42.176Z",
+      "createdAt": "2026-03-09T19:53:42.176Z",
+      "id": "CSGanN665nXyhf1A",
       "name": "StPeteMusic"
     }
   ],
-  "meta": {
-    "templateCredsSetupCompleted": false
-  },
-  "active": false,
-  "pinData": {}
+  "shared": [
+    {
+      "updatedAt": "2026-05-23T02:18:27.392Z",
+      "createdAt": "2026-05-23T02:18:27.392Z",
+      "role": "workflow:owner",
+      "workflowId": "JaFsJwC7X2gsvxmI",
+      "projectId": "9hoLIXSDUw0Dgem2",
+      "project": {
+        "updatedAt": "2026-03-09T19:50:22.065Z",
+        "createdAt": "2026-03-09T19:42:35.601Z",
+        "id": "9hoLIXSDUw0Dgem2",
+        "name": "Matt Taylor <maylortaylor@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "53bffac6-ca7b-415e-be04-a34d28ab196b"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
 }

@@ -1,5 +1,11 @@
 {
+  "updatedAt": "2026-05-13T03:31:22.923Z",
+  "createdAt": "2026-05-13T01:09:05.064Z",
+  "id": "WqMgdZJmJLeVdgBK",
   "name": "venue-events-sync",
+  "description": null,
+  "active": true,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -12,24 +18,28 @@
           ]
         }
       },
-      "id": "a1b2c3d4-0001-4000-8000-000000000001",
+      "id": "965868da-7906-41b3-b0e3-506b26e4e0ab",
       "name": "Monday Midnight ET",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [240, -400]
+      "position": [
+        2032,
+        1360
+      ]
     },
     {
       "parameters": {
-        "httpMethod": "GET",
         "path": "venue-events-sync",
-        "responseMode": "onReceived",
         "options": {}
       },
-      "id": "a1b2c3d4-0002-4000-8000-000000000002",
+      "id": "610e7a5a-dab6-4e8e-8036-c3bf15fe6170",
       "name": "Manual Webhook Trigger",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [240, -240],
+      "position": [
+        2032,
+        1520
+      ],
       "webhookId": "venue-events-sync"
     },
     {
@@ -38,11 +48,14 @@
         "query": "SELECT v.slug, v.name, v.facebook_page_id AS \"facebookPageId\", v.instagram_page_id AS \"instagramPageId\", v.google_calendar_id AS \"googleCalendarId\", (source->>'type') AS \"sourceType\", (source->>'url') AS \"sourceUrl\" FROM venues v, jsonb_array_elements(v.events_sources) AS source WHERE v.events_sources != '[]'::jsonb AND v.is_active = true ORDER BY v.name, source->>'type' ASC",
         "options": {}
       },
-      "id": "a1b2c3d4-0004-4000-8000-000000000004",
+      "id": "1221b164-ecb7-4d02-88a9-63daed814eac",
       "name": "Load Venues With Sources",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.5,
-      "position": [540, -320],
+      "position": [
+        2336,
+        1440
+      ],
       "credentials": {
         "postgres": {
           "id": "pcxLOCySr6sIFHln",
@@ -54,11 +67,14 @@
       "parameters": {
         "options": {}
       },
-      "id": "a1b2c3d4-0006-4000-8000-000000000006",
+      "id": "c1c36d33-53b3-4532-962a-927c5acc4a04",
       "name": "Loop Over Sources",
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
-      "position": [740, -320]
+      "position": [
+        2528,
+        1536
+      ]
     },
     {
       "parameters": {
@@ -67,92 +83,109 @@
         "rules": {
           "rules": [
             {
-              "operation": "equal",
               "value2": "facebook"
             },
             {
-              "operation": "equal",
               "value2": "website",
               "output": 1
             },
             {
-              "operation": "equal",
               "value2": "instagram",
               "output": 2
             }
           ]
         }
       },
-      "id": "a1b2c3d4-0007-4000-8000-000000000007",
+      "id": "8407eba6-27d3-4373-830c-15be0f672cc2",
       "name": "Route By Source Type",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 1,
-      "position": [940, -320]
+      "position": [
+        2736,
+        1600
+      ]
     },
     {
       "parameters": {
         "jsCode": "// Phase 2 placeholder — Instagram scraping requires Graph API access from the venue\n// or Claude AI-assisted caption parsing. Skipped for now.\nconst slug = $json.slug || 'unknown';\nconsole.log('[venue-events-sync] SKIP ' + slug + ' instagram source — Phase 2 not yet implemented');\nreturn [];"
       },
-      "id": "a1b2c3d4-0008-4000-8000-000000000008",
+      "id": "804b87c8-7437-48d7-8729-f74bd5f36436",
       "name": "Instagram Skip (Phase 2)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1180, -160]
+      "position": [
+        2976,
+        1600
+      ]
     },
     {
       "parameters": {
         "jsCode": "// Website scraping not yet wired — add HTTP Request + HTML Extract nodes here\n// when venue website URLs are confirmed (Ruby's Elixir, Blueberry Patch).\nconst slug = $json.slug || 'unknown';\nconsole.log('[venue-events-sync] SKIP ' + slug + ' website source — scraper not yet wired');\nreturn [];"
       },
-      "id": "a1b2c3d4-0009-4000-8000-000000000009",
+      "id": "c0da784f-8df5-42f6-97ac-ff669e3c5dae",
       "name": "Website Skip (Not Yet Wired)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1180, 0]
+      "position": [
+        2976,
+        1760
+      ]
     },
     {
       "parameters": {
         "jsCode": "// Build the Graph API URL and pass venue context through.\n// HTTP calls belong in HTTP Request nodes — this node only prepares data.\nconst item = $input.first().json;\nconst appId     = $env.FB_APP_ID;\nconst appSecret = $env.FB_APP_SECRET;\nconst pageId    = item.facebookPageId;\n\nif (!pageId || !appId || !appSecret) {\n  console.log('[venue-events-sync] ' + item.slug + ': missing FB_APP_ID, FB_APP_SECRET, or facebookPageId — skipping');\n  return [];\n}\n\nconst nowUnix = Math.floor(Date.now() / 1000);\nconst maxUnix = nowUnix + 60 * 24 * 60 * 60;\nconst token   = appId + '|' + appSecret;\nconst fields  = 'id,name,description,start_time,end_time,cover,ticket_uri,place';\n\nconst graphApiUrl = 'https://graph.facebook.com/v21.0/' + pageId + '/events'\n  + '?access_token=' + encodeURIComponent(token)\n  + '&fields=' + fields\n  + '&since=' + nowUnix\n  + '&until=' + maxUnix\n  + '&limit=50';\n\nreturn [{ json: { ...item, _graphApiUrl: graphApiUrl } }];"
       },
-      "id": "a1b2c3d4-0010-4000-8000-000000000010",
+      "id": "57d6b148-690d-4aa4-8236-fe5cb761f82e",
       "name": "FB: Build Graph API URL",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1180, -480],
+      "position": [
+        2976,
+        1280
+      ],
       "continueOnFail": true
     },
     {
       "parameters": {
-        "method": "GET",
         "url": "={{ $json._graphApiUrl }}",
         "options": {}
       },
-      "id": "a1b2c3d4-0011-4000-8000-000000000011",
+      "id": "bb443e8b-9c8f-4eeb-8c26-a2335376717c",
       "name": "FB: Graph API Request",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1420, -480],
+      "position": [
+        3216,
+        1280
+      ],
       "continueOnFail": true
     },
     {
       "parameters": {
         "jsCode": "// Normalise Graph API response into the shape expected by Loop Over Events.\n// Source context (slug, calendarId) retrieved from the URL-builder node because\n// the HTTP Request node replaced $json with the API response body.\nconst sourceItem = $('FB: Build Graph API URL').first().json;\nconst response   = $input.first().json;\n\nconst slug       = sourceItem.slug;\nconst calendarId = sourceItem.googleCalendarId;\n\nconst events = response.data;\nif (!events || !Array.isArray(events) || events.length === 0) {\n  const reason = (response.error && response.error.message) ? response.error.message : 'empty or failed response';\n  console.log('[venue-events-sync] ' + slug + ': Graph API returned no events — ' + reason);\n  return [];\n}\n\nconst now = Date.now();\nconst max = now + 60 * 24 * 60 * 60 * 1000;\nconst normalised = [];\n\nfor (const ev of events) {\n  try {\n    const startMs = ev.start_time ? new Date(ev.start_time).getTime() : null;\n    if (!startMs || startMs < now || startMs > max) continue;\n    const id = String(ev.id);\n    normalised.push({ json: {\n      _slug:       slug,\n      _calendarId: calendarId,\n      fbEventId:   id,\n      dedup_id:    'fb_' + id,\n      title:       ev.name        || '',\n      description: ev.description || null,\n      startTime:   ev.start_time,\n      endTime:     ev.end_time    || null,\n      imageUrl:    (ev.cover && ev.cover.source) ? ev.cover.source : null,\n      ticketUrl:   ev.ticket_uri  || null,\n      eventBy:     (ev.place && ev.place.name) ? ev.place.name : null,\n      fbEventUrl:  'https://www.facebook.com/events/' + id,\n      source:      'graph_api'\n    }});\n  } catch (e) {\n    console.log('[venue-events-sync] ' + slug + ': error normalising event ' + ev.id + ' — ' + e.message);\n  }\n}\n\nconsole.log('[venue-events-sync] ' + slug + ': normalised ' + normalised.length + ' events from graph_api');\nreturn normalised;"
       },
-      "id": "a1b2c3d4-0012-4000-8000-000000000012",
+      "id": "48d9e21f-83f7-47ec-adf1-814efaea8603",
       "name": "FB: Normalise Graph API Events",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1660, -480],
+      "position": [
+        3456,
+        1280
+      ],
       "continueOnFail": true
     },
     {
       "parameters": {
         "options": {}
       },
-      "id": "a1b2c3d4-0013-4000-8000-000000000013",
+      "id": "779a8829-33a7-4585-bff1-7b3c796e0ed2",
       "name": "Loop Over Events",
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
-      "position": [1900, -480]
+      "position": [
+        3696,
+        1280
+      ]
     },
     {
       "parameters": {
@@ -162,7 +195,6 @@
           "value": "={{ $json._calendarId }}",
           "mode": "id"
         },
-        "returnAll": false,
         "limit": 10,
         "options": {
           "timeMin": "={{ $now.minus(1, 'days').toISO() }}",
@@ -172,29 +204,35 @@
           "query": "={{ $json.title }}"
         }
       },
-      "id": "a1b2c3d4-0014-4000-8000-000000000014",
+      "id": "f05388b0-68e2-4aea-b0e1-a4767ae82659",
       "name": "Search GCal For Duplicate",
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1,
-      "continueOnFail": true,
       "alwaysOutputData": true,
-      "position": [2100, -480],
+      "position": [
+        3904,
+        1280
+      ],
       "credentials": {
         "googleCalendarOAuth2Api": {
-          "id": "bKr3uyzb1sZZD8hj",
-          "name": "SPM-calendar-website"
+          "id": "bsYCJ9AtPKlBbmSs",
+          "name": "SPM-Google OAuth"
         }
-      }
+      },
+      "continueOnFail": true
     },
     {
       "parameters": {
         "jsCode": "// Check if the event already exists in GCal by matching dedup_id in description\n// or by close title + date match (±12h).\nconst eventItem = $('Loop Over Events').first().json;\nconst gcalResults = $input.all();\n\nconst dedupId    = eventItem.dedup_id || '';\nconst eventTitle = (eventItem.title || '').toLowerCase().trim();\nconst eventStart = eventItem.startTime ? new Date(eventItem.startTime).getTime() : null;\n\nlet found = null;\nfor (const r of gcalResults) {\n  const desc  = (r.json.description || '').toLowerCase();\n  const title = (r.json.summary     || '').toLowerCase().trim();\n  const start = (r.json.start && r.json.start.dateTime) ? new Date(r.json.start.dateTime).getTime() : null;\n\n  if (dedupId && desc.includes('[dedup_id: ' + dedupId + ']')) { found = r.json; break; }\n  if (eventTitle && title === eventTitle && eventStart && start) {\n    if (Math.abs(eventStart - start) / (1000 * 60 * 60) <= 12) { found = r.json; break; }\n  }\n}\n\nreturn [{\n  json: {\n    ...eventItem,\n    _gcalExists:  found ? true : false,\n    _gcalEventId: found ? found.id : null\n  }\n}];"
       },
-      "id": "a1b2c3d4-0015-4000-8000-000000000015",
+      "id": "2bee7a61-05e1-43d6-b9d0-fc9fb00784b4",
       "name": "Check Duplicate",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2300, -480],
+      "position": [
+        4096,
+        1280
+      ],
       "continueOnFail": true
     },
     {
@@ -220,21 +258,27 @@
         },
         "options": {}
       },
-      "id": "a1b2c3d4-0016-4000-8000-000000000016",
+      "id": "399692c8-a1b7-4447-8f14-6ba3c3c7b668",
       "name": "Not In GCal Yet?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [2500, -480]
+      "position": [
+        4304,
+        1280
+      ]
     },
     {
       "parameters": {
         "jsCode": "// Build the GCal event description with structured metadata.\n// The [dedup_id: fb_XXX] anchor is used by the duplicate-check node on future runs.\nconst ev = $input.first().json;\n\nconst parts = [];\nif (ev.eventBy)    parts.push('Presented by: ' + ev.eventBy);\nif (ev.ticketUrl)  parts.push('Tickets: ' + ev.ticketUrl);\nif (ev.description) { parts.push('---'); parts.push(ev.description); }\nparts.push('');\nif (ev.fbEventUrl) parts.push('Source: ' + ev.fbEventUrl);\nparts.push('[dedup_id: ' + ev.dedup_id + ']');\n\nconst description = parts.join('\\n').trim();\n\nfunction toRFC3339(str) {\n  if (!str) return null;\n  const d = new Date(str);\n  return isNaN(d.getTime()) ? null : d.toISOString();\n}\n\nreturn [{ json: {\n  ...ev,\n  _gcalDescription: description,\n  _startRFC: toRFC3339(ev.startTime),\n  _endRFC:   ev.endTime ? toRFC3339(ev.endTime) : null\n} }];"
       },
-      "id": "a1b2c3d4-0017-4000-8000-000000000017",
+      "id": "cda379ae-9aef-4406-b3f2-79551f8bca75",
       "name": "Build GCal Description",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2740, -560],
+      "position": [
+        4544,
+        1200
+      ],
       "continueOnFail": true
     },
     {
@@ -247,84 +291,102 @@
         "start": "={{ $json._startRFC }}",
         "end": "={{ $json._endRFC ?? $json._startRFC }}",
         "additionalFields": {
-          "summary": "={{ $json.title }}",
-          "description": "={{ $json._gcalDescription }}"
+          "description": "={{ $json._gcalDescription }}",
+          "summary": "={{ $json.title }}"
         }
       },
-      "id": "a1b2c3d4-0018-4000-8000-000000000018",
+      "id": "3a484bea-b4c6-4a78-ade6-872700b0418b",
       "name": "Create GCal Event",
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1,
-      "continueOnFail": true,
-      "position": [2940, -560],
+      "position": [
+        4736,
+        1200
+      ],
       "credentials": {
         "googleCalendarOAuth2Api": {
-          "id": "bKr3uyzb1sZZD8hj",
-          "name": "SPM-calendar-website"
+          "id": "bsYCJ9AtPKlBbmSs",
+          "name": "SPM-Google OAuth"
         }
-      }
+      },
+      "continueOnFail": true
     },
     {
       "parameters": {
         "jsCode": "// Merge GCal event id from the create response back onto the event item.\nconst created  = $input.first().json;\nconst loopItem = $('Loop Over Events').first().json;\nconst gcalId   = created.id || loopItem._gcalEventId || null;\n\nif (!gcalId) {\n  console.log('[venue-events-sync] ' + loopItem._slug + ': could not get GCal event id — skipping DB upsert');\n  return [];\n}\nreturn [{ json: { ...loopItem, _gcalEventId: gcalId } }];"
       },
-      "id": "a1b2c3d4-0019-4000-8000-000000000019",
+      "id": "9b7bfc8d-f3db-407d-9ee8-66ccfa23faa4",
       "name": "Merge GCal ID (new)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [3140, -560],
+      "position": [
+        4944,
+        1200
+      ],
       "continueOnFail": true
     },
     {
       "parameters": {
         "jsCode": "// Already exists path — pass the existing GCal event id through.\nconst ev = $input.first().json;\nif (!ev._gcalEventId) {\n  console.log('[venue-events-sync] ' + ev._slug + ': already in GCal but no id — skipping DB upsert');\n  return [];\n}\nreturn [{ json: ev }];"
       },
-      "id": "a1b2c3d4-0020-4000-8000-000000000020",
+      "id": "56f15046-2573-44b5-b892-f5be1c31e8e4",
       "name": "Merge GCal ID (existing)",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2740, -400],
+      "position": [
+        4544,
+        1360
+      ],
       "continueOnFail": true
     },
     {
       "parameters": {
         "jsCode": "// Build the DB upsert SQL.\n// Does NOT set tag — owned by spm-multi-gcal-to-db-sync tag detection.\nfunction esc(v) {\n  if (v === null || v === undefined) return 'NULL';\n  return \"'\" + String(v).replace(/'/g, \"''\") + \"'\";\n}\n\nconst ev = $input.first().json;\nif (!ev._gcalEventId) return [];\n\nconst extraData = JSON.stringify({\n  source:       ev.source       || 'facebook',\n  fb_event_url: ev.fbEventUrl   || null,\n  event_by:     ev.eventBy      || null,\n  dedup_id:     ev.dedup_id     || null\n});\n\nconst sql = 'INSERT INTO events (\\n'\n  + '  google_event_id, title, description, start_time, end_time,\\n'\n  + '  venue, ticket_url, image_url, extra_data, is_active, synced_at\\n'\n  + ') VALUES (\\n'\n  + '  ' + esc(ev._gcalEventId) + ',\\n'\n  + '  ' + esc(ev.title) + ',\\n'\n  + '  ' + esc(ev.description) + ',\\n'\n  + '  ' + (ev.startTime ? esc(ev.startTime) + '::TIMESTAMPTZ' : 'NULL') + ',\\n'\n  + '  ' + (ev.endTime   ? esc(ev.endTime)   + '::TIMESTAMPTZ' : 'NULL') + ',\\n'\n  + '  ' + esc(ev._slug) + ',\\n'\n  + '  ' + esc(ev.ticketUrl) + ',\\n'\n  + '  ' + esc(ev.imageUrl) + ',\\n'\n  + '  ' + esc(extraData) + '::jsonb,\\n'\n  + '  true,\\n'\n  + '  NOW()\\n'\n  + ')\\n'\n  + 'ON CONFLICT (google_event_id) DO UPDATE SET\\n'\n  + '  title       = EXCLUDED.title,\\n'\n  + '  description = EXCLUDED.description,\\n'\n  + '  start_time  = EXCLUDED.start_time,\\n'\n  + '  end_time    = EXCLUDED.end_time,\\n'\n  + '  venue       = EXCLUDED.venue,\\n'\n  + '  ticket_url  = EXCLUDED.ticket_url,\\n'\n  + '  image_url   = EXCLUDED.image_url,\\n'\n  + '  extra_data  = EXCLUDED.extra_data,\\n'\n  + '  is_active   = true,\\n'\n  + '  synced_at   = NOW()\\n'\n  + 'RETURNING id, google_event_id, title';\n\nreturn [{ json: { sql, title: ev.title, slug: ev._slug } }];"
       },
-      "id": "a1b2c3d4-0021-4000-8000-000000000021",
+      "id": "be34ebed-26dc-40e8-8558-b6656f8f74e0",
       "name": "Build DB Upsert SQL",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [3340, -480],
+      "position": [
+        5136,
+        1280
+      ],
       "continueOnFail": true
     },
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "={{ $json.sql }}",
+        "query": "{{ $json.sql }}",
         "options": {}
       },
-      "id": "a1b2c3d4-0022-4000-8000-000000000022",
+      "id": "b3c60eb6-8580-40ff-b85f-5e07b781d90a",
       "name": "Upsert Event To DB",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.5,
-      "continueOnFail": true,
-      "position": [3540, -480],
+      "position": [
+        5344,
+        1280
+      ],
       "credentials": {
         "postgres": {
           "id": "pcxLOCySr6sIFHln",
           "name": "SPM Postgres DB account"
         }
-      }
+      },
+      "continueOnFail": true
     },
     {
       "parameters": {
         "jsCode": "// 300ms throttle between events to stay under GCal API quota.\nawait new Promise(function(r) { setTimeout(r, 300); });\nreturn $input.all();"
       },
-      "id": "a1b2c3d4-0023-4000-8000-000000000023",
+      "id": "27a313bc-533f-424b-90eb-0fc963c756a7",
       "name": "Event Rate Limit",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [3740, -480]
+      "position": [
+        5536,
+        1280
+      ]
     },
     {
       "parameters": {
@@ -332,28 +394,34 @@
         "query": "UPDATE events SET image_url = NULL WHERE start_time < NOW() - INTERVAL '1 hour' AND image_url IS NOT NULL RETURNING id, title, venue",
         "options": {}
       },
-      "id": "a1b2c3d4-0024-4000-8000-000000000024",
+      "id": "9633eff1-af1c-4724-afb3-a1ececbd6c21",
       "name": "Cleanup Past Event Images",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.5,
-      "continueOnFail": true,
-      "position": [3940, -320],
+      "position": [
+        5744,
+        1440
+      ],
       "credentials": {
         "postgres": {
           "id": "pcxLOCySr6sIFHln",
           "name": "SPM Postgres DB account"
         }
-      }
+      },
+      "continueOnFail": true
     },
     {
       "parameters": {
         "jsCode": "const cleaned = $input.all();\nconsole.log('[venue-events-sync] RUN COMPLETE — images cleaned: ' + cleaned.length + ' — ' + new Date().toISOString());\nreturn [{ json: { ok: true, images_cleaned: cleaned.length, finished_at: new Date().toISOString() } }];"
       },
-      "id": "a1b2c3d4-0025-4000-8000-000000000025",
+      "id": "dc085280-9519-4539-a7b5-6070fb1ae549",
       "name": "Summary Log",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [4140, -320]
+      "position": [
+        5936,
+        1440
+      ]
     },
     {
       "parameters": {
@@ -362,96 +430,312 @@
         "width": 520
       },
       "type": "n8n-nodes-base.stickyNote",
-      "position": [240, -720],
+      "position": [
+        2032,
+        1040
+      ],
       "typeVersion": 1,
-      "id": "a1b2c3d4-0026-4000-8000-000000000026",
+      "id": "dd5418a7-da8d-4606-81d6-9c837f1614f1",
       "name": "Sticky Note"
     }
   ],
-  "pinData": {},
   "connections": {
     "Monday Midnight ET": {
-      "main": [[{ "node": "Load Venues With Sources", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Load Venues With Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Manual Webhook Trigger": {
-      "main": [[{ "node": "Load Venues With Sources", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Load Venues With Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Load Venues With Sources": {
-      "main": [[{ "node": "Loop Over Sources", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Loop Over Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Loop Over Sources": {
       "main": [
-        [{ "node": "Cleanup Past Event Images", "type": "main", "index": 0 }],
-        [{ "node": "Route By Source Type", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Cleanup Past Event Images",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Route By Source Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Route By Source Type": {
       "main": [
-        [{ "node": "FB: Build Graph API URL", "type": "main", "index": 0 }],
-        [{ "node": "Website Skip (Not Yet Wired)", "type": "main", "index": 0 }],
-        [{ "node": "Instagram Skip (Phase 2)", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "FB: Build Graph API URL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Website Skip (Not Yet Wired)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Instagram Skip (Phase 2)",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "FB: Build Graph API URL": {
-      "main": [[{ "node": "FB: Graph API Request", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "FB: Graph API Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "FB: Graph API Request": {
-      "main": [[{ "node": "FB: Normalise Graph API Events", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "FB: Normalise Graph API Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "FB: Normalise Graph API Events": {
-      "main": [[{ "node": "Loop Over Events", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Loop Over Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Loop Over Events": {
       "main": [
-        [{ "node": "Loop Over Sources", "type": "main", "index": 0 }],
-        [{ "node": "Search GCal For Duplicate", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Search GCal For Duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Search GCal For Duplicate": {
-      "main": [[{ "node": "Check Duplicate", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Check Duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Check Duplicate": {
-      "main": [[{ "node": "Not In GCal Yet?", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Not In GCal Yet?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Not In GCal Yet?": {
       "main": [
-        [{ "node": "Build GCal Description", "type": "main", "index": 0 }],
-        [{ "node": "Merge GCal ID (existing)", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Build GCal Description",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge GCal ID (existing)",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Build GCal Description": {
-      "main": [[{ "node": "Create GCal Event", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Create GCal Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Create GCal Event": {
-      "main": [[{ "node": "Merge GCal ID (new)", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Merge GCal ID (new)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Merge GCal ID (new)": {
-      "main": [[{ "node": "Build DB Upsert SQL", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Build DB Upsert SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Merge GCal ID (existing)": {
-      "main": [[{ "node": "Build DB Upsert SQL", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Build DB Upsert SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Build DB Upsert SQL": {
-      "main": [[{ "node": "Upsert Event To DB", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Upsert Event To DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Upsert Event To DB": {
-      "main": [[{ "node": "Event Rate Limit", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Event Rate Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Event Rate Limit": {
-      "main": [[{ "node": "Loop Over Events", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Loop Over Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Cleanup Past Event Images": {
-      "main": [[{ "node": "Summary Log", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Summary Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": true,
   "settings": {
     "executionOrder": "v1",
-    "saveManualExecutions": true,
-    "callerPolicy": "workflowsFromSameOwner",
-    "errorWorkflow": ""
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": {
+    "node:Monday Midnight ET": {
+      "recurrenceRules": []
+    }
   },
   "meta": {
-    "instanceId": ""
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "645db733-83af-41bb-ac1d-4ca20a646a0c",
+  "activeVersionId": "ceb06003-d7ba-4824-89be-b2f2ee6e8145",
+  "versionCounter": 64,
+  "triggerCount": 2,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-05-13T01:09:05.067Z",
+      "createdAt": "2026-05-13T01:09:05.067Z",
+      "role": "workflow:owner",
+      "workflowId": "WqMgdZJmJLeVdgBK",
+      "projectId": "9hoLIXSDUw0Dgem2",
+      "project": {
+        "updatedAt": "2026-03-09T19:50:22.065Z",
+        "createdAt": "2026-03-09T19:42:35.601Z",
+        "id": "9hoLIXSDUw0Dgem2",
+        "name": "Matt Taylor <maylortaylor@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "53bffac6-ca7b-415e-be04-a34d28ab196b"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
   }
 }
