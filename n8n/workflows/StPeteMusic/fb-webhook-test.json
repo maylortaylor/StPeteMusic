@@ -1,0 +1,115 @@
+{
+  "updatedAt": "2026-05-07T18:33:09.485Z",
+  "createdAt": "2026-05-07T18:17:18.191Z",
+  "id": "uw47VxKD0Y3tCpkn",
+  "name": "FB webhook test",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "fb-page",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d30f3b90-8d0e-4d99-85d4-01acd9080ce5",
+      "name": "Webhook",
+      "webhookId": "7ff033c4-2f15-4647-b09f-65d3aa22a87d"
+    },
+    {
+      "parameters": {
+        "jsCode": "const challenge = $input.first().json.query['hub.challenge'];       \n  return [{ json: { challenge } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "d54b939d-09b9-4b2e-ba75-9b784203479d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.challenge }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        416,
+        0
+      ],
+      "id": "1c8041a1-b584-46ff-9f10-8e6f6f7d0360",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "d5dc936e-3e6d-4fbd-af3a-2c247cd17e66",
+  "activeVersionId": "d5dc936e-3e6d-4fbd-af3a-2c247cd17e66",
+  "versionCounter": 62,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-05-07T18:17:18.197Z",
+      "createdAt": "2026-05-07T18:17:18.197Z",
+      "role": "workflow:owner",
+      "workflowId": "uw47VxKD0Y3tCpkn",
+      "projectId": "9hoLIXSDUw0Dgem2",
+      "project": {
+        "updatedAt": "2026-03-09T19:50:22.065Z",
+        "createdAt": "2026-03-09T19:42:35.601Z",
+        "id": "9hoLIXSDUw0Dgem2",
+        "name": "Matt Taylor <maylortaylor@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "53bffac6-ca7b-415e-be04-a34d28ab196b"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": "Version d5dc936e",
+    "description": ""
+  }
+}

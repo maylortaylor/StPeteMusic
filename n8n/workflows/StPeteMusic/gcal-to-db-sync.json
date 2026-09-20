@@ -1,5 +1,11 @@
 {
+  "updatedAt": "2026-05-02T02:23:05.907Z",
+  "createdAt": "2026-05-02T01:41:19.442Z",
+  "id": "FtomyZf1Jmu5SmWn",
   "name": "gcal-to-db-sync",
+  "description": null,
+  "active": false,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -12,17 +18,24 @@
           ]
         }
       },
-      "id": "cron-trigger",
+      "id": "716670e7-071e-4535-a9fe-5d34a7799d92",
       "name": "Every 96 Hours",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.1,
-      "position": [0, 0]
+      "position": [
+        624,
+        -1216
+      ]
     },
     {
       "parameters": {
-        "resource": "event",
         "operation": "getAll",
-        "calendarId": "suite.e.stpete@gmail.com",
+        "calendar": {
+          "__rl": true,
+          "value": "suite.e.stpete@gmail.com",
+          "mode": "list",
+          "cachedResultName": "Suite E Calendar"
+        },
         "returnAll": true,
         "options": {
           "timeMin": "={{ $now.startOf('month').toISO() }}",
@@ -31,53 +44,134 @@
           "orderBy": "startTime"
         }
       },
-      "id": "gcal-list",
+      "id": "010bdea7-d036-4d24-bf75-9ea5ee065cb0",
       "name": "Get Calendar Events",
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1,
-      "position": [200, 0]
+      "position": [
+        832,
+        -1216
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "bsYCJ9AtPKlBbmSs",
+          "name": "Google Calendar account"
+        }
+      }
     },
     {
       "parameters": {
-        "jsCode": "// Parse each Google Calendar event and build the upsert SQL inline.\n// Embedding values directly avoids n8n queryReplacement quirks.\n\nfunction esc(v) {\n  // Escape a value for safe inclusion in a SQL string literal.\n  if (v === null || v === undefined) return 'NULL';\n  return \"'\" + String(v).replace(/'/g, \"''\") + \"'\";\n}\n\nfunction stripHtml(html) {\n  if (!html) return null;\n  return html\n    .replace(/<br\\s*\\/?>/gi, '\\n')\n    .replace(/<\\/li>/gi, '\\n')\n    .replace(/<\\/p>/gi, '\\n')\n    .replace(/<[^>]+>/g, '')\n    .replace(/&amp;/g, '&')\n    .replace(/&lt;/g, '<')\n    .replace(/&gt;/g, '>')\n    .replace(/&quot;/g, '\"')\n    .replace(/&#39;/g, \"'\")\n    .replace(/&nbsp;/g, ' ')\n    .replace(/\\n{3,}/g, '\\n\\n')\n    .trim() || null;\n}\n\nconst items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  const ev = item.json;\n\n  // Skip all-day events (no dateTime) and untitled events\n  if (!ev.start?.dateTime) continue;\n  const title = (ev.summary || '').trim();\n  if (!title) continue;\n\n  const description = stripHtml(ev.description);\n  const titleLower = title.toLowerCase();\n  // Use raw description for tag/ticket parsing before HTML is stripped from those lines\n  const rawDesc = (ev.description || '');\n\n  // Auto-detect tag from title\n  let tag = null;\n  if (titleLower.includes('final friday')) {\n    tag = 'final-friday';\n  } else if (titleLower.includes('open house') || titleLower.includes('ohc')) {\n    tag = 'ohc';\n  } else if (titleLower.includes('instant noodles') || titleLower.includes('community jam')) {\n    tag = 'community-jam';\n  } else if (titleLower.includes('art walk') || titleLower.includes('second saturday') || titleLower.includes('2nd saturday')) {\n    tag = 'art-walk';\n  } else if (titleLower.includes('workshop') || titleLower.includes('class')) {\n    tag = 'workshop-class';\n  } else {\n    const tagsMatch = rawDesc.match(/^tags:\\s*(.+)$/im);\n    if (tagsMatch) tag = tagsMatch[1].trim().split(',')[0].trim();\n  }\n\n  // Parse tickets: url from raw description\n  let ticketUrl = null;\n  const ticketsMatch = rawDesc.match(/^tickets:\\s*(https?:\\/\\/\\S+)$/im);\n  if (ticketsMatch) ticketUrl = ticketsMatch[1].trim();\n\n  const googleEventId = ev.id;\n  const startTime = ev.start.dateTime;\n  const endTime = ev.end?.dateTime || null;\n  const location = ev.location || null;\n  const desc = description;\n\n  const sql = `\nINSERT INTO events (\n  google_event_id, title, description, start_time, end_time,\n  location, tag, ticket_url, is_active, synced_at\n) VALUES (\n  ${esc(googleEventId)}, ${esc(title)}, ${esc(desc)},\n  ${esc(startTime)}::TIMESTAMPTZ, ${esc(endTime) === 'NULL' ? 'NULL' : esc(endTime) + '::TIMESTAMPTZ'},\n  ${esc(location)}, ${esc(tag)}, ${esc(ticketUrl)}, true, NOW()\n)\nON CONFLICT (google_event_id) DO UPDATE SET\n  title       = EXCLUDED.title,\n  description = EXCLUDED.description,\n  start_time  = EXCLUDED.start_time,\n  end_time    = EXCLUDED.end_time,\n  location    = EXCLUDED.location,\n  tag         = EXCLUDED.tag,\n  ticket_url  = EXCLUDED.ticket_url,\n  is_active   = true,\n  synced_at   = NOW()\nRETURNING id, google_event_id, title\n`.trim();\n\n  results.push({ json: { sql, title, tag } });\n}\n\nreturn results;\n"
+        "jsCode": "// Parse each Google Calendar event and build the upsert SQL inline.\n// Embedding values directly avoids n8n queryReplacement quirks.\n\nfunction esc(v) {\n  // Escape a value for safe inclusion in a SQL string literal.\n  if (v === null || v === undefined) return 'NULL';\n  return \"'\" + String(v).replace(/'/g, \"''\") + \"'\";\n}\n\nconst items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  const ev = item.json;\n\n  // Skip all-day events (no dateTime) and untitled events\n  if (!ev.start?.dateTime) continue;\n  const title = (ev.summary || '').trim();\n  if (!title) continue;\n\n  const description = (ev.description || '').trim();\n  const titleLower = title.toLowerCase();\n\n  // Auto-detect tag from title\n  let tag = null;\n  if (titleLower.includes('final friday')) {\n    tag = 'final-friday';\n  } else if (titleLower.includes('open house') || titleLower.includes('ohc')) {\n    tag = 'ohc';\n  } else if (titleLower.includes('instant noodles') || titleLower.includes('community jam')) {\n    tag = 'community-jam';\n  } else if (titleLower.includes('art walk') || titleLower.includes('second saturday') || titleLower.includes('2nd saturday')) {\n    tag = 'art-walk';\n  } else if (titleLower.includes('workshop') || titleLower.includes('class')) {\n    tag = 'workshop-class';\n  } else {\n    const tagsMatch = description.match(/^tags:\\s*(.+)$/im);\n    if (tagsMatch) tag = tagsMatch[1].trim().split(',')[0].trim();\n  }\n\n  // Parse tickets: url from description\n  let ticketUrl = null;\n  const ticketsMatch = description.match(/^tickets:\\s*(https?:\\/\\/\\S+)$/im);\n  if (ticketsMatch) ticketUrl = ticketsMatch[1].trim();\n\n  const googleEventId = ev.id;\n  const startTime = ev.start.dateTime;\n  const endTime = ev.end?.dateTime || null;\n  const location = ev.location || null;\n  const desc = description || null;\n\n  const sql = `\nINSERT INTO events (\n  google_event_id, title, description, start_time, end_time,\n  location, tag, ticket_url, is_active, synced_at\n) VALUES (\n  ${esc(googleEventId)}, ${esc(title)}, ${esc(desc)},\n  ${esc(startTime)}::TIMESTAMPTZ, ${esc(endTime) === 'NULL' ? 'NULL' : esc(endTime) + '::TIMESTAMPTZ'},\n  ${esc(location)}, ${esc(tag)}, ${esc(ticketUrl)}, true, NOW()\n)\nON CONFLICT (google_event_id) DO UPDATE SET\n  title       = EXCLUDED.title,\n  description = EXCLUDED.description,\n  start_time  = EXCLUDED.start_time,\n  end_time    = EXCLUDED.end_time,\n  location    = EXCLUDED.location,\n  tag         = EXCLUDED.tag,\n  ticket_url  = EXCLUDED.ticket_url,\n  is_active   = true,\n  synced_at   = NOW()\nRETURNING id, google_event_id, title\n`.trim();\n\n  results.push({ json: { sql, title, tag } });\n}\n\nreturn results;\n"
       },
-      "id": "parse-events",
+      "id": "4d947fd1-3816-42a2-b446-df1bd8317f04",
       "name": "Parse Events",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [400, 0]
+      "position": [
+        1024,
+        -1216
+      ]
     },
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "={{ $json.sql }}",
+        "query": "{{ $json.sql }}",
         "options": {}
       },
-      "id": "upsert-event",
+      "id": "12754b8e-59e9-47eb-8205-bfa1471afcc2",
       "name": "Upsert Event",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.5,
-      "position": [600, 0]
+      "position": [
+        1232,
+        -1216
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "pcxLOCySr6sIFHln",
+          "name": "Postgres account"
+        }
+      }
     }
   ],
   "connections": {
     "Every 96 Hours": {
-      "main": [[{ "node": "Get Calendar Events", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Get Calendar Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Get Calendar Events": {
-      "main": [[{ "node": "Parse Events", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Parse Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Parse Events": {
-      "main": [[{ "node": "Upsert Event", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Upsert Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
   },
-  "tags": [
-    { "name": "StPeteMusic" }
-  ],
+  "staticData": null,
   "meta": {
     "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "4b43d8be-c36a-49cb-9a46-2bcc529c5268",
+  "activeVersionId": null,
+  "versionCounter": 41,
+  "triggerCount": 0,
+  "tags": [
+    {
+      "updatedAt": "2026-03-09T19:53:42.176Z",
+      "createdAt": "2026-03-09T19:53:42.176Z",
+      "id": "CSGanN665nXyhf1A",
+      "name": "StPeteMusic"
+    }
+  ],
+  "shared": [
+    {
+      "updatedAt": "2026-05-02T01:41:19.450Z",
+      "createdAt": "2026-05-02T01:41:19.450Z",
+      "role": "workflow:owner",
+      "workflowId": "FtomyZf1Jmu5SmWn",
+      "projectId": "9hoLIXSDUw0Dgem2",
+      "project": {
+        "updatedAt": "2026-03-09T19:50:22.065Z",
+        "createdAt": "2026-03-09T19:42:35.601Z",
+        "id": "9hoLIXSDUw0Dgem2",
+        "name": "Matt Taylor <maylortaylor@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "53bffac6-ca7b-415e-be04-a34d28ab196b"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
   }
 }

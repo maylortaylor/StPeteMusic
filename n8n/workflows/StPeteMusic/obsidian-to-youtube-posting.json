@@ -1,5 +1,11 @@
 {
+  "updatedAt": "2026-03-12T04:42:39.884Z",
+  "createdAt": "2026-03-09T19:53:43.773Z",
+  "id": "YZFDQUe741C0HkWT",
   "name": "Obsidian to YouTube Posting",
+  "description": null,
+  "active": false,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {},
@@ -454,7 +460,6 @@
       "name": "Should Publish Now?"
     }
   ],
-  "pinData": {},
   "connections": {
     "Manual Trigger": {
       "main": [
@@ -687,18 +692,20 @@
       ]
     }
   },
-  "active": false,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "235fa942-ec00-41d4-b8c4-f68576fb359a",
+  "staticData": null,
   "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "e3410d7e1106827496d30c16a70a3c3349e5fbddf2632c2c4f538b86bf95708b"
+    "templateCredsSetupCompleted": true
   },
-  "id": "YZFDQUe741C0HkWT",
+  "pinData": {},
+  "versionId": "235fa942-ec00-41d4-b8c4-f68576fb359a",
+  "activeVersionId": null,
+  "versionCounter": 363,
+  "triggerCount": 0,
   "tags": [
     {
       "updatedAt": "2026-03-09T19:53:42.176Z",
@@ -718,5 +725,28 @@
       "id": "ubEwZ3lFI4vprooV",
       "name": "YouTube"
     }
-  ]
+  ],
+  "shared": [
+    {
+      "updatedAt": "2026-03-09T19:53:43.781Z",
+      "createdAt": "2026-03-09T19:53:43.781Z",
+      "role": "workflow:owner",
+      "workflowId": "YZFDQUe741C0HkWT",
+      "projectId": "9hoLIXSDUw0Dgem2",
+      "project": {
+        "updatedAt": "2026-03-09T19:50:22.065Z",
+        "createdAt": "2026-03-09T19:42:35.601Z",
+        "id": "9hoLIXSDUw0Dgem2",
+        "name": "Matt Taylor <maylortaylor@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "53bffac6-ca7b-415e-be04-a34d28ab196b"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
 }

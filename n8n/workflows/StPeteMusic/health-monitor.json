@@ -1,5 +1,11 @@
 {
+  "updatedAt": "2026-07-31T20:19:19.000Z",
+  "createdAt": "2026-06-01T00:42:41.705Z",
+  "id": "RZOXRN0KK0lTa7tk",
   "name": "Health Monitor",
+  "description": null,
+  "active": true,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -118,7 +124,6 @@
       ]
     }
   ],
-  "pinData": {},
   "connections": {
     "Every 5 Minutes": {
       "main": [
@@ -165,12 +170,56 @@
       ]
     }
   },
-  "active": false,
   "settings": {
     "executionOrder": "v1",
     "saveManualExecutions": true
   },
+  "staticData": {
+    "node:Every 15 Minutes": {
+      "recurrenceRules": []
+    },
+    "node:Every 60 Minutes": {
+      "recurrenceRules": []
+    },
+    "node:Every 5 Minutes": {
+      "recurrenceRules": []
+    },
+    "global": {
+      "lastAlert_n8n": 1788737150117,
+      "lastAlert_HLS CDN": 1787148062157,
+      "lastAlert_Listmonk": 1788737150117
+    }
+  },
   "meta": {
     "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "d0e94278-16bb-4d7e-ad98-3a5282f8e3cb",
+  "activeVersionId": "d0e94278-16bb-4d7e-ad98-3a5282f8e3cb",
+  "versionCounter": 42,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-06-01T00:42:41.708Z",
+      "createdAt": "2026-06-01T00:42:41.708Z",
+      "role": "workflow:owner",
+      "workflowId": "RZOXRN0KK0lTa7tk",
+      "projectId": "9hoLIXSDUw0Dgem2",
+      "project": {
+        "updatedAt": "2026-03-09T19:50:22.065Z",
+        "createdAt": "2026-03-09T19:42:35.601Z",
+        "id": "9hoLIXSDUw0Dgem2",
+        "name": "Matt Taylor <maylortaylor@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "53bffac6-ca7b-415e-be04-a34d28ab196b"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
   }
 }

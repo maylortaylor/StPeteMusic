@@ -1,6 +1,11 @@
 {
+  "updatedAt": "2026-07-31T20:19:22.000Z",
+  "createdAt": "2026-07-31T20:01:00.826Z",
   "id": "streamwatchdog01",
   "name": "Stream Watchdog",
+  "description": null,
+  "active": true,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -47,7 +52,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Alerts only on the live -> not-live TRANSITION. A steady 'not live' is normal most of\n// the day, so alerting on the state itself would be constant noise and get muted.\n//\n// Signal source: /api/stream/youtube-status computes `live` via isHlsLive(), the same check\n// the public /live page uses -- including MediaMTX's cookie/redirect dance and the GET-not-HEAD\n// requirement. If this says not live, the page shows nothing. That is the thing we care about.\n\nconst store = $getWorkflowStaticData('global');\nconst res = $input.first().json;\nconst status = res.statusCode || 0;\nconst reachable = status >= 200 && status < 400;\n\n// A network blip reaching our own API is not evidence the stream dropped. Skip the round\n// entirely and keep the previous state, otherwise every hiccup pages us mid-show.\nif (!reachable) {\n  return [];\n}\n\nlet live = false;\ntry {\n  const body = typeof res.body === 'string' ? JSON.parse(res.body) : res.body;\n  live = body && body.live === true;\n} catch (err) {\n  return [];\n}\n\nconst wasLive = store.wasLive === true;\nstore.wasLive = live;\n\n// Stream just came up \u2014 remember when, so the drop alert can say how long it ran.\nif (live && !wasLive) {\n  store.liveSince = new Date().toISOString();\n  return [];\n}\n\nif (!live && wasLive) {\n  const since = store.liveSince ? new Date(store.liveSince) : null;\n  const mins = since ? Math.round((Date.now() - since.getTime()) / 60000) : null;\n  store.liveSince = null;\n\n  const lines = [\n    'The livestream is no longer publishing.',\n    '',\n    mins !== null ? `It had been live for about ${mins} minute(s).` : '',\n    '',\n    'If the show is still running, OBS has disconnected or MediaMTX stopped ingesting.',\n    'Page:    https://www.stpetemusic.live/live',\n    'Checked: https://www.stpetemusic.live/api/stream/youtube-status',\n    `Time:    ${new Date().toISOString()}`,\n  ];\n\n  return [{ json: { subject: '[StPeteMusic] ALERT: stream STOPPED', text: lines.join('\\n') } }];\n}\n\nreturn [];"
+        "jsCode": "// Alerts only on the live -> not-live TRANSITION. A steady 'not live' is normal most of\n// the day, so alerting on the state itself would be constant noise and get muted.\n//\n// Signal source: /api/stream/youtube-status computes `live` via isHlsLive(), the same check\n// the public /live page uses -- including MediaMTX's cookie/redirect dance and the GET-not-HEAD\n// requirement. If this says not live, the page shows nothing. That is the thing we care about.\n\nconst store = $getWorkflowStaticData('global');\nconst res = $input.first().json;\nconst status = res.statusCode || 0;\nconst reachable = status >= 200 && status < 400;\n\n// A network blip reaching our own API is not evidence the stream dropped. Skip the round\n// entirely and keep the previous state, otherwise every hiccup pages us mid-show.\nif (!reachable) {\n  return [];\n}\n\nlet live = false;\ntry {\n  const body = typeof res.body === 'string' ? JSON.parse(res.body) : res.body;\n  live = body && body.live === true;\n} catch (err) {\n  return [];\n}\n\nconst wasLive = store.wasLive === true;\nstore.wasLive = live;\n\n// Stream just came up — remember when, so the drop alert can say how long it ran.\nif (live && !wasLive) {\n  store.liveSince = new Date().toISOString();\n  return [];\n}\n\nif (!live && wasLive) {\n  const since = store.liveSince ? new Date(store.liveSince) : null;\n  const mins = since ? Math.round((Date.now() - since.getTime()) / 60000) : null;\n  store.liveSince = null;\n\n  const lines = [\n    'The livestream is no longer publishing.',\n    '',\n    mins !== null ? `It had been live for about ${mins} minute(s).` : '',\n    '',\n    'If the show is still running, OBS has disconnected or MediaMTX stopped ingesting.',\n    'Page:    https://www.stpetemusic.live/live',\n    'Checked: https://www.stpetemusic.live/api/stream/youtube-status',\n    `Time:    ${new Date().toISOString()}`,\n  ];\n\n  return [{ json: { subject: '[StPeteMusic] ALERT: stream STOPPED', text: lines.join('\\n') } }];\n}\n\nreturn [];"
       },
       "id": "a1f3c2d4-3333-4a01-9c10-0a1b2c3d4e03",
       "name": "Detect Drop",
@@ -98,7 +103,6 @@
       ]
     }
   ],
-  "pinData": {},
   "connections": {
     "Every Minute": {
       "main": [
@@ -134,10 +138,47 @@
       ]
     }
   },
-  "active": false,
   "settings": {
     "executionOrder": "v1",
     "saveManualExecutions": true
   },
-  "meta": {}
+  "staticData": {
+    "node:Every Minute": {
+      "recurrenceRules": []
+    },
+    "global": {
+      "wasLive": false,
+      "liveSince": null
+    }
+  },
+  "meta": {},
+  "pinData": {},
+  "versionId": "b77e82ad-e91e-47bc-929c-93cd42488329",
+  "activeVersionId": "b77e82ad-e91e-47bc-929c-93cd42488329",
+  "versionCounter": 73598,
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-07-31T20:01:00.830Z",
+      "createdAt": "2026-07-31T20:01:00.830Z",
+      "role": "workflow:owner",
+      "workflowId": "streamwatchdog01",
+      "projectId": "9hoLIXSDUw0Dgem2",
+      "project": {
+        "updatedAt": "2026-03-09T19:50:22.065Z",
+        "createdAt": "2026-03-09T19:42:35.601Z",
+        "id": "9hoLIXSDUw0Dgem2",
+        "name": "Matt Taylor <maylortaylor@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "53bffac6-ca7b-415e-be04-a34d28ab196b"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
 }
