@@ -28,7 +28,7 @@
     "sharp": "^0.35.3",
     "sonner": "^2.0.7",
     "tailwind-merge": "^2.4.0",
-    "zod": "^3.23.5"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
