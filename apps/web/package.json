@@ -62,7 +62,7 @@
     "postcss": "^8.5.25",
     "tailwindcss": "^4.2.4",
     "typescript": "^6",
-    "vitest": "^4.1.5",
+    "vitest": "^5.0.1",
     "yet-another-react-lightbox": "^3.32.0"
   }
 }
