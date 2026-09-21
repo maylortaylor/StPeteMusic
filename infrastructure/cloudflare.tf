@@ -65,10 +65,18 @@ resource "cloudflare_record" "admin" {
 resource "cloudflare_record" "stream" {
   count = local.enable_cloudflare ? 1 : 0
 
-  zone_id         = var.cloudflare_zone_id
-  name            = "stream"
-  type            = "A"
-  content         = aws_eip.n8n.public_ip
+  zone_id = var.cloudflare_zone_id
+  name    = "stream"
+  type    = "A"
+  # Reconcile to reality: RTMP ingest moved to the roboBOREALIS services box
+  # (#117, ADR-0028), and this record already resolves to that box's EIP. It was
+  # repointed outside this IaC, so the old `aws_eip.n8n.public_ip` here was drift
+  # a `tofu apply` would have reverted, breaking the live stream. Hardcoded to the
+  # services box's STABLE EIP (18.211.32.207, i-00a2e6f72b886b28b) rather than
+  # the old box, and decoupled from aws_eip.n8n so the old box can be retired.
+  # INTERIM: roboborealis-platform#400 decides whether this record + the HLS stack
+  # move to platform ownership; until then this keeps StPeteMusic's IaC honest.
+  content         = "18.211.32.207"
   proxied         = false
   ttl             = 60
   allow_overwrite = true

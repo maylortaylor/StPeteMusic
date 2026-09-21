@@ -44,8 +44,12 @@ resource "aws_ssm_parameter" "rtmp_stream_key" {
 # Route53 health check — monitors TCP:1935 from AWS edge nodes every 30s
 # ~$0.50/month. Visible in Route53 console; attach to SNS for alerts later.
 resource "aws_route53_health_check" "rtmp" {
-  type              = "TCP"
-  ip_address        = aws_eip.n8n.public_ip
+  type = "TCP"
+  # RTMP now runs on the roboBOREALIS services box (#117, ADR-0028), so the
+  # health check watches that box's stable EIP (18.211.32.207), not the retiring
+  # old box. Decoupled from aws_eip.n8n so the old box can be removed.
+  # INTERIM pending roboborealis-platform#400 (streaming-stack ownership).
+  ip_address        = "18.211.32.207"
   port              = 1935
   request_interval  = 30
   failure_threshold = 3
