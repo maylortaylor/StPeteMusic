@@ -16,6 +16,22 @@ locals {
   enable_cloudflare = var.cloudflare_zone_id != "" && var.cloudflare_api_token != ""
 }
 
+# 🔴 apex, www and admin left Amplify for the roboBOREALIS platform (2026-09-22).
+#
+# These three used to derive their content from aws_amplify_domain_association,
+# which no longer exists - the Amplify apps are deleted. They now point at the
+# platform CloudFront distribution, which is what is actually live.
+#
+# They stay MANAGED here rather than being dropped from state. Deleting the
+# resource blocks would destroy live DNS and take the site down, and a `removed`
+# block was tried first but this stack pins OpenTofu ~1.9, where the nested
+# `lifecycle { destroy = false }` is rejected as an unsupported block. Rather
+# than depend on what a bare `removed` means on that version, the records keep an
+# owner and the configuration is corrected to match reality.
+#
+# Values verified against the Cloudflare API on 2026-09-22: all three are
+# unproxied CNAMEs to the platform distribution.
+
 # ── Web app: www.stpetemusic.live ─────────────────────────────────────────────
 
 resource "cloudflare_record" "www" {
@@ -24,7 +40,7 @@ resource "cloudflare_record" "www" {
   zone_id         = var.cloudflare_zone_id
   name            = "www"
   type            = "CNAME"
-  content         = try(split(" ", one([for s in aws_amplify_domain_association.web.sub_domain : s.dns_record if s.prefix == "www"]))[2], "")
+  content         = var.platform_cloudfront_domain
   proxied         = false
   ttl             = 1  # 1 = auto (required when proxied = false)
   allow_overwrite = true
@@ -39,7 +55,7 @@ resource "cloudflare_record" "apex" {
   zone_id         = var.cloudflare_zone_id
   name            = "@"
   type            = "CNAME"
-  content         = try(split(" ", one([for s in aws_amplify_domain_association.web.sub_domain : s.dns_record if s.prefix == ""]))[2], "")
+  content         = var.platform_cloudfront_domain
   proxied         = false
   ttl             = 1
   allow_overwrite = true
@@ -53,7 +69,7 @@ resource "cloudflare_record" "admin" {
   zone_id = var.cloudflare_zone_id
   name    = "admin"
   type    = "CNAME"
-  content = try(split(" ", one([for s in aws_amplify_domain_association.admin.sub_domain : s.dns_record if s.prefix == "admin"]))[2], "")
+  content = var.platform_cloudfront_domain
   proxied = false
   ttl     = 1
 }
