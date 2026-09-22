@@ -4,12 +4,15 @@
 # AWS Free Tier includes 10 alarms/month free (account-wide, all regions). Each alarm beyond 10 costs
 # $0.10/month (us-east-1, standard resolution). We deliberately stay within the free tier.
 #
-# Current managed alarms = 7 (headroom: 3):
-#   1. ec2_cpu                2. ec2_status_check     3. rds_storage_low     4. rds_cpu
-#   5. cloudfront_5xx         6. rtmp_health          7. ec2_disk_high
+# Current managed alarms = 2 (headroom: 8):
+#   1. cloudfront_5xx         2. rtmp_health
 #
-# Rule: before adding an 11th alarm, retire a lower-value one or consolidate. First candidate to cut is
-# ec2_status_check — EC2 auto-recovers, and rtmp_health + cloudfront_5xx already catch a real outage.
+# ec2_cpu, ec2_status_check and ec2_disk_high retired with the old EC2 box
+# (roboborealis-platform#400) — nothing left to alarm on. rtmp_health stays: it watches the
+# Route53 health check, which now monitors the roboBOREALIS services box, not the old EC2.
+# rds_storage_low and rds_cpu were already removed with the RDS instance (#364).
+#
+# Rule: before adding an 11th alarm, retire a lower-value one or consolidate.
 # When you add/remove an alarm, update the census list above so the count stays auditable in one place.
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -22,38 +25,6 @@ resource "aws_sns_topic_subscription" "alerts_email" {
   topic_arn = aws_sns_topic.alerts.arn
   protocol  = "email"
   endpoint  = var.alert_email
-}
-
-resource "aws_cloudwatch_metric_alarm" "ec2_cpu" {
-  alarm_name          = "${var.project}-ec2-cpu-high"
-  alarm_description   = "EC2 CPU > 85% for 10 min — n8n/Listmonk/MediaMTX may be under load"
-  namespace           = "AWS/EC2"
-  metric_name         = "CPUUtilization"
-  dimensions          = { InstanceId = aws_instance.n8n.id }
-  statistic           = "Average"
-  period              = 300
-  evaluation_periods  = 2
-  threshold           = 85
-  comparison_operator = "GreaterThanThreshold"
-  alarm_actions       = [aws_sns_topic.alerts.arn]
-  treat_missing_data  = "notBreaching"
-  tags                = { Project = var.project }
-}
-
-resource "aws_cloudwatch_metric_alarm" "ec2_status_check" {
-  alarm_name          = "${var.project}-ec2-status-check-failed"
-  alarm_description   = "EC2 instance or system status check failed — hardware/OS issue"
-  namespace           = "AWS/EC2"
-  metric_name         = "StatusCheckFailed"
-  dimensions          = { InstanceId = aws_instance.n8n.id }
-  statistic           = "Maximum"
-  period              = 60
-  evaluation_periods  = 2
-  threshold           = 0
-  comparison_operator = "GreaterThanThreshold"
-  alarm_actions       = [aws_sns_topic.alerts.arn]
-  treat_missing_data  = "notBreaching"
-  tags                = { Project = var.project }
 }
 
 # CloudFront metrics require Region = "Global" dimension even in us-east-1
@@ -91,31 +62,5 @@ resource "aws_cloudwatch_metric_alarm" "rtmp_health" {
   comparison_operator = "LessThanThreshold"
   alarm_actions       = [aws_sns_topic.alerts.arn]
   treat_missing_data  = "notBreaching"
-  tags                = { Project = var.project }
-}
-
-# EC2 root-disk usage. Default EC2 metrics do NOT include disk, so disk-watchdog.sh publishes the custom
-# StPeteMusic/Host DiskUsedPercent metric every 10 min. Fires at 85% — before the 100%-full wedge that
-# takes down RTMP/HLS (2026-07-19 outage). treat_missing_data = "breaching": if the watchdog stops
-# publishing, the disk is unmonitored and that itself warrants a page.
-resource "aws_cloudwatch_metric_alarm" "ec2_disk_high" {
-  alarm_name        = "${var.project}-ec2-disk-high"
-  alarm_description = "EC2 root disk > 85% — stream recordings may fill the volume and take down RTMP/HLS"
-  namespace         = "StPeteMusic/Host"
-  metric_name       = "DiskUsedPercent"
-  dimensions        = { InstanceId = aws_instance.n8n.id }
-  statistic         = "Maximum"
-  # period MUST match disk-watchdog.timer's OnUnitActiveSec (10 min). At the previous 300s, every
-  # evaluation window contained one real datapoint and one structurally empty period, and with
-  # treat_missing_data = "breaching" that empty period counted as a breach. It only stayed OK
-  # because 2-of-2 periods must breach — so any timer jitter or one slow run put two empty periods
-  # back-to-back and false-alarmed. Matching the publish cadence makes "missing" mean what it is
-  # supposed to mean: the watchdog has actually stopped, which is worth a page.
-  period              = 600
-  evaluation_periods  = 2
-  threshold           = 85
-  comparison_operator = "GreaterThanThreshold"
-  alarm_actions       = [aws_sns_topic.alerts.arn]
-  treat_missing_data  = "breaching"
   tags                = { Project = var.project }
 }
