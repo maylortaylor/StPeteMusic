@@ -1,5 +1,15 @@
 # CLAUDE.md — StPeteMusic
 
+⚠️ **Public site + admin are retired here, live on roboBOREALIS now.** As of 2026-09-22
+`stpetemusic.live`, `www`, and `admin` all serve from `roboborealis-platform`'s
+`clients/stpetemusic/` (Galaxy tier). The Amplify apps, the shared RDS instance, and this
+repo's dedicated EC2 box are all deleted — most of `.claude/infrastructure.md` below now
+describes infra that no longer exists. **This repo still owns one live thing:**
+`infrastructure/streaming.tf` (RTMP/HLS, ADR-0028 in the platform repo) — that stays here on
+purpose, only its origin moved to the platform's services box. Current content and
+credentials source-of-truth, and infra history, still live here; current architecture and
+day-to-day ops live in `roboborealis-platform`.
+
 Small apps + knowledge base for @StPeteMusic, a community music org in St. Pete, FL.
 Parent company: Tangent LLC. Partner venue: Suite E Studios.
 
