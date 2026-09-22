@@ -285,3 +285,16 @@ variable "alert_email" {
   type        = string
   default     = "theburgmusic@gmail.com"
 }
+
+# Where apex, www and admin point now that StPeteMusic's web and admin run on
+# the roboBOREALIS platform box instead of Amplify. A variable rather than a
+# literal in cloudflare.tf so the cutover target has one name, and so pointing
+# the site somewhere else later is a single edit.
+#
+# Verified against the Cloudflare API 2026-09-22: apex, www and admin are all
+# unproxied CNAMEs to this host.
+variable "platform_cloudfront_domain" {
+  description = "CloudFront distribution serving the platform build of stpetemusic.live"
+  type        = string
+  default     = "d123fbe0johuow.cloudfront.net"
+}
