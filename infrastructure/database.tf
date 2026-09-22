@@ -62,7 +62,16 @@ resource "aws_db_instance" "main" {
   db_subnet_group_name   = aws_db_subnet_group.main.name
   vpc_security_group_ids = [aws_security_group.rds.id]
   skip_final_snapshot    = false
-  deletion_protection    = true
+  # 🔴 Named explicitly because the provider REQUIRES a final_snapshot_identifier
+  # when skip_final_snapshot is false. Leaving it unset does not mean "generate
+  # one" - it means the destroy fails at the last step, after everything else
+  # has already been torn down.
+  final_snapshot_identifier = "${var.project}-postgres-final-2026-09"
+  # Retirement prerequisite (roboborealis/roboborealis-platform#364). RDS refuses
+  # to delete an instance with deletion protection on, so this flag has to be
+  # false in an APPLIED state before the resource can be removed. Two applies,
+  # not one, which is why this is its own change.
+  deletion_protection    = false
   multi_az               = false
   publicly_accessible    = true   # required for Amplify SSR + local dev → RDS connectivity
   apply_immediately      = true   # apply modifications immediately, not at next maintenance window
