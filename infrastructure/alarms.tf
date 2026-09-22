@@ -56,38 +56,6 @@ resource "aws_cloudwatch_metric_alarm" "ec2_status_check" {
   tags                = { Project = var.project }
 }
 
-resource "aws_cloudwatch_metric_alarm" "rds_storage_low" {
-  alarm_name          = "${var.project}-rds-storage-low"
-  alarm_description   = "RDS free storage < 2 GB — disk will fill if not addressed"
-  namespace           = "AWS/RDS"
-  metric_name         = "FreeStorageSpace"
-  dimensions          = { DBInstanceIdentifier = aws_db_instance.main.identifier }
-  statistic           = "Average"
-  period              = 300
-  evaluation_periods  = 1
-  threshold           = 2147483648
-  comparison_operator = "LessThanThreshold"
-  alarm_actions       = [aws_sns_topic.alerts.arn]
-  treat_missing_data  = "notBreaching"
-  tags                = { Project = var.project }
-}
-
-resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
-  alarm_name          = "${var.project}-rds-cpu-high"
-  alarm_description   = "RDS CPU > 80% for 10 min — db.t4g.micro is very small"
-  namespace           = "AWS/RDS"
-  metric_name         = "CPUUtilization"
-  dimensions          = { DBInstanceIdentifier = aws_db_instance.main.identifier }
-  statistic           = "Average"
-  period              = 300
-  evaluation_periods  = 2
-  threshold           = 80
-  comparison_operator = "GreaterThanThreshold"
-  alarm_actions       = [aws_sns_topic.alerts.arn]
-  treat_missing_data  = "notBreaching"
-  tags                = { Project = var.project }
-}
-
 # CloudFront metrics require Region = "Global" dimension even in us-east-1
 resource "aws_cloudwatch_metric_alarm" "cloudfront_5xx" {
   alarm_name        = "${var.project}-cloudfront-5xx-high"
