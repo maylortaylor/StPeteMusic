@@ -6,7 +6,8 @@
 # an out-of-band `aws ssm delete-parameter` rather than a plain code removal, since it's the
 # parameter behind this repo's long-running ParameterAlreadyExists drift (exists in AWS, not
 # correctly tracked in tofu state) — see the PR for the exact command and verify it's gone
-# post-apply. rtmp_stream_key lives in streaming.tf, not here, and is untouched (still live).
+# post-apply. The old /stpetemusic/streaming/rtmp_stream_key was removed in #346 (mediamtx reads
+# the /roboborealis/services/mediamtx/ copy).
 
 resource "aws_ssm_parameter" "clarity_project_id" {
   count = var.clarity_project_id != "" ? 1 : 0
