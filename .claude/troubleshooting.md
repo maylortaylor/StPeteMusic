@@ -1,178 +1,52 @@
 ---
 topic: troubleshooting
-triggers: error, down, debug, troubleshoot, ssh, terraform issue, connection refused, 403, 500, not responding, credentials issue, env leakage, contamination, error logs, production errors, streaming, rtmp, obs, mediamtx, live page, unable to connect
-updated: 2026-06-21
+triggers: errors, down, 403, 500, not responding, connection refused, site down, streaming, rtmp, obs not connecting, live page broken, tofu, credentials
+updated: 2026-09-23
 ---
 
 # Troubleshooting
 
-## Querying Production Error Logs
+The site, admin, n8n and listmonk are debugged in `roboborealis/roboborealis-platform`, not here.
+Start with that repo's `docs/INFRASTRUCTURE.md`. This file covers what this repo still owns.
 
-Both the web app and admin app write structured errors to the `error_logs` table in Postgres. Logs are retained for 30 days.
+## Quick health check
 
-**Via admin API (easiest for Claude agents — requires a logged-in Clerk session):**
-```
-GET https://admin.stpetemusic.live/api/admin/error-logs?hours=24
-GET https://admin.stpetemusic.live/api/admin/error-logs?hours=48&app=web
-GET https://admin.stpetemusic.live/api/admin/error-logs?hours=6&level=error&limit=50
-```
-
-Query params:
-- `hours` — look back N hours (default 24, max 168)
-- `app` — `web` or `admin` (default: both)
-- `level` — `error` or `warn` (default: both)
-- `limit` — number of results (default 100, max 500)
-
-Response shape:
-```json
-{
-  "summary": { "total": 12, "by_app": {"web": 8, "admin": 4}, "by_status_code": {"500": 10} },
-  "errors": [{ "created_at": "...", "app": "web", "status_code": 500, "path": "/api/contact", "message": "..." }]
-}
-```
-
-**Via direct DB query (for Claude agents with DATABASE_URL):**
-```sql
-SELECT app, status_code, path, message, created_at
-FROM error_logs
-WHERE created_at > now() - interval '24 hours'
-ORDER BY created_at DESC
-LIMIT 50;
-```
-
----
-
-## AWS Credentials Issues
-
-**Problem:** `Error: No valid credential sources found`
-
-**Solution:**
-1. Verify `.envrc` is allowed: `direnv allow`
-2. Configure AWS profile:
-   ```bash
-   aws configure --profile personal
-   ```
-3. Test: `AWS_PROFILE=personal aws sts get-caller-identity`
-
-**Problem:** AWS commands reference `/Users/matttaylor/Documents/_dev/amver-hub/aws_token`
-
-**Solution:** This is contamination from PSD projects. The `.envrc` file should clean this up automatically:
 ```bash
-direnv allow
-cd .  # refresh environment
-AWS_PROFILE=personal aws sts get-caller-identity
+for u in https://stpetemusic.live/ https://admin.stpetemusic.live/ https://n8n.stpetemusic.live/healthz https://stpetemusic.live/api/stream/status; do
+  curl -s -o /dev/null -w "$u %{http_code}\n" --max-time 10 "$u"
+done
 ```
 
-If it persists, check your shell config (`.zshrc`, `.bashrc`) for `AWS_WEB_IDENTITY_TOKEN_FILE` and remove it.
+`/api/stream/status` returns `{"live":false}` when nothing is publishing. That is normal.
 
-## Terraform Issues
+## AWS credentials
 
-**Problem:** `Backend initialization required`
+`Error: No valid credential sources found`, or a path to `amver-hub/aws_token` in an error:
+a PSD env var is leaking in. Use the `awsp` alias, or `unset AWS_WEB_IDENTITY_TOKEN_FILE
+AWS_ROLE_ARN` then `AWS_PROFILE=personal aws sts get-caller-identity`.
 
-**Solution:**
-```bash
-cd infrastructure
-unset AWS_WEB_IDENTITY_TOKEN_FILE && AWS_PROFILE=personal tofu init -reconfigure
-```
+## OpenTofu
 
-**Problem:** `tofu plan` shows no changes but changes are expected
+- `Backend initialization required`: `cd infrastructure && awsp tofu init -reconfigure`.
+- A local `plan` without every CI `TF_VAR_*` flips count-gated resources to 0 and plans
+  phantom destroys. Read the CI plan on the PR instead of trusting a local one.
 
-**Solution:** State might be out of sync:
-```bash
-unset AWS_WEB_IDENTITY_TOKEN_FILE
-AWS_PROFILE=personal tofu refresh
-AWS_PROFILE=personal tofu plan
-```
+## Live streaming (OBS / RTMP / `/live`)
 
-## n8n Server Down
-
-**Problem:** `https://n8n.stpetemusic.live` not responding
-
-**Solutions (in order):**
-1. Check AWS status:
+1. **OBS "unable to connect":** `nc -vz -G 5 stream.stpetemusic.live 1935`. If that works, the
+   Stream Key format is wrong: it must be `live?user=stream&pass=<key>`.
+2. **OBS connects but auth fails:** mediamtx on the services box has the wrong key. Check its
+   logs over SSM (no SSH, port 22 is closed):
    ```bash
-   AWS_PROFILE=personal aws ec2 describe-instance-status \
-     --instance-ids i-03874197d725b0455 --region us-east-1
+   awsp aws ssm send-command --instance-ids i-00a2e6f72b886b28b --document-name AWS-RunShellScript \
+     --parameters 'commands=["docker logs --tail 50 rb-services-mediamtx"]'
    ```
+3. **Streaming but `/live` says off air:** check the manifest and the platform's status route:
+   `curl -s https://stpetemusic.live/api/stream/status` and
+   `curl -sI https://hls.stpetemusic.live/live/index.m3u8`.
+4. **Player shows but video is blank:** usually CORS or CSP. Check the browser console. The HLS
+   response must carry exactly one `access-control-allow-origin` header.
+5. **No autoplay:** browsers block unmuted autoplay without a user gesture. Expected.
 
-2. Restart Docker containers:
-   ```bash
-   ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@n8n.stpetemusic.live \
-     "cd ~/stpetemusic/n8n && docker-compose -f docker-compose.prod.yaml restart"
-   ```
-
-3. Reboot instance:
-   ```bash
-   AWS_PROFILE=personal aws ec2 reboot-instances \
-     --instance-ids i-03874197d725b0455 --region us-east-1
-   ```
-
-4. Full stop/start:
-   ```bash
-   AWS_PROFILE=personal aws ec2 stop-instances --instance-ids i-03874197d725b0455 --region us-east-1
-   sleep 30
-   AWS_PROFILE=personal aws ec2 start-instances --instance-ids i-03874197d725b0455 --region us-east-1
-   ```
-
-## Live Streaming Not Working (OBS / RTMP / /live page)
-
-Full architecture + the 7 root causes already found and fixed (2026-06-21, PRs #236-#242) are in `.claude/infrastructure.md` under "Live Streaming". Check that section first — most repeat failures will be one of those same root causes resurfacing. Quick diagnostic order:
-
-1. **OBS says "unable to connect"** → check network first, not auth:
-   ```bash
-   AWS_PROFILE=personal aws ec2 describe-instances --instance-ids i-03874197d725b0455 --query 'Reservations[].Instances[].State.Name' --profile personal
-   nc -vz -G 5 stream.stpetemusic.live 1935
-   ```
-   If both are fine, it's almost certainly the OBS Stream Key format — must be `live?user=stream&pass=<key>`, not a bare key, not `rtmp://user:pass@host`, and not OBS's separate "Use Authentication" checkbox.
-2. **OBS connects but auth fails repeatedly** → SSH in and check MediaMTX actually has the real key substituted (not the literal `${RTMP_STREAM_KEY}` string):
-   ```bash
-   ssh -i ~/.ssh/stpetemusic-n8n.pem ec2-user@54.235.171.182 "docker logs --tail 50 stpetemusic-mediamtx"
-   ```
-3. **OBS streams fine but `/live` shows "Off Air"** → check the manifest directly with cookies, since `curl` without `-L -b/-c` will always show a redirect loop even when the stream is live (this is normal MediaMTX behavior, not a bug):
-   ```bash
-   curl -s https://www.stpetemusic.live/api/stream/youtube-status   # should be {"live":true,...,"platform":"hls"}
-   ```
-4. **`/live` shows the player but the video is blank** → almost certainly CORS or CSP, not RTMP/MediaMTX. Check browser console for `Content-Security-Policy` violations or CORS errors — `curl` cannot reproduce these, use a headless browser (Playwright is already a devDependency):
-   ```bash
-   curl -s -D - -H "Origin: https://www.stpetemusic.live" https://hls.stpetemusic.live/live/index.m3u8 | grep -i access-control-allow-origin
-   # should be exactly ONE line, matching the origin — not "*", not two lines
-   ```
-5. **Video plays but doesn't autostart** → browsers block unmuted autoplay without a user gesture; this is expected, see `LivePlayer.tsx`'s muted-autoplay + unmute-button handling.
-
-## SSH Access Denied
-
-**Problem:** `Connection refused` or `Operation timed out`
-
-**Reason:** SSH is restricted to a specific IP (see `infrastructure/ec2.tf`)
-
-**Solution:** Update the security group in Terraform:
-```hcl
-# In infrastructure/ec2.tf, find aws_security_group.n8n
-# Update cidr_blocks for port 22:
-cidr_blocks = ["YOUR.IP.ADDRESS/32"]  # Replace with your public IP
-```
-
-Then apply:
-```bash
-cd infrastructure
-unset AWS_WEB_IDENTITY_TOKEN_FILE && AWS_PROFILE=personal tofu apply
-```
-
-## Environment Variable Leakage
-
-**Problem:** Global env vars from other projects interfere
-
-**Prevention:**
-- ✅ Always run from this project directory (direnv will isolate environment)
-- ✅ Use `AWS_PROFILE=personal` explicitly when not in directory
-- ✅ Pre-commit hooks prevent committing bad configs
-- ✅ Run setup.sh to validate clean environment
-
-**If contamination happens:**
-```bash
-unset AWS_WEB_IDENTITY_TOKEN_FILE
-unset DATABASE_URL
-unset KEYCLOAK_ISSUER
-direnv allow
-cd .  # refresh
-```
+The `stpetemusic-rtmp-unhealthy` alarm (via SNS `stpetemusic-alerts`) fires when the Route 53
+health check cannot reach `:1935`.

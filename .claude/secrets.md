@@ -1,49 +1,32 @@
 ---
 topic: secrets
-triggers: secret, token, env, github secret, rotate, credential, password, api key, ig_access_token, env var, listmonk, environment variable
-updated: 2026-06-21
+triggers: secret, token, env, github secret, rotate, credential, password, api key, ig_access_token, env var
+updated: 2026-09-23
 ---
 
-# Secrets Management
+# Secrets
 
-**GitHub Secrets are the single source of truth.** Manage at: `Settings → Secrets → Actions`
+There is no deploy from this repo any more, so no `.env` is written anywhere from here.
 
-**Do NOT:**
-- Edit `~/stpetemusic/.env` on EC2 directly — it is **overwritten on every deploy**
-- Commit any secrets to `.env` or any other file
-- SSH to rotate a token — update the GitHub Secret instead and let deploy apply it
+## Where each secret lives now
 
-**How it works:**
-```
-GitHub Secrets → deploy.yml (on push to main) → writes ~/stpetemusic/.env → n8n restarts
-```
+| Secret | Home |
+|---|---|
+| Site/admin runtime (DB URL, auth, Google OAuth, YouTube key, linktree URL, HLS URL) | SSM `/roboborealis/stpetemusic/*`, rendered onto the platform box by its `render-env.sh` |
+| n8n env (FB/IG tokens, `N8N_WEBHOOK_SECRET`, Resend, alert email) | SSM `/roboborealis/services/stpetemusic/*`, passed into n8n by `40-n8n.sh` |
+| n8n credentials (Anthropic, Google OAuth, Postgres) | n8n's own credential store on the services box |
+| RTMP stream key | SSM `/roboborealis/services/mediamtx/rtmp_stream_key` |
+| This repo's CI (Cloudflare, GCP, `alert_email`, `clarity_project_id`) | GitHub Secrets, passed as `TF_VAR_*` by `tofu-plan.yml` / `tofu-apply.yml` |
 
-## Required GitHub Secrets
-| GitHub Secret Name | Written to `.env` as | Description |
-|--------------------|----------------------|-------------|
-| `EC2_HOST` | — | SSH target |
-| `EC2_USER` | — | SSH user |
-| `EC2_SSH_KEY` | — | SSH private key |
-| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | — | Terraform only |
-| `POSTGRES_USER` / `POSTGRES_PASSWORD` | same | PostgreSQL |
-| `DB_ENCRYPTION_KEY` | same | pgcrypto encryption key |
-| `N8N_ENCRYPTION_KEY` / `N8N_API_KEY` | same | n8n encryption + API key |
-| `OBSIDIAN_HOST` | same | Tailscale URL `http://<IP>:27123` |
-| `ANTHROPIC_API_KEY` | `CLAUDE_API_KEY_N8N_STPETEMUSIC` | Claude |
-| `GROQ_API_KEY` / `N8N_GEMINI_API_KEY` | same | Groq + Gemini |
-| `IG_USER_ID` / `IG_APP_ID` / `IG_ACCESS_TOKEN` | same | Instagram |
-| `FB_PAGE_ID` / `FB_ACCESS_TOKEN` | same | Facebook |
-| `FACEBOOK_PIXEL_ID` | same + `NEXT_PUBLIC_META_PIXEL_ID` (via `meta_pixel_id` TF var) | Meta Pixel / Conversions API — read by `apps/web/src/app/api/meta-events/route.ts` |
-| `FACEBOOK_SYSTEM_USER_TOKEN` | same | Meta Conversions API token (Meta's auto-created "Conversions API System User") |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` / `YOUTUBE_API_KEY` | YouTube vars | YouTube |
-| `LISTMONK_USERNAME` / `LISTMONK_PASSWORD` | same | Listmonk API user (NOT admin login) |
+Many `TF_VAR_*` lines in the two tofu workflows now feed variables nothing uses. They are
+harmless. Remove them with the matching variables when convenient.
 
-## Rotating a Secret
-1. Get new token value
-2. GitHub → Settings → Secrets → Actions → update the secret
-3. Push any commit to `main` (or re-run last deploy workflow)
-4. n8n picks up new token after container restarts
+**Local reference copy:** `.env` in this repo (gitignored) still holds the original values, and
+is where the platform's SSM copies were taken from. Never commit it.
 
-## Instagram Token (`IG_ACCESS_TOKEN`)
-Uses Page Access Token (never expires if derived from long-lived user token).
-To rotate: short-lived User Token → long-lived → Page Token from `950900529511914/owned_pages`.
+## Instagram token (`IG_ACCESS_TOKEN`)
+
+A Page Access Token, which never expires if derived from a long-lived user token. To rotate:
+short-lived User Token → long-lived → Page Token from `950900529511914/owned_pages`. Then update
+SSM `/roboborealis/services/stpetemusic/ig_access_token` and re-run the platform's
+`deploy-services.yml`.
