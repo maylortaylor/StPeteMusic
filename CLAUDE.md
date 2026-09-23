@@ -10,12 +10,11 @@ purpose, only its origin moved to the platform's services box. Current content a
 credentials source-of-truth, and infra history, still live here; current architecture and
 day-to-day ops live in `roboborealis-platform`.
 
-Small apps + knowledge base for @StPeteMusic, a community music org in St. Pete, FL.
+Infrastructure + knowledge base for @StPeteMusic, a community music org in St. Pete, FL.
 Parent company: Tangent LLC. Partner venue: Suite E Studios.
 
 ## Quick Reference
-- Production: https://www.stpetemusic.live · Amplify app ID: `d1fjwgk99cbqor`
-- Staging: https://develop.d1fjwgk99cbqor.amplifyapp.com
+- Production: https://www.stpetemusic.live, served by roboborealis-platform (`clients/stpetemusic/`). The apps that used to be here were removed in #351.
 - Never push directly to `main` — CI + 1 PR review required
 - Managed by Matt Taylor (@maylortaylor) · team: Matt + Austen Van Der Bleek
 - Key skills: `/github`, `/brainstorm` (before features), `/grill-me` (pre-push), `/security-review`, `/feature-dev:feature-dev`
@@ -37,7 +36,6 @@ Parent company: Tangent LLC. Partner venue: Suite E Studios.
 | YouTube feature (review queue, admin UI, publish workflow, quota, OAuth, sync, proposals, calendar match) | [youtube.md](.claude/youtube.md) |
 | Database & schema (db, schema, migration, drizzle, postgres, table, query, model, uuid, column) | [database.md](.claude/database.md) |
 | Admin auth & Clerk (protected routes, middleware, session, login, sign-in, clerk, dashboard) | [clerk.md](.claude/clerk.md) |
-| Social & OG images (og:image, share image, facebook preview, twitter card, cdn upload, social-images, hash) | [social-images/README.md](apps/web/social-images/README.md) |
 
 ## Key Files
 | File | Purpose |
