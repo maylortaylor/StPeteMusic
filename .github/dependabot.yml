@@ -11,34 +11,6 @@ updates:
       - "dependencies"
       - "docker"
 
-  # Keep npm packages up to date. This is an npm-workspaces monorepo with a
-  # single root package-lock.json (apps/*, packages/*) — directory must be
-  # "/" so Dependabot updates the shared lockfile correctly. Pointing this at
-  # a workspace subdirectory (e.g. "/apps/web") leaves package-lock.json out
-  # of sync with the bumped package.json, which fails `npm ci` in CI for
-  # every PR Dependabot opens.
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "npm"
-    # Collapse routine minor/patch bumps into one PR per week. Ungrouped, these
-    # arrive as up to 5 separate PRs that each rewrite the shared lockfile, so
-    # they conflict with each other and — with strict branch protection on main —
-    # force a rebase and a full CI run per merge. Majors stay ungrouped so a
-    # breaking bump still gets looked at on its own.
-    groups:
-      npm-minor-patch:
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
-
   # Keep GitHub Actions up to date
   - package-ecosystem: "github-actions"
     directory: "/"
