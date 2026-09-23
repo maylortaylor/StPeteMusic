@@ -1,5 +1,10 @@
 # WordPress Linktree Widget — Installation Guide
 
+> **Out of date (2026-09-23).** The widget fetches `www.stpetemusic.live/api/linktree`. That route
+> belonged to the retired StPeteMusic site and no longer exists, and the AWS API behind it was
+> removed in #346. The current data source is the n8n webhook `https://n8n.stpetemusic.live/webhook/linktree`
+> (same array of profiles). Point the widget at it and check CORS before re-installing.
+
 This guide explains how to add the Suite E Studios links widget to **suiteestudios.com**. The widget fetches live links from the StPeteMusic API and displays them automatically — no manual updates needed when Linktree changes.
 
 ---
@@ -120,7 +125,7 @@ Paste any overrides there. Examples:
 2. The widget should show **"Loading links…"** briefly, then display the Suite E Studios link cards
 3. Open browser DevTools → **Network tab** — you should see a successful request to:
    ```
-   https://qag1q0ijn5.execute-api.us-east-1.amazonaws.com/linktree
+   https://n8n.stpetemusic.live/webhook/linktree
    ```
 4. Click a card — it should open in a new tab at the correct URL
 5. Resize to mobile width (~375px) — cards should stack to a single column

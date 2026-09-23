@@ -19,7 +19,7 @@
 │   └── workflows/StPeteMusic/  # Active workflows (source of truth)
 ├── database/             # PostgreSQL migrations (auto-applied on every deploy to main)
 ├── docs/                 # Architecture docs, runbooks, incident reports, roadmap
-├── .github/workflows/    # CI/CD pipelines (ci, deploy, amplify-deploy, tofu-apply)
+├── .github/workflows/    # CI/CD pipelines (ci, tofu-plan, tofu-apply)
 ├── .claude/              # Context files for Claude Code agents (load before any task)
 ├── CLAUDE.md             # Agent entry point — load this first
 ├── SETUP.md              # First-time developer setup guide
