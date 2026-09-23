@@ -1,34 +1,24 @@
 ---
 topic: n8n
-triggers: n8n, workflow, automation, obsidian, youtube, instagram, facebook, social post, posting, google drive, drive, video, reel, publish
-updated: 2026-04-30
+triggers: n8n, workflow, automation, obsidian, youtube, instagram, facebook, social post, posting, google drive, video, reel, publish, linktree
+updated: 2026-09-23
 ---
 
-# n8n Workflows
+# n8n
 
-**Active workflows only**: `n8n/workflows/StPeteMusic/` — do not import from other directories.
-**Detailed n8n guidance**: `n8n/CLAUDE.md`
+**Live n8n is https://n8n.stpetemusic.live, on the roboBOREALIS services box.** The deploy
+source of truth for the live workflows is the platform repo:
+`infrastructure/services/n8n/workflows/stpetemusic/` (StPeteMusic keepers) and
+`.../shared/` (the linktree API + scraper that feed the site's "Find Us Everywhere").
 
-`system-prompt.md` is the source of truth for AI agent instructions — always keep in sync with `systemMessage` field in the workflow JSON.
+`n8n/workflows/StPeteMusic/` here is an **archive** of the pre-platform workflows. The audit
+that chose the keepers is roboborealis-platform#395. Do not import from here without checking
+the platform copy first. The go-live workflow was removed on purpose (roboborealis-platform#472).
 
-## obsidian-to-youtube-posting
-**File**: `n8n/workflows/StPeteMusic/obsidian-to-youtube-posting.json`
-**Trigger**: Manual + scheduled every 4 hours
-Reads Obsidian posts with `status: ready`, downloads video from Google Drive, publishes to YouTube and/or Instagram.
+`system-prompt.md` files here are still the source for the AI agent prompts, and
+`scripts/sync-n8n-prompts.js` (a pre-commit hook) syncs them into the archived JSON.
 
-Key rules:
-- Google Drive files must be **public (shared-by-link)** for IG download
-- Instagram scheduling: `published=false` + `scheduled_publish_time` (Unix timestamp from `postDate`)
-- `postDate` must be 10 min – 75 days in the future when container is created
-- Container status polling: checks `status_code` every 30s until `FINISHED` or `SCHEDULED`
-- Videos saved to `~/stpetemusic/n8n/local-files/videos/` → served at `https://n8n.stpetemusic.live/media/<filename>`
+## AI config
 
-## obsidian-post-creator
-**File**: `n8n/workflows/StPeteMusic/obsidian-post-creator.json`
-Chat-based agent that generates YouTube post metadata and writes drafts to Obsidian.
-When updating the system prompt: edit `system-prompt.md` first → sync `systemMessage` in JSON → commit both.
-
-## AI Config
-- Default: Anthropic Claude (`CLAUDE_API_KEY_N8N_STPETEMUSIC`)
-- Backup: Google Gemini (`N8N_GEMINI_API_KEY`)
-- Always use Claude as default in new workflow AI nodes
+- Default: Anthropic Claude. Backup: Google Gemini.
+- Always use Claude as the default in new workflow AI nodes.

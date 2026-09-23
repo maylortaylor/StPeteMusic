@@ -1,14 +1,10 @@
 # CLAUDE.md — StPeteMusic
 
-⚠️ **Public site + admin are retired here, live on roboBOREALIS now.** As of 2026-09-22
-`stpetemusic.live`, `www`, and `admin` all serve from `roboborealis-platform`'s
-`clients/stpetemusic/` (Galaxy tier). The Amplify apps, the shared RDS instance, and this
-repo's dedicated EC2 box are all deleted — most of `.claude/infrastructure.md` below now
-describes infra that no longer exists. **This repo still owns one live thing:**
-`infrastructure/streaming.tf` (RTMP/HLS, ADR-0028 in the platform repo) — that stays here on
-purpose, only its origin moved to the platform's services box. Current content and
-credentials source-of-truth, and infra history, still live here; current architecture and
-day-to-day ops live in `roboborealis-platform`.
+⚠️ **Public site + admin are retired here, live on roboBOREALIS now.** Since 2026-09-22
+`stpetemusic.live`, `www` and `admin` serve from `roboborealis-platform`'s
+`clients/stpetemusic/` (Galaxy tier). This repo now holds only `infrastructure/` (the live
+stream CDN, RTMP health check, alarms, Cloudflare DNS, GCP), an n8n workflow archive,
+`database/` history and docs. The `.claude/` topic files were refreshed 2026-09-23 (#355).
 
 Infrastructure + knowledge base for @StPeteMusic, a community music org in St. Pete, FL.
 Parent company: Tangent LLC. Partner venue: Suite E Studios.
@@ -26,21 +22,16 @@ Parent company: Tangent LLC. Partner venue: Suite E Studios.
 |--------------|------|
 | Brand & social accounts (@stpetemusic, suite e, team, IG, FB, YouTube, EventBrite) | [brand.md](.claude/brand.md) |
 | Events & content (final friday, instant noodles, art walk, captions, posts, shows, bands) | [events.md](.claude/events.md) |
-| Infrastructure & deployment (aws, amplify, ec2, dns, tofu, terraform, ssl, cloudflare, listmonk, CI, streaming, rtmp, obs, mediamtx, hls, live page) | [infrastructure.md](.claude/infrastructure.md) |
+| Infrastructure (aws, dns, tofu, terraform, ssl, cloudflare, CI, streaming, rtmp, obs, mediamtx, hls, live page, alarms, gcp) | [infrastructure.md](.claude/infrastructure.md) |
 | n8n & automation (workflows, obsidian, posting, youtube, instagram, google drive, video, reel) | [n8n.md](.claude/n8n.md) |
 | Facebook & Instagram webhooks (fb automation, ig automation, page webhook, comment, message, mention) | [FACEBOOK_INSTAGRAM_AUTOMATION.md](docs/plans/FACEBOOK_INSTAGRAM_AUTOMATION.md) |
 | Secrets & credentials (tokens, github secrets, env vars, rotate, listmonk, credential management) | [secrets.md](.claude/secrets.md) |
 | Local setup (direnv, envrc, pre-commit, install, first-time, hooks) | [SETUP.md](SETUP.md) |
-| Debugging & troubleshooting (errors, down, ssh, 403, 500, not responding, connection refused, error logs, production errors, logError, what broke, site down, check logs, streaming, rtmp, obs not connecting, live page broken) | [troubleshooting.md](.claude/troubleshooting.md) |
+| Debugging & troubleshooting (errors, down, 403, 500, not responding, connection refused, site down, streaming, rtmp, obs not connecting, live page broken, tofu, credentials) | [troubleshooting.md](.claude/troubleshooting.md) |
 | Ads & analytics (google ads, microsoft ads, bing, meta pixel, GTM, clarity, paid, advertising) | [ads-accounts-todo.md](.claude/ads-accounts-todo.md) |
-| YouTube feature (review queue, admin UI, publish workflow, quota, OAuth, sync, proposals, calendar match) | [youtube.md](.claude/youtube.md) |
-| Database & schema (db, schema, migration, drizzle, postgres, table, query, model, uuid, column) | [database.md](.claude/database.md) |
-| Admin auth & Clerk (protected routes, middleware, session, login, sign-in, clerk, dashboard) | [clerk.md](.claude/clerk.md) |
 
 ## Key Files
 | File | Purpose |
 |---|---|
-| `AWS_SETUP.md` | Production server quick reference |
-| `docs/AWS_DEPLOYMENT.md` | Full AWS setup guide |
 | `n8n/CLAUDE.md` | n8n-specific guidance |
 | `.env.example` | Env variable template (safe to commit) |
