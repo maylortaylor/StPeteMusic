@@ -45,5 +45,4 @@ Parent company: Tangent LLC. Partner venue: Suite E Studios.
 | `AWS_SETUP.md` | Production server quick reference |
 | `docs/AWS_DEPLOYMENT.md` | Full AWS setup guide |
 | `n8n/CLAUDE.md` | n8n-specific guidance |
-| `.github/workflows/deploy.yml` | CI/CD — writes `.env` on EC2 from GitHub Secrets |
 | `.env.example` | Env variable template (safe to commit) |

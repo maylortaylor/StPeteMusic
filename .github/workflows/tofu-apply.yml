@@ -12,9 +12,8 @@ permissions:
   contents: read
   id-token: write  # required for Google Workload Identity Federation
 
-# Shares the same concurrency group as deploy.yml so tofu-apply and deploy
-# never run simultaneously. If both fire on the same push (infra + app changes),
-# tofu-apply runs first (instance type change, etc.), then deploy SSH runs safely.
+# One apply at a time. deploy.yml used to share this group. It was removed in
+# #349 along with the old EC2 box it deployed to.
 concurrency:
   group: production-deploy
   cancel-in-progress: false

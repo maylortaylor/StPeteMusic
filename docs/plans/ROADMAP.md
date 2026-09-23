@@ -56,7 +56,7 @@
 | **EC2 t3.small** | ✅ Running | `us-east-1`, Elastic IP `54.235.171.182`, instance `i-03874197d725b0455` (upgraded from t3.micro to fix the 2026-04-28 OOM incident — not free-tier eligible) |
 | **RDS PostgreSQL 16** | ✅ Running | `db.t4g.micro`, databases: `n8n` + `listmonk_stpetemusic` (SSL required) |
 | **OpenTofu IaC** | ✅ Active | S3 state backend (`stpetemusic-terraform-state`) + DynamoDB lock table |
-| **GitHub Actions CI/CD** | ✅ Active | `tofu-plan.yml`, `tofu-apply.yml`, `ci.yml`, `deploy.yml`, `web-ci.yml` |
+| **GitHub Actions CI/CD** | ✅ Active | `tofu-plan.yml`, `tofu-apply.yml`, `ci.yml`, `web-ci.yml` (`deploy.yml` removed in #349) |
 | **n8n** | ✅ Running | https://n8n.stpetemusic.live (Docker on EC2, nginx, Let's Encrypt) |
 | **Listmonk** | ✅ Running | https://listmonk.stpetemusic.live (Docker on EC2, nginx, Let's Encrypt) |
 | **Newsletter Signup** | ✅ Working | `POST /api/newsletter/subscribe` → Listmonk list ID 3 |
@@ -69,7 +69,7 @@
 
 | Component | Status | Details |
 |---|---|---|
-| **Linktree API** | ✅ Deployed | Lambda + DynamoDB + API GW live at `qag1q0ijn5.execute-api.us-east-1.amazonaws.com` |
+| **Linktree API** | Removed 2026-09-23 | The Lambda + DynamoDB + API Gateway stack was torn down in #346. The n8n webhook `https://n8n.stpetemusic.live/webhook/linktree` replaced it. |
 | **LinkTreeSection (stpetemusic.live)** | ✅ Live | Homepage "Find Us Everywhere" section — fetches via `/api/linktree` proxy, renders sorted link cards |
 | **WordPress Widget (suiteestudios.com)** | ✅ Ready | `apps/web/public/linktree-widget.html` — paste-ready snippet with Suite E brand styling; install guide in `docs/wordpress-linktree-widget.md` |
 | **Newsletter n8n Workflows** | 🟡 Files exist | `newsletter-draft-creator.json`, `newsletter-publisher.json` — not yet imported into n8n UI |
@@ -151,7 +151,7 @@ Linktree scraper (Phase 1.5)
 
 ### ~~A — Deploy Linktree API~~ ✅ Complete
 
-API is live at `https://qag1q0ijn5.execute-api.us-east-1.amazonaws.com/linktree`.
+Historical. This API was removed in #346. The n8n webhook `https://n8n.stpetemusic.live/webhook/linktree` replaced it and returns the same array of profiles.
 
 - `GET /linktree` — returns array of all profiles (stpetemusic + suite_e_studios)
 - Scraped hourly via EventBridge + Lambda → DynamoDB
